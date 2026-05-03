@@ -269,6 +269,27 @@ class TestDashboardFrontierStrategy(unittest.TestCase):
         self.assertEqual(payload["configured_key_previews"], {"TOKEN": "su...et"})
         self.assertNotIn("super-secret", str(payload))
 
+    def test_runtime_settings_post_updates_recipe(self):
+        res = self.client.post(
+            "/api/workspace/runtime",
+            json={
+                "prepare": "uv sync",
+                "before_run": "make reset-test-state",
+                "prefix": "uv run",
+            },
+        )
+        self.assertEqual(res.status_code, 200, res.get_json())
+        cfg = load_config(self.root)
+        self.assertEqual(
+            cfg["runtime"],
+            {
+                "prepare": "uv sync",
+                "before_run": "make reset-test-state",
+                "prefix": "uv run",
+            },
+        )
+        self.assertEqual(res.get_json()["runtime"]["prefix"], "uv run")
+
     def test_runtime_variables_post_stores_values_outside_config_and_redacts(self):
         res = self.client.post(
             "/api/workspace/runtime-variables",

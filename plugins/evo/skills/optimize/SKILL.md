@@ -30,7 +30,7 @@ Pool mode defaults to `commit_strategy=tracked-only` so warm state in slots stay
 
 **Infra setup is not user-invocable.** If a remote provider is missing SDKs, auth, or setup details, read `plugins/evo/skills/infra-setup/references/provider-matrix.md`. It summarizes what each provider actually needs and replaces the old per-provider prompt files.
 
-**Runtime env.** Benchmark/runtime env is evo configuration, not something subagents should rediscover or copy into worktrees. Use `evo env show` to inspect redacted configured sources. If a run fails because an expected env key is missing, report it as setup failure or configure the source with `evo env load ...` from the orchestrator; do not patch benchmark code to bake in secrets. Use `evo run <exp_id> --check` for non-committing wiring validation; do not invent ad-hoc validation wrappers.
+**Runtime recipe/env.** Benchmark runtime is evo configuration, not something subagents should rediscover or copy into worktrees. Use `evo config runtime show` for prepare/before-run/prefix and `evo env show` for redacted env sources. If a run fails because expected runtime setup or env is missing, report it as setup failure or configure it from the orchestrator; do not patch benchmark code to bake in secrets or local paths. Use `evo run <exp_id> --check` for non-committing wiring validation; do not invent ad-hoc validation wrappers.
 
 ## Prerequisites
 
@@ -78,6 +78,7 @@ Repeat until interrupted or stall limit reached:
 ```bash
 evo scratchpad          # full state: tree, best path, frontier, annotations, diffs, gates, what-not-to-try
 evo config show         # redacted workspace config
+evo config runtime show # runtime prepare/before-run/prefix recipe
 evo env show            # redacted runtime env metadata
 evo frontier            # explorable nodes ranked by the configured strategy (JSON envelope: {strategy, nodes[{id,score,rank,...}], generated_at})
 evo status              # one-line summary

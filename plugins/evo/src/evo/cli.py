@@ -428,6 +428,8 @@ def cmd_config(args: argparse.Namespace) -> int:
         return cmd_config_set(args)
     if args.config_action == "backend":
         return cmd_config_backend(args)
+    if args.config_action == "runtime":
+        return cmd_config_runtime(args)
     raise RuntimeError(f"unknown config action: {args.config_action}")
 
 
@@ -472,6 +474,9 @@ def cmd_config_show(args: argparse.Namespace) -> int:
     backend_config = data.get("execution_backend_config") or {}
     if backend_config:
         print(f"execution_backend_config: {json.dumps(backend_config, sort_keys=True)}")
+    runtime = data.get("runtime") or {}
+    if runtime:
+        print(f"runtime: {json.dumps(runtime, sort_keys=True)}")
     runtime_env = runtime_env_summary(root, config)
     print(f"runtime_env.inherit_shell: {str(runtime_env['inherit_shell']).lower()}")
     print(f"runtime_env.dotenv_sources: {len(runtime_env['dotenv'])}")
@@ -500,6 +505,56 @@ def cmd_config_set(args: argparse.Namespace) -> int:
         atomic_write_json(config_path(root), config)
     print(f"config {args.field} set")
     return 0
+
+
+def _ensure_runtime_config(config: dict[str, Any]) -> dict[str, Any]:
+    runtime = config.setdefault("runtime", {})
+    runtime.setdefault("prepare", None)
+    runtime.setdefault("before_run", None)
+    runtime.setdefault("prefix", None)
+    return runtime
+
+
+def _normalize_runtime_value(value: str | None) -> str | None:
+    if value is None:
+        return None
+    stripped = value.strip()
+    return stripped or None
+
+
+def cmd_config_runtime(args: argparse.Namespace) -> int:
+    root = repo_root()
+    _require_workspace(root)
+
+    if args.runtime_action == "show":
+        config = load_config(root)
+        runtime = _ensure_runtime_config(config)
+        if getattr(args, "json", False):
+            print(json.dumps(runtime, indent=2))
+            return 0
+        print(f"prepare: {runtime.get('prepare') or '<not set>'}")
+        print(f"before_run: {runtime.get('before_run') or '<not set>'}")
+        print(f"prefix: {runtime.get('prefix') or '<not set>'}")
+        return 0
+
+    if args.runtime_action == "set":
+        updates = {
+            key: _normalize_runtime_value(getattr(args, key))
+            for key in ("prepare", "before_run", "prefix")
+            if getattr(args, key) is not None
+        }
+        if not updates:
+            raise RuntimeError("config runtime set requires at least one runtime flag")
+        with advisory_lock(lock_file_for(config_path(root))):
+            config = load_config(root)
+            runtime = _ensure_runtime_config(config)
+            runtime.update(updates)
+            atomic_write_json(config_path(root), config)
+        changed = ", ".join(sorted(updates))
+        print(f"runtime config set: {changed}")
+        return 0
+
+    raise RuntimeError(f"unknown runtime action: {args.runtime_action}")
 
 
 def cmd_config_backend(args: argparse.Namespace) -> int:
@@ -1221,6 +1276,7 @@ def _write_attempt_outcome(
     score: float | None = None,
     benchmark: dict | None = None,
     gates: list[dict] | None = None,
+    runtime: list[dict] | None = None,
     error: str | None = None,
     commit: str | None = None,
     parent_score: float | None = None,
@@ -1239,6 +1295,7 @@ def _write_attempt_outcome(
         "started_at": started_at,
         "finished_at": finished,
         "benchmark": benchmark,
+        "runtime": runtime or [],
         "gates": gates or [],
         "error": error,
         "commit": commit,
@@ -1510,6 +1567,61 @@ def _runtime_env_for_attempt(
     return env
 
 
+def _apply_runtime_prefix(config: dict, command: str) -> str:
+    prefix = ((config.get("runtime") or {}).get("prefix") or "").strip()
+    if not prefix:
+        return command
+    return f"{prefix} {command}"
+
+
+def _runtime_hook_command(config: dict, name: str) -> str | None:
+    runtime = config.get("runtime") or {}
+    command = runtime.get(name)
+    if not isinstance(command, str):
+        return None
+    command = command.strip()
+    return command or None
+
+
+def _run_runtime_hook(
+    executor: Any,
+    config: dict,
+    name: str,
+    *,
+    root: Path,
+    worktree: Path,
+    target: Path,
+    env: dict[str, str],
+    timeout: float | None,
+    log_path: Path,
+) -> dict | None:
+    command = _runtime_hook_command(config, name)
+    if command is None:
+        return None
+    resolved = fill_command_template(command, target=target, worktree=worktree)
+    hook_env = {k: v for k, v in env.items() if not k.startswith("EVO_")}
+    result = executor.stream(
+        ["sh", "-c", resolved],
+        cwd=worktree,
+        env=hook_env,
+        timeout=timeout,
+        stdout_path=log_path,
+        stderr_path=log_path,
+    )
+    record = {
+        "name": name,
+        "command": resolved,
+        "returncode": result.exit_code,
+        "timed_out": result.timed_out,
+        "log": str(log_path.relative_to(root)) if log_path.is_relative_to(root) else str(log_path),
+    }
+    if result.timed_out:
+        raise RuntimeError(f"runtime_{name}_timeout")
+    if (result.exit_code or 0) != 0:
+        raise RuntimeError(f"runtime_{name}_exit_{result.exit_code}")
+    return record
+
+
 def _inherited_gate_specs(config: dict, graph: dict, parent_id: str) -> tuple[list[dict], dict[str, str]]:
     inherited_gates = collect_gates_from_path(graph, parent_id)
     if config.get("gate"):
@@ -1558,7 +1670,10 @@ def _cmd_run_check(
         env_traces_dir = str(traces_dir.resolve())
         env_result_path = str(result_path.resolve())
 
-    benchmark_cmd = fill_command_template(config["benchmark"], target=target, worktree=worktree)
+    benchmark_cmd = _apply_runtime_prefix(
+        config,
+        fill_command_template(config["benchmark"], target=target, worktree=worktree),
+    )
     env = _runtime_env_for_attempt(
         root,
         config,
@@ -1569,11 +1684,30 @@ def _cmd_run_check(
         env_result_path=env_result_path,
     )
     gate_records: list[dict] = []
+    runtime_records: list[dict] = []
     benchmark_record: dict | None = None
     status = "failed"
     score: float | None = None
     error: str | None = None
     try:
+        for hook_name, log_name in (
+            ("prepare", "runtime_prepare.log"),
+            ("before_run", "runtime_before_run.log"),
+        ):
+            record = _run_runtime_hook(
+                executor,
+                config,
+                hook_name,
+                root=root,
+                worktree=worktree,
+                target=target,
+                env=env,
+                timeout=args.timeout,
+                log_path=check_dir / log_name,
+            )
+            if record is not None:
+                runtime_records.append(record)
+
         bench = executor.stream(
             ["sh", "-c", benchmark_cmd],
             cwd=run_cwd, env=env, timeout=args.timeout,
@@ -1599,7 +1733,10 @@ def _cmd_run_check(
         gate_env = {k: v for k, v in env.items() if not k.startswith("EVO_")}
         gate_failures: list[str] = []
         for g in inherited_gates:
-            gate_cmd = fill_command_template(g["command"], target=target, worktree=worktree)
+            gate_cmd = _apply_runtime_prefix(
+                config,
+                fill_command_template(g["command"], target=target, worktree=worktree),
+            )
             gate_log_file = check_dir / f"gate_{g['name']}.log"
             gate_result = executor.stream(
                 ["sh", "-c", gate_cmd],
@@ -1638,6 +1775,7 @@ def _cmd_run_check(
             "finished_at": utc_now(),
             "benchmark": benchmark_record,
             "gates": gate_records,
+            "runtime": runtime_records,
             "error": error,
         }
         atomic_write_json(check_dir / "check.json", payload)
@@ -1748,7 +1886,10 @@ def _cmd_run_impl(
         env_traces_dir = str(traces_dir.resolve())
         env_result_path = str(result_path.resolve())
 
-    benchmark_cmd = fill_command_template(config["benchmark"], target=target, worktree=worktree)
+    benchmark_cmd = _apply_runtime_prefix(
+        config,
+        fill_command_template(config["benchmark"], target=target, worktree=worktree),
+    )
     # Build env from the configured runtime sources. Values are resolved fresh
     # for every attempt and then injected into local or remote processes.
     env = _runtime_env_for_attempt(
@@ -1779,9 +1920,28 @@ def _cmd_run_impl(
     (a_dir / "diff.patch").write_text(diff_text, encoding="utf-8")
 
     gate_records: list[dict] = []
+    runtime_records: list[dict] = []
     benchmark_record: dict | None = None
 
     try:
+        for hook_name, log_name in (
+            ("prepare", "runtime_prepare.log"),
+            ("before_run", "runtime_before_run.log"),
+        ):
+            record = _run_runtime_hook(
+                executor,
+                config,
+                hook_name,
+                root=root,
+                worktree=worktree,
+                target=target,
+                env=env,
+                timeout=args.timeout,
+                log_path=a_dir / log_name,
+            )
+            if record is not None:
+                runtime_records.append(record)
+
         # Run benchmark via sh -c so the user-provided command string
         # (with placeholders interpolated) executes through a shell, same
         # semantics as before.
@@ -1822,7 +1982,10 @@ def _cmd_run_impl(
         gate_env = {k: v for k, v in env.items() if not k.startswith("EVO_")}
 
         for g in inherited_gates:
-            gate_cmd = fill_command_template(g["command"], target=target, worktree=worktree)
+            gate_cmd = _apply_runtime_prefix(
+                config,
+                fill_command_template(g["command"], target=target, worktree=worktree),
+            )
             gate_log_file = a_dir / f"gate_{g['name']}.log"
             gate_result = executor.stream(
                 ["sh", "-c", gate_cmd],
@@ -1914,7 +2077,7 @@ def _cmd_run_impl(
             _write_attempt_outcome(
                 root, args.exp_id, attempt_n, "committed",
                 node=node, started_at=started_at, score=score,
-                benchmark=benchmark_record, gates=gate_records,
+                benchmark=benchmark_record, runtime=runtime_records, gates=gate_records,
                 commit=commit, parent_score=parent_score, metric=metric,
             )
             # Release the workspace lease on transition into `committed`.
@@ -1945,7 +2108,7 @@ def _cmd_run_impl(
         _write_attempt_outcome(
             root, args.exp_id, attempt_n, "evaluated",
             node=node, started_at=started_at, score=score,
-            benchmark=benchmark_record, gates=gate_records,
+            benchmark=benchmark_record, runtime=runtime_records, gates=gate_records,
             parent_score=parent_score, metric=metric,
         )
         write_scratchpad(root)
@@ -1989,7 +2152,7 @@ def _cmd_run_impl(
         _write_attempt_outcome(
             root, args.exp_id, attempt_n, "failed",
             node=node, started_at=started_at, score=salvaged_score,
-            benchmark=benchmark_record, gates=gate_records,
+            benchmark=benchmark_record, runtime=runtime_records, gates=gate_records,
             error=error_msg, parent_score=parent_score, metric=metric,
         )
         write_scratchpad(root)
@@ -2498,8 +2661,42 @@ def _cmd_gate_check_impl(
     remote = executor.is_remote
     run_cwd: Path | str = worktree if remote else root
     env = resolve_runtime_env(root, config)
+    runtime_records: list[dict] = []
     gate_records: list[dict] = []
     inherited_gates, gate_origins = _inherited_gate_specs(config, graph, args.exp_id)
+    try:
+        for hook_name, log_name in (
+            ("prepare", "runtime_prepare.log"),
+            ("before_run", "runtime_before_run.log"),
+        ):
+            record = _run_runtime_hook(
+                executor,
+                config,
+                hook_name,
+                root=root,
+                worktree=worktree,
+                target=target,
+                env=env,
+                timeout=args.timeout,
+                log_path=check_dir / log_name,
+            )
+            if record is not None:
+                runtime_records.append(record)
+    except Exception as exc:  # noqa: BLE001
+        payload = {
+            "experiment_id": args.exp_id,
+            "check": check_n,
+            "status": "failed",
+            "kind": "gate",
+            "started_at": started_at,
+            "finished_at": utc_now(),
+            "runtime": runtime_records,
+            "gates": [],
+            "error": str(exc),
+        }
+        atomic_write_json(check_dir / "gate_check.json", payload)
+        print(f"GATE_CHECK_FAILED {args.exp_id} {exc} artifacts={check_dir}")
+        return 1
     if not inherited_gates:
         payload = {
             "experiment_id": args.exp_id,
@@ -2508,6 +2705,7 @@ def _cmd_gate_check_impl(
             "kind": "gate",
             "started_at": started_at,
             "finished_at": utc_now(),
+            "runtime": runtime_records,
             "gates": [],
             "error": None,
         }
@@ -2517,7 +2715,10 @@ def _cmd_gate_check_impl(
 
     failures: list[str] = []
     for g in inherited_gates:
-        gate_cmd = fill_command_template(g["command"], target=target, worktree=worktree)
+        gate_cmd = _apply_runtime_prefix(
+            config,
+            fill_command_template(g["command"], target=target, worktree=worktree),
+        )
         log_file = gates_dir / f"{g['name']}.log"
         result = executor.stream(
             ["sh", "-c", gate_cmd],
@@ -2546,6 +2747,7 @@ def _cmd_gate_check_impl(
         "kind": "gate",
         "started_at": started_at,
         "finished_at": utc_now(),
+        "runtime": runtime_records,
         "gates": gate_records,
         "error": f"gate_failed:{','.join(failures)}" if failures else None,
     }
@@ -2630,6 +2832,19 @@ def build_parser() -> argparse.ArgumentParser:
     )
     config_set_p.add_argument("value")
     config_set_p.set_defaults(func=cmd_config)
+    config_runtime_p = config_sub.add_parser(
+        "runtime",
+        help="configure workspace runtime recipe",
+    )
+    runtime_sub = config_runtime_p.add_subparsers(dest="runtime_action", required=True)
+    runtime_show_p = runtime_sub.add_parser("show", help="show runtime prepare/before-run/prefix")
+    runtime_show_p.add_argument("--json", action="store_true", help="emit JSON")
+    runtime_show_p.set_defaults(func=cmd_config)
+    runtime_set_p = runtime_sub.add_parser("set", help="set runtime prepare/before-run/prefix")
+    runtime_set_p.add_argument("--prepare", help="command that prepares the experiment workspace")
+    runtime_set_p.add_argument("--before-run", dest="before_run", help="command that resets per-attempt runtime state")
+    runtime_set_p.add_argument("--prefix", help="command prefix for benchmark and gate commands")
+    runtime_set_p.set_defaults(func=cmd_config)
     config_backend_p = config_sub.add_parser(
         "backend",
         help="set the workspace default execution backend",

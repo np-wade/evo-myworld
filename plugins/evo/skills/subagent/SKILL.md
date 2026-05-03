@@ -40,6 +40,7 @@ an isolated copy of the codebase where you make your changes.
 evo scratchpad          # full state summary (tree, best path, frontier, annotations, diffs, gates)
 evo status              # one-line: metric, best score, experiment counts
 evo config show         # redacted workspace config
+evo config runtime show # runtime prepare/before-run/prefix recipe
 evo env show            # redacted runtime env metadata
 evo traces <id> <task>  # per-task trace detail
 evo path <id>           # root-to-node chain with scores
@@ -204,7 +205,7 @@ The trace format is forward-compatible -- extra fields are preserved. Do NOT cha
 
 - Do NOT run `evo init` or `evo reset`
 - `evo discard <your_exp_id> --reason "..."` is your explicit "abandon" action — use it for any node you've decided not to pursue further (pre-run realization, evaluated with a bad hypothesis, or unfixable infra failure). Discard deletes the worktree and branch; the node and its per-attempt artifacts stay in `.evo/` as a record of what was tried.
-- Do NOT copy `.env` files or bake secrets into source. Runtime env is configured by the orchestrator (`evo env ...`) and injected into benchmark/gate processes. If a missing key blocks evaluation, report setup failure.
+- Do NOT copy `.env` files, bake secrets into source, or hard-code local runtime paths. Runtime setup/env is configured by the orchestrator (`evo config runtime ...`, `evo env ...`) and injected into benchmark/gate processes. If a missing dependency, setup step, or key blocks evaluation, report setup failure.
 - Always annotate your experiments, especially before discarding — the annotation is what persists after the worktree is gone.
 - Stay within your brief's objective and boundaries -- don't drift into unrelated changes
 

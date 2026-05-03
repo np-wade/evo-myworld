@@ -1169,6 +1169,7 @@ function renderProjectSettings(panel, ws) {
 }
 
 function renderRuntimeSettings(panel, ws) {
+  const runtimeRecipe = ws.runtime || {};
   const runtimeEnv = ws.runtime_env || {};
   const sources = runtimeEnv.dotenv || [];
   const configuredKeyPreviews = runtimeEnv.configured_key_previews || {};
@@ -1180,6 +1181,9 @@ function renderRuntimeSettings(panel, ws) {
     .slice(0, 8);
   const inheritedCount = Math.max(0, (runtimeEnv.resolved_key_count ?? 0) - Object.keys(configuredKeyPreviews).length - Object.keys(runtimeVariablePreviews).length);
   const draft = {
+    prepare: runtimeRecipe.prepare || '',
+    beforeRun: runtimeRecipe.before_run || '',
+    prefix: runtimeRecipe.prefix || '',
     inheritShell: !!runtimeEnv.inherit_shell,
     sources: sources.map(source => ({
       path: source.path || '',
@@ -1192,11 +1196,14 @@ function renderRuntimeSettings(panel, ws) {
     <div class="settings-hero">
       <div>
         <div class="settings-section-title">Runtime</div>
-        <div class="settings-section-sub">environment passed to benchmark and gate processes</div>
+        <div class="settings-section-sub">setup, command prefix, and environment for benchmark/gate processes</div>
       </div>
-      <div class="settings-hero-badge mono">${draft.inheritShell ? 'shell + dotenv' : 'dotenv only'}</div>
+      <div class="settings-hero-badge mono">${draft.prefix ? 'prefixed' : 'direct'}</div>
     </div>
     <div class="settings-rows">
+      <div class="settings-row"><span>Prepare</span><strong>${draft.prepare ? 'set' : 'off'}</strong></div>
+      <div class="settings-row"><span>Before run</span><strong>${draft.beforeRun ? 'set' : 'off'}</strong></div>
+      <div class="settings-row"><span>Command prefix</span><strong>${draft.prefix ? esc(draft.prefix) : 'off'}</strong></div>
       <div class="settings-row"><span>Shell process env</span><strong>${draft.inheritShell ? `inherited · ${inheritedCount} keys` : 'off'}</strong></div>
       <div class="settings-row"><span>Dashboard variables</span><strong>${Object.keys(runtimeVariablePreviews).length}</strong></div>
       <div class="settings-row"><span>File sources</span><strong>${sources.length}</strong></div>
@@ -1212,6 +1219,22 @@ function renderRuntimeSettings(panel, ws) {
 
   function renderRuntimeForm() {
     formHost.innerHTML = `
+      <div class="settings-block">
+        <div class="settings-block-label">Recipe</div>
+        <label class="settings-field">
+          <span>Prepare command</span>
+          <input id="runtime-prepare" class="settings-input mono" value="${esc(draft.prepare)}" placeholder="uv sync">
+        </label>
+        <label class="settings-field">
+          <span>Before each run</span>
+          <input id="runtime-before-run" class="settings-input mono" value="${esc(draft.beforeRun)}" placeholder="make reset-test-state">
+        </label>
+        <label class="settings-field">
+          <span>Command prefix</span>
+          <input id="runtime-prefix" class="settings-input mono" value="${esc(draft.prefix)}" placeholder="uv run">
+        </label>
+        <div class="settings-help">Prepare and before-run execute in the experiment workspace. Prefix wraps benchmark and gate commands.</div>
+      </div>
       <div class="settings-block">
         <div class="settings-block-label">Variables</div>
         <label class="settings-field checkbox runtime-toggle-row">
@@ -1241,7 +1264,7 @@ function renderRuntimeSettings(panel, ws) {
       <div class="settings-actions">
         <span id="runtime-env-status" class="strategy-status"></span>
         <span class="spacer"></span>
-        <button id="runtime-env-save" class="btn-primary" type="button">Save runtime env</button>
+        <button id="runtime-env-save" class="btn-primary" type="button">Save runtime</button>
       </div>
     `;
 
@@ -1264,7 +1287,7 @@ function renderRuntimeSettings(panel, ws) {
     });
     formHost.querySelector('#runtime-env-save').addEventListener('click', async () => {
       collectRuntimeDraft();
-      await saveRuntimeEnvSettings(draft, formHost.querySelector('#runtime-env-status'));
+      await saveRuntimeSettings(draft, formHost.querySelector('#runtime-env-status'));
     });
     formHost.querySelector('#runtime-add-variable').addEventListener('click', () => {
       openRuntimeVariableModal();
@@ -1275,6 +1298,9 @@ function renderRuntimeSettings(panel, ws) {
   }
 
   function collectRuntimeDraft() {
+    draft.prepare = formHost.querySelector('#runtime-prepare')?.value.trim() || '';
+    draft.beforeRun = formHost.querySelector('#runtime-before-run')?.value.trim() || '';
+    draft.prefix = formHost.querySelector('#runtime-prefix')?.value.trim() || '';
     const inheritInput = formHost.querySelector('#runtime-inherit-shell');
     if (inheritInput) draft.inheritShell = inheritInput.checked;
     draft.sources = Array.from(formHost.querySelectorAll('[data-runtime-source]')).map((row) => ({
@@ -1332,9 +1358,14 @@ function renderRuntimeKeyGrid(previews) {
   `).join('')}</div>`;
 }
 
-async function saveRuntimeEnvSettings(draft, statusEl) {
+async function saveRuntimeSettings(draft, statusEl) {
   statusEl.textContent = 'saving...';
-  const payload = {
+  const runtimePayload = {
+    prepare: draft.prepare,
+    before_run: draft.beforeRun,
+    prefix: draft.prefix,
+  };
+  const envPayload = {
     inherit_shell: draft.inheritShell,
     dotenv: draft.sources.map(source => ({
       path: source.path,
@@ -1343,10 +1374,20 @@ async function saveRuntimeEnvSettings(draft, statusEl) {
     })),
   };
   try {
+    const runtimeRes = await fetch('/api/workspace/runtime', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(runtimePayload),
+    });
+    const runtimeData = await runtimeRes.json();
+    if (!runtimeRes.ok) {
+      statusEl.textContent = `error: ${runtimeData.error || runtimeRes.status}`;
+      return;
+    }
     const res = await fetch('/api/workspace/runtime-env', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify(payload),
+      body: JSON.stringify(envPayload),
     });
     const data = await res.json();
     if (!res.ok) {

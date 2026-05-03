@@ -177,7 +177,14 @@ evo init \
   --host claude-code
 ```
 
-Use the same runtime entry point the project already uses, but make sure the command is valid from the main repo root and does not assume uncommitted runtime state exists inside the worktree. Worktrees are git checkouts; untracked directories such as local virtualenvs, build caches, and downloaded models are usually not present there. Prefer committed runners or package-manager commands such as `"poetry run python {worktree}/benchmark.py ..."` / `"uv run python {worktree}/benchmark.py ..."` over paths that only exist in the main checkout.
+Use the same runtime entry point the project already uses, but make sure the command does not assume uncommitted runtime state exists inside the worktree. Worktrees are git checkouts; untracked directories such as local virtualenvs, build caches, and downloaded models are usually not present there. If the benchmark needs setup or a package-manager runner, configure evo's runtime recipe instead of baking local paths into the benchmark command:
+
+```bash
+evo config runtime set --prepare "uv sync" --before-run "make reset-test-state" --prefix "uv run"
+evo config runtime show
+```
+
+`prepare` and `before-run` execute in the experiment workspace. `prefix` is prepended to benchmark and gate commands.
 
 `evo init` creates `.evo/`, the synthetic `root` node, and auto-starts the dashboard. It prints a line like:
 
@@ -363,6 +370,7 @@ End the skill by reporting in chat:
 ```bash
 evo get <id>                        # full experiment detail with scores
 evo config show                     # redacted workspace configuration
+evo config runtime show             # runtime prepare/before-run/prefix recipe
 evo env show                        # redacted runtime env metadata
 evo traces <id> <task>              # per-task trace
 evo annotate <id> <task> "analysis" # record failure analysis

@@ -475,6 +475,28 @@ def _validate_and_save_runtime_env_settings(root: Path, body: dict[str, Any]) ->
     return _workspace_summary(root)
 
 
+def _normalize_runtime_settings(body: dict[str, Any]) -> dict[str, str | None]:
+    def clean(name: str) -> str | None:
+        value = body.get(name)
+        if value is None:
+            return None
+        text = str(value).strip()
+        return text or None
+
+    return {
+        "prepare": clean("prepare"),
+        "before_run": clean("before_run"),
+        "prefix": clean("prefix"),
+    }
+
+
+def _validate_and_save_runtime_settings(root: Path, body: dict[str, Any]) -> dict[str, Any]:
+    config = load_config(root)
+    config["runtime"] = _normalize_runtime_settings(body)
+    save_config(root, config)
+    return _workspace_summary(root)
+
+
 def _normalize_runtime_variables(body: dict[str, Any]) -> dict[str, str]:
     variables: dict[str, str] = {}
     for raw in body.get("variables", []) or []:
@@ -579,6 +601,11 @@ def _workspace_summary(root: Path) -> dict[str, Any]:
         "host": host,
         "commit_strategy": config.get("commit_strategy", "all"),
         "frontier_strategy": config.get("frontier_strategy"),
+        "runtime": {
+            "prepare": (config.get("runtime") or {}).get("prepare"),
+            "before_run": (config.get("runtime") or {}).get("before_run"),
+            "prefix": (config.get("runtime") or {}).get("prefix"),
+        },
         "runtime_env": runtime_env_summary(root, config),
         "keyfile_present": (root / ".evo" / "keyfile").exists(),
         "provider_readiness": _provider_readiness(config),
@@ -696,6 +723,15 @@ def create_app(root: Path | None = None) -> Flask:
         body = request.get_json(silent=True) or {}
         try:
             summary = _validate_and_save_runtime_env_settings(_root(), body)
+        except (ValueError, RuntimeError) as exc:
+            return jsonify({"error": str(exc)}), 400
+        return jsonify(summary)
+
+    @app.post("/api/workspace/runtime")
+    def workspace_runtime():
+        body = request.get_json(silent=True) or {}
+        try:
+            summary = _validate_and_save_runtime_settings(_root(), body)
         except (ValueError, RuntimeError) as exc:
             return jsonify({"error": str(exc)}), 400
         return jsonify(summary)

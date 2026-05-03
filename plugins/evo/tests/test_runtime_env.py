@@ -203,6 +203,79 @@ def test_cli_config_show_and_set_basic_fields(tmp_path: Path) -> None:
         shutdown_dashboard(tmp_path)
 
 
+def test_config_runtime_check_runs_hooks_and_prefix(tmp_path: Path) -> None:
+    init_repo(tmp_path)
+    write(tmp_path / "agent.py", 'STATE = "baseline"\n')
+    write(
+        tmp_path / "eval.py",
+        """from __future__ import annotations
+import json
+import os
+from pathlib import Path
+
+worktree = Path(os.environ["EVO_WORKTREE"])
+score = 1.0 if (
+    os.environ.get("PREFIXED") == "1"
+    and (worktree / "runtime_prepared.txt").exists()
+    and (worktree / "runtime_before.txt").exists()
+) else 0.0
+Path(os.environ["EVO_RESULT_PATH"]).write_text(json.dumps({"score": score}), encoding="utf-8")
+""",
+    )
+    write(
+        tmp_path / "gate.py",
+        """from __future__ import annotations
+import os
+import sys
+
+sys.exit(0 if os.environ.get("PREFIXED") == "1" else 2)
+""",
+    )
+    run(["git", "add", "."], cwd=tmp_path)
+    run(["git", "commit", "-m", "fixture: runtime recipe"], cwd=tmp_path)
+
+    try:
+        evo(
+            [
+                "init",
+                "--target", "agent.py",
+                "--benchmark", "python3 eval.py",
+                "--gate", "python3 gate.py",
+                "--metric", "max",
+                "--host", "generic",
+            ],
+            cwd=tmp_path,
+        )
+        evo(
+            [
+                "config",
+                "runtime",
+                "set",
+                "--prepare", "printf prepared > runtime_prepared.txt",
+                "--before-run", "printf before > runtime_before.txt",
+                "--prefix", "env PREFIXED=1",
+            ],
+            cwd=tmp_path,
+        )
+        runtime = json.loads(evo(["config", "runtime", "show", "--json"], cwd=tmp_path).stdout)
+        assert runtime["prepare"] == "printf prepared > runtime_prepared.txt"
+        assert runtime["before_run"] == "printf before > runtime_before.txt"
+        assert runtime["prefix"] == "env PREFIXED=1"
+
+        evo(["new", "--parent", "root", "-m", "baseline"], cwd=tmp_path)
+        checked = evo(["run", "exp_0000", "--check"], cwd=tmp_path)
+        assert "CHECK_PASSED exp_0000 score=1.0" in checked.stdout
+        check_dir = tmp_path / ".evo" / "run_0000" / "experiments" / "exp_0000" / "checks" / "001"
+        payload = json.loads((check_dir / "check.json").read_text(encoding="utf-8"))
+        assert [item["name"] for item in payload["runtime"]] == ["prepare", "before_run"]
+        assert (check_dir / "runtime_prepare.log").exists()
+        assert (check_dir / "runtime_before_run.log").exists()
+        assert payload["benchmark"]["command"] == "env PREFIXED=1 python3 eval.py"
+        assert payload["gates"][0]["command"] == "env PREFIXED=1 python3 gate.py"
+    finally:
+        shutdown_dashboard(tmp_path)
+
+
 def test_run_check_writes_artifacts_without_changing_node_status(tmp_path: Path) -> None:
     init_repo(tmp_path)
     write(tmp_path / "agent.py", 'STATE = "baseline"\n')
