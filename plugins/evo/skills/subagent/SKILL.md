@@ -39,6 +39,8 @@ an isolated copy of the codebase where you make your changes.
 ```bash
 evo scratchpad          # full state summary (tree, best path, frontier, annotations, diffs, gates)
 evo status              # one-line: metric, best score, experiment counts
+evo config show         # redacted workspace config
+evo env show            # redacted runtime env metadata
 evo traces <id> <task>  # per-task trace detail
 evo path <id>           # root-to-node chain with scores
 evo diff <id>           # diff vs parent
@@ -172,10 +174,10 @@ Always annotate so other agents can learn from your experiments.
 When you fix a critical, easy-to-regress behavior, lock it in as a gate so future experiments on this branch can't break it:
 
 ```bash
-evo gate add <exp_id> --name "social_eng_resistance" --command "python benchmark.py --agent {target} --task-ids 3"
+evo gate add <exp_id> --name "social_eng_resistance" --command "python3 {worktree}/benchmark.py --target {target} --task-ids 3 --min-score 0.9"
 ```
 
-Good candidates: a specific benchmark task that was hard to fix, a test for a critical policy rule, a smoke test for a fragile behavior. Do NOT gate every passing task -- that over-constrains the search.
+Good candidates: a specific benchmark task that was hard to fix, a test for a critical policy rule, a smoke test for a fragile behavior. The gate command must exit non-zero when the protected behavior regresses; a bare benchmark invocation that prints a low score but exits 0 is decorative and should not be registered. Do NOT gate every passing task -- that over-constrains the search.
 
 ### 7. Decide: continue or stop
 
@@ -183,12 +185,15 @@ Continue if budget remains AND (last outcome was committed, OR you have a meanin
 
 Stop if budget exhausted, infra failure, or you've exhausted variations with no improvement.
 
-## Enriching traces (optional)
+## Enriching traces
 
 Check `.evo/meta.json` for `"instrumentation_mode"` (`"sdk"` or `"inline"`) to see which style the benchmark uses -- **stay consistent with that choice across iterations; do not flip styles mid-run.**
 
+Trace quality is part of the benchmark contract. After a failed baseline or failed task, the orchestrator should be able to reconstruct what happened using only `evo traces <exp_id> <task_id>`. If not, the trace logging is too thin.
+
 - **SDK mode** (`from evo_agent import Run`): enrich traces by adding `run.log(task_id, ...)` calls for more observability, or extra fields to `run.report()`.
 - **Inline mode** (benchmark has local `log_task`/`logTask` helpers): add fields to the trace dict built inside `log_task()`.
+- **LLM / agent benchmarks**: log the task input, observation/frame summary, prompt or message summary, model/tool response, selected action, retries/errors, and final task outcome. If the project already has a separate recorder, decide whether evo traces mirror the important fields or whether the recorder artifact is explicitly linked from the evo trace.
 
 The trace format is forward-compatible -- extra fields are preserved. Do NOT change the score computation or gate logic -- only add observability.
 
@@ -196,6 +201,7 @@ The trace format is forward-compatible -- extra fields are preserved. Do NOT cha
 
 - Do NOT run `evo init` or `evo reset`
 - `evo discard <your_exp_id> --reason "..."` is your explicit "abandon" action — use it for any node you've decided not to pursue further (pre-run realization, evaluated with a bad hypothesis, or unfixable infra failure). Discard deletes the worktree and branch; the node and its per-attempt artifacts stay in `.evo/` as a record of what was tried.
+- Do NOT copy `.env` files or bake secrets into source. Runtime env is configured by the orchestrator (`evo env ...`) and injected into benchmark/gate processes. If a missing key blocks evaluation, report setup failure.
 - Always annotate your experiments, especially before discarding — the annotation is what persists after the worktree is gone.
 - Stay within your brief's objective and boundaries -- don't drift into unrelated changes
 

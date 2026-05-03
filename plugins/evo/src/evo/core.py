@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import secrets
 import subprocess
 import tempfile
@@ -219,6 +220,10 @@ def default_config(root: Path, target: str, benchmark: str, metric: str, gate: s
         "comparison_blocked": False,
         "max_attempts": DEFAULT_MAX_ATTEMPTS,
         "frontier_strategy": DEFAULT_FRONTIER_STRATEGY,
+        "runtime_env": {
+            "inherit_shell": True,
+            "dotenv": [],
+        },
         "initialized_at": utc_now(),
     }
 
@@ -256,6 +261,113 @@ def save_config(root: Path, config: dict[str, Any]) -> None:
     path = config_path(root)
     with advisory_lock(lock_file_for(path)):
         atomic_write_json(path, config)
+
+
+_DOTENV_KEY_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
+
+
+def parse_dotenv(text: str) -> dict[str, str]:
+    """Parse the simple dotenv subset evo supports for runtime env forwarding."""
+    values: dict[str, str] = {}
+    for raw_line in text.splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#"):
+            continue
+        if line.startswith("export "):
+            line = line[len("export "):].lstrip()
+        if "=" not in line:
+            continue
+        key, value = line.split("=", 1)
+        key = key.strip()
+        if not _DOTENV_KEY_RE.match(key):
+            continue
+        value = value.strip()
+        if len(value) >= 2 and value[0] == value[-1] == "'":
+            value = value[1:-1]
+        elif len(value) >= 2 and value[0] == value[-1] == '"':
+            value = bytes(value[1:-1], "utf-8").decode("unicode_escape")
+        else:
+            match = re.search(r"\s+#", value)
+            if match:
+                value = value[:match.start()].rstrip()
+        values[key] = value
+    return values
+
+
+def _dotenv_path(root: Path, raw_path: str) -> Path:
+    path = Path(raw_path).expanduser()
+    if not path.is_absolute():
+        path = root / path
+    return path
+
+
+def resolve_runtime_env(root: Path, config: dict[str, Any]) -> dict[str, str]:
+    """Resolve benchmark/gate runtime env fresh for each attempt.
+
+    Config stores source metadata only; values are loaded from the orchestrator
+    process environment and configured dotenv files when this function runs.
+    """
+    runtime_env = dict(config.get("runtime_env") or {})
+    resolved: dict[str, str] = {}
+    if runtime_env.get("inherit_shell", True):
+        resolved.update(os.environ)
+
+    for source in runtime_env.get("dotenv", []) or []:
+        if not isinstance(source, dict):
+            continue
+        raw_path = str(source.get("path") or "")
+        if not raw_path:
+            continue
+        path = _dotenv_path(root, raw_path)
+        if not path.exists():
+            raise RuntimeError(f"runtime dotenv file not found: {raw_path} ({path})")
+        parsed = parse_dotenv(path.read_text(encoding="utf-8"))
+        mode = source.get("mode", "all")
+        if mode == "all":
+            resolved.update(parsed)
+        elif mode == "allow":
+            allowed = [str(k) for k in source.get("keys", []) or []]
+            for key in allowed:
+                if key in parsed:
+                    resolved[key] = parsed[key]
+        else:
+            raise RuntimeError(f"unknown runtime dotenv mode for {raw_path}: {mode!r}")
+    return resolved
+
+
+def runtime_env_summary(root: Path, config: dict[str, Any]) -> dict[str, Any]:
+    """Return redacted runtime env metadata for CLI/UI display."""
+    runtime_env = dict(config.get("runtime_env") or {})
+    sources = []
+    key_names: set[str] = set(os.environ) if runtime_env.get("inherit_shell", True) else set()
+    for source in runtime_env.get("dotenv", []) or []:
+        if not isinstance(source, dict):
+            continue
+        raw_path = str(source.get("path") or "")
+        path = _dotenv_path(root, raw_path) if raw_path else root
+        entry = {
+            "path": raw_path,
+            "mode": source.get("mode", "all"),
+            "keys": list(source.get("keys", []) or []),
+            "exists": path.exists(),
+        }
+        if path.exists():
+            parsed = parse_dotenv(path.read_text(encoding="utf-8"))
+            if entry["mode"] == "all":
+                entry["resolved_keys"] = sorted(parsed)
+                key_names.update(parsed)
+            else:
+                allowed = [str(k) for k in source.get("keys", []) or []]
+                present = sorted(k for k in allowed if k in parsed)
+                entry["resolved_keys"] = present
+                key_names.update(present)
+        sources.append(entry)
+    return {
+        "inherit_shell": runtime_env.get("inherit_shell", True),
+        "dotenv": sources,
+        "resolved_key_count": len(key_names),
+        "resolved_keys": sorted(key_names),
+    }
 
 
 def load_graph(root: Path) -> dict[str, Any]:

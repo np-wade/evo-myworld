@@ -55,6 +55,8 @@ from .core import (
     remove_gate,
     repo_root,
     reset_runtime_state,
+    resolve_runtime_env,
+    runtime_env_summary,
     save_config,
     set_host,
     update_node,
@@ -420,9 +422,84 @@ def cmd_host(args: argparse.Namespace) -> int:
 
 
 def cmd_config(args: argparse.Namespace) -> int:
+    if args.config_action == "show":
+        return cmd_config_show(args)
+    if args.config_action == "set":
+        return cmd_config_set(args)
     if args.config_action == "backend":
         return cmd_config_backend(args)
     raise RuntimeError(f"unknown config action: {args.config_action}")
+
+
+def _redact_config_value(value: Any) -> Any:
+    if isinstance(value, dict):
+        redacted = {}
+        for key, child in value.items():
+            key_lower = str(key).lower()
+            if key_lower in {
+                "api_key",
+                "bearer_token",
+                "token",
+                "secret",
+                "password",
+                "private_key",
+                "ssh_private_key",
+                "key",
+            }:
+                redacted[key] = "<redacted>" if child else child
+            else:
+                redacted[key] = _redact_config_value(child)
+        return redacted
+    if isinstance(value, list):
+        return [_redact_config_value(item) for item in value]
+    return value
+
+
+def cmd_config_show(args: argparse.Namespace) -> int:
+    root = repo_root()
+    config, _graph = _require_workspace(root)
+    data = _redact_config_value(config)
+    if getattr(args, "json", False):
+        print(json.dumps(data, indent=2))
+        return 0
+
+    print(f"target: {data.get('target', '')}")
+    print(f"benchmark: {data.get('benchmark', '')}")
+    print(f"metric: {data.get('metric', '')}")
+    print(f"host: {get_host(root) or '<not set>'}")
+    print(f"commit_strategy: {data.get('commit_strategy', 'all')}")
+    print(f"execution_backend: {data.get('execution_backend', 'worktree')}")
+    backend_config = data.get("execution_backend_config") or {}
+    if backend_config:
+        print(f"execution_backend_config: {json.dumps(backend_config, sort_keys=True)}")
+    runtime_env = runtime_env_summary(root, config)
+    print(f"runtime_env.inherit_shell: {str(runtime_env['inherit_shell']).lower()}")
+    print(f"runtime_env.dotenv_sources: {len(runtime_env['dotenv'])}")
+    return 0
+
+
+def cmd_config_set(args: argparse.Namespace) -> int:
+    root = repo_root()
+    _require_workspace(root)
+    with advisory_lock(lock_file_for(config_path(root))):
+        config = load_config(root)
+        if args.field == "target":
+            config["target"] = args.value
+        elif args.field == "benchmark":
+            config["benchmark"] = args.value
+        elif args.field == "metric":
+            if args.value not in {"max", "min"}:
+                raise RuntimeError("metric must be 'max' or 'min'")
+            config["metric"] = args.value
+        elif args.field == "commit-strategy":
+            if args.value not in {"all", "tracked-only"}:
+                raise RuntimeError("commit-strategy must be 'all' or 'tracked-only'")
+            config["commit_strategy"] = args.value
+        else:
+            raise RuntimeError(f"unknown config field: {args.field}")
+        atomic_write_json(config_path(root), config)
+    print(f"config {args.field} set")
+    return 0
 
 
 def cmd_config_backend(args: argparse.Namespace) -> int:
@@ -506,6 +583,84 @@ def cmd_config_backend(args: argparse.Namespace) -> int:
         summary = "backend set to worktree"
     print(summary)
     return 0
+
+
+def _ensure_runtime_env_config(config: dict[str, Any]) -> dict[str, Any]:
+    runtime_env = config.setdefault("runtime_env", {})
+    runtime_env.setdefault("inherit_shell", True)
+    runtime_env.setdefault("dotenv", [])
+    return runtime_env
+
+
+def cmd_env(args: argparse.Namespace) -> int:
+    root = repo_root()
+    config, _graph = _require_workspace(root)
+
+    if args.env_action == "show":
+        summary = runtime_env_summary(root, config)
+        if getattr(args, "json", False):
+            print(json.dumps(summary, indent=2))
+            return 0
+        print(f"inherit_shell: {str(summary['inherit_shell']).lower()}")
+        print(f"resolved_keys: {summary['resolved_key_count']} configured/present")
+        for source in summary["dotenv"]:
+            status = "present" if source["exists"] else "missing"
+            if source["mode"] == "allow":
+                allow = ",".join(source.get("keys", [])) or "(none)"
+                resolved = ",".join(source.get("resolved_keys", [])) or "(none)"
+                print(
+                    f"dotenv: {source['path']} mode=allow keys={allow} "
+                    f"resolved={resolved} ({status})"
+                )
+            else:
+                count = len(source.get("resolved_keys", []))
+                print(f"dotenv: {source['path']} mode=all keys={count} ({status})")
+        return 0
+
+    with advisory_lock(lock_file_for(config_path(root))):
+        config = load_config(root)
+        runtime_env = _ensure_runtime_env_config(config)
+
+        if args.env_action == "inherit-shell":
+            runtime_env["inherit_shell"] = args.value == "on"
+            atomic_write_json(config_path(root), config)
+            print(f"inherit_shell set to {str(runtime_env['inherit_shell']).lower()}")
+            return 0
+
+        if args.env_action == "load":
+            if args.all:
+                entry = {"path": args.path, "mode": "all"}
+            else:
+                keys = [k.strip() for k in args.allow.split(",") if k.strip()]
+                if not keys:
+                    raise RuntimeError("--allow requires at least one key")
+                entry = {"path": args.path, "mode": "allow", "keys": keys}
+
+            sources = list(runtime_env.get("dotenv", []) or [])
+            replaced = False
+            for idx, source in enumerate(sources):
+                if isinstance(source, dict) and source.get("path") == args.path:
+                    sources[idx] = entry
+                    replaced = True
+                    break
+            if not replaced:
+                sources.append(entry)
+            runtime_env["dotenv"] = sources
+            atomic_write_json(config_path(root), config)
+            action = "updated" if replaced else "added"
+            if entry["mode"] == "allow":
+                print(f"{action} dotenv {args.path} (allow: {','.join(entry['keys'])})")
+            else:
+                print(f"{action} dotenv {args.path} (all keys)")
+            return 0
+
+        if args.env_action == "clear":
+            runtime_env["dotenv"] = []
+            atomic_write_json(config_path(root), config)
+            print("cleared runtime dotenv sources")
+            return 0
+
+    raise RuntimeError(f"unknown env action: {args.env_action}")
 
 
 # ---------------------------------------------------------------------------
@@ -1414,16 +1569,13 @@ def _cmd_run_impl(
         )
     else:
         run_cwd = root
-        env_traces_dir = str(traces_dir)
-        env_result_path = str(result_path)
+        env_traces_dir = str(traces_dir.resolve())
+        env_result_path = str(result_path.resolve())
 
     benchmark_cmd = fill_command_template(config["benchmark"], target=target, worktree=worktree)
-    # Build env. In remote mode, only forward the EVO_* vars and leave
-    # the rest of os.environ off the wire (would leak local secrets).
-    if remote:
-        env = {}
-    else:
-        env = os.environ.copy()
+    # Build env from the configured runtime sources. Values are resolved fresh
+    # for every attempt and then injected into local or remote processes.
+    env = resolve_runtime_env(root, config)
     env["EVO_TRACES_DIR"] = env_traces_dir
     env["EVO_WORKTREE"] = str(worktree)
     env["EVO_EXPERIMENT_ID"] = args.exp_id
@@ -2205,6 +2357,16 @@ def build_parser() -> argparse.ArgumentParser:
         help="mutate workspace configuration",
     )
     config_sub = config_p.add_subparsers(dest="config_action", required=True)
+    config_show_p = config_sub.add_parser("show", help="show redacted workspace configuration")
+    config_show_p.add_argument("--json", action="store_true", help="emit JSON")
+    config_show_p.set_defaults(func=cmd_config)
+    config_set_p = config_sub.add_parser("set", help="set basic workspace configuration fields")
+    config_set_p.add_argument(
+        "field",
+        choices=["target", "benchmark", "metric", "commit-strategy"],
+    )
+    config_set_p.add_argument("value")
+    config_set_p.set_defaults(func=cmd_config)
     config_backend_p = config_sub.add_parser(
         "backend",
         help="set the workspace default execution backend",
@@ -2231,6 +2393,29 @@ def build_parser() -> argparse.ArgumentParser:
              "my_pkg.providers:Provider.",
     )
     config_backend_p.set_defaults(func=cmd_config_backend)
+
+    env_p = sub.add_parser(
+        "env",
+        help="configure benchmark/gate runtime environment forwarding",
+    )
+    env_sub = env_p.add_subparsers(dest="env_action", required=True)
+    env_show_p = env_sub.add_parser("show", help="show redacted runtime env metadata")
+    env_show_p.add_argument("--json", action="store_true", help="emit JSON")
+    env_show_p.set_defaults(func=cmd_env)
+    env_inherit_p = env_sub.add_parser(
+        "inherit-shell",
+        help="enable or disable inheriting the orchestrator process environment",
+    )
+    env_inherit_p.add_argument("value", choices=["on", "off"])
+    env_inherit_p.set_defaults(func=cmd_env)
+    env_load_p = env_sub.add_parser("load", help="add or update a dotenv source")
+    env_load_p.add_argument("path")
+    env_load_mode = env_load_p.add_mutually_exclusive_group(required=True)
+    env_load_mode.add_argument("--all", action="store_true", help="forward all keys from this dotenv file")
+    env_load_mode.add_argument("--allow", help="comma-separated allowlist of keys to forward")
+    env_load_p.set_defaults(func=cmd_env)
+    env_clear_p = env_sub.add_parser("clear", help="remove all configured dotenv sources")
+    env_clear_p.set_defaults(func=cmd_env)
 
     workspace_p = sub.add_parser(
         "workspace",

@@ -14,6 +14,7 @@ Use this when the user wants to change where experiments run: local worktrees, p
 - Check prerequisites before mutating evo config.
 - Never install provider SDKs silently.
 - Give one actionable auth command per provider.
+- Keep provider credentials separate from benchmark runtime env.
 
 ## Flow
 
@@ -30,8 +31,8 @@ Use this when the user wants to change where experiments run: local worktrees, p
 - `ssh:user@host[:port]`
    - another built-in provider name
    - dotted import path for a custom provider
-3. Check whether evo itself appears to be installed via `pipx`, `uv tool`, or a venv by calling `python -c "from evo.providers import detect_install_method; print(detect_install_method())"`.
-4. For SDK-backed providers, verify the SDK import. If missing, ask the user before installing it.
+3. Check whether `evo` is on PATH and whether it is the expected `evo-hq-cli` package (`evo --version`). If the provider SDK is missing, evo's provider loader prints the provider-specific extra or SDK package to install; use that message rather than guessing.
+4. For SDK-backed providers, verify the SDK import only when you can run the check in the same environment that owns the `evo` executable. If missing, ask the user before installing it.
    - If `evo` was installed with `uv tool` or `pip`/`venv`, prefer the matching extra on `evo-hq-cli`:
      - `uv-tool`: `uv tool install --reinstall 'evo-hq-cli[<provider-extra>]'`
      - `venv` / `pip`: `python -m pip install 'evo-hq-cli[<provider-extra>]'`
@@ -54,6 +55,10 @@ evo config backend pool --workspaces /abs/slot-a,/abs/slot-b
 7. Be explicit that incomplete provider setup usually surfaces on
    `evo new --remote <provider> ...`, because that is where remote
    allocation and bootstrap actually happen.
+8. If the benchmark itself needs application keys, configure runtime env
+   separately with `evo env load <path> --all` or
+   `evo env load <path> --allow KEY1,KEY2`. Provider auth provisions the
+   sandbox; runtime env is what benchmark/gate processes see.
 
 ## Pre-assumptions
 

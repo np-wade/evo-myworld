@@ -102,7 +102,7 @@ For cases 2 and 3, ask once:
 
 > "I can wire up the benchmark in one of two ways:
 >
-> 1. **SDK mode** -- install the SDK (Python: `pip install evo-hq-agent` / Node: `npm install @evo-hq/evo-agent`). Richer per-task logs, ~5 lines of user code.
+> 1. **SDK mode** -- install the evo agent SDK with this project's package manager/runtime (for example `uv add --dev evo-hq-agent`, `python -m pip install evo-hq-agent`, or `npm install @evo-hq/evo-agent`). Richer per-task logs, ~5 lines of user code.
 > 2. **Inline mode** -- paste a ~30-line helper directly into the benchmark. Zero new dependencies. Same data contract."
 
 Pass the answer to `evo init` via `--instrumentation-mode <sdk|inline>` in step 7. **Never install packages without this confirmation.** If you skip the question (case 1), still pass the detected mode to `evo init` so optimize/subagent runs see a consistent value.
@@ -177,7 +177,7 @@ evo init \
   --host claude-code
 ```
 
-If the project uses a specific interpreter (poetry, pipenv, a venv), qualify it: `"poetry run python {worktree}/benchmark.py ..."`, `".venv/bin/python {worktree}/benchmark.py ..."`, etc.
+Use the same runtime entry point the project already uses, but make sure the command is valid from the main repo root and does not assume uncommitted runtime state exists inside the worktree. Worktrees are git checkouts; untracked directories such as local virtualenvs, build caches, and downloaded models are usually not present there. Prefer committed runners or package-manager commands such as `"poetry run python {worktree}/benchmark.py ..."` / `"uv run python {worktree}/benchmark.py ..."` over paths that only exist in the main checkout.
 
 `evo init` creates `.evo/`, the synthetic `root` node, and auto-starts the dashboard. It prints a line like:
 
@@ -186,6 +186,16 @@ Dashboard live: http://127.0.0.1:8080 (pid 12345)
 ```
 
 **Relay that line back to the user verbatim.** If port 8080 is busy, evo auto-increments -- show whatever port prints. The URL is how the user watches the run.
+
+**Runtime environment.** If the benchmark needs keys or other runtime variables, configure them through evo rather than copying `.env` into worktrees or hand-editing `config.json`:
+
+```bash
+evo env load .env --all
+evo env load .env --allow KEY1,KEY2
+evo env show
+```
+
+Values are resolved fresh by the orchestrator on each `evo run`. Config stores dotenv source metadata and key names, not secret values. The benchmark and gates receive the resolved env; gates do not receive `EVO_*` artifact variables.
 
 ## 8. Set up gates
 
@@ -277,8 +287,8 @@ WORKTREE="<...>"
 TARGET="$WORKTREE/<...>"
 VALIDATOR="<...>/scripts/validate_result.py"
 
-mkdir -p .evo/validate
-ATTEMPT="$(mktemp -d .evo/validate/run-XXXXXX)"
+mkdir -p "$PWD/.evo/validate"
+ATTEMPT="$(mktemp -d "$PWD/.evo/validate/run-XXXXXX")"
 mkdir -p "$ATTEMPT/traces"
 
 EVO_TRACES_DIR="$ATTEMPT/traces" \
@@ -291,6 +301,8 @@ python3 "$VALIDATOR" "$ATTEMPT/result.json"
 ```
 
 Adapt the benchmark invocation (interpreter, args) to whatever you stored with `evo init`. The non-negotiable part is that the resulting bash command contains no literal `{worktree}`, `{target}`, or relative-script paths -- expand all of them to absolute paths before the shell runs the line. Each invocation gets a fresh attempt subdir, so re-running on failure is safe.
+
+Use absolute paths for `EVO_TRACES_DIR` and `EVO_RESULT_PATH`, as shown above. Some benchmarks legitimately `chdir` internally to import the target or load fixtures; relative evo paths break in that case and make the run look like a missing-result crash.
 
 The validator asserts `result.json` exists, is non-empty, and is a JSON object with a numeric `score`. Also verify:
 
@@ -372,6 +384,8 @@ End the skill by reporting in chat:
 
 ```bash
 evo get <id>                        # full experiment detail with scores
+evo config show                     # redacted workspace configuration
+evo env show                        # redacted runtime env metadata
 evo traces <id> <task>              # per-task trace
 evo annotate <id> <task> "analysis" # record failure analysis
 evo scratchpad                      # full state: tree, best path, frontier, annotations, diffs, gates

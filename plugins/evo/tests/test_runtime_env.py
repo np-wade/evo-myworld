@@ -1,0 +1,190 @@
+from __future__ import annotations
+
+import json
+import os
+import signal
+import subprocess
+from pathlib import Path
+
+import pytest
+
+from evo.core import parse_dotenv, resolve_runtime_env, runtime_env_summary
+
+
+REPO_ROOT = Path(__file__).resolve().parents[3]
+PLUGIN_ROOT = REPO_ROOT / "plugins" / "evo"
+
+
+def run(args: list[str], cwd: Path, check: bool = True) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(args, cwd=cwd, check=check, capture_output=True, text=True)
+
+
+def evo(args: list[str], cwd: Path, check: bool = True) -> subprocess.CompletedProcess[str]:
+    return run(["uv", "run", "--project", str(PLUGIN_ROOT), "evo", *args], cwd=cwd, check=check)
+
+
+def write(path: Path, content: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(content, encoding="utf-8")
+
+
+def init_repo(root: Path) -> None:
+    run(["git", "init", "-b", "main"], cwd=root)
+    run(["git", "config", "user.name", "evo"], cwd=root)
+    run(["git", "config", "user.email", "evo@example.com"], cwd=root)
+
+
+def shutdown_dashboard(root: Path) -> None:
+    pid_file = root / ".evo" / "dashboard.pid"
+    if not pid_file.exists():
+        return
+    try:
+        pid = int(pid_file.read_text(encoding="utf-8").strip())
+        os.kill(pid, signal.SIGTERM)
+    except (OSError, ValueError):
+        pass
+
+
+def test_parse_dotenv_simple_subset() -> None:
+    parsed = parse_dotenv(
+        """
+        # comment
+        A=one
+        export B="two words"
+        C='literal # value'
+        D=plain # inline comment
+        BAD-NAME=ignored
+        """
+    )
+    assert parsed == {
+        "A": "one",
+        "B": "two words",
+        "C": "literal # value",
+        "D": "plain",
+    }
+
+
+def test_resolve_runtime_env_overlays_dotenv_over_shell(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("TOKEN", "shell")
+    write(tmp_path / ".env", "TOKEN=dotenv\nOTHER=visible\n")
+    config = {
+        "runtime_env": {
+            "inherit_shell": True,
+            "dotenv": [{"path": ".env", "mode": "allow", "keys": ["TOKEN"]}],
+        }
+    }
+    resolved = resolve_runtime_env(tmp_path, config)
+    assert resolved["TOKEN"] == "dotenv"
+    assert "OTHER" not in resolved
+
+
+def test_runtime_env_summary_redacts_values(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("TOKEN", "shell-secret")
+    write(tmp_path / ".env", "TOKEN=dotenv-secret\n")
+    config = {
+        "runtime_env": {
+            "inherit_shell": False,
+            "dotenv": [{"path": ".env", "mode": "all"}],
+        }
+    }
+    summary = runtime_env_summary(tmp_path, config)
+    encoded = json.dumps(summary)
+    assert "TOKEN" in encoded
+    assert "dotenv-secret" not in encoded
+    assert "shell-secret" not in encoded
+
+
+def test_missing_runtime_env_file_fails_clearly(tmp_path: Path) -> None:
+    config = {"runtime_env": {"inherit_shell": False, "dotenv": [{"path": ".env", "mode": "all"}]}}
+    with pytest.raises(RuntimeError, match="runtime dotenv file not found"):
+        resolve_runtime_env(tmp_path, config)
+
+
+def test_cli_env_load_and_run_forward_runtime_env(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    init_repo(tmp_path)
+    write(tmp_path / "agent.py", 'STATE = "baseline"\n')
+    write(
+        tmp_path / "eval.py",
+        """from __future__ import annotations
+import json
+import os
+from pathlib import Path
+
+assert Path(os.environ["EVO_RESULT_PATH"]).is_absolute()
+assert Path(os.environ["EVO_TRACES_DIR"]).is_absolute()
+score = 1.0 if os.environ.get("TOKEN") == "from-file" else 0.0
+Path(os.environ["EVO_RESULT_PATH"]).write_text(json.dumps({"score": score}), encoding="utf-8")
+""",
+    )
+    write(
+        tmp_path / "gate.py",
+        """from __future__ import annotations
+import os
+import sys
+
+if os.environ.get("TOKEN") != "from-file":
+    sys.exit(2)
+if any(key.startswith("EVO_") for key in os.environ):
+    sys.exit(3)
+""",
+    )
+    run(["git", "add", "."], cwd=tmp_path)
+    run(["git", "commit", "-m", "fixture: runtime env"], cwd=tmp_path)
+
+    monkeypatch.setenv("TOKEN", "shell")
+    try:
+        evo(
+            [
+                "init",
+                "--target", "agent.py",
+                "--benchmark", "python3 eval.py",
+                "--gate", "python3 gate.py",
+                "--metric", "max",
+                "--host", "generic",
+            ],
+            cwd=tmp_path,
+        )
+        write(tmp_path / ".env", "TOKEN=from-file\n")
+        evo(["env", "load", ".env", "--all"], cwd=tmp_path)
+        config_text = (tmp_path / ".evo" / "run_0000" / "config.json").read_text(encoding="utf-8")
+        assert "from-file" not in config_text
+
+        shown = evo(["env", "show", "--json"], cwd=tmp_path).stdout
+        assert "TOKEN" in shown
+        assert "from-file" not in shown
+
+        evo(["new", "--parent", "root", "-m", "baseline"], cwd=tmp_path)
+        result = evo(["run", "exp_0000"], cwd=tmp_path)
+        assert "COMMITTED exp_0000 1.0" in result.stdout
+    finally:
+        shutdown_dashboard(tmp_path)
+
+
+def test_cli_config_show_and_set_basic_fields(tmp_path: Path) -> None:
+    init_repo(tmp_path)
+    write(tmp_path / "agent.py", 'STATE = "baseline"\n')
+    write(tmp_path / "eval.py", 'print({"score": 0.0})\n')
+    run(["git", "add", "."], cwd=tmp_path)
+    run(["git", "commit", "-m", "fixture: config"], cwd=tmp_path)
+
+    try:
+        evo(
+            [
+                "init",
+                "--target", "agent.py",
+                "--benchmark", "python3 eval.py",
+                "--metric", "max",
+                "--host", "generic",
+            ],
+            cwd=tmp_path,
+        )
+        evo(["config", "set", "benchmark", "python3 eval.py --updated"], cwd=tmp_path)
+        evo(["config", "set", "metric", "min"], cwd=tmp_path)
+        evo(["config", "set", "commit-strategy", "tracked-only"], cwd=tmp_path)
+        shown = json.loads(evo(["config", "show", "--json"], cwd=tmp_path).stdout)
+        assert shown["benchmark"] == "python3 eval.py --updated"
+        assert shown["metric"] == "min"
+        assert shown["commit_strategy"] == "tracked-only"
+        assert "runtime_env" in shown
+    finally:
+        shutdown_dashboard(tmp_path)

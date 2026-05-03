@@ -22,13 +22,15 @@ These defaults can be overridden via arguments: `/optimize [subagents=N] [budget
 - **budget**: max iterations each subagent can run within its branch (default: 5)
 - **stall**: consecutive rounds with no improvement before auto-stopping (default: 5)
 
-**Pool mode (if active).** When the workspace was initialized with `--backend pool`, concurrent experiments cap at the pool size. Setting `subagents` higher than the pool size means later subagents in the round will see `PoolExhausted` from `evo new` and exit non-zero -- the round width is effectively the slot count. Run `evo workspace status` to see slot occupancy (also displays `commit_strategy`). Reduce `subagents` to the pool size if exhaustion is recurring. Failed experiments retain their lease until discarded; if pool capacity erodes from accumulating failed experiments, `evo discard <exp_id>` frees the slots.
+**Pool mode (if active).** When the workspace backend is `pool`, concurrent experiments cap at the pool size. Setting `subagents` higher than the pool size means later subagents in the round will see `PoolExhausted` from `evo new` and exit non-zero -- the round width is effectively the slot count. Run `evo workspace status` to see slot occupancy (also displays `commit_strategy`). Reduce `subagents` to the pool size if exhaustion is recurring. Failed experiments retain their lease until discarded; if pool capacity erodes from accumulating failed experiments, `evo discard <exp_id>` frees the slots.
 
 Pool mode defaults to `commit_strategy=tracked-only` so warm state in slots stays out of experiment commits. Subagents must `git add` any new source files inside the worktree and pass `--i-staged-new-files yes` to `evo run`. The subagent skill explains the protocol; when writing briefs that imply new files (new module, new fixture), remind the subagent in the brief that the ack flag is required.
 
-**Remote-backend mode (`--backend remote`).** When the workspace is in remote mode, each experiment's worktree lives inside a separate remote container. Subagents use `evo bash / read / write / edit / glob / grep --exp-id <id>` instead of native `Bash`/`Read`/`Write`/`Edit` tools. **Every brief you write to a subagent in remote mode MUST start by stating the exp_id explicitly:** `"Your experiment id is exp_NNNN. Pass --exp-id exp_NNNN on every evo command."` This is the only thing that prevents one subagent from accidentally operating on another's container. evo CLI hard-errors if `--exp-id` is missing, but it can't catch a subagent that confidently passes the wrong id; the brief is the discipline.
+**Remote-backend mode.** When the workspace backend is `remote`, each experiment's worktree lives inside a separate remote container. Subagents use `evo bash / read / write / edit / glob / grep --exp-id <id>` instead of native `Bash`/`Read`/`Write`/`Edit` tools. **Every brief you write to a subagent in remote mode MUST start by stating the exp_id explicitly:** `"Your experiment id is exp_NNNN. Pass --exp-id exp_NNNN on every evo command."` This is the only thing that prevents one subagent from accidentally operating on another's container. evo CLI hard-errors if `--exp-id` is missing, but it can't catch a subagent that confidently passes the wrong id; the brief is the discipline.
 
 **Infra setup is not user-invocable.** If a remote provider is missing SDKs, auth, or setup details, read `plugins/evo/skills/infra-setup/references/provider-matrix.md`. It summarizes what each provider actually needs and replaces the old per-provider prompt files.
+
+**Runtime env.** Benchmark/runtime env is evo configuration, not something subagents should rediscover or copy into worktrees. Use `evo env show` to inspect redacted configured sources. If a run fails because an expected env key is missing, report it as setup failure or configure the source with `evo env load ...` from the orchestrator; do not patch benchmark code to bake in secrets.
 
 ## Prerequisites
 
@@ -75,6 +77,8 @@ Repeat until interrupted or stall limit reached:
 
 ```bash
 evo scratchpad          # full state: tree, best path, frontier, annotations, diffs, gates, what-not-to-try
+evo config show         # redacted workspace config
+evo env show            # redacted runtime env metadata
 evo frontier            # explorable nodes ranked by the configured strategy (JSON envelope: {strategy, nodes[{id,score,rank,...}], generated_at})
 evo status              # one-line summary
 evo annotations         # all annotations (filterable with --task/--exp)
