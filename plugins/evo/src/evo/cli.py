@@ -48,6 +48,7 @@ from .core import (
     node_target_path,
     notes_path,
     load_result,
+    parse_diff_patch,
     parse_score,
     path_to_node,
     project_path,
@@ -84,6 +85,28 @@ def _read_node(root: Path, exp_id: str) -> dict:
         return graph["nodes"][exp_id]
     except KeyError as exc:
         raise RuntimeError(f"unknown experiment: {exp_id}") from exc
+
+
+def _anchor_commit_ref(root: Path, run_id: str, exp_id: str, commit: str) -> None:
+    """Pin <commit> via `refs/evo-anchor/<run_id>/<exp_id>` so it survives
+    `git branch -D` (which `evo discard` runs). Without this anchor, a
+    discarded committed node's commit becomes unreachable and is vulnerable
+    to git GC.
+
+    Hard-fails on update-ref errors. The pre-fix call used check=False and
+    silently swallowed failures, leaving the orchestrator's ODB with the
+    commit objects but no ref keeping them alive.
+    """
+    result = subprocess.run(
+        ["git", "update-ref", f"refs/evo-anchor/{run_id}/{exp_id}", commit],
+        cwd=root, check=False, capture_output=True, text=True,
+    )
+    if result.returncode != 0:
+        raise RuntimeError(
+            f"failed to anchor commit {commit} via "
+            f"refs/evo-anchor/{run_id}/{exp_id}: "
+            f"{result.stderr.strip() or 'unknown error'}"
+        )
 
 
 def _resolve_parent_score(graph: dict, parent_id: str) -> float | None:
@@ -314,7 +337,6 @@ def cmd_init(args: argparse.Namespace) -> int:
         meta = json.loads(meta_file.read_text(encoding="utf-8"))
         meta["instrumentation_mode"] = args.instrumentation_mode
         atomic_write_json(meta_file, meta)
-    write_scratchpad(root)
     _start_dashboard_background(root, port=args.port)
     print(
         f"Initialized evo workspace {run_id} at {workspace_path(root)} "
@@ -1426,6 +1448,9 @@ def _write_attempt_outcome(
     attempt_state = _read_attempt_state(root, exp_id, attempt)
     if attempt_state:
         payload["attempt_state"] = attempt_state
+    parsed_diff = parse_diff_patch(root, exp_id, attempt)
+    if parsed_diff:
+        payload["change_files"] = parsed_diff["files"]
     atomic_write_json(attempt_outcome_path(root, exp_id, attempt), payload)
 
 
@@ -1692,7 +1717,6 @@ def cmd_run(args: argparse.Namespace) -> int:
                 backend.release_lease(_DCtx(root=root, node=failed_node))
             except Exception:
                 pass
-            write_scratchpad(root)
             print(f"FAILED {args.exp_id} {error_msg}")
             return 1
         raise
@@ -2386,13 +2410,17 @@ def _cmd_run_impl(
                         sandbox_repo=str(worktree),
                         bundle_dir=bundle_dir,
                     )
+
+            # Anchor the commit via `refs/evo-anchor/<run>/<exp>` so it survives
+            # `git branch -D` (which `evo discard` runs). Worktree commits are
+            # already in the main repo; remote commits were just fetched
+            # above. Pool deferred — pool commits live in slot git stores.
+            if commit:
+                backend_kind = config.get("execution_backend") or "worktree"
+                if backend_kind in ("worktree", "remote"):
                     meta = _load_meta(root)
                     run_id = meta.get("active", "run_0000")
-                    subprocess.run(
-                        ["git", "update-ref",
-                         f"refs/evo/{run_id}/{args.exp_id}", commit],
-                        cwd=root, check=False, capture_output=True,
-                    )
+                    _anchor_commit_ref(root, run_id, args.exp_id, commit)
 
             def _mark_committed(current_node: dict, _graph: dict) -> None:
                 current_node["status"] = "committed"
@@ -2427,7 +2455,6 @@ def _cmd_run_impl(
             _lb(root, node=committed_node, workspace_config=config).release_lease(
                 _DCtx(root=root, node=committed_node)
             )
-            write_scratchpad(root)
             delta = "" if parent_score is None else f" ({'+' if metric == 'max' else ''}{score - parent_score:.4f} vs parent)"
             print(f"COMMITTED {args.exp_id} {score}{delta}")
             return 0
@@ -2453,7 +2480,6 @@ def _cmd_run_impl(
             benchmark=benchmark_record, runtime=runtime_records, gates=gate_records,
             parent_score=parent_score, metric=metric,
         )
-        write_scratchpad(root)
         remaining = max_attempts - (evaluated_attempts + 1)
         suffix = f" ({remaining} attempts remaining)" if remaining > 0 else " (no attempts remaining -- retry blocked)"
         reason = []
@@ -2502,7 +2528,6 @@ def _cmd_run_impl(
             benchmark=benchmark_record, runtime=runtime_records, gates=gate_records,
             error=error_msg, parent_score=parent_score, metric=metric,
         )
-        write_scratchpad(root)
         print(f"FAILED {args.exp_id} {exc}")
         return 1
 
@@ -2538,7 +2563,6 @@ def _record_done_result(root: Path, args: argparse.Namespace) -> int:
             current_node["score"] = args.score
         update_node(root, args.exp_id, _mark_failed)
         _finalize_result(root, args.exp_id, node, args.score, "failed", {"recorded_only": True})
-        write_scratchpad(root)
         print(f"RECORDED {args.exp_id} score={args.score} (no compare)")
         return 0
 
@@ -2564,7 +2588,6 @@ def _record_done_result(root: Path, args: argparse.Namespace) -> int:
         _lb(root, node=committed_node, workspace_config=config).release_lease(
             _DCtx(root=root, node=committed_node)
         )
-    write_scratchpad(root)
     print(f"{status.upper()} {args.exp_id} {args.score}")
     return 0
 
@@ -2575,7 +2598,49 @@ def cmd_done(args: argparse.Namespace) -> int:
 
 def cmd_discard(args: argparse.Namespace) -> int:
     root = repo_root()
+    graph = load_graph(root)
     node = _read_node(root, args.exp_id)
+    status = node.get("status")
+    force = bool(getattr(args, "force", False))
+
+    # Guard: committed nodes must not be discarded — destroying their branch
+    # ref orphans the commit (vulnerable to git GC). The orchestrator should
+    # use `evo prune` instead, which preserves branch+commit while marking
+    # the lineage as exhausted.
+    if status == "committed":
+        raise RuntimeError(
+            f"cannot discard committed node {args.exp_id}: discarding would "
+            f"destroy its branch ref and risk orphaning the commit. "
+            f"Use `evo prune {args.exp_id} --reason \"...\"` instead — "
+            f"prune marks the lineage exhausted while preserving the commit "
+            f"so it can be branched from later (or restored via `evo restore`)."
+        )
+
+    # Guard: active nodes are mid-run; discard is racy because the running
+    # `evo run` process may still write outcomes that contradict the discard.
+    # Require explicit --force to acknowledge.
+    if status == "active" and not force:
+        raise RuntimeError(
+            f"cannot discard active node {args.exp_id}: a benchmark may be "
+            f"in flight. Wait for the run to finish, or pass --force to "
+            f"override (the running process may still write a final outcome "
+            f"that contradicts this discard)."
+        )
+
+    # Guard: discarding a node with live (non-discarded) children orphans
+    # those children's parent reference. Mirror cmd_gc's existing guard.
+    live_children = [
+        cid for cid in node.get("children", [])
+        if cid in graph["nodes"]
+        and graph["nodes"][cid].get("status") != "discarded"
+    ]
+    if live_children:
+        raise RuntimeError(
+            f"cannot discard {args.exp_id}: it has {len(live_children)} "
+            f"non-discarded child experiment(s) ({', '.join(live_children[:3])}"
+            f"{', ...' if len(live_children) > 3 else ''}). "
+            f"Discard or commit-and-prune those first."
+        )
 
     def _mark(current_node: dict, _graph: dict) -> None:
         current_node["status"] = "discarded"
@@ -2584,22 +2649,130 @@ def cmd_discard(args: argparse.Namespace) -> int:
     update_node(root, args.exp_id, _mark)
     _finalize_result(root, args.exp_id, node, node.get("score"), "discarded", {"reason": args.reason})
     delete_discarded_experiment(root, node)
-    write_scratchpad(root)
     print(f"DISCARDED {args.exp_id}: {args.reason}")
     return 0
+
+
+def cmd_restore(args: argparse.Namespace) -> int:
+    """Bring a pruned or discarded node back into play.
+
+    pruned → committed: status flip; frontier surfaces it again.
+    discarded → committed: verify `refs/evo-anchor/<run>/<exp>` exists in the main
+        repo (the anchor written at commit time), recreate the regular
+        branch ref `refs/heads/<branch>` from it, mark the worktree field
+        as stale (it was deleted by discard; next `evo new --parent` will
+        re-allocate), and flip status. If the anchor is missing — meaning
+        the commit was lost (git GC, or a backend that didn't anchor) —
+        error and point at `experiments/<id>/attempts/NNN/diff.patch` for
+        manual replay.
+    """
+    root = repo_root()
+    node = _read_node(root, args.exp_id)
+    status = node.get("status")
+
+    if status == "pruned":
+        def _unprune(current_node: dict, _graph: dict) -> None:
+            current_node["status"] = "committed"
+            current_node["pruned_reason"] = None
+
+        update_node(root, args.exp_id, _unprune)
+        print(f"RESTORED {args.exp_id}: pruned → committed")
+        return 0
+
+    if status == "discarded":
+        commit = node.get("commit")
+        if not commit:
+            raise RuntimeError(
+                f"cannot restore {args.exp_id}: no commit hash recorded "
+                f"(node was likely never committed)."
+            )
+        meta = _load_meta(root)
+        run_id = meta.get("active") or "run_0000"
+        anchor_ref = f"refs/evo-anchor/{run_id}/{args.exp_id}"
+
+        # Verify the anchor ref exists and points at the recorded commit.
+        anchor_check = subprocess.run(
+            ["git", "rev-parse", anchor_ref],
+            cwd=root, check=False, capture_output=True, text=True,
+        )
+        if anchor_check.returncode != 0:
+            # No anchor → fall back to direct commit lookup
+            commit_check = subprocess.run(
+                ["git", "cat-file", "-e", commit],
+                cwd=root, check=False, capture_output=True, text=True,
+            )
+            if commit_check.returncode != 0:
+                # Commit is gone too. Point at the diff.patch.
+                attempt = node.get("current_attempt", 1)
+                diff_path = (
+                    f"experiments/{args.exp_id}/attempts/{int(attempt):03d}/diff.patch"
+                )
+                raise RuntimeError(
+                    f"cannot restore {args.exp_id}: anchor ref {anchor_ref} "
+                    f"is missing AND commit {commit} is no longer reachable "
+                    f"in git (likely garbage-collected). The change content "
+                    f"may still be recoverable from {diff_path} (apply it "
+                    f"manually to the parent and create a fresh commit)."
+                )
+            # Commit exists but no anchor — keep going; we'll write the
+            # anchor as part of restoration.
+
+        # Recreate the regular branch from the commit so future
+        # `evo new --parent <id>` can fork from it cleanly.
+        branch = node.get("branch")
+        if branch:
+            # If the branch happens to still exist (e.g. discard's
+            # `git branch -D` failed silently in the past), don't error —
+            # just point it at the right commit.
+            subprocess.run(
+                ["git", "branch", "-f", branch, commit],
+                cwd=root, check=True, capture_output=True, text=True,
+            )
+
+        # If the anchor was missing, write it now (restoration is the
+        # right moment to re-anchor — we just confirmed the commit exists).
+        if anchor_check.returncode != 0:
+            _anchor_commit_ref(root, run_id, args.exp_id, commit)
+
+        def _undiscard(current_node: dict, _graph: dict) -> None:
+            current_node["status"] = "committed"
+            current_node["discard_reason"] = None
+            # Mark the worktree as stale; the next allocator on this
+            # parent will re-resolve.
+            current_node["worktree_stale"] = True
+
+        update_node(root, args.exp_id, _undiscard)
+        print(
+            f"RESTORED {args.exp_id}: discarded → committed (branch={branch} "
+            f"recreated from {commit[:8]})"
+        )
+        return 0
+
+    raise RuntimeError(
+        f"cannot restore {args.exp_id}: status is {status!r}; "
+        f"only `pruned` and `discarded` nodes can be restored."
+    )
 
 
 def cmd_prune(args: argparse.Namespace) -> int:
     root = repo_root()
 
     def _mark(current_node: dict, _graph: dict) -> None:
-        if current_node.get("status") != "committed":
-            raise RuntimeError("only committed nodes can be pruned")
+        # Prune accepts committed AND evaluated nodes:
+        # - committed: "this lineage is exhausted; preserve the commit but
+        #   stop branching from here"
+        # - evaluated: "this didn't promote, but the score is informative;
+        #   don't branch from it either"
+        # Active/failed/discarded/pruned all stay forbidden.
+        if current_node.get("status") not in ("committed", "evaluated"):
+            raise RuntimeError(
+                f"only committed or evaluated nodes can be pruned; "
+                f"{args.exp_id} is {current_node.get('status')!r}"
+            )
         current_node["status"] = "pruned"
         current_node["pruned_reason"] = args.reason
 
     update_node(root, args.exp_id, _mark)
-    write_scratchpad(root)
     print(f"PRUNED {args.exp_id}: {args.reason}")
     return 0
 
@@ -2797,6 +2970,38 @@ def cmd_scratchpad(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_awaiting(args: argparse.Namespace) -> int:
+    """List evaluated-but-not-decided nodes (the Awaiting Decision drill-down)."""
+    root = repo_root()
+    graph = load_graph(root)
+    evaluated = [
+        n for n in graph["nodes"].values()
+        if n.get("status") == "evaluated"
+    ]
+    evaluated.sort(key=lambda n: n.get("updated_at", ""), reverse=True)
+    print(json.dumps(evaluated, indent=2))
+    return 0
+
+
+def cmd_discards(args: argparse.Namespace) -> int:
+    """List discarded nodes, optionally filtered by substring match on hypothesis."""
+    root = repo_root()
+    graph = load_graph(root)
+    discarded = [
+        n for n in graph["nodes"].values()
+        if n.get("status") == "discarded"
+    ]
+    if getattr(args, "like", None):
+        needle = args.like.lower()
+        discarded = [
+            n for n in discarded
+            if needle in (n.get("hypothesis") or "").lower()
+        ]
+    discarded.sort(key=lambda n: n.get("updated_at", ""), reverse=True)
+    print(json.dumps(discarded, indent=2))
+    return 0
+
+
 def cmd_get(args: argparse.Namespace) -> int:
     root = repo_root()
     if args.filename:
@@ -2882,7 +3087,6 @@ def cmd_traces(args: argparse.Namespace) -> int:
 def cmd_annotate(args: argparse.Namespace) -> int:
     root = repo_root()
     entry = append_annotation(root, args.exp_id, args.task, args.analysis)
-    write_scratchpad(root)
     print(json.dumps(entry, indent=2))
     return 0
 
@@ -2920,7 +3124,6 @@ def cmd_set(args: argparse.Namespace) -> int:
             current_node["notes"].append({"text": args.note, "timestamp": utc_now()})
 
     node = update_node(root, args.exp_id, _mutate)
-    write_scratchpad(root)
     print(json.dumps(node, indent=2))
     return 0
 
@@ -2933,7 +3136,6 @@ def cmd_infra(args: argparse.Namespace) -> int:
         config["current_eval_epoch"] = int(config.get("current_eval_epoch", 1)) + 1
         config["comparison_blocked"] = True
         save_config(root, config)
-    write_scratchpad(root)
     print(json.dumps(event, indent=2))
     return 0
 
@@ -2944,13 +3146,11 @@ def cmd_gate(args: argparse.Namespace) -> int:
 
     if args.gate_action == "add":
         entry = add_gate(root, args.exp_id, args.name, args.command)
-        write_scratchpad(root)
         print(json.dumps(entry, indent=2))
         return 0
 
     if args.gate_action == "remove":
         remove_gate(root, args.exp_id, args.name)
-        write_scratchpad(root)
         print(f"Removed gate '{args.name}' from {args.exp_id}")
         return 0
 
@@ -3396,12 +3596,30 @@ def build_parser() -> argparse.ArgumentParser:
     discard_p = sub.add_parser("discard")
     discard_p.add_argument("exp_id")
     discard_p.add_argument("--reason", required=True)
+    discard_p.add_argument(
+        "--force",
+        action="store_true",
+        help="force discard of an active node (the running benchmark may "
+             "still write a final outcome that contradicts this discard)",
+    )
     discard_p.set_defaults(func=cmd_discard)
 
     prune_p = sub.add_parser("prune")
     prune_p.add_argument("exp_id")
     prune_p.add_argument("--reason", required=True)
     prune_p.set_defaults(func=cmd_prune)
+
+    restore_p = sub.add_parser(
+        "restore",
+        help="restore a pruned or discarded node back to committed",
+        description="Reverse of `evo prune` and `evo discard`. "
+                    "Flips status back to committed; recreates the regular "
+                    "branch ref from `refs/evo-anchor/<run>/<exp>` if needed. "
+                    "Discarded nodes whose commit is no longer reachable "
+                    "(git GC) are pointed to their saved diff.patch.",
+    )
+    restore_p.add_argument("exp_id")
+    restore_p.set_defaults(func=cmd_restore)
 
     gc_p = sub.add_parser("gc")
     gc_p.set_defaults(func=cmd_gc)
@@ -3432,6 +3650,25 @@ def build_parser() -> argparse.ArgumentParser:
 
     scratchpad_p = sub.add_parser("scratchpad")
     scratchpad_p.set_defaults(func=cmd_scratchpad)
+
+    awaiting_p = sub.add_parser(
+        "awaiting",
+        help="list evaluated nodes awaiting commit/discard decision",
+        description="Drill-down for the scratchpad's Awaiting Decision section. "
+                    "Returns JSON of every evaluated-but-not-decided node, "
+                    "sorted by updated_at descending.",
+    )
+    awaiting_p.set_defaults(func=cmd_awaiting)
+
+    discards_p = sub.add_parser(
+        "discards",
+        help="list discarded nodes, optionally filtered by hypothesis substring",
+        description="Drill-down for the scratchpad's What Not To Try section. "
+                    "Returns JSON of discarded nodes; pass --like TEXT for "
+                    "case-insensitive substring match on the hypothesis.",
+    )
+    discards_p.add_argument("--like", help="case-insensitive substring match on hypothesis text")
+    discards_p.set_defaults(func=cmd_discards)
 
     get_p = sub.add_parser("get")
     get_p.add_argument("exp_id")

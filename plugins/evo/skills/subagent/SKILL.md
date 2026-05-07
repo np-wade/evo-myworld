@@ -222,7 +222,10 @@ The trace format is forward-compatible -- extra fields are preserved. Do NOT cha
 ## Rules
 
 - Do NOT run `evo init` or `evo reset`
-- `evo discard <your_exp_id> --reason "..."` is your explicit "abandon" action — use it for any node you've decided not to pursue further (pre-run realization, evaluated with a bad hypothesis, or unfixable infra failure). Discard deletes the worktree and branch; the node and its per-attempt artifacts stay in `.evo/` as a record of what was tried.
+- `evo discard <your_exp_id> --reason "..."` is your explicit "abandon" action — use it for any *non-committed* node you've decided not to pursue further (pre-run realization, evaluated with a bad hypothesis, or unfixable infra failure). Discard deletes the worktree and branch; the node and its per-attempt artifacts stay in `.evo/` as a record of what was tried.
+- If `evo discard` errors with **"cannot discard committed node ... use prune"** — the experiment cleared the gate and improved the score. You shouldn't be discarding it. Don't fight the error; the orchestrator owns committed-lineage decisions via `evo prune`.
+- If `evo discard` errors with **"cannot discard active node ... pass --force"** — the run is still in flight. Wait for it to finish; don't `--force` unless you know what you're doing (the running process can still write a final outcome that contradicts the discard).
+- If `evo discard` errors with **"cannot discard ... has non-discarded children"** — sibling/child experiments depend on this node's parent reference. Discard or commit-and-prune those first.
 - Do NOT copy `.env` files, bake secrets into source, or hard-code local runtime paths. Runtime setup/env is configured by the orchestrator (`evo config runtime ...`, `evo env ...`) and injected into benchmark/gate processes. If a missing dependency, setup step, or key blocks evaluation, report setup failure.
 - Always annotate your experiments, especially before discarding — the annotation is what persists after the worktree is gone.
 - Stay within your brief's objective and boundaries -- don't drift into unrelated changes

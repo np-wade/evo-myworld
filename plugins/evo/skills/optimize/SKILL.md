@@ -238,6 +238,23 @@ Prune dead branches where 3+ children all regressed:
   ```bash
   evo prune <exp_id> --reason "exhausted: N children all regressed"
   ```
+
+`evo prune` accepts `committed` or `evaluated` nodes. Use it when you want
+to mark a lineage exhausted while preserving the result for later review or
+reference. Prune keeps the git commit alive (anchored at `refs/evo-anchor/<run>/<exp>`)
+so the node can be restored if needed. **Never `evo discard` a committed
+node** — it would orphan the branch ref and risk losing the commit.
+
+If a previously-pruned (or discarded-then-restored) node is worth revisiting:
+  ```bash
+  evo restore <exp_id>
+  ```
+Flips status back to committed; recreates the regular branch from the anchor
+ref so future `evo new --parent <id>` works. For discarded nodes whose commit
+is no longer reachable in git (rare; needs `git gc --prune=now` after the
+discard), restore errors and points at `experiments/<id>/attempts/NNN/diff.patch`
+for manual replay.
+
 Update notes with cross-cutting learnings:
   ```bash
   evo set <exp_id> --note "key insight from round N"

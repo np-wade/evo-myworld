@@ -558,6 +558,38 @@ def attempt_outcome_path(root: Path, exp_id: str, attempt: int) -> Path:
     return attempt_dir(root, exp_id, attempt) / "outcome.json"
 
 
+def parse_diff_patch(root: Path, exp_id: str, attempt: int) -> dict[str, Any] | None:
+    """Parse experiments/<exp_id>/attempts/NNN/diff.patch into structured data.
+
+    Returns {"files": [str], "added": int, "removed": int} or None if the patch
+    is missing, empty, or contains no diff headers. Used by both the scratchpad
+    diff-summary line and outcome.json's `change_files` field.
+    """
+    if attempt <= 0:
+        return None
+    patch = experiments_path(root) / exp_id / "attempts" / f"{attempt:03d}" / "diff.patch"
+    if not patch.exists():
+        return None
+    content = patch.read_text(encoding="utf-8")
+    if not content.strip():
+        return None
+    files: list[str] = []
+    added = 0
+    removed = 0
+    for line in content.splitlines():
+        if line.startswith("diff --git"):
+            parts = line.split()
+            if len(parts) >= 4:
+                files.append(parts[3].lstrip("b/"))
+        elif line.startswith("+") and not line.startswith("+++"):
+            added += 1
+        elif line.startswith("-") and not line.startswith("---"):
+            removed += 1
+    if not files:
+        return None
+    return {"files": files, "added": added, "removed": removed}
+
+
 def experiment_log_path(root: Path, exp_id: str, filename: str) -> Path:
     return experiments_dir_for(root, exp_id) / filename
 

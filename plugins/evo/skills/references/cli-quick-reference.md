@@ -107,10 +107,27 @@ evo new --parent <parent_id> -m "<hypothesis>"
 evo run <exp_id> [--timeout <seconds>]
 evo run <exp_id> --check [--timeout <seconds>]
 evo done <exp_id> --score <float> [--traces <dir>] [--no-compare]
-evo discard <exp_id> --reason "<why>"
+evo discard <exp_id> --reason "<why>" [--force]
 evo prune <exp_id> --reason "<why>"
+evo restore <exp_id>
 evo gc
 ```
+
+Lifecycle command rules:
+
+- `evo discard` is for non-committed nodes (active/evaluated/failed). Refuses
+  `committed` (use `evo prune` — discard would orphan the commit). Refuses
+  `active` without `--force` (the run may still be writing). Refuses any node
+  with non-discarded children.
+- `evo prune` is for committed or evaluated nodes you want to mark as
+  exhausted while preserving the result. The git commit stays alive via the
+  anchor ref `refs/evo-anchor/<run>/<exp>`.
+- `evo restore` undoes a prune (status flips back to committed) or undoes a
+  discard if the commit is still reachable (recreates the regular branch ref
+  from the anchor). If the commit was lost to git GC, restore points you at
+  `experiments/<id>/attempts/NNN/diff.patch` for manual replay.
+- `evo gc` is a sweeper that frees worktree directories from
+  committed/failed/pruned nodes. Branches and commits are kept.
 
 Outcomes:
 
