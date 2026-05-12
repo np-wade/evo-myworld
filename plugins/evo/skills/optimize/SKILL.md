@@ -10,9 +10,12 @@ Run the `evo` optimization loop. Each round, the orchestrator writes structured 
 
 This skill runs on any host that implements the Agent Skills spec. When the body uses generic phrases, apply the host's best-fit equivalent:
 
-- **"spawn N subagents in parallel"** -- use your host's parallel-subagent or background-task tool if you have one (e.g. `Agent` with `run_in_background`, `spawn_agent` + `wait_agent`, `spawn_agents_on_csv` for batch). Respect the host's concurrency cap -- if N exceeds it, run in batches. If the host has no parallel-subagent tool, run them serially and note the reduced round width in the final summary.
+- **"spawn N subagents in parallel"** -- use your host's parallel-subagent tool. Two delivery shapes:
+  - *Background+notify* (`claude-code` / `codex` / `hermes` / `openclaw`): fire-and-forget; the runtime delivers a completion notification at a later turn when each subagent finishes. Per host: `claude-code` -> wrap each spawn in `Bash(run_in_background=true)` so the runtime notifies on completion; `codex` -> non-blocking subagent; `hermes` -> `terminal(background=true)`; `openclaw` -> `sessions_spawn deliver:false`.
+  - *Batch parallel* (`opencode`): fire N `task` calls in ONE assistant message; they run concurrently in child sessions; all tool_results return together when the slowest finishes. Plan all parallel work (including non-task tools) in that one message — opencode cannot interleave reasoning across turns while subagents run.
+  Respect the host's concurrency cap; batch if N exceeds it.
 - **Slash commands shown in user-facing copy** (e.g. `/evo:optimize`) -- translate to your host's mention syntax when speaking to the user (e.g. `$evo optimize` on Codex -- plugin namespace then skill name, separated by a space).
-- **`evo dispatch` (optimization subagents only, host-specific).** On `claude-code`, the optimization subagents in step 5 are launched via `evo dispatch run --background` instead of the host's parallel-Task tool. This shares an explorer's KV cache across siblings of the same parent (~99% prefix reuse). On every other host (`codex`, `opencode`, `openclaw`, `hermes`, `generic`), `evo dispatch` is unsupported and exits 2 with guidance -- step 5 stays on the host's parallel-Task primitive there. The scan sub-agents in step 3 always use the host's parallel-Task tool regardless of host (they don't allocate experiments, so fork-cache doesn't apply).
+- **`evo dispatch` (optimization subagents only, host-specific).** On `claude-code`, the optimization subagents in step 5 are launched via `evo dispatch run` wrapped in `Bash(run_in_background=true)` — the dispatch blocks until its child finishes, the bash tool runs in the background, and the runtime delivers a completion notification per subagent at later turn boundaries. This shares an explorer's KV cache across siblings of the same parent (~99% prefix reuse). On every other host (`codex`, `opencode`, `openclaw`, `hermes`, `generic`), `evo dispatch` is unsupported and exits 2 with guidance -- step 5 stays on the host's parallel-Task primitive there. The scan sub-agents in step 3 always use the host's parallel-Task tool regardless of host (they don't allocate experiments, so fork-cache doesn't apply).
 
 ## Configuration
 
@@ -199,18 +202,23 @@ The mechanism depends on the host recorded by `evo init` / step 0.1's migration 
 
 On `claude-code`, dispatch one child per brief. Each call allocates a new experiment under `<parent>`, ensures an explorer session for that parent is warm (lazy on first dispatch), and forks a child via `claude -p --resume <SID> --fork-session`.
 
-```bash
-# Fan out N children in parallel
-for brief in <each brief>:
-  evo dispatch run \
-    --parent <parent_id> \
-    -m "<brief: objective + boundaries + pointer traces, formatted as you wrote it>" \
-    --budget <budget> \
-    [--explore-context "<focus hint, only on the first dispatch of the round>"] \
-    --background
+```
+# Fan out N children. One Bash(run_in_background=true) call per brief.
+# Each call's bash blocks until `evo dispatch run` returns (i.e. that
+# child has committed/failed), then exits — at which point claude code
+# delivers a <task-notification> with the dispatch's final stdout
+# (status + score + outcome JSON). Notifications arrive at later turn
+# boundaries, one per subagent, as each finishes.
 
-# Block until all complete
-evo dispatch wait
+for brief in <each brief>:
+  Bash(
+    command =
+      'evo dispatch run --parent <parent_id> '
+      '-m "<brief: objective + boundaries + pointer traces>" '
+      '--budget <budget> '
+      '[--explore-context "<focus hint, first dispatch of the round only>"]',
+    run_in_background = True,
+  )
 ```
 
 The `--explore-context` flag is shared per parent (it shapes the explorer's read pass) -- pass it on the first dispatch from a given parent in a round, omit on subsequent ones. If you need a different focus mid-round, pass `--refresh-explorer` to force a rebuild.
@@ -223,11 +231,16 @@ Spawn all subagents in a **single batch** using your host's parallel-subagent to
 
 Pick a faster model for straightforward briefs and a stronger model for harder ones requiring deeper trace analysis, if your host exposes per-call model selection.
 
-Each subagent prompt must include:
-- An instruction to read `skills/subagent/SKILL.md` and follow its protocol
+Each subagent prompt MUST start with the literal sentence:
+
+> "First, read `skills/subagent/SKILL.md` and follow its protocol exactly. Allocate your experiment via `evo new --parent <id>`, edit inside the returned worktree, evaluate via `evo run <exp_id>`. Do not skip these steps even if the brief looks simple."
+
+Then append:
 - The four-field brief verbatim (objective, parent, boundaries/anti-patterns, pointer traces)
 - The iteration budget
 - A one-paragraph scratchpad summary (current best score, frontier nodes, recent failures) for context
+
+The opening sentence is non-negotiable — without it small models often skip the evo CLI and edit files directly, which produces no committed experiments and breaks the round.
 
 ### 6. Collect results and update state
 

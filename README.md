@@ -27,7 +27,7 @@ Claude Code bundles its own copy. Every other host calls `evo` as an external bi
 
 ```bash
 uv tool install evo-hq-cli   # or: pipx install evo-hq-cli
-evo --version                # evo-hq-cli 0.3.0
+evo --version
 ```
 
 ### 2. Add the plugin
@@ -45,27 +45,65 @@ Invoke: `/evo:discover`, `/evo:optimize`.
 
 ```bash
 codex plugin marketplace add evo-hq/evo
+evo install codex
 ```
 
-Then `/plugins` → `evo` → install. Invoke: `$evo discover`, `$evo optimize`.
+Then trust the evo hooks: start `codex`, run `/hooks`, trust each evo hook. Without this, `evo direct` mid-run directives won't reach the agent; skills and the rest of evo still work.
+
+For non-interactive setups (CI, scripts, `codex exec`), add `--trust-hooks` to skip the manual review:
+
+```bash
+evo install codex --trust-hooks
+```
+
+Invoke: `$evo:discover`, `$evo:optimize`.
 
 **OpenClaw**
 
 ```bash
 openclaw plugins install evo --marketplace https://github.com/evo-hq/evo
+evo install openclaw
 ```
 
 Invoke: `/discover`, `/optimize`.
 
-**Hermes** (per-skill install, no bundle support)
+**Hermes** (skills install per-skill; runtime plugin via pip entry-point)
 
 ```bash
-hermes skills install evo-hq/evo/plugins/evo/skills/discover --force
-hermes skills install evo-hq/evo/plugins/evo/skills/optimize
-hermes skills install evo-hq/evo/plugins/evo/skills/subagent
+# Skills
+hermes skills install evo-hq/evo/plugins/evo/skills/discover -y --force
+hermes skills install evo-hq/evo/plugins/evo/skills/optimize -y
+hermes skills install evo-hq/evo/plugins/evo/skills/subagent -y
+hermes skills install evo-hq/evo/plugins/evo/skills/infra-setup -y
+
+# Runtime plugin (for `evo direct` mid-run notifications)
+evo install hermes
 ```
 
-`--force` on `discover` bypasses the SKILL.md scanner (it flags evo's own install examples). Invoke: `/discover`, `/optimize`.
+`--force` on `discover` bypasses the SKILL.md scanner (it flags evo's
+own install examples). Invoke: `/discover`, `/optimize`.
+
+**Opencode**
+
+```bash
+npx skills add evo-hq/evo --agent opencode -g
+evo install opencode
+```
+
+Invoke: `/discover`, `/optimize`.
+
+> Note: opencode's `task` tool is batch-parallel (all subagents in one
+> assistant turn return together when the slowest finishes), not
+> background-with-notification like the other four hosts. evo's optimize
+> loop works fine — rounds complete batch-wise — but reactive workflows
+> that act on early completions before the slowest finishes aren't
+> supported on opencode.
+
+**Verify any install**
+
+```bash
+evo doctor <host>     # claude-code, codex, hermes, opencode, or openclaw
+```
 
 ## Usage
 
