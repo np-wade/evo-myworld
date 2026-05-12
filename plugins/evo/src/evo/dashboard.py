@@ -13,6 +13,7 @@ from .core import (
     _load_meta,
     _save_meta,
     attempt_dir,
+    attempt_outcome_path,
     attempt_traces_dir,
     best_committed_score,
     evo_dir,
@@ -29,10 +30,13 @@ from .core import (
     runtime_env_summary,
     runtime_env_values_path,
     save_config,
+    update_node,
 )
+from .core import utc_now
 from .frontier_strategies import (
     DEFAULT_FRONTIER_STRATEGY,
     FRONTIER_STRATEGIES,
+    pick as frontier_pick,
     resolve_from_config,
     validate_frontier_strategy,
 )
@@ -657,8 +661,10 @@ def create_app(root: Path | None = None) -> Flask:
                 "baseline_score": baseline,
                 "total_experiments": len(nodes),
                 "committed": sum(1 for node in nodes if node.get("status") == "committed"),
+                "evaluated": sum(1 for node in nodes if node.get("status") == "evaluated"),
                 "discarded": sum(1 for node in nodes if node.get("status") == "discarded"),
                 "active": sum(1 for node in nodes if node.get("status") == "active"),
+                "pending": sum(1 for node in nodes if node.get("status") == "pending"),
                 "failed": sum(1 for node in nodes if node.get("status") == "failed"),
                 "pruned": sum(1 for node in nodes if node.get("status") == "pruned"),
                 "frontier": len(frontier_nodes(graph)),
@@ -705,6 +711,48 @@ def create_app(root: Path | None = None) -> Flask:
         root = _root()
         config = load_config(root)
         return jsonify(_public_node(root, load_graph(root)["nodes"][exp_id], workspace_config=config))
+
+    @app.post("/api/node/<exp_id>/prune")
+    def prune_node(exp_id: str):
+        """Mark a node as pruned with a reason. Mirrors `evo prune <exp_id>`.
+
+        Pruning removes a committed/evaluated leaf from the frontier without
+        deleting the commit. Active/failed/discarded/already-pruned nodes
+        cannot be pruned.
+        """
+        body = request.get_json(silent=True) or {}
+        reason = (body.get("reason") or "").strip()
+        if not reason:
+            return jsonify({"error": "reason is required"}), 400
+
+        root = _root()
+        graph = load_graph(root)
+        if exp_id not in graph["nodes"]:
+            return jsonify({"error": f"unknown experiment {exp_id!r}"}), 404
+        current_status = graph["nodes"][exp_id].get("status")
+        if current_status not in ("committed", "evaluated"):
+            return (
+                jsonify(
+                    {
+                        "error": (
+                            f"only committed or evaluated nodes can be pruned; "
+                            f"{exp_id} is {current_status!r}"
+                        )
+                    }
+                ),
+                409,
+            )
+
+        def _mark(current_node: dict, _graph: dict) -> None:
+            current_node["status"] = "pruned"
+            current_node["pruned_reason"] = reason
+
+        try:
+            updated = update_node(root, exp_id, _mark)
+        except (KeyError, RuntimeError) as exc:
+            return jsonify({"error": str(exc)}), 400
+        config = load_config(root)
+        return jsonify(_public_node(root, updated, workspace_config=config))
 
     @app.get("/api/workspace")
     def workspace():
@@ -849,6 +897,59 @@ def create_app(root: Path | None = None) -> Flask:
         config["frontier_strategy"] = normalized
         save_config(_root(), config)
         return jsonify(normalized)
+
+    @app.get("/api/frontier")
+    def frontier():
+        """Strategy-ranked frontier nodes — same logic as `evo frontier`, minus
+        the infra_log append. The dashboard polls this on every tick, so we
+        skip the persistence step (the CLI uses it for actual selection events).
+
+        Optional ?seed=N pins stochastic strategies for reproducible polls.
+        Default is seed=0 so the rail doesn't shuffle between refreshes."""
+        root = _root()
+        config = load_config(root)
+        graph = load_graph(root)
+        raw_nodes = frontier_nodes(graph)
+        summaries = [
+            {
+                "id": n["id"],
+                "score": n.get("score"),
+                "eval_epoch": n.get("eval_epoch"),
+                "hypothesis": n.get("hypothesis"),
+            }
+            for n in raw_nodes
+        ]
+        strategy = resolve_from_config(config)
+        # pareto_per_task needs per-attempt outcome files for task-level scores.
+        outcomes: dict[str, dict] = {}
+        if strategy["kind"] == "pareto_per_task":
+            for n in raw_nodes:
+                attempt = n.get("current_attempt")
+                if not attempt:
+                    continue
+                path = attempt_outcome_path(root, n["id"], int(attempt))
+                if path.exists():
+                    try:
+                        outcomes[n["id"]] = json.loads(path.read_text(encoding="utf-8"))
+                    except json.JSONDecodeError:
+                        pass
+        metric = config.get("metric", "max")
+        seed_q = request.args.get("seed", default=0, type=int)
+        try:
+            ranked, seed_used = frontier_pick(
+                summaries, strategy, metric, outcomes=outcomes, seed=seed_q,
+            )
+        except ValueError as exc:
+            return jsonify({"error": str(exc)}), 400
+        payload = {
+            "strategy": strategy,
+            "generated_at": utc_now(),
+            "picks": ranked,
+            "all_ids": [n["id"] for n in raw_nodes],
+        }
+        if strategy["kind"] in {"epsilon_greedy", "softmax", "pareto_per_task"}:
+            payload["seed"] = seed_used
+        return jsonify(payload)
 
     return app
 
