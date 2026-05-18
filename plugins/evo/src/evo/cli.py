@@ -4450,6 +4450,21 @@ def build_parser() -> argparse.ArgumentParser:
              "write on user approval, enabling mid-run directives. Use only "
              "if you've reviewed plugins/evo/hooks/hooks.json and accept it.",
     )
+    install_p.add_argument(
+        "--version",
+        default=None,
+        help="Pin host-side prereq install to a specific evo-hq-cli release "
+             "(e.g. '0.4.0') or any git ref (branch/tag/sha). Without this, "
+             "the host's marketplace install pulls from the default branch.",
+    )
+    install_p.add_argument(
+        "--force",
+        action="store_true",
+        help="Re-run the host's marketplace install even if the install state "
+             "already exists. Without --force, the prereq is skipped when the "
+             "host plugin is already present (avoids overwriting a tag-pinned "
+             "install with default-branch content).",
+    )
     install_p.set_defaults(func=cmd_install)
 
     uninstall_p = sub.add_parser("uninstall", help="Remove the evo plugin for a host")

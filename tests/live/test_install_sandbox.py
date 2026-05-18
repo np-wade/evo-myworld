@@ -256,6 +256,63 @@ def test_openclaw(sandbox_4g):
     sandbox_4g.run("export PATH=$HOME/.local/bin:$PATH; evo doctor openclaw")
 
 
+def test_upgrade_0_4_0_to_alpha_via_pypi(sandbox):
+    """Real upgrade flow: 0.4.0 (manually wired up the 0.4.0 way) →
+    0.4.1-alpha.1 via PyPI + `evo update --force`. Verifies that a user
+    on 0.4.0 can migrate to the alpha using the documented migration
+    one-liner.
+
+    Note: 0.4.0's `evo install claude-code` was a print-only stub — the
+    user had to run `claude plugin marketplace add` + `claude plugin
+    install` manually. So we simulate that 0.4.0 install path here, then
+    test the upgrade.
+    """
+    # Step 1: reset to 0.4.0 from PyPI
+    sandbox.run("export PATH=$HOME/.local/bin:$PATH; uv tool uninstall evo-hq-cli",
+                timeout=60)
+    sandbox.run("export PATH=$HOME/.local/bin:$PATH; uv tool install evo-hq-cli==0.4.0",
+                timeout=300)
+    v1 = sandbox.run("export PATH=$HOME/.local/bin:$PATH; evo --version").strip()
+    assert "0.4.0" in v1 and "0.4.1" not in v1, f"expected 0.4.0, got {v1!r}"
+
+    # Step 2: install claude-code the 0.4.0 way (manual marketplace + install)
+    sandbox.install_node("22")
+    sandbox.run(
+        f"{sandbox._sudo}npm install -g @anthropic-ai/claude-code > /tmp/cc.log 2>&1",
+        timeout=300,
+    )
+    sandbox.run("claude plugin marketplace add evo-hq/evo", timeout=120)
+    sandbox.run("claude plugin install evo@evo-hq-evo --scope user", timeout=120)
+    sandbox.run("export PATH=$HOME/.local/bin:$PATH; evo doctor claude-code")
+    # Verify pre-upgrade cache is 0.4.0
+    pre = sandbox.run(
+        "grep version $HOME/.claude/plugins/cache/evo-hq-evo/evo/*/.claude-plugin/plugin.json"
+    )
+    assert "0.4.0" in pre and "0.4.1" not in pre, f"expected 0.4.0 cache, got {pre!r}"
+
+    # Step 3: the documented migration one-liner from README
+    sandbox.run(
+        "export PATH=$HOME/.local/bin:$PATH; "
+        "uv tool install --force evo-hq-cli==0.4.1-alpha.1",
+        timeout=300,
+    )
+    v2 = sandbox.run("export PATH=$HOME/.local/bin:$PATH; evo --version").strip()
+    assert "0.4.1" in v2, f"expected 0.4.1 after CLI upgrade, got {v2!r}"
+
+    sandbox.run(
+        "export PATH=$HOME/.local/bin:$PATH; "
+        "evo update claude-code --version 0.4.1-alpha.1 --force",
+        timeout=240,
+    )
+    sandbox.run("export PATH=$HOME/.local/bin:$PATH; evo doctor claude-code")
+
+    # Step 4: verify cache version flipped to 0.4.1
+    post = sandbox.run(
+        "grep version $HOME/.claude/plugins/cache/evo-hq-evo/evo/*/.claude-plugin/plugin.json"
+    )
+    assert "0.4.1" in post, f"expected 0.4.1 in cache after upgrade, got {post!r}"
+
+
 def test_hermes(sandbox):
     """Hermes: official installer + `evo install hermes --from-path` against
     the local source tarball.

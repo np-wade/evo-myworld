@@ -62,12 +62,20 @@ def install(args: argparse.Namespace) -> int:
     # sandbox, and pull skills from the uploaded source instead).
     if not getattr(args, "from_path", None) and not getattr(args, "from_source", False):
         if shutil.which("hermes") is not None:
+            # Pin to --version's git tag when set. hermes accepts
+            # `owner/repo@<ref>/path/to/skill` per test_release_smoke.py:115.
+            version = getattr(args, "version", None)
+            ref_suffix = ""
+            if version:
+                import re as _re
+                ref = f"v{version}" if _re.match(r"^\d+\.\d+\.\d+", version) else version
+                ref_suffix = f"@{ref}"
             for skill in _SKILLS:
                 # `discover` needs --force to bypass the SKILL.md scanner,
                 # which flags evo's own install examples.
                 extra = ["--force"] if skill == "discover" else []
                 cmd = ["hermes", "skills", "install",
-                       f"evo-hq/evo/plugins/evo/skills/{skill}", "-y", *extra]
+                       f"evo-hq/evo{ref_suffix}/plugins/evo/skills/{skill}", "-y", *extra]
                 print(f"$ {' '.join(cmd)}")
                 subprocess.call(cmd)
         else:

@@ -95,16 +95,31 @@ def install(args: argparse.Namespace) -> int:
 
     from_path = getattr(args, "from_path", None)
     trust_hooks = bool(getattr(args, "trust_hooks", False))
+    force = bool(getattr(args, "force", False))
 
-    # Drive `codex plugin marketplace add` automatically (idempotent on
-    # repeat installs — codex returns success even if already added). This
-    # also has the side effect of creating ~/.codex/ on fresh installs
-    # where codex CLI has been npm-installed but never run.
-    # Skipped when --from-path is set, because the user is testing a local
-    # marketplace dir and shouldn't have it overwritten by the GitHub copy.
-    if not from_path:
+    # Drive `codex plugin marketplace add` automatically. Skip if:
+    #   - --from-path is set (user is testing a local marketplace)
+    #   - marketplace clone already exists and --force not set (avoids
+    #     overwriting a tag-pinned install with unpinned default-branch
+    #     content; e.g. release-smoke tests do their own tag-pinned
+    #     marketplace add and would lose the pin if we re-added unpinned)
+    mkt_cache = _marketplace_cache()
+    if from_path:
+        pass
+    elif mkt_cache.exists() and not force:
+        print(
+            f"codex marketplace cache already at {mkt_cache}; "
+            "skipping `codex plugin marketplace add` prereq (use --force to refresh)"
+        )
+    else:
         import subprocess as _sp
-        mkt_cmd = ["codex", "plugin", "marketplace", "add", "evo-hq/evo"]
+        version = getattr(args, "version", None)
+        source = "evo-hq/evo"
+        if version:
+            import re as _re
+            ref = f"v{version}" if _re.match(r"^\d+\.\d+\.\d+", version) else version
+            source = f"{source}@{ref}"
+        mkt_cmd = ["codex", "plugin", "marketplace", "add", source]
         print(f"$ {' '.join(mkt_cmd)}")
         _sp.call(mkt_cmd)
 
