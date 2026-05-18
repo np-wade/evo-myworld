@@ -257,14 +257,16 @@ def test_openclaw(sandbox_4g):
 
 
 # ---------------------------------------------------------------------------
-# Upgrade verification: 0.4.0 → latest alpha via documented migration path
+# Upgrade verification: 0.4.0 → current release via documented migration path
 # ---------------------------------------------------------------------------
 
-# PyPI normalises 0.4.1-alpha.2 to 0.4.1a2; plugin marketplace tag is
-# v0.4.1-alpha.2. Both forms appear in user-facing docs and are tested
-# together to catch normalisation drift between PyPI metadata and git tags.
-_ALPHA_PEP440 = "0.4.1a5"
-_ALPHA_TAG = "0.4.1-alpha.5"
+# Target version for the upgrade flow. For stable releases both forms
+# below are identical; for pre-releases they diverge (PyPI normalises
+# 0.4.1-alpha.2 to 0.4.1a2 while the plugin marketplace tag stays
+# v0.4.1-alpha.2). Keep both so the test catches normalisation drift
+# whenever the target is a pre-release.
+_TARGET_PEP440 = "0.4.1"
+_TARGET_TAG = "0.4.1"
 
 
 def _install_evo_cli(sandbox, pypi_version: str):
@@ -289,15 +291,15 @@ def _run_documented_upgrade(sandbox, host: str):
     """
     sandbox.run(
         f"export PATH=$HOME/.local/bin:$PATH; "
-        f"uv tool install --force 'evo-hq-cli=={_ALPHA_PEP440}'",
+        f"uv tool install --force 'evo-hq-cli=={_TARGET_PEP440}'",
         timeout=300,
     )
     v_cli = sandbox.run("export PATH=$HOME/.local/bin:$PATH; evo --version").strip()
-    assert _ALPHA_TAG in v_cli, f"expected {_ALPHA_TAG} in {v_cli!r}"
+    assert _TARGET_TAG in v_cli, f"expected {_TARGET_TAG} in {v_cli!r}"
 
     sandbox.run(
         f"export PATH=$HOME/.local/bin:$PATH; "
-        f"evo update {host} --version {_ALPHA_TAG} --force",
+        f"evo update {host} --version {_TARGET_TAG} --force",
         timeout=300,
     )
     sandbox.run(f"export PATH=$HOME/.local/bin:$PATH; evo doctor {host}")
@@ -330,7 +332,7 @@ def test_upgrade_claude_code(sandbox):
     post = sandbox.run(
         "grep version $HOME/.claude/plugins/cache/evo-hq-evo/evo/*/.claude-plugin/plugin.json"
     )
-    assert _ALPHA_TAG in post, f"expected {_ALPHA_TAG} in cache, got {post!r}"
+    assert _TARGET_TAG in post, f"expected {_TARGET_TAG} in cache, got {post!r}"
 
 
 def test_upgrade_codex(sandbox):

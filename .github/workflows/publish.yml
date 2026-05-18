@@ -263,32 +263,15 @@ jobs:
           VERSION="${TAG#cli-v}"
           VERSION="${VERSION#v}"
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-      - name: Wait for evo-hq-cli to be queryable on PyPI
-        run: |
-          VERSION="${{ steps.version.outputs.version }}"
-          # PyPI normalises 0.4.1-alpha.5 -> 0.4.1a5 (PEP-440). The JSON
-          # API endpoint accepts the normalised form.
-          PEP440=$(echo "$VERSION" \
-            | sed -E 's/-alpha\./a/; s/-beta\./b/; s/-rc\./rc/')
-          echo "Polling https://pypi.org/pypi/evo-hq-cli/$PEP440/json..."
-          # `pip index versions` is experimental and silently outputs
-          # nothing when its index cache is stale — useless for polling.
-          # Hit PyPI's JSON API directly: 200 = version exists, 404 =
-          # not yet. Exit 1 on timeout so a broken publish surfaces here
-          # instead of as a confusing pip error in the next step.
-          for i in $(seq 1 30); do
-            code=$(curl -s -o /dev/null -w "%{http_code}" \
-              "https://pypi.org/pypi/evo-hq-cli/$PEP440/json" || echo "000")
-            if [ "$code" = "200" ]; then
-              echo "Found evo-hq-cli==$PEP440 on PyPI (after ${i} attempts)"
-              exit 0
-            fi
-            echo "  attempt $i: HTTP $code, sleeping 5s..."
-            sleep 5
-          done
-          echo "::error::evo-hq-cli==$PEP440 not queryable on PyPI after 150s"
-          echo "::error::publish-cli step may have failed silently; check its logs"
-          exit 1
+      # Note: previously had a "wait for PyPI queryable" polling loop
+      # here. Removed because PyPI propagation (twine upload →
+      # queryable) is reliably <30s and the sandbox spawn + bootstrap
+      # in the smoke tests below already takes longer than that. The
+      # extra wait was a defensive ~30s tax on every release for a
+      # race that wasn't actually happening. If publish-cli silently
+      # broke, the smoke step's `uv tool install evo-hq-cli==X` would
+      # fail with a clear "no matching distribution" — diagnosable
+      # without the polling layer.
       - name: Install test deps
         run: |
           python -m pip install --upgrade pip
