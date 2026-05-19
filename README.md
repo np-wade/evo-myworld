@@ -57,7 +57,7 @@ Pass `optimize` parameters as `key=value` after the skill name:
 | `budget` | 5 | Max iterations each subagent can run within its branch |
 | `stall` | 5 | Consecutive rounds with no improvement before auto-stopping |
 
-Invocation syntax is host-specific: `/evo:` on Claude Code, `$evo` on Codex, natural language on Hermes, Opencode, and OpenClaw.
+Invocation syntax is host-specific: `/evo:` on Claude Code, `$evo` on Codex, natural language on Hermes, Opencode, OpenClaw, and Pi.
 
 ## Install
 
@@ -66,10 +66,10 @@ Invocation syntax is host-specific: `/evo:` on Claude Code, `$evo` on Codex, nat
 uv tool install evo-hq-cli
 
 # 2. Host CLI (if you don't already have it)
-npm install -g @anthropic-ai/claude-code     # or @openai/codex, openclaw
+npm install -g @anthropic-ai/claude-code     # or @openai/codex, openclaw, @earendil-works/pi-coding-agent
 
 # 3. Plugin + host hooks
-evo install <host>     # claude-code | codex | hermes | opencode | openclaw
+evo install <host>     # claude-code | codex | hermes | opencode | openclaw | pi
 ```
 
 `evo install <host>` installs the plugin into the host's marketplace and stages the hooks evo needs to talk to in-flight subagents. Verify with `evo doctor <host>`.
@@ -142,7 +142,7 @@ uv run --project /path/to/evo/plugins/evo evo dashboard --port 8080
 ## Upgrading
 
 ```bash
-evo update <host>                    # host: claude-code | codex | hermes | opencode | openclaw
+evo update <host>                    # host: claude-code | codex | hermes | opencode | openclaw | pi
 evo update <host> --version 0.4.1    # pin to a release
 ```
 
