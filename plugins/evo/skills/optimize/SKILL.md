@@ -10,7 +10,7 @@ Run the `evo` optimization loop. Each round, the orchestrator writes structured 
 
 This skill runs on any host that implements the Agent Skills spec. When the body uses generic phrases, apply the host's best-fit equivalent:
 
-- **"spawn N subagents in parallel"** -- use your host's parallel-subagent tool. See Step 5 below for the per-host spawn commands. Two broad shapes exist: *background+notify* (claude-code / codex / hermes / openclaw — fire-and-forget; the runtime delivers a `<task-notification>` at a later turn per subagent), and *batch parallel* (opencode — all spawns return together in one message).
+- **"spawn N subagents in parallel"** -- use your host's parallel-subagent tool. See Step 5 below for the per-host spawn commands. Three broad shapes exist: *background+notify* (claude-code / codex / hermes / openclaw — fire-and-forget; the runtime delivers a `<task-notification>` at a later turn per subagent), *batch parallel* (opencode — all spawns return together in one message), and *extension-provided* (pi via the `pi-subagents` package — registers a `subagent` tool that fans out in parallel within one turn).
 - **Slash commands shown in user-facing copy** (e.g. `/evo:optimize`) -- translate to your host's mention syntax when speaking to the user (e.g. `$evo optimize` on Codex -- plugin namespace then skill name, separated by a space).
 
 ## Mid-run user directives (`evo direct`)
@@ -101,7 +101,7 @@ Repeat until interrupted or stall limit reached:
 
 **Step 0 (always, before anything else): ensure you have read `.evo/project.md`.** Its contents define the optimization metric and goal; every pattern you report MUST be tied to a failure mode of that goal. If you haven't read it yet in this session, read it now -- before listing experiments, opening any `outcome.json`, or spawning sub-agents. If the file is missing, stop and tell the user.
 
-**Step 0.1 (one-time auto-migration): ensure the workspace knows what runtime you are.** Run `evo host show`. If it prints `<not set>`, the workspace pre-dates the host signature field — declare your runtime now: `evo host set <one of: claude-code, codex, opencode, openclaw, hermes, generic>`. You know what runtime you're operating in (your system prompt, env vars like `CLAUDECODE=1`, your own self-identity); pick the matching value. If genuinely unsure, use `generic`. Do not ask the user — this is a one-time silent migration. Subsequent rounds skip this step (`evo host show` returns the recorded value).
+**Step 0.1 (one-time auto-migration): ensure the workspace knows what runtime you are.** Run `evo host show`. If it prints `<not set>`, the workspace pre-dates the host signature field — declare your runtime now: `evo host set <one of: claude-code, codex, opencode, openclaw, hermes, pi, generic>`. You know what runtime you're operating in (your system prompt, env vars like `CLAUDECODE=1`, your own self-identity); pick the matching value. If genuinely unsure, use `generic`. Do not ask the user — this is a one-time silent migration. Subsequent rounds skip this step (`evo host show` returns the recorded value).
 
 ```bash
 evo scratchpad          # bounded state summary (tree, frontier, awaiting decision, gates, annotations, what-not-to-try, notes)
@@ -213,6 +213,7 @@ Per host, the spawn shape matters because evo's loop depends on *completion noti
 - **hermes** — `terminal(background=true)`; notifications delivered similarly.
 - **openclaw** — `sessions_spawn deliver:false`; notifications delivered similarly.
 - **opencode** — *batch-parallel only* (no background notifications). Fire N `task` calls in ONE assistant message; all `tool_result`s return together when the slowest finishes. Plan all parallel work (including non-task tools) in that single message — opencode cannot interleave reasoning across turns while subagents run.
+- **pi** — *batch-parallel via extension*. Pi's default toolkit has no subagent primitive; `evo install pi` ensures the `pi-subagents` package is present, which registers a `subagent` tool. Fire N `subagent` calls in ONE assistant message; all results return together when the slowest finishes (same shape as opencode). If the `subagent` tool isn't available, fall back to running experiments sequentially in your own turn (`evo new` → `evo run` per attempt) and tell the user to `pi install npm:pi-subagents` for proper fanout.
 
 Respect the host's concurrency cap; batch if N exceeds it.
 

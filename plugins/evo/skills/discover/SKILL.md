@@ -164,12 +164,12 @@ build/
 ```bash
 evo init --name "<short project name>" \
   --target <file> --benchmark "<command using {worktree} and {target}>" --metric <max|min> \
-  --host <claude-code|codex|opencode|openclaw|hermes|generic> \
+  --host <claude-code|codex|opencode|openclaw|hermes|pi|generic> \
   --instrumentation-mode <sdk|inline> [--gate "<gate command>"] \
   [--commit-strategy <all|tracked-only>]
 ```
 
-**`--host` is required.** Pass the host runtime you (the orchestrator) are running under. Allowed values: `claude-code`, `codex`, `opencode`, `openclaw`, `hermes`, `generic`. This is recorded in `.evo/meta.json` so other commands can adapt to host-specific conventions. Pick the value matching the runtime you invoked `discover` from. Use `evo host set <value>` later if you change runtimes.
+**`--host` is required.** Pass the host runtime you (the orchestrator) are running under. Allowed values: `claude-code`, `codex`, `opencode`, `openclaw`, `hermes`, `pi`, `generic`. This is recorded in `.evo/meta.json` so other commands can adapt to host-specific conventions. Pick the value matching the runtime you invoked `discover` from. Use `evo host set <value>` later if you change runtimes.
 
 **`--name` should be a short human-readable project label** for dashboard display, chosen from the repository/product context. Existing workspaces without a name fall back to the repo directory name; do not hand-edit config just to migrate them.
 
