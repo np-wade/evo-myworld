@@ -733,23 +733,25 @@ def test_opencode(sandbox_4g):
 
     prompt = _shell_quote(_read_prompt())
 
+    # `evo install opencode` now installs skills itself (via npx skills
+    # add). In local-source mode pass --from-path so skills come from the
+    # uploaded local repo, not GitHub. In PyPI mode the adapter tag-pins
+    # via --version.
+    import os as _os
+    smoke_version = _os.environ.get("EVO_RELEASE_SMOKE_VERSION", "").strip()
+    if sandbox_4g.marketplace_source.startswith("/"):
+        evo_install_opencode_args = "--from-path /tmp/evo-local-repo"
+    elif smoke_version:
+        evo_install_opencode_args = f"--version {smoke_version}"
+    else:
+        evo_install_opencode_args = ""
     _drive_smoke(
         sandbox_4g,
         host="opencode",
         install_steps=[
             "curl -fsSL https://opencode.ai/install | bash > /tmp/opencode.log 2>&1",
-            # Skills via the canonical cross-host CLI; opencode scans
-            # ~/.agents/skills/ where this writes by default with -g.
-            # npx skills accepts local paths and git URLs with `#<ref>`
-            # fragments. Tag-pin via _skills_repo_ref_opencode() so the
-            # smoke run for v0.4.0-alpha.N pulls v0.4.0-alpha.N skills,
-            # not whatever's on main (which lags behind alpha tags).
             f"export PATH=$HOME/.local/bin:$HOME/.opencode/bin:$PATH; "
-            f"npx -y skills add "
-            f"{_skills_repo_ref_opencode(sandbox_4g.marketplace_source)} "
-            f"--agent opencode -g -y",
-            "export PATH=$HOME/.local/bin:$HOME/.opencode/bin:$PATH; "
-            "evo install opencode",
+            f"evo install opencode {evo_install_opencode_args}",
         ],
         drive_cmd=(
             "export PATH=$HOME/.local/bin:$HOME/.opencode/bin:$PATH; "
