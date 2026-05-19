@@ -18,7 +18,7 @@
 
 *Inspired by [Karpathy's autoresearch](https://github.com/karpathy/nanochat).*
 
-Runs on Claude Code, Codex, OpenClaw, Hermes, or Opencode. Experiments run locally or on remote sandboxes — Modal, E2B, Daytona, AWS, Azure, SSH.
+Runs on Claude Code, Codex, OpenClaw, Hermes, Opencode, or Pi. Experiments run locally or on remote sandboxes — Modal, E2B, Daytona, AWS, Azure, SSH.
 
 Point it at a repo. evo runs experiments in **parallel** — each subagent edits the code in its own workspace and runs your benchmark. The orchestrator keeps wins, discards losses, and explores multiple directions at once instead of one greedy path.
 
