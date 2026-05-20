@@ -21,6 +21,7 @@ Per `notes/cross-host-inject-design.md`.
 from __future__ import annotations
 
 import argparse
+import datetime as dt
 import json
 import os
 import sys
@@ -39,6 +40,24 @@ from .registry import get_session, register_session
 # these to catch directives queued before the session existed. Covers both
 # Claude Code's PascalCase and Cursor's camelCase spelling.
 _SESSION_START_EVENTS = ("SessionStart", "sessionStart")
+
+
+def _drain_debug(**fields) -> None:
+    """Append a diagnostic line to ~/.cursor/evo-drain.log, but only when the
+    opt-in sentinel ~/.cursor/.evo-drain-debug exists (or EVO_DRAIN_DEBUG is
+    set). Used to diagnose why a directive isn't reaching a Cursor IDE
+    session — shows the hook payload shape and where the drain decided to
+    bail. Never logs in normal operation; failures are swallowed."""
+    try:
+        sentinel = Path.home() / ".cursor" / ".evo-drain-debug"
+        if not sentinel.exists() and not os.environ.get("EVO_DRAIN_DEBUG"):
+            return
+        rec = {"ts": dt.datetime.now().isoformat(timespec="seconds"), **fields}
+        log = Path.home() / ".cursor" / "evo-drain.log"
+        with log.open("a", encoding="utf-8") as f:
+            f.write(json.dumps(rec) + "\n")
+    except Exception:  # noqa: BLE001 — diagnostics must never break the hook
+        pass
 
 
 HOST_HOOK_EVENT_NAMES = {
@@ -276,16 +295,27 @@ def main(argv: list[str] | None = None) -> int:
         return drain_session(root, args.session, host=args.host, hook_event=hook_event)
 
     # Mode 2: self-contained — resolve everything from args + stdin payload.
-    session = args.session or payload.get("session_id") or payload.get("conversation_id")
-    if not session:
-        sys.stdout.write("{}")
-        return 0
-    root = _resolve_root_from_payload(payload)
-    if root is None or not inject_root(root).parent.exists():
-        sys.stdout.write("{}")
-        return 0
+    # Key on conversation_id: it's present in EVERY Cursor hook event, whereas
+    # session_id only appears in sessionStart. Keying on session_id would
+    # register the session under one id at sessionStart and then look up a
+    # different id at postToolUse (where session_id is absent), so mid-run
+    # directives would never be delivered.
     host = args.host or "cursor"
-    if not _self_contained_gate(root, session, host, hook_event):
+    session = args.session or payload.get("conversation_id") or payload.get("session_id")
+    root = _resolve_root_from_payload(payload)
+    if not session or root is None or not inject_root(root).parent.exists():
+        _drain_debug(stage="resolve", host=host, hook_event=hook_event,
+                     payload_keys=sorted(payload.keys()), session=session,
+                     root=str(root) if root else None, decision="bail")
+        sys.stdout.write("{}")
+        return 0
+    registered = session_file(root, session).exists()
+    has_marker = marker.exists(root, session)
+    gate = _self_contained_gate(root, session, host, hook_event)
+    _drain_debug(stage="gate", host=host, hook_event=hook_event, session=session,
+                 root=str(root), registered_before=registered, marker=has_marker,
+                 gate=gate)
+    if not gate:
         sys.stdout.write("{}")
         return 0
     return drain_session(root, session, host=host, hook_event=hook_event)
