@@ -15,14 +15,21 @@
 **[Try it](#try-it)** · **[Install](#install)** · **[How it works](#how-it-works)** · **[Dashboard](#dashboard)** · **[Upgrading](#upgrading)**
 
 </div>
+A plugin for your agentic framework that optimizes code through experiments
 
-*Inspired by [Karpathy's autoresearch](https://github.com/karpathy/nanochat).*
+You give it a codebase. It discovers metrics to optimize, sets up the evaluation, and starts running experiments in a loop -- trying things, keeping what improves the score, throwing away what doesn't.
+
+*Inspired by [Karpathy's autoresearch](https://github.com/karpathy/autoresearch)* -- where an LLM runs training experiments autonomously to beat its own best score. Autoresearch is a pure hill climb: try something, keep or revert, repeat on a single branch. Evo adds structure on top of that idea:
+
+- **Tree search over greedy hill climb.** Multiple directions can fork from any committed node, so exploration doesn't collapse to one path.
+- **Parallel semi-autonomous agents.** Spawn multiple subagents and run them simultaneously, each in its own git worktree. Each subagent reads traces, formulates hypotheses, and can run multiple iterations within its branch.
+- **Shared state.** Failure traces, annotations, and discarded hypotheses are accessible to every agent before it decides what to try next.
+- **Gating.** Regression tests or safety checks can be wired up as a gate. Experiments that don't pass get discarded.
+- **Observability.** A dashboard to monitor your experiments.
+- **Benchmark discovery.** The `discover` skill explores the repo, figures out what to measure, and instruments the evaluation.
+
 
 Runs on Claude Code, Codex, OpenClaw, Hermes, Opencode, or Pi. Experiments run locally or on remote sandboxes — Modal, E2B, Daytona, AWS, Azure, SSH.
-
-Point it at a repo. evo runs experiments in **parallel** — each subagent edits the code in its own workspace and runs your benchmark. The orchestrator keeps wins, discards losses, and explores multiple directions at once instead of one greedy path.
-
-evo also sets up **gates** — pass/fail checks (your tests, or any custom invariant) that protect against unintended changes. An experiment that breaks a gate is discarded even if its score went up, so the search can't trade correctness for speed or game the metric.
 
 Runs until you stop it.
 
