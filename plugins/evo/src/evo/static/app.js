@@ -189,6 +189,25 @@ function scoreDelta(node) {
   return sign + d.toFixed(2);
 }
 
+// Color for a score-delta string from scoreDelta(), honoring metric
+// direction. For a 'max' metric an increase (+) is the improvement (green);
+// for 'min' (less is better) a decrease (-) is. No change / no parent is
+// neutral.
+function deltaColorFor(delta) {
+  if (!delta || delta === '+0.00' || delta === '-0.00') return 'var(--text-4)';
+  const isMax = (state.stats?.metric || 'max') === 'max';
+  const improved = delta.startsWith('+') ? isMax : !isMax;
+  return improved ? 'var(--green)' : 'var(--red)';
+}
+
+// Improvement class ('up'/'down'/'neutral') for a delta string — same
+// metric-direction logic as deltaColorFor. 'up' (green) means improved.
+function deltaClassFor(delta) {
+  if (!delta || delta === '+0.00' || delta === '-0.00') return 'neutral';
+  const isMax = (state.stats?.metric || 'max') === 'max';
+  return (delta.startsWith('+') ? isMax : !isMax) ? 'up' : 'down';
+}
+
 function getExperiments() {
   return Object.values(state.graph.nodes)
     .filter(n => n.id !== 'root')
@@ -1266,8 +1285,7 @@ function renderTimeline(opts) {
       barInner = `<span class="exp-status pruned"></span><span class="exp-id">root</span><span class="exp-hyp">baseline</span>`;
     } else {
       const delta = scoreDelta(r.node);
-      const deltaColor = delta.startsWith('+') && delta !== '+0.00' ? 'var(--green)'
-        : delta.startsWith('-') ? 'var(--red)' : 'var(--text-4)';
+      const deltaColor = deltaColorFor(delta);
       const hyp = r.node.hypothesis || (r.node.status === 'failed' ? (r.node.error || 'failed') : '(no hypothesis)');
       const scoreText = r.node.score != null ? r.node.score.toFixed(2) : (r.node.status === 'failed' ? 'err' : '—');
       const dotCls = r.node.status || 'pending';
@@ -1756,8 +1774,7 @@ function renderChildrenSection(node) {
                     : c.status === 'failed' ? 'err'
                     : c.status === 'active' ? 'run' : '—';
     const delta = scoreDelta(c);
-    const deltaColor = delta.startsWith('+') && delta !== '+0.00' ? 'var(--green)'
-                     : delta.startsWith('-') ? 'var(--red)' : 'var(--text-4)';
+    const deltaColor = deltaColorFor(delta);
     const hyp = c.hypothesis || (c.status === 'failed' ? (c.error || 'failed') : '');
     return `<div class="drawer-child" onclick="openDrawer('${esc(c.id)}')" title="${esc(c.hypothesis || c.id)}">
       <span class="drawer-child-dot ${dot}"></span>
@@ -1813,8 +1830,7 @@ async function openDrawer(expId, opts) {
   const ws = state.workspace || {};
 
   const delta = scoreDelta(node);
-  const deltaColor = delta.startsWith('+') && delta !== '+0.00' ? 'var(--green)' :
-                     delta.startsWith('-') ? 'var(--red)' : 'var(--text-4)';
+  const deltaColor = deltaColorFor(delta);
   const statusColor = STATUS_COLORS[node.status] || '#52525b';
   const hasChildren = (node.children || []).length > 0;
   const activeTab = ['summary', 'diff', 'tasks'].includes(state.sidebarTab)
@@ -1849,9 +1865,7 @@ async function openDrawer(expId, opts) {
   if (activeTab === 'summary') {
     // Status pill lives in the drawer HEADER (always-visible). No need
     // to repeat it here. The meta line just carries the parent link.
-    const deltaClass = !delta ? '' :
-      (delta.startsWith('+') && delta !== '+0.00') ? 'up' :
-      delta.startsWith('-') ? 'down' : 'neutral';
+    const deltaClass = deltaClassFor(delta);
     const parentLine = node.parent && node.parent !== 'root'
       ? `<div class="drawer-score-meta">from <a class="drawer-parent-link" onclick="openDrawer('${esc(node.parent)}')">${esc(node.parent)}</a></div>`
       : (node.parent === 'root' ? `<div class="drawer-score-meta">from baseline</div>` : '');
