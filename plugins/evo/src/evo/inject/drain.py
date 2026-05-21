@@ -65,9 +65,10 @@ HOST_HOOK_EVENT_NAMES = {
     "claude-code": ("PreToolUse", "UserPromptSubmit", "SessionStart", "PostToolUse"),
     "codex": ("PreToolUse", "UserPromptSubmit", "SessionStart", "PostToolUse"),
     # Cursor: sessionStart + beforeSubmitPrompt register the session; preToolUse
-    # delivers mid-turn (shell via updated_input echo, other tools via
-    # deny+agent_message, edits deferred); stop is the turn-end fallback via
-    # followup_message. (additional_context is dropped by the IDE.)
+    # delivers mid-turn for SHELL tools only (updated_input echo into stdout);
+    # every non-shell tool defers (no consume) and is delivered at turn end via
+    # stop -> followup_message. (additional_context is dropped by the IDE, and
+    # agent_message-on-deny consumes without the agent acting — both verified.)
     "cursor": ("sessionStart", "beforeSubmitPrompt", "preToolUse", "stop"),
 }
 
@@ -141,15 +142,13 @@ _DELIVER_EVENTS = ("stop", "subagentStop", "preToolUse")
 
 
 def _cursor_tool_class(tool_name: str | None) -> str:
-    """Classify a Cursor preToolUse tool_name into how evo can safely deliver
-    a directive on it:
-      'shell' — rewrite the command (updated_input) to print the directive in
-                stdout; non-disruptive, the command still runs.
-      'edit'  — DON'T touch: denying an edit risks Cursor's edit-loop/corruption
-                failure mode. Defer delivery to the next non-edit tool.
-      'other' — Read/Grep/Glob/search/MCP/Task: safe to deny + agent_message
-                (idempotent, the agent re-issues the call).
-    Tool names vary by Cursor version, so match on substrings.
+    """Classify a Cursor preToolUse tool_name. Only 'shell' has a working
+    mid-turn delivery channel — rewrite the command via updated_input so the
+    directive prints to stdout (the tool result the model reads); the command
+    still runs. Every other tool DEFERS (no consume) and is delivered at the
+    turn-end stop: deny+agent_message was tried and consumes the directive
+    without the agent acting on it. The 'edit'/'other' split is retained only
+    for debug logging. Tool names vary by Cursor version — match substrings.
     """
     t = (tool_name or "").lower()
     if any(k in t for k in ("shell", "bash", "terminal", "run_command", "runterminalcmd")):
@@ -176,10 +175,11 @@ def _self_contained_gate(
     Delivery events are `_DELIVER_EVENTS` (preToolUse / stop / subagentStop).
     Everything else (sessionStart, beforeSubmitPrompt) is register-only — the
     IDE drops additional_context so there's nothing to deliver, and draining
-    there would just consume directives. On `preToolUse`, an Edit/Write tool is
-    DEFERRED (return False, no consume): denying an edit risks Cursor's
-    edit-loop/corruption failure mode, so the directive waits (peek-don't-pop)
-    for the agent's next non-edit tool call or stop.
+    there would just consume directives. On `preToolUse`, only a SHELL tool
+    delivers (updated_input echo); every non-shell tool is DEFERRED (return
+    False, no consume) so the directive waits (peek-don't-pop) for the next
+    shell call or the turn-end stop — deny+agent_message consumes without
+    delivering on non-shell tools.
     """
     fresh = not session_file(root, session_id).exists()
     if fresh:
