@@ -21,8 +21,10 @@ Per `notes/cross-host-inject-design.md`.
 from __future__ import annotations
 
 import argparse
+import datetime as dt
 import json
 import os
+import shlex
 import sys
 from pathlib import Path
 
@@ -30,14 +32,44 @@ from . import marker, queue
 from .paths import (
     exp_events_path,
     inject_root,
+    session_file,
     workspace_events_path,
 )
-from .registry import get_session
+from .registry import get_session, register_session
+
+# Hook event names that signal a fresh session — drain unconditionally on
+# these to catch directives queued before the session existed. Covers both
+# Claude Code's PascalCase and Cursor's camelCase spelling.
+_SESSION_START_EVENTS = ("SessionStart", "sessionStart")
+
+
+def _drain_debug(**fields) -> None:
+    """Append a diagnostic line to ~/.cursor/evo-drain.log, but only when the
+    opt-in sentinel ~/.cursor/.evo-drain-debug exists (or EVO_DRAIN_DEBUG is
+    set). Used to diagnose why a directive isn't reaching a Cursor IDE
+    session — shows the hook payload shape and where the drain decided to
+    bail. Never logs in normal operation; failures are swallowed."""
+    try:
+        sentinel = Path.home() / ".cursor" / ".evo-drain-debug"
+        if not sentinel.exists() and not os.environ.get("EVO_DRAIN_DEBUG"):
+            return
+        rec = {"ts": dt.datetime.now().isoformat(timespec="seconds"), **fields}
+        log = Path.home() / ".cursor" / "evo-drain.log"
+        with log.open("a", encoding="utf-8") as f:
+            f.write(json.dumps(rec) + "\n")
+    except Exception:  # noqa: BLE001 — diagnostics must never break the hook
+        pass
 
 
 HOST_HOOK_EVENT_NAMES = {
     "claude-code": ("PreToolUse", "UserPromptSubmit", "SessionStart", "PostToolUse"),
     "codex": ("PreToolUse", "UserPromptSubmit", "SessionStart", "PostToolUse"),
+    # Cursor: sessionStart + beforeSubmitPrompt register the session; preToolUse
+    # delivers mid-turn for SHELL tools only (updated_input echo into stdout);
+    # every non-shell tool defers (no consume) and is delivered at turn end via
+    # stop -> followup_message. (additional_context is dropped by the IDE, and
+    # agent_message-on-deny consumes without the agent acting — both verified.)
+    "cursor": ("sessionStart", "beforeSubmitPrompt", "preToolUse", "stop"),
 }
 
 
@@ -59,21 +91,113 @@ def _detect_host_from_env() -> str:
     return "claude-code"
 
 
-def _detect_hook_event_from_stdin() -> str | None:
-    """Hook stdin payloads include hook_event_name. Read it best-effort."""
+def _read_stdin_payload() -> dict:
+    """Read the host's hook stdin payload as a dict. Returns {} when stdin
+    is a tty, empty, or not JSON. stdin can only be consumed once, so this
+    is the single read point — all fields (hook event, session id,
+    workspace roots) are derived from the returned dict."""
     if sys.stdin.isatty():
-        return None
+        return {}
     try:
         raw = sys.stdin.read()
     except Exception:  # noqa: BLE001
-        return None
+        return {}
     if not raw:
-        return None
+        return {}
     try:
         data = json.loads(raw)
     except json.JSONDecodeError:
-        return None
-    return data.get("hook_event_name") or data.get("hookEventName")
+        return {}
+    return data if isinstance(data, dict) else {}
+
+
+def _hook_event_from_payload(payload: dict) -> str | None:
+    return payload.get("hook_event_name") or payload.get("hookEventName")
+
+
+def _resolve_root_from_payload(payload: dict) -> Path | None:
+    """Locate the workspace root (dir containing `.evo/`) for hosts whose
+    hook command runs from outside the project. Cursor's user-level
+    `~/.cursor/hooks.json` runs from `~/.cursor/`, not the repo, so cwd is
+    useless — the project path arrives in the payload's `workspace_roots`.
+    Falls back to walking up from cwd. Returns None if no `.evo/` is found.
+    """
+    candidates: list[Path] = []
+    roots = payload.get("workspace_roots")
+    if isinstance(roots, list):
+        candidates.extend(Path(r) for r in roots if isinstance(r, str) and r)
+    candidates.append(Path.cwd())
+    for start in candidates:
+        cur = start
+        while True:
+            if (cur / ".evo").is_dir():
+                return cur
+            if cur.parent == cur:
+                break
+            cur = cur.parent
+    return None
+
+
+_DELIVER_EVENTS = ("stop", "subagentStop", "preToolUse")
+
+
+def _cursor_tool_class(tool_name: str | None) -> str:
+    """Classify a Cursor preToolUse tool_name. Only 'shell' has a working
+    mid-turn delivery channel — rewrite the command via updated_input so the
+    directive prints to stdout (the tool result the model reads); the command
+    still runs. Every other tool DEFERS (no consume) and is delivered at the
+    turn-end stop: deny+agent_message was tried and consumes the directive
+    without the agent acting on it. The 'edit'/'other' split is retained only
+    for debug logging. Tool names vary by Cursor version — match substrings.
+    """
+    t = (tool_name or "").lower()
+    if any(k in t for k in ("shell", "bash", "terminal", "run_command", "runterminalcmd")):
+        return "shell"
+    if any(k in t for k in ("edit", "write", "create_file", "search_replace", "str_replace", "applypatch", "apply_patch")):
+        return "edit"
+    return "other"
+
+
+def _self_contained_gate(
+    root: Path, session_id: str, host: str, hook_event: str | None,
+    tool_name: str | None = None,
+) -> bool:
+    """Gate for hosts wired directly to `evo-drain` (no `evo-hook-drain`
+    binary in front). Returns True when the caller should proceed to drain.
+
+    Registers the session on the FIRST event of any kind, seeding its offset
+    to the current queue tail. `sessionStart` only fires for brand-new chats —
+    a *resumed* Cursor chat never fires it, so registration must also happen on
+    the other wired events (beforeSubmitPrompt, stop); otherwise the session
+    stays unregistered and `evo direct` can never reach it. Seeding the offset
+    avoids replaying directives queued before this session existed.
+
+    Delivery events are `_DELIVER_EVENTS` (preToolUse / stop / subagentStop).
+    Everything else (sessionStart, beforeSubmitPrompt) is register-only — the
+    IDE drops additional_context so there's nothing to deliver, and draining
+    there would just consume directives. On `preToolUse`, only a SHELL tool
+    delivers (updated_input echo); every non-shell tool is DEFERRED (return
+    False, no consume) so the directive waits (peek-don't-pop) for the next
+    shell call or the turn-end stop — deny+agent_message consumes without
+    delivering on non-shell tools.
+    """
+    fresh = not session_file(root, session_id).exists()
+    if fresh:
+        register_session(root, session_id, host)
+        queue.init_offset_to_latest(root, session_id)
+    if hook_event not in _DELIVER_EVENTS:
+        return False  # register-only (sessionStart, beforeSubmitPrompt, …)
+    if hook_event == "preToolUse" and _cursor_tool_class(tool_name) != "shell":
+        # Only shell delivers mid-turn (updated_input echo into stdout, which
+        # the model reliably reads). For every other tool, deny+agent_message
+        # CONSUMES the directive without actually delivering it (verified: a
+        # Read deny clears the marker but the agent never gets the message).
+        # So defer (no consume) — the directive waits for the next shell call
+        # or the turn-end `stop`, both of which deliver reliably.
+        return False
+    if fresh:
+        return False  # just registered on this event; nothing marked yet
+    return marker.exists(root, session_id)
 
 
 def format_directive_text(events: list[dict]) -> str:
@@ -97,8 +221,9 @@ def format_directive_text(events: list[dict]) -> str:
     return "\n".join(lines)
 
 
-def emit_for_host(host: str, hook_event: str | None, text: str) -> None:
-    """Write the host-specific JSON payload to stdout."""
+def emit_for_host(host: str, hook_event: str | None, text: str, payload: dict | None = None) -> None:
+    """Write the host-specific JSON payload to stdout. `payload` is the raw
+    hook stdin (needed by the cursor preToolUse branch for tool_name/command)."""
     if not text:
         sys.stdout.write("{}")
         return
@@ -118,14 +243,35 @@ def emit_for_host(host: str, hook_event: str | None, text: str) -> None:
         payload = {"context": text}
         sys.stdout.write(json.dumps(payload, separators=(",", ":")))
         return
+    if host == "cursor":
+        # Cursor delivery, routed around the IDE's broken additional_context:
+        #   stop/subagentStop -> followup_message (auto-submitted at turn end)
+        #   preToolUse + shell -> updated_input: prepend an echo of the directive
+        #     so it lands in the command's stdout (the tool result the model
+        #     reads); command still runs (exit code preserved by ordering last).
+        # Non-shell preToolUse never reaches here — the gate defers it (deny+
+        # agent_message consumes without delivering, so we let stop deliver).
+        p = payload or {}
+        if hook_event in ("stop", "subagentStop"):
+            out: dict = {"followup_message": text}
+        elif hook_event == "preToolUse" and _cursor_tool_class(p.get("tool_name")) == "shell":
+            tool_input = dict(p.get("tool_input") or {})
+            orig = tool_input.get("command", "")
+            tool_input["command"] = "printf '%s\\n' " + shlex.quote(text) + " ; " + orig
+            out = {"permission": "allow", "updated_input": tool_input}
+        else:
+            out = {"additional_context": text}
+        sys.stdout.write(json.dumps(out, separators=(",", ":")))
+        return
     # opencode and other in-process hosts: this entry point shouldn't
     # normally be invoked there. Fall through to a generic envelope.
     sys.stdout.write(json.dumps({"text": text}, separators=(",", ":")))
 
 
-def drain_session(root: Path, session_id: str, host: str | None = None, hook_event: str | None = None) -> int:
+def drain_session(root: Path, session_id: str, host: str | None = None, hook_event: str | None = None, payload: dict | None = None) -> int:
     """Read events for `session_id`, format, emit, update offset,
-    unlink marker. Returns 0 on success."""
+    unlink marker. Returns 0 on success. `payload` is the raw hook stdin,
+    passed through to emit_for_host (cursor preToolUse needs tool_name/command)."""
     if not inject_root(root).exists():
         sys.stdout.write("{}")
         return 0
@@ -164,7 +310,7 @@ def drain_session(root: Path, session_id: str, host: str | None = None, hook_eve
             new_workspace_offset = new_events[-1]["id"]
 
     text = format_directive_text(events)
-    emit_for_host(host, hook_event, text)
+    emit_for_host(host, hook_event, text, payload)
 
     # Update offset and unlink marker — only after successful emit
     if new_workspace_offset or new_exp_offset:
@@ -179,25 +325,59 @@ def drain_session(root: Path, session_id: str, host: str | None = None, hook_eve
 
 
 def main(argv: list[str] | None = None) -> int:
+    """Two invocation modes:
+
+    1. Front-ended by the `evo-hook-drain` Rust binary (claude-code/codex):
+       it passes `--run-dir` and `--session` and has already done the marker
+       gate, so this just drains.
+    2. Self-contained (cursor): the host's hooks.json calls `evo-drain
+       --host cursor` directly with no Rust binary in front. `--run-dir` and
+       `--session` are omitted; they're resolved from the hook stdin payload
+       (`workspace_roots`, `conversation_id`) and the marker gate runs here.
+    """
     parser = argparse.ArgumentParser(prog="evo.drain")
-    parser.add_argument("--run-dir", required=True, help="Path to .evo/run_*/ directory")
-    parser.add_argument("--session", required=True, help="session_id to drain")
-    parser.add_argument("--host", default=None, help="host name (claude-code/codex/hermes/opencode); auto-detected if omitted")
+    parser.add_argument("--run-dir", default=None, help="Path to .evo/run_*/ directory (omit for self-contained hosts)")
+    parser.add_argument("--session", default=None, help="session_id to drain (omit to read from stdin payload)")
+    parser.add_argument("--host", default=None, help="host name (claude-code/codex/hermes/opencode/cursor); auto-detected if omitted")
     args = parser.parse_args(argv)
 
-    run_dir = Path(args.run_dir)
-    # The drain logic uses workspace_path() internally via paths.py;
-    # but here we receive run_dir directly. We need root. Walk up from
-    # run_dir/.. to find the workspace root (the dir CONTAINING .evo/).
-    # run_dir is .../.evo/run_*; parent.parent is the workspace root.
-    if run_dir.parent.name == ".evo":
-        root = run_dir.parent.parent
-    else:
-        # Fallback: assume run_dir itself is under .evo/ at depth 1
-        root = run_dir.parent.parent
+    payload = _read_stdin_payload()
+    hook_event = _hook_event_from_payload(payload)
 
-    hook_event = _detect_hook_event_from_stdin()
-    return drain_session(root, args.session, host=args.host, hook_event=hook_event)
+    # Mode 1: Rust-driven — run-dir + session supplied, gate already done.
+    if args.run_dir:
+        run_dir = Path(args.run_dir)
+        # run_dir is .../.evo/run_*; the workspace root is its grandparent.
+        root = run_dir.parent.parent
+        return drain_session(root, args.session, host=args.host, hook_event=hook_event)
+
+    # Mode 2: self-contained — resolve everything from args + stdin payload.
+    # Key on conversation_id: it's present in EVERY Cursor hook event, whereas
+    # session_id only appears in sessionStart. Keying on session_id would
+    # register the session under one id at sessionStart and then look up a
+    # different id at postToolUse (where session_id is absent), so mid-run
+    # directives would never be delivered.
+    host = args.host or "cursor"
+    session = args.session or payload.get("conversation_id") or payload.get("session_id")
+    root = _resolve_root_from_payload(payload)
+    if not session or root is None or not inject_root(root).parent.exists():
+        _drain_debug(stage="resolve", host=host, hook_event=hook_event,
+                     payload_keys=sorted(payload.keys()), session=session,
+                     root=str(root) if root else None, decision="bail")
+        sys.stdout.write("{}")
+        return 0
+    tool_name = payload.get("tool_name")
+    registered = session_file(root, session).exists()
+    has_marker = marker.exists(root, session)
+    gate = _self_contained_gate(root, session, host, hook_event, tool_name)
+    _drain_debug(stage="gate", host=host, hook_event=hook_event, session=session,
+                 root=str(root), tool_name=tool_name,
+                 tool_class=_cursor_tool_class(tool_name) if hook_event == "preToolUse" else None,
+                 registered_before=registered, marker=has_marker, gate=gate)
+    if not gate:
+        sys.stdout.write("{}")
+        return 0
+    return drain_session(root, session, host=host, hook_event=hook_event, payload=payload)
 
 
 if __name__ == "__main__":
