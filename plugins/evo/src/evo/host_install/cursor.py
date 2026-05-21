@@ -43,12 +43,14 @@ _RELEASE_VERSION_RE = re.compile(r"^\d+\.\d+\.\d+([.\-+a-zA-Z0-9]*)$")
 #     prompt, so it registers resumed chats too (where sessionStart never
 #     fires) — without it, a resumed chat stays unregistered and `evo direct`
 #     can't reach it.
-#   - stop: fires at the end of each agent turn and returns followup_message,
-#     which the IDE auto-submits as a visible new message — the only channel
-#     that actually reaches the chat.
-# postToolUse is not wired: its only output (additional_context) is silently
-# dropped by Cursor's IDE agent.
-_INJECT_EVENTS = ("sessionStart", "beforeSubmitPrompt", "stop")
+#   - preToolUse: fires before EVERY tool (mid-turn) — the analogue of
+#     claude-code's PreToolUse inject. Delivers tool-aware: shell via
+#     updated_input (echo the directive into stdout), other tools via
+#     deny+agent_message; edits are deferred (never denied). The drain decides
+#     per tool_name.
+#   - stop: end of each agent turn -> followup_message; turn-end fallback for
+#     turns with no deliverable tool call.
+_INJECT_EVENTS = ("sessionStart", "beforeSubmitPrompt", "preToolUse", "stop")
 
 
 def _cursor_base() -> Path:

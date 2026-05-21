@@ -24,6 +24,7 @@ import argparse
 import datetime as dt
 import json
 import os
+import shlex
 import sys
 from pathlib import Path
 
@@ -63,10 +64,11 @@ def _drain_debug(**fields) -> None:
 HOST_HOOK_EVENT_NAMES = {
     "claude-code": ("PreToolUse", "UserPromptSubmit", "SessionStart", "PostToolUse"),
     "codex": ("PreToolUse", "UserPromptSubmit", "SessionStart", "PostToolUse"),
-    # Cursor: sessionStart + beforeSubmitPrompt register the session (the IDE
-    # drops additional_context); directives are delivered on stop via
-    # followup_message (auto-submitted as a visible message).
-    "cursor": ("sessionStart", "beforeSubmitPrompt", "stop"),
+    # Cursor: sessionStart + beforeSubmitPrompt register the session; preToolUse
+    # delivers mid-turn (shell via updated_input echo, other tools via
+    # deny+agent_message, edits deferred); stop is the turn-end fallback via
+    # followup_message. (additional_context is dropped by the IDE.)
+    "cursor": ("sessionStart", "beforeSubmitPrompt", "preToolUse", "stop"),
 }
 
 
@@ -135,11 +137,31 @@ def _resolve_root_from_payload(payload: dict) -> Path | None:
     return None
 
 
-_DELIVER_EVENTS = ("stop", "subagentStop")
+_DELIVER_EVENTS = ("stop", "subagentStop", "preToolUse")
+
+
+def _cursor_tool_class(tool_name: str | None) -> str:
+    """Classify a Cursor preToolUse tool_name into how evo can safely deliver
+    a directive on it:
+      'shell' — rewrite the command (updated_input) to print the directive in
+                stdout; non-disruptive, the command still runs.
+      'edit'  — DON'T touch: denying an edit risks Cursor's edit-loop/corruption
+                failure mode. Defer delivery to the next non-edit tool.
+      'other' — Read/Grep/Glob/search/MCP/Task: safe to deny + agent_message
+                (idempotent, the agent re-issues the call).
+    Tool names vary by Cursor version, so match on substrings.
+    """
+    t = (tool_name or "").lower()
+    if any(k in t for k in ("shell", "bash", "terminal", "run_command", "runterminalcmd")):
+        return "shell"
+    if any(k in t for k in ("edit", "write", "create_file", "search_replace", "str_replace", "applypatch", "apply_patch")):
+        return "edit"
+    return "other"
 
 
 def _self_contained_gate(
-    root: Path, session_id: str, host: str, hook_event: str | None
+    root: Path, session_id: str, host: str, hook_event: str | None,
+    tool_name: str | None = None,
 ) -> bool:
     """Gate for hosts wired directly to `evo-drain` (no `evo-hook-drain`
     binary in front). Returns True when the caller should proceed to drain.
@@ -151,11 +173,13 @@ def _self_contained_gate(
     stays unregistered and `evo direct` can never reach it. Seeding the offset
     avoids replaying directives queued before this session existed.
 
-    Only `stop`/`subagentStop` can actually deliver in Cursor (via
-    followup_message); every other event is register-only. The IDE drops
-    `additional_context`, so there's nothing to deliver on sessionStart/
-    beforeSubmitPrompt — and draining there would just consume directives
-    before the stop hook could deliver them.
+    Delivery events are `_DELIVER_EVENTS` (preToolUse / stop / subagentStop).
+    Everything else (sessionStart, beforeSubmitPrompt) is register-only — the
+    IDE drops additional_context so there's nothing to deliver, and draining
+    there would just consume directives. On `preToolUse`, an Edit/Write tool is
+    DEFERRED (return False, no consume): denying an edit risks Cursor's
+    edit-loop/corruption failure mode, so the directive waits (peek-don't-pop)
+    for the agent's next non-edit tool call or stop.
     """
     fresh = not session_file(root, session_id).exists()
     if fresh:
@@ -163,8 +187,10 @@ def _self_contained_gate(
         queue.init_offset_to_latest(root, session_id)
     if hook_event not in _DELIVER_EVENTS:
         return False  # register-only (sessionStart, beforeSubmitPrompt, …)
+    if hook_event == "preToolUse" and _cursor_tool_class(tool_name) == "edit":
+        return False  # defer — never deny an edit (corruption risk)
     if fresh:
-        return False  # just registered on this stop; nothing marked yet
+        return False  # just registered on this event; nothing marked yet
     return marker.exists(root, session_id)
 
 
@@ -189,8 +215,9 @@ def format_directive_text(events: list[dict]) -> str:
     return "\n".join(lines)
 
 
-def emit_for_host(host: str, hook_event: str | None, text: str) -> None:
-    """Write the host-specific JSON payload to stdout."""
+def emit_for_host(host: str, hook_event: str | None, text: str, payload: dict | None = None) -> None:
+    """Write the host-specific JSON payload to stdout. `payload` is the raw
+    hook stdin (needed by the cursor preToolUse branch for tool_name/command)."""
     if not text:
         sys.stdout.write("{}")
         return
@@ -211,24 +238,43 @@ def emit_for_host(host: str, hook_event: str | None, text: str) -> None:
         sys.stdout.write(json.dumps(payload, separators=(",", ":")))
         return
     if host == "cursor":
-        # Cursor's hook output contract differs from Claude Code's: there is
-        # no hookSpecificOutput envelope. `sessionStart` and `postToolUse`
-        # honor {"additional_context": ...}; `stop`/`subagentStop` honor
-        # {"followup_message": ...}. `beforeSubmitPrompt` is informational
-        # only (cannot inject), so it is never wired as a drain channel.
+        # Cursor delivery, mirroring claude-code's PreToolUse/Stop inject but
+        # routed around the IDE's broken additional_context:
+        #   stop/subagentStop -> followup_message (auto-submitted at turn end)
+        #   preToolUse:
+        #     shell tool -> updated_input: prepend an echo of the directive so it
+        #       lands in the command's stdout (the tool result the model reads);
+        #       command still runs (its exit code is preserved by ordering last).
+        #     other tools -> permission:"deny" + agent_message (only path that
+        #       reaches the model mid-turn); the agent reads it and re-issues.
+        #   (edit/write never reach here — the gate defers them.)
+        p = payload or {}
         if hook_event in ("stop", "subagentStop"):
-            sys.stdout.write(json.dumps({"followup_message": text}, separators=(",", ":")))
+            out: dict = {"followup_message": text}
+        elif hook_event == "preToolUse" and _cursor_tool_class(p.get("tool_name")) == "shell":
+            tool_input = dict(p.get("tool_input") or {})
+            orig = tool_input.get("command", "")
+            tool_input["command"] = "printf '%s\\n' " + shlex.quote(text) + " ; " + orig
+            out = {"permission": "allow", "updated_input": tool_input}
+        elif hook_event == "preToolUse":
+            out = {
+                "permission": "deny",
+                "agent_message": text + "\n\nApply this directive now, then re-issue the action you were about to take and continue your work.",
+                "user_message": "evo delivered a queued directive",
+            }
         else:
-            sys.stdout.write(json.dumps({"additional_context": text}, separators=(",", ":")))
+            out = {"additional_context": text}
+        sys.stdout.write(json.dumps(out, separators=(",", ":")))
         return
     # opencode and other in-process hosts: this entry point shouldn't
     # normally be invoked there. Fall through to a generic envelope.
     sys.stdout.write(json.dumps({"text": text}, separators=(",", ":")))
 
 
-def drain_session(root: Path, session_id: str, host: str | None = None, hook_event: str | None = None) -> int:
+def drain_session(root: Path, session_id: str, host: str | None = None, hook_event: str | None = None, payload: dict | None = None) -> int:
     """Read events for `session_id`, format, emit, update offset,
-    unlink marker. Returns 0 on success."""
+    unlink marker. Returns 0 on success. `payload` is the raw hook stdin,
+    passed through to emit_for_host (cursor preToolUse needs tool_name/command)."""
     if not inject_root(root).exists():
         sys.stdout.write("{}")
         return 0
@@ -267,7 +313,7 @@ def drain_session(root: Path, session_id: str, host: str | None = None, hook_eve
             new_workspace_offset = new_events[-1]["id"]
 
     text = format_directive_text(events)
-    emit_for_host(host, hook_event, text)
+    emit_for_host(host, hook_event, text, payload)
 
     # Update offset and unlink marker — only after successful emit
     if new_workspace_offset or new_exp_offset:
@@ -323,16 +369,18 @@ def main(argv: list[str] | None = None) -> int:
                      root=str(root) if root else None, decision="bail")
         sys.stdout.write("{}")
         return 0
+    tool_name = payload.get("tool_name")
     registered = session_file(root, session).exists()
     has_marker = marker.exists(root, session)
-    gate = _self_contained_gate(root, session, host, hook_event)
+    gate = _self_contained_gate(root, session, host, hook_event, tool_name)
     _drain_debug(stage="gate", host=host, hook_event=hook_event, session=session,
-                 root=str(root), registered_before=registered, marker=has_marker,
-                 gate=gate)
+                 root=str(root), tool_name=tool_name,
+                 tool_class=_cursor_tool_class(tool_name) if hook_event == "preToolUse" else None,
+                 registered_before=registered, marker=has_marker, gate=gate)
     if not gate:
         sys.stdout.write("{}")
         return 0
-    return drain_session(root, session, host=host, hook_event=hook_event)
+    return drain_session(root, session, host=host, hook_event=hook_event, payload=payload)
 
 
 if __name__ == "__main__":

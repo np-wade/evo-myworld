@@ -49,11 +49,11 @@ PY
 HOOKS="$CURSOR_HOME/hooks.json"
 grep -q '"afterFileEdit"' "$HOOKS" || die "clobbered the user's existing hook"
 pass "preserved user's afterFileEdit hook"
-for ev in sessionStart beforeSubmitPrompt stop; do
+for ev in sessionStart beforeSubmitPrompt preToolUse stop; do
   grep -q "\"$ev\"" "$HOOKS" || die "did not wire inject event: $ev"
 done
 grep -q 'evo-drain --host cursor' "$HOOKS" || die "drain command not written"
-pass "wired sessionStart + beforeSubmitPrompt + stop -> evo-drain --host cursor"
+pass "wired sessionStart + beforeSubmitPrompt + preToolUse + stop -> evo-drain --host cursor"
 
 # Idempotence: writing twice must not duplicate evo entries.
 $PY - <<PY
@@ -63,12 +63,12 @@ PY
 COUNT=$($PY - <<PY
 import json,os
 d=json.load(open(os.path.join(os.environ["CURSOR_HOME"],"hooks.json")))
-n=sum("evo-drain" in str(e.get("command","")) for ev in ("sessionStart","beforeSubmitPrompt","stop") for e in d["hooks"].get(ev,[]))
+n=sum("evo-drain" in str(e.get("command","")) for ev in ("sessionStart","beforeSubmitPrompt","preToolUse","stop") for e in d["hooks"].get(ev,[]))
 print(n)
 PY
 )
-[ "$COUNT" = "3" ] || die "expected 3 evo entries after re-run, got $COUNT (not idempotent)"
-pass "idempotent re-run (3 evo entries, no dupes)"
+[ "$COUNT" = "4" ] || die "expected 4 evo entries after re-run, got $COUNT (not idempotent)"
+pass "idempotent re-run (4 evo entries, no dupes)"
 
 DOC_OUT="$($EVO doctor cursor 2>&1 || true)"
 echo "$DOC_OUT" | grep -q "inject hooks wired" || die "doctor did not confirm wired hooks"
@@ -118,6 +118,33 @@ EMPTY_OUT=$(printf '{"hook_event_name":"stop","conversation_id":"%s","workspace_
 echo "    stop (drained) -> $EMPTY_OUT"
 [ "$EMPTY_OUT" = "{}" ] || die "expected {} when nothing queued, got $EMPTY_OUT"
 pass "empty queue yields {} (no spurious followup / no loop)"
+
+# ---------------------------------------------------------------------------
+echo "[3] preToolUse tool-aware delivery (mid-turn)"
+ptu() { printf '{"hook_event_name":"preToolUse","conversation_id":"%s","workspace_roots":["%s"],"tool_name":"%s","tool_input":%s}' "$SID" "$WORK" "$1" "$2" | $DRAIN --host cursor; }
+qmark() { $PY -c "from pathlib import Path; from evo.inject import queue, marker; r=Path('$WORK'); queue.append_workspace_event(r,'$1'); marker.touch(r,'$SID')"; }
+
+qmark "T_SHELL"
+SH=$(ptu Shell '{"command":"ls -la"}')
+echo "    Shell -> $SH"
+echo "$SH" | grep -q '"updated_input"' && echo "$SH" | grep -q 'T_SHELL' && echo "$SH" | grep -q 'ls -la' || die "Shell preToolUse should rewrite command with directive echo"
+pass "Shell preToolUse -> updated_input echo (non-disruptive, command preserved)"
+
+qmark "T_READ"
+RD=$(ptu Read '{"path":"main.py"}')
+echo "    Read -> $RD"
+echo "$RD" | grep -q '"permission":"deny"' && echo "$RD" | grep -q '"agent_message"' && echo "$RD" | grep -q 'T_READ' || die "Read preToolUse should deny + agent_message"
+pass "Read preToolUse -> deny + agent_message"
+
+qmark "T_EDIT"
+ED=$(ptu Edit '{"path":"main.py"}')
+echo "    Edit -> $ED"
+[ "$ED" = "{}" ] || die "Edit preToolUse should DEFER (emit {}), got $ED"
+# the deferred directive must survive and deliver on the next stop
+EDSTOP=$(printf '{"hook_event_name":"stop","conversation_id":"%s","workspace_roots":["%s"]}' "$SID" "$WORK" | $DRAIN --host cursor)
+echo "    stop after edit -> $EDSTOP"
+echo "$EDSTOP" | grep -q 'T_EDIT' || die "deferred edit directive lost — should deliver on next stop"
+pass "Edit preToolUse defers (no consume); directive delivered on next stop"
 
 echo
 echo "DRY RUN PASSED — evo-side Cursor inject contract verified."
