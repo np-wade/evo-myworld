@@ -251,6 +251,35 @@ evo infra log [--limit N]                          # read recorded events
   a specific node, and write workspace notes for round-level observations
   not tied to any one experiment.
 
+## Mid-run directives
+
+```bash
+evo direct "<text>"                          # broadcast to engaged orchestrator sessions
+evo direct <exp_id> "<text>"                 # targeted at a specific subagent
+evo direct "<text>" --wait                   # block until any session acks (exit 3 on timeout)
+evo direct "<text>" --wait --wait-timeout 30 # custom timeout in seconds (default 60)
+evo direct-status <event_id>                 # show queue / delivery / ack state for one directive
+evo ack <event_id>                           # called BY the agent after acting on a directive
+```
+
+Agents see directives as a banner in their context:
+
+```
+[EVO DIRECTIVE id=01HX7K…]
+<text>
+[END EVO DIRECTIVE — when done, run: evo ack 01HX7K…]
+```
+
+The banner is user-authoritative — treat its content as a new user turn,
+override earlier constraints it contradicts, and run `evo ack <id>` after
+acting on it so `evo direct-status` and `evo direct --wait` can report
+success.
+
+Fanout output prints `fanout=N, skipped_unengaged=M, skipped_subagent=K`.
+Sessions that have never run an `evo` command (registered at SessionStart
+but otherwise idle) are filtered out — only "engaged" sessions on
+supported hosts receive broadcast directives.
+
 ## Workspace Ops
 
 Use these when an experiment may be remote, or when the orchestrator gave you
