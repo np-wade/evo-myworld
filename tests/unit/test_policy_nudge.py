@@ -669,7 +669,8 @@ class TestPolicyNudgeDoesNotBlock(_Base):
 
 
 # ---------------------------------------------------------------------------
-# Cross-host: Cursor edit tool names
+# Cross-host: Cursor — both via drain_session (camelCase hook_event) AND
+# via the full main() pipeline as the cursor hooks.json would invoke it.
 # ---------------------------------------------------------------------------
 
 class TestCursorPolicyNudge(_Base):
@@ -679,7 +680,8 @@ class TestCursorPolicyNudge(_Base):
         mark_engaged(self.root, "cursor_sid")
         mark_optimize_mode(self.root, "cursor_sid")
 
-    def test_cursor_edit_file_blocked(self):
+    def test_cursor_edit_file_blocked_via_drain_session(self):
+        """Direct drain_session entry, claude-code-style PreToolUse."""
         self._setup_cursor_orchestrator()
         out = _drive_pretooluse(
             self.root, "cursor_sid", "edit_file",
@@ -690,6 +692,216 @@ class TestCursorPolicyNudge(_Base):
             out.get("permission") in ("deny", "ask"),
             f"cursor edit_file must be denied/asked on first violation; got {out!r}"
         )
+
+    def test_cursor_camelcase_pretooluse_blocked_via_drain_session(self):
+        """Cursor sends `preToolUse` (camelCase). The policy block must
+        accept both case variants so it fires through the real cursor
+        event-name path."""
+        self._setup_cursor_orchestrator()
+        from evo.inject.drain import drain_session
+        buf = io.StringIO()
+        payload = {
+            "session_id": "cursor_sid",
+            "hook_event_name": "preToolUse",
+            "tool_name": "edit_file",
+            "tool_input": {"file_path": "/f.py"},
+        }
+        with patch("sys.stdout", buf):
+            drain_session(self.root, "cursor_sid", host="cursor",
+                          hook_event="preToolUse", payload=payload)
+        out = json.loads(buf.getvalue() or "{}")
+        self.assertTrue(
+            out.get("permission") in ("deny", "ask"),
+            f"camelCase preToolUse must trigger policy block; got {out!r}"
+        )
+
+    def test_cursor_camelcase_pretooluse_via_main_pipeline(self):
+        """End-to-end: invoke evo.inject.drain.main() the same way the
+        cursor hooks.json would. Stdin payload uses camelCase event name
+        and `conversation_id` (cursor doesn't always set `session_id` on
+        every event). Must emit the deny envelope."""
+        self._setup_cursor_orchestrator()
+        from evo.inject import drain as drain_mod
+
+        payload_json = json.dumps({
+            "hook_event_name": "preToolUse",
+            "conversation_id": "cursor_sid",
+            "workspace_roots": [str(self.root)],
+            "tool_name": "edit_file",
+            "tool_input": {"file_path": "/some/path.py"},
+        })
+        buf = io.StringIO()
+        with patch("sys.stdin", io.StringIO(payload_json)), \
+             patch("sys.stdout", buf):
+            drain_mod.main(["--host", "cursor"])
+        out = json.loads(buf.getvalue() or "{}")
+        self.assertEqual(
+            out.get("permission"), "deny",
+            f"cursor edit_file under optimize_mode must deny on #1; got {out!r}"
+        )
+
+
+class TestCursorStopNudge(_Base):
+
+    def _setup_cursor_orchestrator(self) -> None:
+        register_session(self.root, "cursor_sid", "cursor")
+        mark_engaged(self.root, "cursor_sid")
+        mark_optimize_mode(self.root, "cursor_sid")
+
+    def test_cursor_stop_emits_followup_message(self):
+        """Cursor doesn't honor `decision: block` — its stop-continuation
+        envelope is `{followup_message: text}`. The drain must dispatch
+        the nudge through emit_for_host's cursor branch."""
+        self._setup_cursor_orchestrator()
+        from evo.inject.drain import drain_session
+        buf = io.StringIO()
+        with patch("sys.stdout", buf):
+            drain_session(self.root, "cursor_sid", host="cursor",
+                          hook_event="stop")
+        out = json.loads(buf.getvalue() or "{}")
+        msg = out.get("followup_message") or ""
+        self.assertIn("optimize", msg.lower(),
+                      f"cursor stop must emit followup_message with the nudge; got {out!r}")
+        self.assertIn("evo wait", msg.lower())
+        self.assertIn("evo exit-optimize-mode", msg.lower())
+
+    def test_cursor_subagent_stop_emits_followup_message(self):
+        self._setup_cursor_orchestrator()
+        from evo.inject.drain import drain_session
+        buf = io.StringIO()
+        with patch("sys.stdout", buf):
+            drain_session(self.root, "cursor_sid", host="cursor",
+                          hook_event="subagentStop")
+        out = json.loads(buf.getvalue() or "{}")
+        self.assertIn("optimize", (out.get("followup_message") or "").lower())
+
+    def test_cursor_stop_via_main_pipeline(self):
+        """End-to-end through main(): cursor hooks.json invokes evo-drain
+        with stdin payload using camelCase `stop` and `conversation_id`.
+        Must emit followup_message even with no marker (always-fire)."""
+        self._setup_cursor_orchestrator()
+        from evo.inject import drain as drain_mod
+
+        payload_json = json.dumps({
+            "hook_event_name": "stop",
+            "conversation_id": "cursor_sid",
+            "workspace_roots": [str(self.root)],
+        })
+        buf = io.StringIO()
+        with patch("sys.stdin", io.StringIO(payload_json)), \
+             patch("sys.stdout", buf):
+            drain_mod.main(["--host", "cursor"])
+        out = json.loads(buf.getvalue() or "{}")
+        self.assertIn(
+            "optimize", (out.get("followup_message") or "").lower(),
+            f"cursor stop must always-fire under optimize_mode; got {out!r}"
+        )
+
+    def test_cursor_even_denied_preToolUse_does_not_consume_directive(self):
+        """Regression: even-numbered denied violations (cadence lets them
+        through) on cursor non-shell tools must NOT consume directives.
+        The policy block fires on odd, lets even pass — but the cursor
+        IDE drops `additional_context`, so emitting an envelope would
+        silently lose any queued `evo direct`."""
+        from evo.inject import drain as drain_mod
+        from evo.inject import queue, marker
+
+        register_session(self.root, "cursor_sid", "cursor")
+        mark_engaged(self.root, "cursor_sid")
+        mark_optimize_mode(self.root, "cursor_sid")
+
+        # Violation #1 — blocked, no consume.
+        out1 = _drive_pretooluse(
+            self.root, "cursor_sid", "edit_file",
+            {"file_path": "/f.py"}, host="cursor",
+        )
+        self.assertEqual(out1.get("permission"), "deny")
+
+        # Now queue a directive and drop a marker.
+        queue.append_workspace_event(self.root, "DELIVER_ME")
+        marker.touch(self.root, "cursor_sid")
+
+        # Violation #2 — under alternating cadence, this passes (no
+        # deny). But it must NOT consume the directive.
+        payload_json = json.dumps({
+            "hook_event_name": "preToolUse",
+            "conversation_id": "cursor_sid",
+            "workspace_roots": [str(self.root)],
+            "tool_name": "edit_file",
+            "tool_input": {"file_path": "/f.py"},
+        })
+        buf = io.StringIO()
+        with patch("sys.stdin", io.StringIO(payload_json)), \
+             patch("sys.stdout", buf):
+            drain_mod.main(["--host", "cursor"])
+        out2 = json.loads(buf.getvalue() or "{}")
+        self.assertNotEqual(out2.get("permission"), "deny",
+                            "#2 must pass under alternating cadence")
+        self.assertNotIn("additional_context", out2,
+                         "#2 must not emit additional_context (cursor drops it)")
+        self.assertTrue(
+            marker.exists(self.root, "cursor_sid"),
+            "even-numbered denied tool must not consume the directive"
+        )
+
+    def test_cursor_non_denied_preToolUse_does_not_consume_directive(self):
+        """Regression: in optimize_mode, a non-denied tool (Read/Grep)
+        on cursor must NOT route through drain_session — that would
+        consume queued directives by emitting additional_context which
+        cursor drops, silently losing the directive."""
+        from evo.inject import drain as drain_mod
+        from evo.inject import queue, marker
+
+        register_session(self.root, "cursor_sid", "cursor")
+        mark_engaged(self.root, "cursor_sid")
+        mark_optimize_mode(self.root, "cursor_sid")
+
+        # Enqueue a directive and drop a marker.
+        queue.append_workspace_event(self.root, "DELIVER_ME_LATER")
+        marker.touch(self.root, "cursor_sid")
+
+        # A Read tool fires (non-denied, non-shell). The gate must
+        # defer — not consume.
+        payload_json = json.dumps({
+            "hook_event_name": "preToolUse",
+            "conversation_id": "cursor_sid",
+            "workspace_roots": [str(self.root)],
+            "tool_name": "read_file",
+            "tool_input": {"file_path": "/tmp/x"},
+        })
+        buf = io.StringIO()
+        with patch("sys.stdin", io.StringIO(payload_json)), \
+             patch("sys.stdout", buf):
+            drain_mod.main(["--host", "cursor"])
+        out = json.loads(buf.getvalue() or "{}")
+
+        # Either no envelope at all, or no additional_context (the
+        # critical thing: directive must NOT be consumed yet).
+        self.assertNotIn("permission", out,
+                         f"non-denied Read must not emit a deny: {out!r}")
+        # Marker should still exist — directive not yet consumed.
+        self.assertTrue(
+            marker.exists(self.root, "cursor_sid"),
+            "marker must still exist — Read should not consume the directive"
+        )
+
+    def test_cursor_stop_not_fired_outside_optimize_mode(self):
+        """A casual cursor session (no optimize_mode) must NOT get a
+        forced followup_message — that would force-continue every turn."""
+        register_session(self.root, "casual_cursor", "cursor")
+        mark_engaged(self.root, "casual_cursor")
+        # optimize_mode NOT set
+
+        from evo.inject.drain import drain_session
+        buf = io.StringIO()
+        with patch("sys.stdout", buf):
+            drain_session(self.root, "casual_cursor", host="cursor",
+                          hook_event="stop")
+        out = json.loads(buf.getvalue() or "{}")
+        # Either nothing or an empty additional_context envelope is fine;
+        # what must NOT happen is a followup_message forcing continuation.
+        self.assertNotIn("followup_message", out,
+                         f"casual cursor session must not be force-continued; got {out!r}")
 
 
 if __name__ == "__main__":

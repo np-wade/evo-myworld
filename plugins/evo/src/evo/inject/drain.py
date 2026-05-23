@@ -277,6 +277,7 @@ def _maybe_mark_engaged_from_shell(
 def _self_contained_gate(
     root: Path, session_id: str, host: str, hook_event: str | None,
     tool_name: str | None = None,
+    tool_input: dict | None = None,
 ) -> bool:
     """Gate for hosts wired directly to `evo-drain` (no `evo-hook-drain`
     binary in front). Returns True when the caller should proceed to drain.
@@ -303,6 +304,20 @@ def _self_contained_gate(
         queue.init_offset_to_latest(root, session_id)
     if hook_event not in _DELIVER_EVENTS:
         return False  # register-only (sessionStart, beforeSubmitPrompt, …)
+
+    # Steering bypass for orchestrator-class sessions in optimize_mode:
+    #   - stop/subagentStop: always-fire stop nudge needs drain to run.
+    #   - preToolUse: only when the tool is on the deny list. Letting
+    #     drain_session run on a non-denied tool would consume queued
+    #     directives by emitting `{additional_context: …}` — which the
+    #     IDE drops — silently losing the directive.
+    sess = get_session(root, session_id)
+    if sess and sess.get("optimize_mode") and not sess.get("exp_id"):
+        if hook_event in ("stop", "subagentStop"):
+            return True
+        if hook_event == "preToolUse" and _is_denied_in_optimize_mode(tool_name, tool_input):
+            return True
+
     if hook_event == "preToolUse" and _cursor_tool_class(tool_name) != "shell":
         # Only shell delivers mid-turn (updated_input echo into stdout, which
         # the model reliably reads). For every other tool, deny+agent_message
@@ -507,6 +522,20 @@ def drain_session(root: Path, session_id: str, host: str | None = None, hook_eve
         # inject directive (if any) hasn't actually been delivered to
         # the model; the tool was denied before that point. Leave the
         # state so the next non-violating tool call can drain it.
+        return 0
+
+    # Cursor non-shell preToolUse: the IDE drops `additional_context`,
+    # so we'd consume queued directives without delivering them. This
+    # path is only reachable in optimize_mode (the gate normally defers
+    # non-shell preToolUse). The policy block didn't fire (even-numbered
+    # violation under the alternating cadence), so we let the tool
+    # through but must NOT consume directives.
+    if (
+        host == "cursor"
+        and hook_event in ("preToolUse", "PreToolUse")
+        and _cursor_tool_class(payload.get("tool_name") if payload else None) != "shell"
+    ):
+        sys.stdout.write("{}")
         return 0
 
     # Stop-nudge: if this is a Stop/SubagentStop on an orchestrator in
@@ -1019,6 +1048,9 @@ def _write_policy_state(root: Path, session_id: str, data: dict) -> None:
     p.write_text(json.dumps(data))
 
 
+_PRE_TOOL_EVENTS = ("PreToolUse", "preToolUse")
+
+
 def _should_policy_block(
     root: Path, session_id: str, sess: dict | None, host: str | None,
     hook_event: str | None, payload: dict | None,
@@ -1028,13 +1060,15 @@ def _should_policy_block(
     True on every odd-numbered violation (1, 3, 5, …).
 
     Conditions for considering a tool call a violation:
-      - hook_event is PreToolUse (only block before tool fires).
+      - hook_event is the host's pre-tool event name. claude-code /
+        codex send `PreToolUse`; cursor sends `preToolUse` (camelCase).
+        Both forms accepted via `_PRE_TOOL_EVENTS`.
       - session is orchestrator-class (no exp_id).
       - optimize_mode is true on the session record.
       - tool is on the deny list (edit-tools, or bash with a mutating
         command pattern outside the safe-prefix exemption).
     """
-    if hook_event != "PreToolUse":
+    if hook_event not in _PRE_TOOL_EVENTS:
         return False
     if not sess:
         return False
@@ -1112,11 +1146,15 @@ def _maybe_stop_nudge_text(
     own defeats the point. The escape hatch is `evo exit-optimize-mode`.
 
     Conditions:
-      - hook event must be Stop or SubagentStop.
+      - hook event must be Stop or SubagentStop (case-insensitive
+        across hosts — claude-code/codex use PascalCase, cursor uses
+        camelCase).
       - session must be orchestrator-class (no exp_id).
       - optimize_mode must be true on the session record.
-      - host must support the {decision: block, reason} envelope today —
-        claude-code and codex. Cursor uses a different stop envelope.
+      - host must have a working stop-continuation envelope:
+        claude-code/codex use `{decision: "block", reason: …}`; cursor
+        uses `{followup_message: …}` (auto-submitted at turn end).
+        emit_for_host dispatches the right shape per host.
     """
     if hook_event not in _STOP_EVENTS:
         return None
@@ -1126,8 +1164,8 @@ def _maybe_stop_nudge_text(
         return None  # subagent — not our session to force-continue
     if not sess.get("optimize_mode"):
         return None
-    if host not in ("claude-code", "codex"):
-        return None  # only these hosts honor the block-reason envelope
+    if host not in ("claude-code", "codex", "cursor"):
+        return None  # no known stop-continuation envelope on this host
     return _STOP_NUDGE_TEMPLATE
 
 
@@ -1180,6 +1218,7 @@ def main(argv: list[str] | None = None) -> int:
         sys.stdout.write("{}")
         return 0
     tool_name = payload.get("tool_name")
+    tool_input = payload.get("tool_input") or {}
     registered = session_file(root, session).exists()
     has_marker = marker.exists(root, session)
     # Cursor has no session-id env var that Python `auto_register_from_env`
@@ -1187,7 +1226,7 @@ def main(argv: list[str] | None = None) -> int:
     # used by other hosts. Detect it here instead: if the agent runs any
     # `evo …` shell command, flip engagement on this session's record.
     _maybe_mark_engaged_from_shell(root, session, host, hook_event, payload)
-    gate = _self_contained_gate(root, session, host, hook_event, tool_name)
+    gate = _self_contained_gate(root, session, host, hook_event, tool_name, tool_input)
     # Detect /optimize invocation from the prompt payload for cursor's
     # self-contained path. Must run AFTER the gate because the gate is
     # what lazily registers the cursor session on first event (without
