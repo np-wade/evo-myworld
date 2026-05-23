@@ -679,6 +679,33 @@ class TestCmdDirect(unittest.TestCase):
         self._cmd_direct("exp_0001", "msg")
         assert marker.exists(self.root, "exp_0001")
 
+    def test_targeted_form_touches_per_session_markers_for_matching_subagents(self):
+        """The Rust hook and host gates key marker checks on session_id,
+        not exp_id. `evo direct --to exp_id` must wake the subagent
+        sessions whose `exp_id` field matches — otherwise directives
+        queued after the subagent's SessionStart are stranded."""
+        from evo.inject.registry import register_session
+        # Register two subagent sessions for exp_0001, one for exp_0002,
+        # and one orchestrator (no exp_id).
+        register_session(self.root, "sub_a", "claude-code", exp_id="exp_0001")
+        register_session(self.root, "sub_b", "claude-code", exp_id="exp_0001")
+        register_session(self.root, "sub_other", "claude-code", exp_id="exp_0002")
+        register_session(self.root, "orchestrator", "claude-code")
+
+        self._cmd_direct("exp_0001", "do x")
+        assert marker.exists(self.root, "sub_a"), (
+            "exp_0001 directive must wake sub_a (whose exp_id matches)"
+        )
+        assert marker.exists(self.root, "sub_b"), (
+            "exp_0001 directive must wake sub_b (whose exp_id matches)"
+        )
+        assert not marker.exists(self.root, "sub_other"), (
+            "exp_0001 directive must NOT wake sub_other (different exp_id)"
+        )
+        assert not marker.exists(self.root, "orchestrator"), (
+            "exp_0001 directive must NOT wake orchestrator (no exp_id)"
+        )
+
     def test_targeted_form_does_not_write_workspace_event(self):
         self._cmd_direct("exp_0001", "msg")
         events = queue.read_events_after(workspace_events_path(self.root), None)

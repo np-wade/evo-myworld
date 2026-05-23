@@ -154,7 +154,11 @@ fn iso8601_utc_now() -> String {
     let mm = (remaining % 3600) / 60;
     let ss = remaining % 60;
     let (y, mo, d) = civil_from_days(days);
-    format!("{:04}-{:02}-{:02}T{:02}:{:02}:{:02}Z", y, mo, d, hh, mm, ss)
+    // `+00:00` (not `Z`) so Python `datetime.fromisoformat()` parses it
+    // on 3.10 — that version doesn't accept the `Z` suffix. The Python
+    // side uses `.isoformat()` which already emits `+00:00`, so this
+    // also makes the two writers byte-compatible.
+    format!("{:04}-{:02}-{:02}T{:02}:{:02}:{:02}+00:00", y, mo, d, hh, mm, ss)
 }
 
 /// Howard Hinnant's date algorithm — convert days-since-1970 to (Y, M, D).
@@ -176,15 +180,43 @@ fn register_session(run_dir: &Path, sid: &str, host: &str) -> io::Result<()> {
     let sessions_dir = run_dir.join("inject").join("sessions");
     fs::create_dir_all(&sessions_dir)?;
     let now = iso8601_utc_now();
+    // Honor EVO_EXP_ID at first registration so a subagent's first
+    // SessionStart drain correctly routes to the exp queue (drain.py
+    // chooses workspace-vs-exp based on `sess.exp_id`). Without this,
+    // a directive queued by `evo direct --to exp_id` BEFORE the Python
+    // `auto_register_from_env` merge can be missed.
+    let exp_id_json = match env::var("EVO_EXP_ID") {
+        Ok(v) if !v.is_empty() => format!(r#""{}""#, escape_json_str(&v)),
+        _ => "null".to_string(),
+    };
     let payload = format!(
-        r#"{{"schema_version":1,"session_id":"{}","host":"{}","pid":{},"registered_at":"{}","last_seen_at":"{}","exp_id":null,"parent_session_id":null}}"#,
+        r#"{{"schema_version":1,"session_id":"{}","host":"{}","pid":{},"registered_at":"{}","last_seen_at":"{}","exp_id":{},"parent_session_id":null}}"#,
         sid,
         host,
         process::id(),
         now,
-        now
+        now,
+        exp_id_json,
     );
     fs::write(sessions_dir.join(format!("{}.json", sid)), payload)
+}
+
+/// Minimal JSON-string escape for the small set of chars likely to
+/// appear in session/exp ids. We never expect quotes or backslashes,
+/// but be defensive.
+fn escape_json_str(s: &str) -> String {
+    let mut out = String::with_capacity(s.len());
+    for c in s.chars() {
+        match c {
+            '"' => out.push_str("\\\""),
+            '\\' => out.push_str("\\\\"),
+            '\n' => out.push_str("\\n"),
+            '\r' => out.push_str("\\r"),
+            '\t' => out.push_str("\\t"),
+            _ => out.push(c),
+        }
+    }
+    out
 }
 
 fn read_version(manifest: &Path) -> Option<String> {

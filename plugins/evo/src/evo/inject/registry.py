@@ -271,7 +271,13 @@ def list_active_sessions(root: Path) -> list[dict]:
         last_seen = data.get("last_seen_at")
         try:
             if last_seen:
-                ts = dt.datetime.fromisoformat(last_seen).timestamp()
+                # Python 3.10's `fromisoformat` doesn't accept the `Z`
+                # suffix that some writers (older Rust binary builds)
+                # emit. Translate it to the equivalent `+00:00` for
+                # parseability. Python's own writer uses `+00:00` so
+                # this is a no-op for Python-written records.
+                normalized = last_seen[:-1] + "+00:00" if last_seen.endswith("Z") else last_seen
+                ts = dt.datetime.fromisoformat(normalized).timestamp()
             else:
                 ts = 0
         except (ValueError, TypeError):

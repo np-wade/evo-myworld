@@ -3858,10 +3858,33 @@ def cmd_direct(args: argparse.Namespace) -> int:
 
     if exp_id:
         event_id = queue.append_exp_event(root, exp_id, text)
-        # Touch only the subagent's marker. The subagent's session_id
-        # is the same as exp_id-keyed marker for routing simplicity.
+        # Touch the per-session markers for every registered session
+        # whose `exp_id` matches. The Rust hook + self-contained gates
+        # both key the marker check on the session's own `sid`, NOT on
+        # exp_id — so touching `markers/<exp_id>.flag` (the historical
+        # convention from when subagent sid == exp_id) wakes up zero
+        # drains in current hosts. Without this, exp-targeted directives
+        # queued AFTER the subagent's SessionStart get stranded until
+        # something else triggers a drain.
+        #
+        # Pre-registration window: if the subagent hasn't registered yet
+        # (queued before dispatch), there's no sid to wake. That's OK —
+        # the subagent's SessionStart unconditionally drains the exp
+        # queue from offset 0, so it'll find the event then.
+        sessions = list_active_sessions(root)
+        woken = 0
+        for sess in sessions:
+            if sess.get("exp_id") != exp_id:
+                continue
+            sid = sess.get("session_id")
+            if not sid:
+                continue
+            marker.touch(root, sid)
+            woken += 1
+        # Keep the legacy exp_id-keyed marker for any external observer
+        # that grep'd for it; it's a no-op for routing but harmless.
         marker.touch(root, exp_id)
-        print(f"directive queued (exp={exp_id}, id={event_id})")
+        print(f"directive queued (exp={exp_id}, id={event_id}, woken={woken})")
         return 0
 
     event_id = queue.append_workspace_event(root, text)

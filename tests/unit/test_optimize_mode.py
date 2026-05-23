@@ -228,6 +228,57 @@ class TestOptimizeModeFlagFile(unittest.TestCase):
         self.assertTrue(flag.exists(),
                         "self-heal must re-create the missing flag file")
 
+    def test_drain_reconciles_missing_flag_when_json_says_true(self):
+        """JSON says optimize_mode=true but the flag is missing (e.g.
+        external edit). drain_session reconciles on the next handoff —
+        writes the flag so subsequent Rust gate checks see it."""
+        import io
+        from unittest.mock import patch
+        from evo.inject.registry import mark_optimize_mode
+        from evo.inject.paths import optimize_mode_flag_file
+        from evo.inject.drain import drain_session
+
+        register_session(self.root, "s1", "claude-code")
+        mark_optimize_mode(self.root, "s1")
+        flag = optimize_mode_flag_file(self.root, "s1")
+        # Simulate external corruption: remove the flag, JSON stays true.
+        flag.unlink()
+        self.assertFalse(flag.exists())
+
+        # Drain anywhere — pick the cheapest event.
+        buf = io.StringIO()
+        with patch("sys.stdout", buf):
+            drain_session(self.root, "s1", host="claude-code", hook_event="Stop")
+        self.assertTrue(flag.exists(),
+                        "drain must reconcile JSON=true → flag present")
+
+    def test_drain_does_not_clear_stale_flag_when_json_false(self):
+        """Deliberate non-reconcile: a stale flag with JSON=false is
+        left alone by drain. Concurrent-write race with /optimize would
+        otherwise let a stale snapshot clear a flag that another
+        transaction just wrote — the recovery cost (Rust skips handoff,
+        silent steering loss) is worse than the cost of an extra Python
+        invocation (Rust hands off, Python sees JSON=false, bails)."""
+        import io
+        from unittest.mock import patch
+        from evo.inject.paths import optimize_mode_dir, optimize_mode_flag_file
+        from evo.inject.drain import drain_session
+
+        register_session(self.root, "s1", "claude-code")
+        optimize_mode_dir(self.root).mkdir(parents=True, exist_ok=True)
+        flag = optimize_mode_flag_file(self.root, "s1")
+        flag.touch()
+        self.assertTrue(flag.exists())
+
+        buf = io.StringIO()
+        with patch("sys.stdout", buf):
+            drain_session(self.root, "s1", host="claude-code", hook_event="Stop")
+        # Flag should still be present — user/`evo exit-optimize-mode`
+        # is responsible for clearing.
+        self.assertTrue(flag.exists(),
+                        "stale flag must NOT be cleared by drain "
+                        "(would race with concurrent /optimize)")
+
     def test_unmark_clears_leaked_flag_even_if_json_missing(self):
         """If the session JSON was wiped but the flag leaked, unmark
         should still clean up the flag."""

@@ -510,6 +510,103 @@ def test_nested_env_host_matches_payload_sid_owner(tmp_path):
     assert args[sid_idx + 1] == payload_sid
 
 
+def test_session_start_honors_evo_exp_id_env(tmp_path):
+    """When EVO_EXP_ID is set in the subagent's env at SessionStart,
+    the Rust register_session must record it on the session JSON so
+    the first drain routes to the exp queue, not the workspace queue."""
+    sid = "subagent-cc"
+    # Workspace exists but session not yet registered.
+    run = tmp_path / ".evo" / "run_test"
+    (run / "inject" / "sessions").mkdir(parents=True)
+
+    fake_bin = tmp_path / "fake-bin"
+    _write_fake_drain(fake_bin)
+    env = os.environ.copy()
+    env["PATH"] = f"{fake_bin}{_path_separator()}{_base_path()}"
+    env["EVO_EXP_ID"] = "exp_0042"
+
+    r = subprocess.run(
+        [str(HOOK_PATH)],
+        input=f'{{"session_id":"{sid}","hook_event_name":"SessionStart"}}'.encode(),
+        cwd=str(tmp_path),
+        env=env,
+        capture_output=True,
+        timeout=10,
+    )
+    assert r.returncode == 0
+    rec_path = run / "inject" / "sessions" / f"{sid}.json"
+    assert rec_path.exists()
+    import json
+    rec = json.loads(rec_path.read_text())
+    assert rec.get("exp_id") == "exp_0042", (
+        f"Rust register_session must honor EVO_EXP_ID; got {rec!r}"
+    )
+
+
+def test_rust_writes_iso_timestamp_python_can_parse(tmp_path):
+    """Rust's iso8601_utc_now must emit a form Python 3.10+
+    `datetime.fromisoformat()` can parse. The earlier `Z`-suffix form
+    was rejected on 3.10, causing list_active_sessions to GC valid
+    sessions as stale — which broke `evo direct --to exp_id` fanout
+    because the target subagent's record had just been deleted."""
+    sid = "ts-parse-sess"
+    run = tmp_path / ".evo" / "run_test"
+    (run / "inject" / "sessions").mkdir(parents=True)
+
+    fake_bin = tmp_path / "fake-bin"
+    _write_fake_drain(fake_bin)
+    env = os.environ.copy()
+    env["PATH"] = f"{fake_bin}{_path_separator()}{_base_path()}"
+
+    r = subprocess.run(
+        [str(HOOK_PATH)],
+        input=f'{{"session_id":"{sid}","hook_event_name":"SessionStart"}}'.encode(),
+        cwd=str(tmp_path), env=env, capture_output=True, timeout=10,
+    )
+    assert r.returncode == 0
+    import json
+    import datetime as dt
+    rec = json.loads((run / "inject" / "sessions" / f"{sid}.json").read_text())
+    # Both timestamp fields must be parseable on the supported Python
+    # version range (>=3.10 per pyproject).
+    for field in ("registered_at", "last_seen_at"):
+        ts_str = rec[field]
+        # The actual fix: writer should use `+00:00`, NOT `Z`.
+        assert not ts_str.endswith("Z"), (
+            f"Rust ISO timestamp uses Z suffix which Python 3.10 "
+            f"fromisoformat() doesn't accept; got {ts_str!r}"
+        )
+        # Sanity: parses without error.
+        dt.datetime.fromisoformat(ts_str)
+
+
+def test_session_start_writes_null_exp_id_without_env(tmp_path):
+    """No EVO_EXP_ID env → exp_id stays null (orchestrator-class)."""
+    sid = "orchestrator-cc"
+    run = tmp_path / ".evo" / "run_test"
+    (run / "inject" / "sessions").mkdir(parents=True)
+
+    fake_bin = tmp_path / "fake-bin"
+    _write_fake_drain(fake_bin)
+    env = os.environ.copy()
+    env["PATH"] = f"{fake_bin}{_path_separator()}{_base_path()}"
+    env.pop("EVO_EXP_ID", None)
+
+    r = subprocess.run(
+        [str(HOOK_PATH)],
+        input=f'{{"session_id":"{sid}","hook_event_name":"SessionStart"}}'.encode(),
+        cwd=str(tmp_path),
+        env=env,
+        capture_output=True,
+        timeout=10,
+    )
+    assert r.returncode == 0
+    rec_path = run / "inject" / "sessions" / f"{sid}.json"
+    import json
+    rec = json.loads(rec_path.read_text())
+    assert rec.get("exp_id") is None
+
+
 def test_resume_userpromptsubmit_lazy_registers_session(tmp_path):
     """Resumed claude-code sessions don't fire SessionStart, so the
     session may not be in the registry when UserPromptSubmit arrives.

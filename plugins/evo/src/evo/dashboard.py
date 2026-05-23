@@ -986,12 +986,27 @@ def create_app(root: Path | None = None) -> Flask:
 
         if target_exp:
             event_id = queue.append_exp_event(root, target_exp, text)
+            # Fan out to per-session markers for any registered subagent
+            # whose exp_id matches. See cmd_direct in cli.py for the
+            # rationale — the Rust/host gates key on sid, not exp_id, so
+            # touching markers/<exp_id>.flag alone wakes zero drains.
+            sessions = list_active_sessions(root)
+            woken = 0
+            for sess in sessions:
+                if sess.get("exp_id") != target_exp:
+                    continue
+                sid = sess.get("session_id")
+                if not sid:
+                    continue
+                marker.touch(root, sid)
+                woken += 1
+            # Keep the legacy exp_id-keyed marker for back-compat.
             marker.touch(root, target_exp)
             return jsonify({
                 "event_id": event_id,
                 "kind": "targeted",
                 "exp_id": target_exp,
-                "fanout": 1,
+                "fanout": woken,
             })
 
         mode = (body.get("mode") or "spawn").strip().lower()

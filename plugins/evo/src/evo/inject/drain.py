@@ -474,6 +474,18 @@ def drain_session(root: Path, session_id: str, host: str | None = None, hook_eve
         sys.stdout.write("{}")
         return 0
 
+    # One-direction self-heal: if JSON says optimize_mode=true but the
+    # Rust-cache flag is missing (external corruption or partial-failed
+    # mark), restore it. We deliberately do NOT clear-on-false here —
+    # a stale `sess` snapshot read concurrently with a mark/unmark could
+    # cause us to clear a flag that another transaction just wrote, and
+    # the recovery path (Rust skips handoff → silent steering loss) is
+    # worse than the cost of a spurious flag (Rust hands off → Python
+    # sees JSON=false → bails — extra latency only).
+    if sess.get("optimize_mode") and not sess.get("exp_id"):
+        from .registry import _write_optimize_mode_flag
+        _write_optimize_mode_flag(root, session_id)
+
     host = host or sess.get("host") or _detect_host_from_env()
     # Codex and Claude Code use the same hookSpecificOutput envelope.
     # If host is "unknown" (e.g. legacy registry entry), default to that
