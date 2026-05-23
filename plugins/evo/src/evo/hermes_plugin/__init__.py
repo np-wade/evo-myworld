@@ -1,26 +1,35 @@
 """Hermes runtime plugin — auto-discovered via pip entry-point
 `hermes_agent.plugins`.
 
-Hooks registered:
+Hooks registered (only hooks that hermes actually fires per its
+`VALID_HOOKS` set in `hermes_cli/plugins.py`):
+
 - `on_session_start`: registers the hermes session in evo's inject
   registry. Return value is ignored by hermes.
-- `pre_llm_call`: drains pending events at turn start into
-  `{"context": "..."}`. Fires once per `hermes chat` turn.
-- `transform_tool_result`: drains pending events after each tool
-  call and appends them to the tool result the model sees. Without
-  this, single-turn mode (`hermes chat -q ... -Q`) only drains at
-  turn start — a directive queued *during* the tool-calling loop
-  goes unread because there's no next top-level LLM call to fire
-  `pre_llm_call` again. Per-tool drain closes that gap.
+- `pre_llm_call`: drains pending events at turn start AND injects the
+  policy nudge banner if violations were recorded since the last turn.
+  This is the only hook whose return value hermes honors (as
+  `{"context": "..."}`).
+- `pre_tool_call`: observer-only on hermes (return ignored). Records
+  optimize-mode violations to a state file. The nudge is delivered
+  the next time `pre_llm_call` fires.
 
-Session-id handling: `transform_tool_result` doesn't receive the
-session_id directly (its signature is tool-scoped). We stash the
-session_id from `on_session_start` / `pre_llm_call` into a module
-global so the per-tool hook can read it. Single hermes process =
-single active session at a time, so this is safe; for subagents
-that fork their own session, the parent's drain remains correct
-because `transform_tool_result` only fires for the current agent's
-tools.
+Why not mid-turn delivery: hermes has no hook that can mutate model
+input mid-tool-loop. `pre_tool_call` is observer-only; `post_tool_call`
+return is ignored. So directives queued during a turn are delivered at
+the NEXT turn's `pre_llm_call`. Single-turn (`hermes chat -q ... -Q`)
+runs have no next turn, so mid-turn-queued directives wait until the
+next `hermes chat` invocation. (This was misrepresented in the previous
+plugin which registered a `transform_tool_result` hook hermes doesn't
+fire — verified absent from `VALID_HOOKS` in hermes-agent 0.10.)
+
+Session-id handling: `pre_tool_call` receives `task_id` (the hermes
+session identifier), not `session_id`. We stash the session id from
+`on_session_start` / `pre_llm_call` so `pre_tool_call` can resolve which
+session record to update. Single hermes process = single active session
+at a time, so this is safe; for subagents that fork their own session,
+the parent's drain remains correct because `pre_tool_call` only fires
+for the current agent's tools.
 
 In-process function calls; no fork+exec. We don't use the marker
 fast-path optimization because the cost of reading the queue file is
@@ -38,7 +47,14 @@ from evo.inject import marker
 from evo.inject.paths import inject_root, exp_events_path, workspace_events_path
 from evo.inject.queue import read_events_after, read_offset, write_offset
 from evo.inject.registry import get_session, register_session
-from evo.inject.drain import format_directive_text
+from evo.inject.drain import (
+    _POLICY_NUDGE_TEMPLATE,
+    _is_denied_in_optimize_mode,
+    _maybe_mark_optimize_from_prompt,
+    _read_policy_state,
+    _write_policy_state,
+    format_directive_text,
+)
 
 
 def _resolve_root() -> Path | None:
@@ -62,8 +78,7 @@ def _ensure_registered(root: Path, session_id: str) -> None:
 
 def _compute_drain_text(root: Path, session_id: str) -> str | None:
     """Read pending events for `session_id`, format, update offset, unlink
-    marker. Returns the formatted text or None if nothing to deliver.
-    Mirrors evo.inject.drain.drain_session minus stdout I/O."""
+    marker. Returns the formatted text or None if nothing to deliver."""
     sess = get_session(root, session_id)
     if sess is None:
         marker.unlink(root, session_id)
@@ -99,8 +114,9 @@ def _compute_drain_text(root: Path, session_id: str) -> str | None:
 
 
 # Stash the most-recent session_id from on_session_start / pre_llm_call
-# so `transform_tool_result` (which doesn't receive session_id) can drain
-# into the right session's offset.
+# so `pre_tool_call` (which gets `task_id`, not `session_id`, and which
+# may not match the evo registry session id) can resolve the right
+# session record.
 _LAST_SESSION_ID: str | None = None
 
 
@@ -108,6 +124,39 @@ def _stash_session(session_id: str | None) -> None:
     global _LAST_SESSION_ID
     if session_id:
         _LAST_SESSION_ID = session_id
+
+
+def _record_violation(root: Path, session_id: str, tool_name: str | None) -> None:
+    """Increment the per-session violation counter and mark a pending
+    nudge. Called from `pre_tool_call` for denied tools under optimize_mode.
+
+    Storage: piggybacks on the same `_policy_state_file` used by
+    claude-code/cursor/codex so cadence and counter shape stay
+    consistent across hosts.
+    """
+    state = _read_policy_state(root, session_id)
+    count = int(state.get("violation_count", 0)) + 1
+    state["violation_count"] = count
+    state["last_violation_tool"] = tool_name or ""
+    state["nudge_pending"] = True
+    _write_policy_state(root, session_id, state)
+
+
+def _consume_pending_nudge(root: Path, session_id: str) -> str | None:
+    """At `pre_llm_call`, return the policy nudge banner IF a violation
+    is pending AND the current count satisfies the alternating cadence
+    (odd-numbered violations nudge; even ones pass silently). Resets
+    `nudge_pending` after.
+    """
+    state = _read_policy_state(root, session_id)
+    if not state.get("nudge_pending"):
+        return None
+    count = int(state.get("violation_count", 0))
+    state["nudge_pending"] = False
+    _write_policy_state(root, session_id, state)
+    if count % 2 == 1:
+        return _POLICY_NUDGE_TEMPLATE
+    return None
 
 
 def _on_session_start(session_id: str | None = None, **kwargs):
@@ -124,8 +173,18 @@ def _on_session_start(session_id: str | None = None, **kwargs):
 
 
 def _on_pre_llm_call(session_id: str | None = None, **kwargs):
-    """Per-turn drain. Always reads the queue (in-process is cheap).
-    Returns {"context": "..."} when there's content to inject."""
+    """Per-turn drain + policy nudge delivery.
+
+    Two channels combined into the `{"context": ...}` injection:
+      1. Policy nudge banner — if `pre_tool_call` recorded a denied-tool
+         violation since the last pre_llm_call AND the count satisfies
+         the alternating cadence, prepend the EVO POLICY banner.
+      2. Pending directives (`evo direct`) — appended.
+
+    Also auto-arms `optimize_mode` if the user's prompt looks like
+    `/optimize`. Hermes has no UserPromptSubmit hook; pre_llm_call is
+    the per-turn analogue.
+    """
     if not session_id:
         return None
     _stash_session(session_id)
@@ -133,45 +192,69 @@ def _on_pre_llm_call(session_id: str | None = None, **kwargs):
     if root is None:
         return None
     _ensure_registered(root, session_id)
-    text = _compute_drain_text(root, session_id)
-    if text:
-        return {"context": text}
-    return None
+    # Auto-arm optimize_mode on /optimize. Synthetic event name so the
+    # shared matcher (which gates on hook_event ∈ prompt_events) accepts.
+    _maybe_mark_optimize_from_prompt(
+        root, session_id, "hermes", "userPromptSubmit", kwargs,
+    )
+
+    nudge = _consume_pending_nudge(root, session_id)
+    directive_text = _compute_drain_text(root, session_id)
+
+    if not nudge and not directive_text:
+        return None
+    # Banner first so it stays visible even if context is truncated.
+    parts: list[str] = []
+    if nudge:
+        parts.append("--- evo policy ---")
+        parts.append(nudge)
+    if directive_text:
+        parts.append("--- evo directive ---")
+        parts.append(directive_text)
+    return {"context": "\n\n".join(parts)}
 
 
-def _on_transform_tool_result(
+def _on_pre_tool_call(
     tool_name: str | None = None,
-    arguments: dict | None = None,
-    result: str | None = None,
+    args: dict | None = None,
     task_id: str | None = None,
     **kwargs,
 ):
-    """Per-tool drain. Fires after each tool call; appends any pending
-    directive text to the tool result so the model sees the directive
-    on its very next iteration through the tool-calling loop.
+    """Observer for tool calls. Hermes ignores the return value, so we
+    can't block here — we record the violation so the next `pre_llm_call`
+    can deliver the nudge.
 
-    Returns the modified result string, or None to leave it unchanged
-    (no directive to deliver). Hermes treats `None`/no return as 'leave
-    result unchanged' per its hook contract."""
+    Fires once per tool execution (verified against hermes-agent
+    `model_tools.py#handle_function_call`). Parallel tool calls fire it
+    N times.
+    """
     session_id = kwargs.get("session_id") or _LAST_SESSION_ID
     if not session_id:
         return None
     root = _resolve_root()
     if root is None:
         return None
-    _ensure_registered(root, session_id)
-    text = _compute_drain_text(root, session_id)
-    if not text:
+    sess = get_session(root, session_id)
+    if not sess:
         return None
-    # Suffix the directive after the original tool result. The
-    # `[evo direct] ...` prefix already comes from format_directive_text;
-    # adding a separator line makes the boundary clear to the model.
-    base = result if result is not None else ""
-    return f"{base}\n\n--- evo directive ---\n{text}"
+    if sess.get("exp_id"):
+        return None  # subagent — exempt
+    if not sess.get("optimize_mode"):
+        return None
+    if not _is_denied_in_optimize_mode(tool_name, args):
+        return None
+    _record_violation(root, session_id, tool_name)
+    return None
 
 
 def register(ctx) -> None:
-    """Hermes plugin entry point — invoked once at plugin load."""
+    """Hermes plugin entry point — invoked once at plugin load.
+
+    Only hooks listed in hermes-agent's `VALID_HOOKS` are registered.
+    `transform_tool_result` (used by older evo versions) is NOT a real
+    hermes hook and was silently dropped — confirmed against
+    hermes-agent 0.10's `hermes_cli/plugins.py`.
+    """
     ctx.register_hook("on_session_start", _on_session_start)
     ctx.register_hook("pre_llm_call", _on_pre_llm_call)
-    ctx.register_hook("transform_tool_result", _on_transform_tool_result)
+    ctx.register_hook("pre_tool_call", _on_pre_tool_call)
