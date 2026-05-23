@@ -1,27 +1,39 @@
 // Opencode plugin entry — registered via opencode auto-discovery in
 // `~/.config/opencode/plugins/evo.js` (or `.opencode/plugins/` per-workspace).
 //
-// Two hooks:
-//   `chat.message` fires per user message — prepends drained directive
-//     text to the user message before it goes to the LLM. Useful when the
-//     user submits multiple turns interactively.
-//   `tool.execute.before` fires before each tool call — re-detects the
-//     active evo run and re-registers the session there. Needed because
-//     some agents (notably gpt-5 with the optimize skill) call
-//     `evo init` themselves mid-session, switching the active run from
-//     run_0000 to run_0001. Without re-registration, the session lives
-//     in run_0000 while `evo direct` looks in run_0001 (fanout=0).
+// Hook contract (verified against sst/opencode `packages/plugin/src/index.ts`):
+//   - `chat.message`: fires per user message; mutating `parts` injects text
+//     into LLM input. Used to drain directives + auto-arm optimize_mode.
+//   - `tool.execute.before`: fires pre-tool. THROW to deny — opencode shows
+//     the error message to the model as "Blocked by policy" feedback.
+//     Used as the policy gate: deny when orchestrator + optimize_mode +
+//     denied tool (alternating cadence).
+//   - `event`: fires for system events. `event.type === "session.idle"`
+//     is the turn-end signal (analogue of claude-code Stop). When the
+//     orchestrator session is in optimize_mode, send a follow-up message
+//     via `client.session.prompt(...)` so the loop continues autonomously.
 //
-// See notes/cross-host-inject-design.md.
+// There is NO `stop` hook on opencode — verified absent from the Hooks
+// type in upstream. The always-fire stop nudge uses session.idle + the
+// SDK's session.prompt recipe.
 
 import {
+  POLICY_NUDGE_TEMPLATE,
+  commitDrainPeek,
   drainSession,
   findEvoRunDir,
+  formatDirectiveText,
+  getSession,
   initOffsetToLatest,
   isEvoCommand,
   isRegistered,
   markEngaged,
+  markOptimizeMode,
+  maybeMarkOptimizeFromPrompt,
+  maybeStopNudgeText,
+  peekDrainSession,
   registerSession,
+  shouldPolicyBlock,
 } from "./drain.js"
 import * as fs from "fs"
 import * as path from "path"
@@ -30,10 +42,25 @@ function markerExists(runDir: string, sid: string): boolean {
   return fs.existsSync(path.join(runDir, "inject", "markers", `${sid}.flag`))
 }
 
+function extractPromptTextFromParts(parts: any): string {
+  // chat.message's upstream contract puts the user prompt content in
+  // `output.parts: Part[]` — typically a single `{type: "text", text}`
+  // for plain prompts. `UserMessage` has metadata only, NOT the prompt
+  // text. Read from parts (verified against
+  // sst/opencode/packages/plugin/src/index.ts).
+  if (!Array.isArray(parts)) return ""
+  for (const p of parts) {
+    if (p && p.type === "text" && typeof p.text === "string" && p.text) {
+      return p.text
+    }
+  }
+  return ""
+}
+
 /**
  * Opencode plugin factory — returns hook handlers per opencode's plugin SDK.
  */
-export const EvoPlugin = async ({ project }: any) => {
+export const EvoPlugin = async ({ project, client }: any) => {
   // Idempotent register — only writes the registry file if absent. Safe
   // to call every tool call; cost is a single fs.existsSync check after
   // first registration.
@@ -55,57 +82,106 @@ export const EvoPlugin = async ({ project }: any) => {
       const runDir = ensureRegistered(sessionID)
       if (!runDir) return
 
-      // On first fire, drain unconditionally to catch any directive
-      // queued before the session existed. Later fires use the marker
-      // file as a fast path — skip drain when nothing is queued.
-      const hasMarker = markerExists(runDir, sessionID)
-      if (!hasMarker) {
-        // Also drain on first fire (no marker yet because session was
-        // just registered) — drainSession returns null cheaply if the
-        // queue is empty.
-      }
+      // Auto-arm optimize_mode if the user's prompt matches `/optimize`.
+      // Prompt text lives in output.parts (Part[]), NOT in message — the
+      // upstream `chat.message` contract has UserMessage carry metadata,
+      // and parts as a separate array.
+      const promptText = extractPromptTextFromParts(output?.parts)
+      maybeMarkOptimizeFromPrompt(runDir, sessionID, "opencode", promptText)
 
+      // Drain queued directives. On first fire the marker may not exist
+      // yet (just registered); drainSession is cheap on empty queues.
       const result = drainSession(runDir, sessionID)
-      if (result.text) {
-        if (!Array.isArray(output.parts)) {
-          output.parts = []
-        }
-        const messageID: string =
-          input?.messageID ?? output?.message?.id ?? output.parts[0]?.messageID ?? ""
-        const partID = `prt_evo_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 10)}`
-        output.parts.unshift({
-          type: "text",
-          id: partID,
-          sessionID,
-          messageID,
-          text: result.text,
-        })
+      if (!result.text) return
+
+      if (!Array.isArray(output.parts)) {
+        output.parts = []
       }
+      const messageID: string =
+        input?.messageID ?? output?.message?.id ?? output.parts[0]?.messageID ?? ""
+      const partID = `prt_evo_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 10)}`
+      output.parts.unshift({
+        type: "text",
+        id: partID,
+        sessionID,
+        messageID,
+        text: result.text,
+      })
     },
 
-    "tool.execute.before": async (input: any, _output: any) => {
-      // Fires before every tool call. Two jobs:
-      //  1. Keep the session registered in the CURRENT active run —
-      //     re-detection happens inside ensureRegistered (findEvoRunDir
-      //     picks the latest run_*).
-      //  2. Engagement detection — when the agent runs `evo …` via a
-      //     shell tool, flip has_evo_engaged so `evo direct` fanout can
-      //     reach this session. Mirrors the cursor drain's evo-command
-      //     detector for hosts where Python `auto_register_from_env`
-      //     can't run (opencode doesn't export OPENCODE_SESSION_ID to
-      //     subprocesses; verified via sst/opencode#12158).
+    "tool.execute.before": async (input: any, output: any) => {
+      // Fires before every tool call. Three jobs:
+      //  1. Keep the session registered in the CURRENT active run.
+      //  2. Engagement detection — flip has_evo_engaged on `evo …` shells
+      //     so `evo direct` fanout can reach this session.
+      //  3. POLICY GATE — when the orchestrator (no exp_id) is in
+      //     optimize_mode and the tool is on the deny list, throw to
+      //     block. Alternating cadence (odd violations throw; even pass).
       const runDir = ensureRegistered(input?.sessionID)
       if (!runDir) return
       const sid: string | undefined = input?.sessionID
       if (!sid) return
-      const toolName = (input?.tool || input?.toolName || "").toLowerCase()
-      if (toolName === "bash" || toolName === "shell") {
-        const cmd = input?.args?.command ?? input?.parameters?.command ?? ""
-        if (isEvoCommand(cmd)) {
+
+      const toolName = (input?.tool || input?.toolName || "").toString()
+      const toolArgs = output?.args ?? input?.args ?? {}
+
+      // Engagement detection for evo shell commands.
+      if (toolName.toLowerCase() === "bash" || toolName.toLowerCase() === "shell") {
+        const cmd = (toolArgs as any)?.command ?? ""
+        if (typeof cmd === "string" && isEvoCommand(cmd)) {
           if (markEngaged(runDir, sid)) {
             initOffsetToLatest(runDir, sid)
           }
         }
+      }
+
+      // Policy gate. shouldPolicyBlock returns true on odd-numbered
+      // violations under optimize_mode; throws here become "Blocked by
+      // policy" feedback to the model.
+      if (shouldPolicyBlock(runDir, sid, toolName, toolArgs)) {
+        throw new Error(POLICY_NUDGE_TEMPLATE)
+      }
+    },
+
+    event: async ({ event }: any) => {
+      // Always-fire stop nudge on session.idle (the opencode analogue of
+      // claude-code Stop). When the orchestrator session is in optimize_mode,
+      // inject a follow-up message via client.session.prompt so the agent
+      // keeps driving the /optimize loop. Escape hatch: `evo exit-optimize-mode`.
+      if (!event || event.type !== "session.idle") return
+      const sessionID: string | undefined =
+        event.properties?.sessionID ?? event.sessionID ?? event.session_id
+      if (!sessionID) return
+      const runDir = findEvoRunDir(project?.directory)
+      if (!runDir) return
+      const sess = getSession(runDir, sessionID) as any
+      if (!sess || sess.exp_id || !sess.optimize_mode) return
+
+      // Bail BEFORE any state mutation if we can't actually deliver.
+      // session.prompt is the only delivery channel here; if it's
+      // missing, consuming queued directives would silently lose them.
+      if (!client || typeof client.session?.prompt !== "function") return
+
+      // Peek (don't pop) so a failed injection doesn't consume the
+      // directive. Commit offsets + unlink marker only after the
+      // session.prompt call succeeds.
+      const peek = peekDrainSession(runDir, sessionID)
+      const nudge = maybeStopNudgeText(runDir, sessionID)
+      if (!nudge) return
+      const text = peek.text ? peek.text + "\n\n" + nudge : nudge
+
+      try {
+        await client.session.prompt({
+          path: { id: sessionID },
+          body: {
+            parts: [{ type: "text", text }],
+          },
+        })
+        // Success — now commit the drain.
+        commitDrainPeek(runDir, sessionID, peek)
+      } catch (_e) {
+        // Don't crash the agent on a stop-nudge failure. Directives
+        // stay queued; next session.idle (or chat.message) will retry.
       }
     },
   }
