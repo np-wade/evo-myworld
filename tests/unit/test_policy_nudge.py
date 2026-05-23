@@ -1,18 +1,11 @@
 """Tests for the PreToolUse policy nudge that steers the orchestrator
 back to the /optimize protocol.
 
-When the orchestrator (in optimize_mode) tries to:
-  - Edit / Write / NotebookEdit a file (any host's edit-like tool), OR
-  - Bash a non-allowlisted command (anything other than `evo …`,
-    host-spawn commands, or read-only inspection)
-
-…the drain emits a hard-deny envelope on the 1st violation and every
-5th violation thereafter, with a banner explaining the protocol. In
-between, the tool calls go through silently (no block, no nudge).
-
-The intent: re-anchor the agent's mental model of the optimize protocol
-without nagging it every single tool call. Block-first-then-spaced
-matches the user's spec.
+Design: a deny list of file-mutation tools and bash command patterns.
+When the orchestrator (in optimize_mode) hits the deny list, the drain
+emits a hard-deny envelope on every odd-numbered violation (1, 3, 5, …);
+even-numbered ones pass through to give the agent room to comply or
+override (via `evo exit-optimize-mode`).
 
 Tests use real drain.py functions + real session records. No mocks of
 real impls.
@@ -24,7 +17,6 @@ from __future__ import annotations
 
 import io
 import json
-import os
 import subprocess
 import sys
 import tempfile
@@ -35,8 +27,6 @@ from unittest.mock import patch
 REPO_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO_ROOT / "plugins" / "evo" / "src"))
 
-from evo.inject import queue
-from evo.inject.paths import session_file
 from evo.inject.registry import register_session, mark_engaged, mark_optimize_mode
 
 
@@ -92,114 +82,441 @@ class _Base(unittest.TestCase):
 
 
 # ---------------------------------------------------------------------------
-# Cross-host tool classifier
+# Deny list: tool names
 # ---------------------------------------------------------------------------
 
-class TestToolClassifier(unittest.TestCase):
+class TestDenyListToolNames(unittest.TestCase):
 
-    def test_claude_code_names(self):
-        from evo.inject.drain import _classify_tool
-        self.assertEqual(_classify_tool("claude-code", "Edit"), "edit")
-        self.assertEqual(_classify_tool("claude-code", "Write"), "edit")
-        self.assertEqual(_classify_tool("claude-code", "NotebookEdit"), "edit")
-        self.assertEqual(_classify_tool("claude-code", "Bash"), "bash")
-        self.assertEqual(_classify_tool("claude-code", "Read"), "read")
-        self.assertEqual(_classify_tool("claude-code", "Glob"), "read")
-        self.assertEqual(_classify_tool("claude-code", "Grep"), "read")
+    def test_claude_code_edit_tools_denied(self):
+        from evo.inject.drain import _is_denied_in_optimize_mode
+        for t in ("Edit", "Write", "NotebookEdit", "MultiEdit"):
+            self.assertTrue(_is_denied_in_optimize_mode(t, {}),
+                            f"{t!r} must be denied")
 
-    def test_cursor_names(self):
-        from evo.inject.drain import _classify_tool
-        self.assertEqual(_classify_tool("cursor", "edit_file"), "edit")
-        self.assertEqual(_classify_tool("cursor", "create_file"), "edit")
-        self.assertEqual(_classify_tool("cursor", "search_replace"), "edit")
-        self.assertEqual(_classify_tool("cursor", "run_terminal_cmd"), "bash")
-        self.assertEqual(_classify_tool("cursor", "shell"), "bash")
-        self.assertEqual(_classify_tool("cursor", "read_file"), "read")
+    def test_cursor_edit_tools_denied(self):
+        from evo.inject.drain import _is_denied_in_optimize_mode
+        for t in ("edit_file", "create_file", "search_replace",
+                  "str_replace", "delete_file", "applypatch", "apply_patch"):
+            self.assertTrue(_is_denied_in_optimize_mode(t, {}),
+                            f"{t!r} must be denied")
 
-    def test_codex_names(self):
-        from evo.inject.drain import _classify_tool
-        # Codex uses similar names to claude-code (Edit/Write) plus shell variants
-        self.assertEqual(_classify_tool("codex", "edit"), "edit")
-        self.assertEqual(_classify_tool("codex", "shell"), "bash")
-        self.assertEqual(_classify_tool("codex", "exec"), "bash")
+    def test_read_tools_not_denied(self):
+        from evo.inject.drain import _is_denied_in_optimize_mode
+        for t in ("Read", "Glob", "Grep", "read_file", "list_dir",
+                  "TodoWrite", "WebFetch", "WebSearch"):
+            self.assertFalse(_is_denied_in_optimize_mode(t, {}),
+                             f"{t!r} must NOT be denied (it's read-only / non-mutating)")
 
-    def test_unknown_returns_other(self):
-        from evo.inject.drain import _classify_tool
-        self.assertEqual(_classify_tool("claude-code", "TodoWrite"), "other")
-        self.assertEqual(_classify_tool("claude-code", "WebSearch"), "other")
-        self.assertEqual(_classify_tool("claude-code", None), "other")
-        self.assertEqual(_classify_tool("claude-code", ""), "other")
+    def test_unknown_tool_not_denied(self):
+        from evo.inject.drain import _is_denied_in_optimize_mode
+        self.assertFalse(_is_denied_in_optimize_mode("RandomTool", {}))
+        self.assertFalse(_is_denied_in_optimize_mode(None, {}))
+        self.assertFalse(_is_denied_in_optimize_mode("", {}))
 
 
 # ---------------------------------------------------------------------------
-# Bash allowlist
+# Deny list: bash command patterns
 # ---------------------------------------------------------------------------
 
-class TestBashAllowlist(unittest.TestCase):
+class TestDenyListBashPatterns(unittest.TestCase):
 
-    def test_evo_commands_allowed(self):
-        from evo.inject.drain import _is_allowed_orchestrator_bash
-        self.assertTrue(_is_allowed_orchestrator_bash("evo status"))
-        self.assertTrue(_is_allowed_orchestrator_bash("evo scratchpad"))
-        self.assertTrue(_is_allowed_orchestrator_bash("evo direct 'foo'"))
-        self.assertTrue(_is_allowed_orchestrator_bash("  evo wait --timeout 60"))
+    def _denied(self, cmd: str) -> bool:
+        from evo.inject.drain import _is_denied_in_optimize_mode
+        return _is_denied_in_optimize_mode("Bash", {"command": cmd})
 
-    def test_host_spawn_commands_allowed(self):
-        from evo.inject.drain import _is_allowed_orchestrator_bash
-        # Background subagent spawn patterns from the optimize skill
-        self.assertTrue(_is_allowed_orchestrator_bash(
-            "claude --print --model claude-sonnet-4-5 'do task'"
-        ))
-        self.assertTrue(_is_allowed_orchestrator_bash(
-            "codex exec --full-auto 'do task'"
-        ))
-        self.assertTrue(_is_allowed_orchestrator_bash(
-            "cursor-agent -p 'brief'"
-        ))
-        self.assertTrue(_is_allowed_orchestrator_bash(
-            "opencode run --model anthropic/claude-sonnet-4-5 'brief'"
-        ))
-        self.assertTrue(_is_allowed_orchestrator_bash(
-            "nohup claude --print 'brief' > /tmp/agent.log 2>&1 &"
-        ))
-
-    def test_readonly_inspection_allowed(self):
-        from evo.inject.drain import _is_allowed_orchestrator_bash
+    def test_evo_invocations_pass(self):
         for cmd in (
-            "git status", "git log --oneline -10", "git diff HEAD~1",
-            "ls -la .evo", "cat .evo/config.json",
-            "find . -name '*.py'", "grep -r 'TODO' src/",
-            "head -20 README.md", "tail -50 /tmp/log",
-            "pwd", "env | grep EVO", "echo hello",
-            "wc -l file.txt", "which python",
+            "evo status",
+            "evo scratchpad",
+            "evo wait --timeout 60",
+            "evo direct 'try cosine sim'",
+            "  evo brief --to exp_0001 'do x'",
         ):
-            self.assertTrue(_is_allowed_orchestrator_bash(cmd),
-                            f"expected allowed: {cmd!r}")
+            self.assertFalse(self._denied(cmd), f"evo cmd must pass: {cmd!r}")
 
-    def test_running_experiments_by_hand_blocked(self):
-        from evo.inject.drain import _is_allowed_orchestrator_bash
+    def test_subagent_spawn_passes(self):
         for cmd in (
-            "python bench.py",
-            "python3 -m pytest tests/",
+            "claude --print --model claude-sonnet-4-5 'do task'",
+            "codex exec --full-auto 'do task'",
+            "cursor-agent -p 'brief'",
+            "opencode run --model anthropic/claude-sonnet-4-5 'brief'",
+            "nohup claude --print 'brief' > /tmp/agent.log 2>&1 &",
+            "hermes chat --topic foo 'brief'",
+            "pi 'brief'",
+        ):
+            self.assertFalse(self._denied(cmd), f"host-spawn must pass: {cmd!r}")
+
+    def test_readonly_inspection_passes(self):
+        for cmd in (
+            "git status",
+            "git log --oneline -10",
+            "git diff HEAD~1",
+            "ls -la .evo",
+            "cat .evo/config.json",
+            "find . -name '*.py'",
+            "grep -r 'TODO' src/",
+            "head -20 README.md",
+            "tail -50 /tmp/log",
+            "pwd",
+            "env | grep EVO",
+            "echo hello",
+            "wc -l file.txt",
+            "which python",
+            "python bench.py",  # running scripts is fine; not a mutation
             "pytest -xvs tests/",
-            "./run_benchmark.sh",
             "make eval",
             "node index.js",
+        ):
+            self.assertFalse(self._denied(cmd), f"read-only/run cmd must pass: {cmd!r}")
+
+    def test_redirect_to_file_denied(self):
+        for cmd in (
+            "echo hi > /tmp/out",
+            "echo hi >> /tmp/out",
+            "python bench.py > out.txt",
+            "pytest > /tmp/results 2>&1",  # `2>&1` is fd duplication, not a deny
+        ):
+            self.assertTrue(self._denied(cmd), f"stdout redirect to file must deny: {cmd!r}")
+
+    def test_fd_redirect_to_file_denied(self):
+        for cmd in (
+            "python x.py 2>err.log",
+            "make 2>> errors",
+            "python x.py 2> err.log",
+        ):
+            self.assertTrue(self._denied(cmd), f"fd redirect to file must deny: {cmd!r}")
+
+    def test_fd_duplication_not_denied_by_itself(self):
+        """`2>&1` duplicates fd 2 onto fd 1 — no file write. Driven
+        through the public deny API so a regression in either layer
+        (regex OR the segment dispatcher) is caught."""
+        self.assertFalse(self._denied("pytest 2>&1"),
+                         "`2>&1` alone (fd-to-fd) must not be flagged")
+        self.assertFalse(self._denied("make build 2>&1"),
+                         "`2>&1` alone (fd-to-fd) must not be flagged")
+
+    def test_aggregate_redirect_denied(self):
+        for cmd in (
+            "python x.py &> /tmp/log",
+            "make &>> build.log",
+        ):
+            self.assertTrue(self._denied(cmd), f"aggregate redirect must deny: {cmd!r}")
+
+    def test_file_mutations_denied(self):
+        for cmd in (
+            "tee /tmp/x",
+            "echo hi | tee -a /tmp/x",
+            "sed -i 's/x/y/' f.py",
+            "awk -i inplace '{print}' f.py",
+            "perl -i -pe 's/x/y/' f.py",
+            "mv a b",
+            "cp src/foo.py wt/",
             "rm -rf experiments/",
             "mkdir custom_exp",
-            "cp src/foo.py worktree/",
-            "sed -i 's/x/y/' file.py",
-            "curl http://localhost:8080/run",
+            "rmdir foo",
+            "touch foo",
+            "chmod +x foo.sh",
+            "chown me:me foo",
+            "ln -s a b",
+            "rsync -av src/ dst/",
+            "dd if=/dev/zero of=/tmp/big bs=1M count=10",
+            "truncate -s 0 /tmp/x",
+            "patch -p1 < diff",
+            "install -m 0755 src dst",
         ):
-            self.assertFalse(_is_allowed_orchestrator_bash(cmd),
-                             f"expected NOT allowed: {cmd!r}")
+            self.assertTrue(self._denied(cmd), f"file mutation must deny: {cmd!r}")
+
+    def test_curl_wget_writing_denied(self):
+        for cmd in (
+            "curl -o out.json https://api/...",
+            "curl -O https://example.com/file",
+            "curl --output out.json https://api/...",
+            "curl --remote-name https://example.com/file",
+            "wget https://example.com/file",
+        ):
+            self.assertTrue(self._denied(cmd), f"download must deny: {cmd!r}")
+
+    def test_git_worktree_mutations_denied(self):
+        for cmd in (
+            "git apply patch.diff",
+            "git checkout -- file.py",
+            "git restore file.py",
+            "git reset --hard HEAD~1",
+            "git clean -fd",
+            "git switch other-branch",
+            "git merge other",
+            "git rebase main",
+            "git am < patch",
+            "git stash",
+            "git stash push",
+            "git stash save 'wip'",
+            "git stash pop",
+            "git stash apply",
+            "git stash drop",
+            "git cherry-pick abc123",
+            "git pull",
+            "git clone https://example.com/repo",
+            "git revert HEAD",
+            "git worktree add ../wt",
+        ):
+            self.assertTrue(self._denied(cmd), f"git mutation must deny: {cmd!r}")
+
+    def test_git_stash_readonly_subcommands_pass(self):
+        """`git stash list` and `git stash show` are read-only; must
+        not be denied. The lookahead in the git pattern carves these
+        out from the otherwise-deny `stash`."""
+        for cmd in (
+            "git stash list",
+            "git stash show",
+            "git stash show stash@{0}",
+        ):
+            self.assertFalse(self._denied(cmd),
+                             f"git stash list/show must pass: {cmd!r}")
+
+    def test_sed_perl_option_order_variants_denied(self):
+        """Flag ordering: `sed -E -i` / `sed -e '...' -i` / `perl -CT -i`
+        all mutate in place. The non-greedy preamble in the segment-deny
+        regex must catch these."""
+        for cmd in (
+            "sed -E -i 's/a/b/' f.py",
+            "sed -e 's/a/b/' -i f.py",
+            "sed -nE -i 's/a/b/' f.py",
+            "sed --regexp-extended -i 's/x/y/' f.py",
+            "perl -CT -i -pe 's/a/b/' f.py",
+            "perl -CSD -i.bak -pe 's/x/y/' f.py",
+        ):
+            self.assertTrue(self._denied(cmd),
+                            f"in-place edit with options must deny: {cmd!r}")
+
+    def test_interactive_editors_denied(self):
+        for cmd in ("vim file.py", "vi file", "nano f", "emacs f"):
+            self.assertTrue(self._denied(cmd), f"editor must deny: {cmd!r}")
+
+    def test_inert_quoted_redirect_not_denied(self):
+        """`echo "this > that"` is shell-safe — `>` is inside double
+        quotes, not a real redirect. Must not be flagged."""
+        for cmd in (
+            'echo "this > that"',
+            "echo 'a > b > c'",
+            'evo direct "fix x > y bug"',
+        ):
+            self.assertFalse(self._denied(cmd), f"inert quoted must pass: {cmd!r}")
+
+    def test_command_substitution_inside_dq_still_scanned(self):
+        """`echo "$(rm -rf /)"` must NOT be skipped — command substitution
+        inside double quotes still fires."""
+        self.assertTrue(self._denied('echo "$(rm -rf /tmp/x)"'),
+                        "command substitution inside dq must be scanned")
+
+    def test_benign_substitution_passes(self):
+        """Substitution by itself isn't denial-worthy — only mutations
+        inside the substituted body are. `echo "$(pwd)"`,
+        `git log "$(git rev-parse HEAD)"` are routine read-only work."""
+        for cmd in (
+            'echo "$(pwd)"',
+            'printf "%s\\n" "$(git rev-parse --show-toplevel)"',
+            "ls $(pwd)",
+            'cat "$(find . -name evo.json | head -1)"',
+            "echo `date`",
+        ):
+            self.assertFalse(self._denied(cmd),
+                             f"benign substitution must pass: {cmd!r}")
+
+    def test_nested_substitution_with_mutation_denied(self):
+        """Recursion goes deep enough: `echo "$(rm $(date +%s).log)"`
+        — outer body recurses to inner; inner is benign; outer body
+        starts with `rm` and denies."""
+        self.assertTrue(self._denied('echo "$(rm $(date +%s).log)"'),
+                        "nested substitution with rm in middle layer must deny")
+
+    def test_git_global_options_before_subcommand_denied(self):
+        """`git -C path checkout`, `git --git-dir=…/.git reset --hard`,
+        `git --work-tree=.` etc. mutate the worktree just like the
+        unqualified form. The global-option preamble must not bypass
+        the deny regex."""
+        for cmd in (
+            "git -C . checkout -- file.py",
+            "git -C /tmp/wt stash pop",
+            "git --git-dir=.git reset --hard HEAD",
+            "git --work-tree=. --git-dir=.git checkout -- a",
+            "git -c user.name=foo merge other",
+            "git -P clean -fd",
+        ):
+            self.assertTrue(self._denied(cmd),
+                            f"git with global options must deny: {cmd!r}")
+
+    def test_git_global_options_with_readonly_subcommand_pass(self):
+        """`git -C path log/status/diff/show` are read-only even with
+        global options."""
+        for cmd in (
+            "git -C . status",
+            "git -C /tmp/wt log --oneline -5",
+            "git --git-dir=.git diff HEAD~1",
+            "git -C . stash list",
+            "git -C . stash show",
+        ):
+            self.assertFalse(self._denied(cmd),
+                             f"git read-only with global options must pass: {cmd!r}")
+
+    def test_sh_c_inside_substitution_denied(self):
+        """`echo "$(sh -c 'rm -rf /tmp/x')"` — the inner `sh -c '…'`
+        has its single quotes preserved during substitution extraction
+        (we extract before inert-strip), so the recursion sees the
+        real body and unwraps the inner `sh -c` to find `rm`."""
+        for cmd in (
+            'echo "$(sh -c \'rm -rf /tmp/x\')"',
+            "echo \"$(bash -c 'sed -i s/a/b/ f.py')\"",
+            "echo \"$(zsh -c 'mv a b')\"",
+        ):
+            self.assertTrue(self._denied(cmd),
+                            f"sh -c inside substitution must deny: {cmd!r}")
+
+    def test_process_substitution_with_mutation_denied(self):
+        """`cat <(rm -rf /tmp/x)` and `diff <(...) <(rm ...)` execute
+        their bodies as subprocesses. The body is denied recursively."""
+        for cmd in (
+            "cat <(rm -rf /tmp/x)",
+            "diff <(sort a) <(rm /tmp/x)",
+            "grep foo >(sed -i 's/x/y/' /tmp/out)",
+        ):
+            self.assertTrue(self._denied(cmd),
+                            f"process substitution with mutation must deny: {cmd!r}")
+
+    def test_process_substitution_benign_passes(self):
+        """`diff <(sort a) <(sort b)` is routine; must not deny."""
+        for cmd in (
+            "diff <(sort a) <(sort b)",
+            "cat <(echo 'hello world')",
+        ):
+            self.assertFalse(self._denied(cmd),
+                             f"benign process substitution must pass: {cmd!r}")
+
+    def test_process_substitution_in_double_quotes_is_literal(self):
+        """`echo "<(rm -rf /tmp/x)"` — `<(…)` inside double quotes is
+        literal text, not process substitution. Must not deny."""
+        for cmd in (
+            'echo "<(rm -rf /tmp/x)"',
+            'echo "look at <(sed -i s/x/y/ f)"',
+            "echo '<(rm -rf /tmp/x)'",
+        ):
+            self.assertFalse(self._denied(cmd),
+                             f"<(…) inside quotes is literal: {cmd!r}")
+
+    def test_arithmetic_expansion_not_treated_as_substitution(self):
+        """`$((1 > 0))`, `$((a + b))` — arithmetic expansion. The
+        contents are math, not a shell command, so the `>` redirect
+        regex must not trip on them."""
+        for cmd in (
+            'echo "$((1 > 0))"',
+            "let x=$((5 + 3))",
+            "echo $((a > b ? 1 : 0))",
+            'printf "%d" "$((2 ** 8))"',
+        ):
+            self.assertFalse(self._denied(cmd),
+                             f"arithmetic expansion must pass: {cmd!r}")
+
+    def test_chained_command_after_safe_prefix_denied(self):
+        """`claude --print 'x' ; rm -rf /tmp` — the safe prefix exempts
+        the claude call but the chained `rm` must still trip."""
+        for cmd in (
+            "claude --print 'x' ; rm -rf /tmp/junk",
+            "evo status && sed -i 's/a/b/' f.py",
+            "evo wait || mv a b",
+            "claude --print 'x' | tee /tmp/log",
+            "evo brief --to e1 'x'\nrm /tmp/x",
+        ):
+            self.assertTrue(self._denied(cmd), f"chained mutator must deny: {cmd!r}")
+
+    def test_safe_prefix_with_redirect_passes(self):
+        """Subagent spawn idioms include `… > /tmp/log 2>&1 &` — the
+        safe-prefix exemption covers the whole command."""
+        for cmd in (
+            "nohup claude --print 'brief' > /tmp/agent.log 2>&1 &",
+            "claude --print 'brief' >/tmp/out",
+        ):
+            self.assertFalse(self._denied(cmd), f"safe-prefix with redirect must pass: {cmd!r}")
+
+    def test_bash_dash_c_wrapper_unwrapped(self):
+        """`bash -c "rm -rf x"` — the deny scan must inspect inside the
+        quoted argument."""
+        for cmd in (
+            "bash -c 'rm -rf /tmp/junk'",
+            'bash -c "sed -i s/x/y/ f.py"',
+            "sh -c 'mv a b'",
+            "zsh -ic 'cp a b'",
+            "bash -eo pipefail -c 'tee /tmp/x'",
+        ):
+            self.assertTrue(self._denied(cmd), f"bash -c wrapper must deny: {cmd!r}")
+
+    def test_unbalanced_quotes_dont_crash(self):
+        """Bad shell quoting (unbalanced) must not raise — just don't
+        unwrap and scan as-is."""
+        # Should return without exception; result may be True or False.
+        from evo.inject.drain import _is_denied_in_optimize_mode
+        _is_denied_in_optimize_mode("Bash", {"command": "bash -c 'oops"})
+        _is_denied_in_optimize_mode("Bash", {"command": 'echo "broken'})
+
+    def test_evo_redirect_denied(self):
+        """`evo X > file` is the orchestrator capturing state to a file —
+        a manual-workflow stray that the deny should catch. Host-spawn
+        prefixes (claude/codex/…) keep the redirect exemption for
+        subagent-spawn logging; evo does not."""
+        for cmd in (
+            "evo status > out.txt",
+            "evo scratchpad >> notes.md",
+            "evo wait > /tmp/log",
+            "evo direct 'x' > /tmp/d",
+        ):
+            self.assertTrue(self._denied(cmd),
+                            f"evo redirect must deny: {cmd!r}")
+
+    def test_command_substitution_under_safe_prefix_denied(self):
+        """`$(…)` and backticks under a host-spawn prefix must NOT be
+        exempted — the substituted body is a smuggling vector."""
+        for cmd in (
+            'claude --print "$(rm -rf /tmp/junk)"',
+            "claude --print `rm -rf /tmp/junk`",
+            'evo direct "$(rm -rf /tmp/junk)"',
+            "codex exec --full-auto \"$(sed -i s/a/b/ f.py)\"",
+            "nohup claude --print \"$(rm x)\" > /tmp/log 2>&1 &",
+        ):
+            self.assertTrue(self._denied(cmd),
+                            f"command substitution under safe prefix must deny: {cmd!r}")
+
+    def test_mutating_token_inside_read_only_args_passes(self):
+        """`grep -R rm src/`, `find . -name install`, `echo rm` — the
+        mutating verb appears as an argument, not as the command. The
+        per-segment anchored regex must not deny these."""
+        for cmd in (
+            "grep -R rm src/",
+            "find . -name install",
+            "git diff -- scripts/install.sh",
+            "echo rm",
+            "echo cp a b",
+            "cat /tmp/mkdir.log",
+            "ls -la rm",
+            "git log --grep='rm files'",
+        ):
+            self.assertFalse(self._denied(cmd),
+                             f"mutating token in args must not deny: {cmd!r}")
+
+    def test_absolute_path_to_mutating_verb_still_denied(self):
+        """`/usr/bin/rm -rf …`, `/bin/sed -i …` — the path prefix must
+        not bypass the deny."""
+        for cmd in (
+            "/usr/bin/rm -rf /tmp/x",
+            "/bin/sed -i s/a/b/ f.py",
+            "/usr/local/bin/wget https://x",
+        ):
+            self.assertTrue(self._denied(cmd),
+                            f"path-prefixed mutator must deny: {cmd!r}")
 
 
 # ---------------------------------------------------------------------------
-# First edit blocks, then every 5th
+# Alternating cadence: odd violations block, even pass
 # ---------------------------------------------------------------------------
 
-class TestEditBlockCadence(_Base):
+class TestAlternatingCadence(_Base):
 
     def _setup_orchestrator(self) -> None:
         register_session(self.root, "orch", "claude-code")
@@ -213,50 +530,62 @@ class TestEditBlockCadence(_Base):
         self.assertEqual(out.get("permission"), "deny",
                          f"first Edit must be hard-denied; got {out!r}")
         self.assertIn("optimize", (out.get("reason") or "").lower(),
-                      f"banner must mention optimize protocol")
+                      "banner must mention optimize protocol")
 
-    def test_edits_2_3_4_pass_silently(self):
+    def test_second_edit_passes(self):
         self._setup_orchestrator()
-        # Violation #1 — blocked
         _drive_pretooluse(self.root, "orch", "Edit", {"file_path": "/f.py"})
-        # Violations 2, 3, 4 — silent
-        for n in (2, 3, 4):
-            out = _drive_pretooluse(self.root, "orch", "Edit", {"file_path": "/f.py"})
-            self.assertNotEqual(
-                out.get("permission"), "deny",
-                f"violation #{n} must not block — only #1 and #5 do; got {out!r}"
-            )
+        out = _drive_pretooluse(self.root, "orch", "Edit", {"file_path": "/f.py"})
+        self.assertNotEqual(out.get("permission"), "deny",
+                            f"#2 must pass under alternating cadence; got {out!r}")
 
-    def test_5th_violation_blocks_again(self):
+    def test_third_edit_blocks_again(self):
         self._setup_orchestrator()
-        # Trigger 5 violations: #1 (blocked), #2/3/4 (silent), #5 (blocked again)
         outs = [
             _drive_pretooluse(self.root, "orch", "Edit", {"file_path": "/f.py"})
-            for _ in range(5)
+            for _ in range(3)
         ]
-        self.assertEqual(outs[0].get("permission"), "deny", "#1 must block")
-        for i in (1, 2, 3):
-            self.assertNotEqual(outs[i].get("permission"), "deny",
-                                f"#{i+1} must NOT block")
-        self.assertEqual(outs[4].get("permission"), "deny",
-                         f"#5 must block; got {outs[4]!r}")
+        self.assertEqual(outs[0].get("permission"), "deny", "#1 blocks")
+        self.assertNotEqual(outs[1].get("permission"), "deny", "#2 passes")
+        self.assertEqual(outs[2].get("permission"), "deny", "#3 blocks")
 
-    def test_10th_violation_also_blocks(self):
+    def test_alternating_through_ten(self):
         self._setup_orchestrator()
         outs = [
             _drive_pretooluse(self.root, "orch", "Edit", {"file_path": "/f.py"})
             for _ in range(10)
         ]
-        # Blocks: 1, 5, 10
-        for blocked in (0, 4, 9):
-            self.assertEqual(
-                outs[blocked].get("permission"), "deny",
-                f"#{blocked+1} must block; got {outs[blocked]!r}"
-            )
+        # Odd-indexed-from-1 → indices 0, 2, 4, 6, 8 block
+        for i, out in enumerate(outs, start=1):
+            if i % 2 == 1:
+                self.assertEqual(out.get("permission"), "deny",
+                                 f"violation #{i} (odd) must block; got {out!r}")
+            else:
+                self.assertNotEqual(out.get("permission"), "deny",
+                                    f"violation #{i} (even) must pass; got {out!r}")
+
+    def test_edits_and_bash_share_counter(self):
+        """Edit + Bash violations increment the same counter; the alternating
+        pattern holds across the mixed stream."""
+        self._setup_orchestrator()
+        outs = [
+            _drive_pretooluse(self.root, "orch", "Edit", {"file_path": "/a.py"}),
+            _drive_pretooluse(self.root, "orch", "Bash", {"command": "rm -rf x"}),
+            _drive_pretooluse(self.root, "orch", "Edit", {"file_path": "/b.py"}),
+            _drive_pretooluse(self.root, "orch", "Bash", {"command": "mv a b"}),
+            _drive_pretooluse(self.root, "orch", "Edit", {"file_path": "/c.py"}),
+        ]
+        for i, out in enumerate(outs, start=1):
+            if i % 2 == 1:
+                self.assertEqual(out.get("permission"), "deny",
+                                 f"mixed #{i} (odd) must block")
+            else:
+                self.assertNotEqual(out.get("permission"), "deny",
+                                    f"mixed #{i} (even) must pass")
 
 
 # ---------------------------------------------------------------------------
-# Non-evo Bash also blocked
+# Bash deny gating
 # ---------------------------------------------------------------------------
 
 class TestBashBlock(_Base):
@@ -266,24 +595,24 @@ class TestBashBlock(_Base):
         mark_engaged(self.root, "orch")
         mark_optimize_mode(self.root, "orch")
 
-    def test_first_non_evo_bash_is_blocked(self):
+    def test_first_mutating_bash_blocked(self):
         self._setup_orchestrator()
         out = _drive_pretooluse(
-            self.root, "orch", "Bash", {"command": "python bench.py"},
+            self.root, "orch", "Bash", {"command": "sed -i 's/a/b/' f.py"},
         )
         self.assertEqual(out.get("permission"), "deny",
-                         f"non-evo Bash must block on #1; got {out!r}")
+                         f"first mutating bash must block; got {out!r}")
 
-    def test_evo_bash_command_never_blocked(self):
+    def test_evo_bash_never_blocks(self):
         self._setup_orchestrator()
         for cmd in ("evo status", "evo scratchpad", "evo wait", "evo direct 'foo'"):
             out = _drive_pretooluse(self.root, "orch", "Bash", {"command": cmd})
             self.assertNotEqual(
                 out.get("permission"), "deny",
-                f"evo Bash command must never block: {cmd!r}; got {out!r}"
+                f"evo Bash must never block: {cmd!r}; got {out!r}"
             )
 
-    def test_subagent_spawn_bash_never_blocked(self):
+    def test_subagent_spawn_bash_never_blocks(self):
         self._setup_orchestrator()
         for cmd in (
             "claude --print 'brief' &",
@@ -292,30 +621,23 @@ class TestBashBlock(_Base):
             out = _drive_pretooluse(self.root, "orch", "Bash", {"command": cmd})
             self.assertNotEqual(
                 out.get("permission"), "deny",
-                f"subagent-spawn bash must never block: {cmd!r}; got {out!r}"
+                f"subagent-spawn must never block: {cmd!r}; got {out!r}"
             )
 
-    def test_edit_and_bash_violations_share_counter(self):
-        """A combined violation stream of edits + bashes blocks at #1 and #5
-        overall, not per-rule."""
+    def test_running_scripts_does_not_block(self):
         self._setup_orchestrator()
-        outs = []
-        # Mix edits and non-evo bash
-        outs.append(_drive_pretooluse(self.root, "orch", "Edit", {"file_path": "/a.py"}))
-        outs.append(_drive_pretooluse(self.root, "orch", "Bash", {"command": "python x.py"}))
-        outs.append(_drive_pretooluse(self.root, "orch", "Edit", {"file_path": "/b.py"}))
-        outs.append(_drive_pretooluse(self.root, "orch", "Bash", {"command": "make"}))
-        outs.append(_drive_pretooluse(self.root, "orch", "Edit", {"file_path": "/c.py"}))
-
-        self.assertEqual(outs[0].get("permission"), "deny", "combined #1 blocks")
-        for i in (1, 2, 3):
-            self.assertNotEqual(outs[i].get("permission"), "deny",
-                                f"combined #{i+1} must NOT block")
-        self.assertEqual(outs[4].get("permission"), "deny", "combined #5 blocks")
+        # `python bench.py` / `pytest` / `make` aren't mutating commands
+        # in themselves — the deny list catches only file mutations.
+        for cmd in ("python bench.py", "pytest tests/", "make eval", "node index.js"):
+            out = _drive_pretooluse(self.root, "orch", "Bash", {"command": cmd})
+            self.assertNotEqual(
+                out.get("permission"), "deny",
+                f"running scripts must not block: {cmd!r}; got {out!r}"
+            )
 
 
 # ---------------------------------------------------------------------------
-# Negative cases — must NOT block
+# Subagent + non-optimize-mode + read tools never blocked
 # ---------------------------------------------------------------------------
 
 class TestPolicyNudgeDoesNotBlock(_Base):
@@ -323,7 +645,6 @@ class TestPolicyNudgeDoesNotBlock(_Base):
     def test_subagent_edits_never_blocked(self):
         register_session(self.root, "sub", "claude-code", exp_id="exp_0042")
         mark_engaged(self.root, "sub")
-        # Even if optimize_mode somehow set — subagents are always exempt
         for _ in range(10):
             out = _drive_pretooluse(self.root, "sub", "Edit", {"file_path": "/f.py"})
             self.assertNotEqual(out.get("permission"), "deny",
@@ -332,7 +653,6 @@ class TestPolicyNudgeDoesNotBlock(_Base):
     def test_non_optimize_mode_session_never_blocked(self):
         register_session(self.root, "casual", "claude-code")
         mark_engaged(self.root, "casual")
-        # optimize_mode NOT set — casual session
         for _ in range(10):
             out = _drive_pretooluse(self.root, "casual", "Edit", {"file_path": "/f.py"})
             self.assertNotEqual(out.get("permission"), "deny",
@@ -342,25 +662,14 @@ class TestPolicyNudgeDoesNotBlock(_Base):
         register_session(self.root, "orch", "claude-code")
         mark_engaged(self.root, "orch")
         mark_optimize_mode(self.root, "orch")
-        for tool in ("Read", "Glob", "Grep"):
+        for tool in ("Read", "Glob", "Grep", "TodoWrite", "WebFetch"):
             out = _drive_pretooluse(self.root, "orch", tool, {"file_path": "/f.py"})
-            self.assertNotEqual(out.get("permission"), "deny",
-                                f"{tool} must never be blocked")
-
-    def test_other_tools_never_blocked(self):
-        """Tools that don't fit edit/bash/read (e.g., TodoWrite, WebFetch)
-        must not be blocked — only file mutation + shell execution."""
-        register_session(self.root, "orch", "claude-code")
-        mark_engaged(self.root, "orch")
-        mark_optimize_mode(self.root, "orch")
-        for tool in ("TodoWrite", "WebFetch", "WebSearch"):
-            out = _drive_pretooluse(self.root, "orch", tool, {"x": "y"})
             self.assertNotEqual(out.get("permission"), "deny",
                                 f"{tool} must never be blocked")
 
 
 # ---------------------------------------------------------------------------
-# Cross-host behavior — Cursor edit tool names
+# Cross-host: Cursor edit tool names
 # ---------------------------------------------------------------------------
 
 class TestCursorPolicyNudge(_Base):
@@ -371,20 +680,12 @@ class TestCursorPolicyNudge(_Base):
         mark_optimize_mode(self.root, "cursor_sid")
 
     def test_cursor_edit_file_blocked(self):
-        """Cursor uses edit_file / search_replace / create_file etc.
-        instead of Edit/Write. The classifier handles these the same
-        way and the policy gate fires."""
         self._setup_cursor_orchestrator()
-        # Note: cursor uses different envelope shapes — we only verify
-        # the block happens. Output may differ from claude-code's deny.
         out = _drive_pretooluse(
             self.root, "cursor_sid", "edit_file",
             {"file_path": "/f.py"},
             host="cursor",
         )
-        # On cursor, the policy block can come back as a different shape,
-        # but the key signal is some form of refusal / nudge. Specifically
-        # cursor's deny envelope is "permission": "deny" or "ask".
         self.assertTrue(
             out.get("permission") in ("deny", "ask"),
             f"cursor edit_file must be denied/asked on first violation; got {out!r}"

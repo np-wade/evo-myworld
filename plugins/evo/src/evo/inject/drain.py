@@ -498,9 +498,9 @@ def drain_session(root: Path, session_id: str, host: str | None = None, hook_eve
 
     text = format_directive_text(events)
 
-    # Policy block: orchestrator in optimize_mode tried Edit/Write or
-    # non-evo Bash. Hard-deny on the 1st violation and every 5th after.
-    # Short-circuits the normal emit — the agent sees the deny + banner.
+    # Policy block: orchestrator in optimize_mode tried a denied tool.
+    # Hard-deny on odd-numbered violations (1, 3, 5, …); even ones pass.
+    # Short-circuits the normal emit — agent sees the deny + banner.
     if _should_policy_block(root, session_id, sess, host, hook_event, payload):
         sys.stdout.write(json.dumps(_policy_block_envelope(host), separators=(",", ":")))
         # Don't unlink marker / advance offset on a policy block — the
@@ -511,16 +511,15 @@ def drain_session(root: Path, session_id: str, host: str | None = None, hook_eve
 
     # Stop-nudge: if this is a Stop/SubagentStop on an orchestrator in
     # optimize_mode, augment (or override) the emit with a continuation
-    # prompt so the agent keeps driving the loop autonomously. Loop guard
-    # is progress-gated — consecutive Stop fires with no new experiment
-    # since the last nudge let the agent actually stop.
+    # prompt so the agent keeps driving the loop autonomously. Always
+    # fires while optimize_mode is on — escape via `evo exit-optimize-mode`.
     nudge_text = _maybe_stop_nudge_text(root, session_id, sess, host, hook_event)
     if nudge_text:
-        # Replace the emit text with the nudge — Stop/SubagentStop on
-        # claude-code/codex use the {decision: block, reason} envelope,
-        # not the additionalContext envelope. emit_for_host honors that
-        # for the host-event combination.
-        emit_for_host(host, hook_event, nudge_text, payload)
+        # Combine pending directive text with the nudge so queued
+        # `evo direct` injections aren't dropped when the stop hook
+        # fires. The nudge envelope still drives self-continuation.
+        combined = (text + "\n\n" + nudge_text) if text else nudge_text
+        emit_for_host(host, hook_event, combined, payload)
     else:
         emit_for_host(host, hook_event, text, payload)
 
@@ -546,16 +545,23 @@ def drain_session(root: Path, session_id: str, host: str | None = None, hook_eve
 # ---------------------------------------------------------------------------
 
 
-_EDIT_TOOL_NAMES = frozenset({
+# Deny list — file-mutation tool names across hosts. Exact-name match.
+# Tools NOT in this set (TodoWrite, WebSearch, Read, Glob, Grep, MCP
+# tools, etc.) never count as a violation.
+_DENY_TOOL_NAMES = frozenset({
     # claude-code / codex
     "edit", "write", "notebookedit", "notebook_edit",
+    "multiedit", "multi_edit",
     # cursor
-    "edit_file", "create_file", "search_replace", "applypatch", "apply_patch",
-    "str_replace", "delete_file",
-    # opencode / openclaw / pi / hermes — these tend to use the same set
+    "edit_file", "create_file", "search_replace",
+    "str_replace", "applypatch", "apply_patch", "delete_file",
+    # opencode / openclaw / pi / hermes variants
     "file_write", "file_edit",
 })
 
+
+# Shell-execution tool names. The bash-pattern deny check is only run
+# when the tool name is in this set.
 _BASH_TOOL_NAMES = frozenset({
     "bash", "shell", "exec",
     "run_terminal_cmd", "runterminalcmd",
@@ -563,77 +569,415 @@ _BASH_TOOL_NAMES = frozenset({
     "execute_code", "execute",
 })
 
-_READ_TOOL_NAMES = frozenset({
-    "read", "read_file", "glob", "grep",
-    "find_files", "list_files", "list_dir", "ls",
-    "search", "web_search", "web_fetch",
-})
 
-
-def _classify_tool(host: str, tool_name: str | None) -> str:
-    """Classify a tool call into 'edit' | 'bash' | 'read' | 'other'.
-
-    Cross-host: each host names its tools differently. claude-code uses
-    Edit/Write/Bash; cursor uses edit_file/run_terminal_cmd; codex uses
-    similar names plus 'shell'/'exec'. Uses exact-name matching against
-    known sets to avoid false positives like "TodoWrite" matching "write".
-    """
-    if not tool_name:
-        return "other"
-    t = tool_name.lower()
-    if t in _EDIT_TOOL_NAMES:
-        return "edit"
-    if t in _BASH_TOOL_NAMES:
-        return "bash"
-    if t in _READ_TOOL_NAMES:
-        return "read"
-    return "other"
-
-
-# Bash commands the orchestrator is allowed to run in optimize_mode.
-# These are: any `evo` invocation, any host's headless subagent spawn,
-# and read-only inspection commands. Anything else looks like "running
-# experiments by hand" and gets blocked.
-
-_ORCHESTRATOR_BASH_ALLOWLIST_RE = _re.compile(
-    r"^\s*(?:nohup\s+)?"  # optional nohup wrapper
+# Per-segment hard-deny patterns: mutating verbs anchored to the start
+# of a command segment. After splitting on shell separators, each
+# segment's leading verb is checked here. The leading `^\s*` (optional
+# `nohup`, optional `/path/to/`) handles `nohup rm -rf …` and
+# `/usr/bin/sed -i …`. This anchoring is what prevents `grep -R rm src`
+# from being denied because of the substring `rm`. For verbs whose
+# mutating form depends on a specific flag (sed/awk/perl/curl), the
+# flag is matched via a non-greedy `[^|&;]*?` so option-order variants
+# all trip (`sed -E -i …` and `sed -e '...' -i …` both deny).
+_SEGMENT_DENY_RE = _re.compile(
+    r"^\s*(?:nohup\s+)?(?:\S*/)?"
     r"(?:"
-        r"evo(?:\s|$)"           # any evo command
-        r"|claude(?:\s|$)"        # claude -p / claude --print
-        r"|codex(?:\s|$)"         # codex exec
-        r"|cursor-agent(?:\s|$)"  # cursor-agent -p
-        r"|opencode(?:\s|$)"      # opencode run
-        r"|hermes(?:\s|$)"        # hermes chat
-        r"|openclaw(?:\s|$)"      # openclaw agent
-        r"|pi(?:\s|$)"            # pi-coding-agent (alias `pi`)
-        r"|pi-coding-agent(?:\s|$)"
-        # Read-only inspection
-        r"|git\s+(?:status|log|diff|show|branch|remote|stash|config\s+--get)\b"
-        r"|ls(?:\s|$)"
-        r"|cat(?:\s|$)"
-        r"|find(?:\s|$)"
-        r"|grep(?:\s|$)"
-        r"|head(?:\s|$)"
-        r"|tail(?:\s|$)"
-        r"|wc(?:\s|$)"
-        r"|which(?:\s|$)"
-        r"|pwd(?:\s|$)"
-        r"|env(?:\s|$)"
-        r"|printenv(?:\s|$)"
-        r"|echo(?:\s|$)"
-        r"|true(?:\s|$)"
-        r"|false(?:\s|$)"
+        # tee writing to a file (`cmd | tee /path` after pipe split).
+        r"tee\b(?:\s+-[aiu]+)*\s+[^\s|&<>]+"
+        # sed/perl in-place editors — `-i` (with optional clustered flags
+        # like `-ri` / `-iE`) or `--in-place`. Non-greedy preamble so
+        # `sed -E -i …` and `sed -e '...' -i …` both match.
+        r"|sed\b[^|&;]*?\s-[a-zA-Z]*i[a-zA-Z]*\b"
+        r"|sed\b[^|&;]*?\s--in-place\b"
+        r"|perl\b[^|&;]*?\s-[a-zA-Z]*i[a-zA-Z]*\b"
+        r"|awk\b[^|&;]*?\s-i\s+inplace\b"
+        # File system mutations (verbs that ALWAYS write to disk).
+        r"|(?:mv|cp|rm|mkdir|rmdir|touch|chmod|chown|chgrp|ln|rsync)(?:\s|$)"
+        # dd writing a file: dd of=… (anywhere in argv).
+        r"|dd\b[^|&;]*?\bof="
+        # curl writing a file: -o file / -O / --output / --remote-name.
+        r"|curl\b[^|&;]*?\s-[a-zA-Z]*[oO][a-zA-Z=]*(?:\s|$)"
+        r"|curl\b[^|&;]*?\s--output(?:=|\s)"
+        r"|curl\b[^|&;]*?\s--remote-name\b"
+        # wget (default behavior writes a file).
+        r"|wget(?:\s|$)"
+        r"|patch(?:\s|$)"
+        r"|install(?:\s|$)"
+        r"|truncate(?:\s|$)"
+        # git mutating subcommands. `stash` matches bare/push/save/pop/
+        # apply/drop/clear/create/store; `stash list` and `stash show`
+        # are read-only and excluded via negative lookahead. Allows
+        # global options before the subcommand so `git -C path checkout`
+        # and `git --git-dir=… reset` are caught (the non-greedy `(?:…)*?`
+        # consumes any `-X`/`-X val`/`--long`/`--long=val` repetition).
+        r"|git\b(?:\s+(?:-[a-zA-Z]\S*|--[a-z][a-z-]*(?:=\S+)?)(?:\s+\S+)?)*?\s+(?:apply|checkout|restore|reset|clean|switch|merge|rebase|am|stash(?!\s+(?:list|show)\b)|cherry-pick|pull|clone|revert|worktree)\b"
+        # Interactive editors (write on save).
+        r"|(?:vim|vi|nano|emacs)(?:\s|$)"
     r")"
 )
 
 
-def _is_allowed_orchestrator_bash(command: str | None) -> bool:
-    """Return True if the bash command looks like a legitimate orchestrator
-    action: evo invocation, headless subagent spawn, or read-only inspection.
+# Redirect patterns: stdout/stderr/fd writes to a file. Subagent-spawn
+# idioms legitimately use these for logging (`> /tmp/agent.log 2>&1`),
+# so they only fire as a deny outside the host-spawn-prefix exemption.
+_REDIRECT_DENY_RE = _re.compile(
+    r"(?:"
+        # Standalone redirect `cmd > file` / `cmd >> file`. Excludes
+        # input `<`, digit-prefix `\d+>`, `&>` (aggregate).
+        r"(?<![<\d&])>>?\s*[^\s|&<>;]+"
+        # fd-qualified redirect: `2>err.log`, `10>>out.log`.
+        # Excludes `2>&1` fd-to-fd duplication.
+        r"|\b\d+>>?\s*(?!&)[^\s|&<>;]+"
+        # Bash aggregate redirect: `&>file` / `&>>file`.
+        r"|&>>?\s*(?!&)[^\s|&<>;]+"
+        # Force-clobber redirect: `>|file`
+        r"|>\|\s*[^\s|&<>;]+"
+    r")"
+)
+
+
+# Host-spawn prefixes — these legitimately include `> /tmp/log 2>&1 &`
+# for background subagent logging. The redirect-deny is suppressed for
+# clean (no chained, no substitution) invocations starting with these.
+_HOST_SPAWN_PREFIX_RE = _re.compile(
+    r"^\s*(?:nohup\s+)?"
+    r"(?:"
+        r"claude(?:\s|$)"
+        r"|codex(?:\s|$)"
+        r"|cursor-agent(?:\s|$)"
+        r"|opencode(?:\s|$)"
+        r"|hermes(?:\s|$)"
+        r"|openclaw(?:\s|$)"
+        r"|pi(?:\s|$)"
+        r"|pi-coding-agent(?:\s|$)"
+    r")"
+)
+
+
+# evo command prefix. evo subcommands shouldn't legitimately need stdout
+# redirects, so even though the prefix is "safe" for not chaining, a
+# redirect after it should still fire — orchestrator dumping state to
+# a file is the manual-workflow we're trying to discourage.
+_EVO_PREFIX_RE = _re.compile(r"^\s*evo(?:\s|$)")
+
+
+# Command separators that chain a second command. If any appear
+# unquoted, the safe-prefix exemption is dropped. Bare `&` (not the
+# trailing background marker, not part of `&&` / `>&`).
+_UNQUOTED_SEPARATOR_RE = _re.compile(
+    r"[;\n]"
+    r"|&&|\|\|"
+    r"|\|(?!\|)"
+    r"|(?<![>&])&(?![&>])(?!\s*$)"
+)
+
+
+def _split_segments(cmd: str) -> list[str]:
+    """Split a sanitized shell command on unquoted separators into
+    individual command segments. Used so the segment-deny regex can be
+    anchored to start-of-segment instead of relying on `\\b` which
+    over-matches (`grep -R rm src` would otherwise match `rm`).
     """
-    if not command or not isinstance(command, str):
+    return _UNQUOTED_SEPARATOR_RE.split(cmd)
+
+
+def _extract_substitution_bodies(seg: str) -> list[str]:
+    """Walk `seg` honoring shell quote state, and yield bodies of:
+      - `$(...)` command substitution (balanced parens)
+      - backtick command substitution
+      - `<(...)` / `>(...)` process substitution (balanced parens)
+
+    Single-quoted regions are skipped — single quotes are inert in
+    bash and the contents are literal. Double-quoted regions ARE
+    scanned because substitution fires inside double quotes.
+
+    This must run on the RAW (pre-inert-strip) command. If we ran it
+    after `_strip_inert_quoted`, a body like `sh -c 'rm -rf /tmp/x'`
+    embedded in a substitution would have its quoted body nuked to
+    `sh -c ''` before we ever saw it.
+    """
+    bodies: list[str] = []
+    i = 0
+    n = len(seg)
+    state = "default"  # "default" | "sq" | "dq"
+
+    def _find_balanced_paren_close(start: int) -> int:
+        """Return index just past `)` for a `(` at `start-1` (i.e.
+        `start` is one past the open paren). Tracks nested parens AND
+        quote state inside. -1 if unbalanced."""
+        depth = 1
+        k = start
+        inner = "default"
+        while k < n and depth > 0:
+            cc = seg[k]
+            if inner == "sq":
+                if cc == "'":
+                    inner = "default"
+                k += 1
+                continue
+            if inner == "dq":
+                if cc == "\\" and k + 1 < n:
+                    k += 2
+                    continue
+                if cc == '"':
+                    inner = "default"
+                    k += 1
+                    continue
+                # Fall through — inside dq, $() still tracked.
+            if cc == "\\" and k + 1 < n:
+                k += 2
+                continue
+            if cc == "'" and inner == "default":
+                inner = "sq"
+            elif cc == '"' and inner == "default":
+                inner = "dq"
+            elif cc == "(":
+                depth += 1
+            elif cc == ")":
+                depth -= 1
+            k += 1
+        return k if depth == 0 else -1
+
+    while i < n:
+        c = seg[i]
+        if state == "sq":
+            if c == "'":
+                state = "default"
+            i += 1
+            continue
+        if state == "dq":
+            if c == "\\" and i + 1 < n:
+                i += 2
+                continue
+            if c == '"':
+                state = "default"
+                i += 1
+                continue
+            # Inside dq: $() / backtick still fire. Fall through.
+        if c == "\\" and i + 1 < n:
+            i += 2
+            continue
+        if c == "'" and state == "default":
+            state = "sq"
+            i += 1
+            continue
+        if c == '"' and state == "default":
+            state = "dq"
+            i += 1
+            continue
+        # $(...) command substitution. Skip `$((...))` arithmetic
+        # expansion — that body is a math expression, never a shell
+        # command, and recursing into `(1 > 0)` would false-positive
+        # the redirect-deny on the `>`.
+        if c == "$" and i + 1 < n and seg[i + 1] == "(":
+            if i + 2 < n and seg[i + 2] == "(":
+                # Arithmetic — advance past `$((` so the rest of the
+                # walker sees the inner parens as ordinary text.
+                i += 3
+                continue
+            end = _find_balanced_paren_close(i + 2)
+            if end != -1:
+                bodies.append(seg[i + 2 : end - 1])
+                i = end
+                continue
+        # <(...) and >(...) process substitution. Only at default state;
+        # inside double quotes bash treats `"<(cmd)"` as literal text
+        # (no subshell). Inside single quotes is also inert.
+        if c in ("<", ">") and i + 1 < n and seg[i + 1] == "(" and state == "default":
+            end = _find_balanced_paren_close(i + 2)
+            if end != -1:
+                bodies.append(seg[i + 2 : end - 1])
+                i = end
+                continue
+        # Backtick command substitution (no nesting).
+        if c == "`" and state != "sq":
+            j = i + 1
+            while j < n and seg[j] != "`":
+                if seg[j] == "\\" and j + 1 < n:
+                    j += 2
+                    continue
+                j += 1
+            if j < n:
+                bodies.append(seg[i + 1 : j])
+                i = j + 1
+                continue
+        i += 1
+    return bodies
+
+
+_SHELL_INTERPRETERS = frozenset({"bash", "sh", "zsh", "dash", "ash"})
+
+
+def _unwrap_shell_c_arguments(cmd: str) -> str:
+    """If `cmd` contains `bash -c "..."` / `sh -c '...'` etc., append
+    the quoted argument body to the command so the deny scan inspects
+    its contents. Uses shlex to handle every shell option form
+    (`-o pipefail -c '…'`, `-eo pipefail -c '…'`, `--login -c '…'`,
+    `-ic '…'`, etc.). On parse failure (unbalanced quoting), returns
+    `cmd` unchanged.
+    """
+    import shlex
+    try:
+        tokens = shlex.split(cmd, posix=True)
+    except ValueError:
+        return cmd
+    if not tokens:
+        return cmd
+    appended: list[str] = []
+    i = 0
+    while i < len(tokens):
+        tok = tokens[i]
+        name = tok.rstrip("/").rsplit("/", 1)[-1]
+        if name in _SHELL_INTERPRETERS:
+            j = i + 1
+            while j < len(tokens):
+                t = tokens[j]
+                if t == "-c":
+                    if j + 1 < len(tokens):
+                        appended.append(tokens[j + 1])
+                    break
+                # Combined short-opt block containing `c` (e.g. `-ic`,
+                # `-lc`, `-ce`, `-ceu`): the next token is the script.
+                if (
+                    t.startswith("-")
+                    and not t.startswith("--")
+                    and len(t) > 1
+                    and "c" in t[1:]
+                ):
+                    if j + 1 < len(tokens):
+                        appended.append(tokens[j + 1])
+                    break
+                j += 1
+        i += 1
+    if not appended:
+        return cmd
+    return cmd + " ; " + " ; ".join(appended)
+
+
+def _strip_inert_quoted(cmd: str) -> str:
+    """Remove single- and double-quoted substrings whose contents are
+    inert (no command substitution). Used to kill `echo "x > y"` false
+    positives without opening a `echo "$(rm)"` bypass.
+
+    Single-quoted strings: always inert (no expansion inside bash).
+    Double-quoted strings: stripped only if they don't contain `$(` or
+    backticks (command substitution still fires inside double quotes).
+
+    Also erases `$((...))` arithmetic regions — the body is a math
+    expression, never a shell command, and `>` / `<` inside arithmetic
+    are comparison operators, not redirects. This prevents the segment
+    scan from FP'ing on `echo "$((1 > 0))"`.
+    """
+    cmd = _re.sub(r"'[^']*'", "''", cmd)
+
+    def _replace_dq(match: _re.Match) -> str:
+        body = match.group(0)
+        if "$(" in body or "`" in body:
+            return body
+        return '""'
+
+    cmd = _re.sub(r'"(?:[^"\\]|\\.)*"', _replace_dq, cmd)
+
+    # Erase $((...)) arithmetic. Walk balanced parens — regex can't
+    # easily handle nesting (e.g. `$(($(date +%s) > 0))`).
+    out: list[str] = []
+    i = 0
+    n = len(cmd)
+    while i < n:
+        if (
+            cmd[i] == "$"
+            and i + 2 < n
+            and cmd[i + 1] == "("
+            and cmd[i + 2] == "("
+        ):
+            depth = 2
+            j = i + 3
+            while j < n and depth > 0:
+                if cmd[j] == "(":
+                    depth += 1
+                elif cmd[j] == ")":
+                    depth -= 1
+                j += 1
+            if depth == 0:
+                i = j
+                continue
+        out.append(cmd[i])
+        i += 1
+    return "".join(out)
+
+
+def _is_denied_in_optimize_mode(
+    tool_name: str | None,
+    tool_input: dict | None,
+) -> bool:
+    """Return True if this tool call is on the optimize-mode deny list.
+
+    Either:
+      - tool_name is a known file-mutation tool, OR
+      - tool_name is shell-execution AND, after sanitization + segment
+        split, any segment matches a hard-deny pattern, OR a non-exempt
+        segment contains a file redirect, OR a command substitution
+        body recursively denies.
+
+    Safe-prefix rules (per-segment):
+      - Host-spawn prefixes (`claude`, `codex`, …) exempt the redirect
+        check so `nohup claude --print 'x' > /tmp/log 2>&1 &` passes.
+      - `evo` prefix does NOT exempt redirects — orchestrator dumping
+        state to a file is a manual-workflow stray.
+      - Command substitution (`$(…)` / backticks) is recursively scanned
+        as a nested bash command; only mutations inside trip a deny,
+        so `echo "$(pwd)"` passes but `echo "$(rm -rf /tmp/x)"` denies.
+      - Chained commands (`evo … ; rm`) are scanned segment-by-segment;
+        each segment's exemption is independent.
+    """
+    if not tool_name:
         return False
-    return bool(_ORCHESTRATOR_BASH_ALLOWLIST_RE.match(command))
+    t = tool_name.lower()
+    if t in _DENY_TOOL_NAMES:
+        return True
+    if t not in _BASH_TOOL_NAMES:
+        return False
+
+    cmd = (tool_input or {}).get("command", "") if isinstance(tool_input, dict) else ""
+    if not isinstance(cmd, str) or not cmd:
+        return False
+
+    # Unwrap `bash -c "..."` so its inner script body is scannable.
+    prepared = _unwrap_shell_c_arguments(cmd)
+
+    # Substitution recursion runs on the RAW prepared command. If we
+    # ran it after `_strip_inert_quoted`, a body like
+    # `sh -c 'rm -rf /tmp/x'` embedded in a substitution would have its
+    # quoted argument body nuked to `sh -c ''` before recursion.
+    for body in _extract_substitution_bodies(prepared):
+        if _is_denied_in_optimize_mode("Bash", {"command": body}):
+            return True
+
+    # Now sanitize for the outer scan: strip inert single/double quoted
+    # regions to kill `echo "x > y"` false positives. Substitution
+    # markers in `'$(rm)'` (single quotes) reduce to `''` — fine, since
+    # single-quoted text is literal and never executed.
+    sanitized = _strip_inert_quoted(prepared)
+
+    # Per-segment scan.
+    for segment in _split_segments(sanitized):
+        seg = segment.strip()
+        if not seg:
+            continue
+
+        # Hard-deny verbs anchored to segment start.
+        if _SEGMENT_DENY_RE.match(seg):
+            return True
+
+        # Host-spawn segments may redirect for logging; evo + others
+        # cannot. Plain commands (pytest, python bench.py, ls, git log)
+        # with no mutating verb and no redirect pass through.
+        if _HOST_SPAWN_PREFIX_RE.match(seg):
+            continue
+        if _REDIRECT_DENY_RE.search(seg):
+            return True
+
+    return False
 
 
 _POLICY_NUDGE_TEMPLATE = """[EVO POLICY]
@@ -646,12 +990,10 @@ subagents, let them do the edits and runs, then read the results.
 If you need to wait for subagents to finish, use `evo wait` — it blocks
 until any experiment concludes, max 1h.
 
-Manual edits and non-evo shell commands are discouraged unless they're
-operations evo doesn't already expose. If this block was actually
-warranted (rare), run `evo exit-optimize-mode` first to disable the
-safety nudges, then retry the tool.
-
-(Reminder: next nudge fires after 5 more violations.)
+Manual edits and shell commands that mutate files are discouraged unless
+evo doesn't already expose the operation. If this block was actually
+warranted (rare), run `evo exit-optimize-mode` to disable the safety
+nudges, then retry the tool.
 [END EVO POLICY]
 """
 
@@ -683,14 +1025,14 @@ def _should_policy_block(
 ) -> bool:
     """Decide whether to hard-deny the current tool call as a policy
     violation. Increments the per-session violation counter; returns
-    True on violations #1, #6, #11, etc. (block on first, then every
-    5th).
+    True on every odd-numbered violation (1, 3, 5, …).
 
     Conditions for considering a tool call a violation:
       - hook_event is PreToolUse (only block before tool fires).
       - session is orchestrator-class (no exp_id).
       - optimize_mode is true on the session record.
-      - tool is "edit" OR ("bash" AND command not allowlisted).
+      - tool is on the deny list (edit-tools, or bash with a mutating
+        command pattern outside the safe-prefix exemption).
     """
     if hook_event != "PreToolUse":
         return False
@@ -704,30 +1046,22 @@ def _should_policy_block(
         return False
 
     tool_name = payload.get("tool_name") or ""
-    tool_class = _classify_tool(host or "", tool_name)
     tool_input = payload.get("tool_input") or {}
 
-    is_violation = False
-    if tool_class == "edit":
-        is_violation = True
-    elif tool_class == "bash":
-        cmd = tool_input.get("command") if isinstance(tool_input, dict) else None
-        if not _is_allowed_orchestrator_bash(cmd):
-            is_violation = True
-
-    if not is_violation:
+    if not _is_denied_in_optimize_mode(tool_name, tool_input):
         return False
 
-    # Counter-based cadence: block on the 1st violation and every 5th
-    # after (i.e., 1, 5, 10, 15, …). The 1st blocks immediately to give
-    # the agent a preventative reminder; the modular gating spaces the
-    # follow-ups so we don't nag on every single tool call.
+    # Alternating cadence: block on odd-numbered violations (1, 3, 5, …),
+    # let even-numbered ones through. The agent gets a nudge, then a
+    # try-again chance, then a nudge again — gives it room to either
+    # comply or genuinely override (e.g. by invoking `evo
+    # exit-optimize-mode`).
     state = _read_policy_state(root, session_id)
     count = int(state.get("violation_count", 0)) + 1
     state["violation_count"] = count
     state["last_violation_tool"] = tool_name
     _write_policy_state(root, session_id, state)
-    return count == 1 or count % 5 == 0
+    return count % 2 == 1
 
 
 def _policy_block_envelope(host: str | None) -> dict:
@@ -742,50 +1076,6 @@ def _policy_block_envelope(host: str | None) -> dict:
 # ---------------------------------------------------------------------------
 
 _STOP_EVENTS = ("Stop", "SubagentStop", "stop", "subagentStop")
-
-
-def _experiment_count(root: Path) -> int:
-    """Count experiment dirs under <run_dir>/experiments/. Used as the
-    progress signal for the stop-nudge loop guard.
-    """
-    # Find the active run dir (lexicographically last run_*).
-    evo_dir = root / ".evo"
-    if not evo_dir.is_dir():
-        return 0
-    runs = sorted(
-        p for p in evo_dir.iterdir()
-        if p.is_dir() and p.name.startswith("run_")
-    )
-    if not runs:
-        return 0
-    exp_dir = runs[-1] / "experiments"
-    if not exp_dir.is_dir():
-        return 0
-    try:
-        return sum(1 for p in exp_dir.iterdir() if p.is_dir())
-    except OSError:
-        return 0
-
-
-def _stop_nudge_state_file(root: Path, session_id: str) -> Path:
-    """Per-session stop-nudge bookkeeping: last_nudge_at_exp_count."""
-    return inject_root(root) / "policy_state" / f"{session_id}.json"
-
-
-def _read_stop_nudge_state(root: Path, session_id: str) -> dict:
-    p = _stop_nudge_state_file(root, session_id)
-    if not p.exists():
-        return {}
-    try:
-        return json.loads(p.read_text())
-    except (OSError, ValueError):
-        return {}
-
-
-def _write_stop_nudge_state(root: Path, session_id: str, data: dict) -> None:
-    p = _stop_nudge_state_file(root, session_id)
-    p.parent.mkdir(parents=True, exist_ok=True)
-    p.write_text(json.dumps(data))
 
 
 _STOP_NUDGE_TEMPLATE = """[EVO LOOP]
@@ -817,14 +1107,16 @@ def _maybe_stop_nudge_text(
     """Return continuation-prompt text if this Stop/SubagentStop should
     re-prompt the agent, or None to let the agent stop normally.
 
+    Always fires when conditions hold. The user explicitly invoked
+    /optimize for autonomous operation — letting the agent stop on its
+    own defeats the point. The escape hatch is `evo exit-optimize-mode`.
+
     Conditions:
-      - hook event must be Stop or SubagentStop (case-sensitive per host).
+      - hook event must be Stop or SubagentStop.
       - session must be orchestrator-class (no exp_id).
       - optimize_mode must be true on the session record.
       - host must support the {decision: block, reason} envelope today —
         claude-code and codex. Cursor uses a different stop envelope.
-      - loop guard: if a previous stop-nudge fired and the experiment
-        count hasn't increased since, suppress.
     """
     if hook_event not in _STOP_EVENTS:
         return None
@@ -836,18 +1128,6 @@ def _maybe_stop_nudge_text(
         return None
     if host not in ("claude-code", "codex"):
         return None  # only these hosts honor the block-reason envelope
-
-    state = _read_stop_nudge_state(root, session_id)
-    current_count = _experiment_count(root)
-    last_count = state.get("last_nudge_at_exp_count")
-
-    if last_count is not None and current_count <= last_count:
-        # Previous nudge fired; no new experiment since. Let agent stop.
-        return None
-
-    # Record this nudge for the progress gate.
-    state["last_nudge_at_exp_count"] = current_count
-    _write_stop_nudge_state(root, session_id, state)
     return _STOP_NUDGE_TEMPLATE
 
 

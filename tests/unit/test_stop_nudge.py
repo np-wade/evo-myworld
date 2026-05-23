@@ -5,10 +5,9 @@ event, the drain injects a `{"decision": "block", "reason": ...}`
 envelope that re-prompts the agent to keep going — using `evo wait` to
 block on subagent results or continuing to plan the next round.
 
-Loop guard: progress-gated. If two consecutive Stop fires happen with
-no new experiment committed since the previous nudge, suppress the
-second nudge so the agent can actually stop (it's genuinely done or
-stuck and shouldn't be force-looped forever).
+Always-fire: the user explicitly invoked /optimize for autonomous
+operation. There is no progress gate; the escape hatch is
+`evo exit-optimize-mode`.
 
 No mocks of real impls. Tests drive `drain_session` directly with
 synthesized payloads + real on-disk state.
@@ -20,7 +19,6 @@ from __future__ import annotations
 
 import io
 import json
-import os
 import subprocess
 import sys
 import tempfile
@@ -31,8 +29,6 @@ from unittest.mock import patch
 REPO_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO_ROOT / "plugins" / "evo" / "src"))
 
-from evo.inject import queue
-from evo.inject.paths import session_file
 from evo.inject.registry import register_session, mark_engaged, mark_optimize_mode
 
 
@@ -98,7 +94,7 @@ class TestStopNudgeFires(_Base):
         self.assertIn("optimize", reason.lower(),
                       f"reason must mention optimize protocol; got {reason!r}")
         self.assertIn("evo wait", reason.lower(),
-                      f"reason must mention evo wait as the wait primitive")
+                      "reason must mention evo wait as the wait primitive")
 
     def test_orchestrator_in_optimize_mode_is_nudged_on_subagent_stop(self):
         """SubagentStop on the orchestrator session (when its Task subagent
@@ -120,6 +116,59 @@ class TestStopNudgeFires(_Base):
 
 
 # ---------------------------------------------------------------------------
+# Always-fire: no progress gate. Repeated Stops keep nudging until the
+# session leaves optimize_mode (via `evo exit-optimize-mode`).
+# ---------------------------------------------------------------------------
+
+class TestStopNudgeAlwaysFires(_Base):
+
+    def test_two_consecutive_stops_both_nudge(self):
+        register_session(self.root, "orch", "claude-code")
+        mark_engaged(self.root, "orch")
+        mark_optimize_mode(self.root, "orch")
+
+        first = _drain_stop(self.root, "orch", hook_event="Stop")
+        self.assertEqual(first.get("decision"), "block", "first Stop nudges")
+
+        second = _drain_stop(self.root, "orch", hook_event="Stop")
+        self.assertEqual(
+            second.get("decision"), "block",
+            "second Stop must also nudge — always-fire while optimize_mode is on"
+        )
+
+    def test_many_consecutive_stops_all_nudge(self):
+        register_session(self.root, "orch", "claude-code")
+        mark_engaged(self.root, "orch")
+        mark_optimize_mode(self.root, "orch")
+
+        for i in range(5):
+            out = _drain_stop(self.root, "orch", hook_event="Stop")
+            self.assertEqual(
+                out.get("decision"), "block",
+                f"Stop #{i + 1} must nudge while optimize_mode is on"
+            )
+
+    def test_exit_optimize_mode_stops_nudging(self):
+        """Once `evo exit-optimize-mode` flips the flag off, Stop no longer
+        forces continuation."""
+        from evo.inject.registry import unmark_optimize_mode
+
+        register_session(self.root, "orch", "claude-code")
+        mark_engaged(self.root, "orch")
+        mark_optimize_mode(self.root, "orch")
+        first = _drain_stop(self.root, "orch", hook_event="Stop")
+        self.assertEqual(first.get("decision"), "block")
+
+        unmark_optimize_mode(self.root, "orch")
+
+        out = _drain_stop(self.root, "orch", hook_event="Stop")
+        self.assertNotEqual(
+            out.get("decision"), "block",
+            "after exit-optimize-mode, Stop must let the agent actually stop"
+        )
+
+
+# ---------------------------------------------------------------------------
 # Negative: don't nudge in cases where we shouldn't
 # ---------------------------------------------------------------------------
 
@@ -130,21 +179,30 @@ class TestStopNudgeDoesNotFire(_Base):
         mark_engaged(self.root, "other")
         # optimize_mode NOT set
         out = _drain_stop(self.root, "other", hook_event="Stop")
-        # Existing engagement-only Stop emits empty additionalContext envelope
-        # (no events queued). Must NOT be a decision:block.
         self.assertNotEqual(out.get("decision"), "block",
                             "non-optimize-mode session must not be force-continued")
 
     def test_subagent_not_nudged(self):
         """Subagents must NOT be force-continued. They have their own
-        bounded scope; the orchestrator owns the loop."""
+        bounded scope; the orchestrator owns the loop. Forces
+        optimize_mode true on the subagent record (by direct write —
+        mark_optimize_mode refuses subagents) to verify the exp_id
+        guard is the actual blocker, independent of optimize_mode."""
         register_session(self.root, "sub", "claude-code", exp_id="exp_0042")
         mark_engaged(self.root, "sub")
-        # Even if optimize_mode somehow got flipped on a subagent record,
-        # the stop-nudge check should exclude subagents via exp_id presence.
+        # Bypass mark_optimize_mode (which exempts subagents) and force
+        # optimize_mode=true directly. Now BOTH guards would have to be
+        # honored — the exp_id one is what catches it.
+        from evo.inject.paths import session_file
+        sf = session_file(self.root, "sub")
+        data = json.loads(sf.read_text())
+        data["optimize_mode"] = True
+        data["optimize_mode_at"] = "2026-01-01T00:00:00Z"
+        sf.write_text(json.dumps(data))
+
         out = _drain_stop(self.root, "sub", hook_event="SubagentStop")
         self.assertNotEqual(out.get("decision"), "block",
-                            "subagent must not be force-continued")
+                            "subagent must not be force-continued even with optimize_mode flipped on")
 
     def test_pre_tool_use_event_not_treated_as_stop(self):
         """The stop-nudge should ONLY fire on Stop/SubagentStop. A PreToolUse
@@ -158,93 +216,19 @@ class TestStopNudgeDoesNotFire(_Base):
 
 
 # ---------------------------------------------------------------------------
-# Progress-gated loop guard
-# ---------------------------------------------------------------------------
-
-class TestStopNudgeLoopGuard(_Base):
-
-    def _commit_experiment(self, exp_id: str) -> None:
-        """Simulate a subagent committing an experiment (creates the dir,
-        which is the signal stop-nudge progress-tracks)."""
-        (self.run_dir / "experiments" / exp_id).mkdir(parents=True, exist_ok=True)
-        (self.run_dir / "experiments" / exp_id / "outcome.json").write_text(
-            json.dumps({"score": 1.0})
-        )
-
-    def test_two_consecutive_stops_without_progress_does_NOT_nudge_twice(self):
-        """First Stop fires nudge. If next Stop fires with no new
-        experiment since, the second one must NOT nudge — the agent
-        is genuinely done or stuck."""
-        register_session(self.root, "orch", "claude-code")
-        mark_engaged(self.root, "orch")
-        mark_optimize_mode(self.root, "orch")
-
-        first = _drain_stop(self.root, "orch", hook_event="Stop")
-        self.assertEqual(first.get("decision"), "block", "first Stop nudges")
-
-        # No experiment committed between the two stops
-        second = _drain_stop(self.root, "orch", hook_event="Stop")
-        self.assertNotEqual(
-            second.get("decision"), "block",
-            "second consecutive Stop without progress must not nudge — "
-            "agent must be allowed to actually stop"
-        )
-
-    def test_progress_between_stops_unblocks_nudge_again(self):
-        """First Stop nudges. After progress (experiment committed), the
-        next Stop nudges again (the loop continues working)."""
-        register_session(self.root, "orch", "claude-code")
-        mark_engaged(self.root, "orch")
-        mark_optimize_mode(self.root, "orch")
-
-        first = _drain_stop(self.root, "orch", hook_event="Stop")
-        self.assertEqual(first.get("decision"), "block")
-
-        # Subagent commits an experiment — progress!
-        self._commit_experiment("exp_0001")
-
-        second = _drain_stop(self.root, "orch", hook_event="Stop")
-        self.assertEqual(
-            second.get("decision"), "block",
-            "Stop after progress must nudge again — the loop is working"
-        )
-
-    def test_three_stops_progress_progress_no_progress(self):
-        """Realistic sequence: stop → progress → stop → progress → stop
-        (no progress). Third stop must not nudge."""
-        register_session(self.root, "orch", "claude-code")
-        mark_engaged(self.root, "orch")
-        mark_optimize_mode(self.root, "orch")
-
-        out1 = _drain_stop(self.root, "orch", hook_event="Stop")
-        self.assertEqual(out1.get("decision"), "block")
-
-        self._commit_experiment("exp_0001")
-
-        out2 = _drain_stop(self.root, "orch", hook_event="Stop")
-        self.assertEqual(out2.get("decision"), "block")
-
-        # No new progress this time
-        out3 = _drain_stop(self.root, "orch", hook_event="Stop")
-        self.assertNotEqual(out3.get("decision"), "block",
-                            "third stop without progress must let agent stop")
-
-
-# ---------------------------------------------------------------------------
-# Reason content: autonomous-driving language
+# Reason content: autonomous-driving language + escape hatch
 # ---------------------------------------------------------------------------
 
 class TestStopNudgeReasonContent(_Base):
 
-    def test_reason_says_dont_ask_user(self):
+    def test_reason_signals_autonomy(self):
         register_session(self.root, "orch", "claude-code")
         mark_engaged(self.root, "orch")
         mark_optimize_mode(self.root, "orch")
         out = _drain_stop(self.root, "orch", hook_event="Stop")
         reason = (out.get("reason") or "").lower()
-        # Mention autonomy / not asking the user
         self.assertTrue(
-            "autonom" in reason or "user" in reason,
+            "autonom" in reason or "hands-off" in reason or "user" in reason,
             f"reason should signal autonomous driving; got: {reason!r}"
         )
 
@@ -254,6 +238,49 @@ class TestStopNudgeReasonContent(_Base):
         mark_optimize_mode(self.root, "orch")
         out = _drain_stop(self.root, "orch", hook_event="Stop")
         self.assertIn("evo wait", (out.get("reason") or "").lower())
+
+    def test_reason_mentions_escape_hatch(self):
+        """The continuation prompt must surface `evo exit-optimize-mode` so
+        the agent knows how to legitimately end the loop."""
+        register_session(self.root, "orch", "claude-code")
+        mark_engaged(self.root, "orch")
+        mark_optimize_mode(self.root, "orch")
+        out = _drain_stop(self.root, "orch", hook_event="Stop")
+        self.assertIn("evo exit-optimize-mode", (out.get("reason") or "").lower())
+
+
+# ---------------------------------------------------------------------------
+# Combined emit: pending directives must not be dropped by the nudge
+# ---------------------------------------------------------------------------
+
+class TestStopNudgePreservesQueuedDirectives(_Base):
+
+    def test_pending_evo_direct_text_included_in_stop_reason(self):
+        """When a user issues `evo direct 'try X'` and then the
+        orchestrator emits Stop, the directive must still reach the
+        agent. The nudge alone would drop it because the offset advances
+        as part of normal drain."""
+        from evo.inject import queue
+
+        register_session(self.root, "orch", "claude-code")
+        mark_engaged(self.root, "orch")
+        mark_optimize_mode(self.root, "orch")
+
+        # Enqueue an evo-direct event onto the workspace queue.
+        queue.append_workspace_event(self.root, "TRY_COSINE_SIM_NOW")
+        # Drop a marker so the drain looks at the queue.
+        from evo.inject import marker
+        marker.touch(self.root, "orch")
+
+        out = _drain_stop(self.root, "orch", hook_event="Stop")
+        reason = out.get("reason") or ""
+
+        self.assertEqual(out.get("decision"), "block", "stop nudge still fires")
+        self.assertIn(
+            "TRY_COSINE_SIM_NOW", reason,
+            "pending evo-direct text must be included in the stop reason "
+            "so the user's intervention isn't dropped",
+        )
 
 
 if __name__ == "__main__":
