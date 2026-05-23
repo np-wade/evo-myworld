@@ -93,10 +93,13 @@ def register_session(
                 data["exp_id"] = exp_id
             if parent_session_id is not None and not data.get("parent_session_id"):
                 data["parent_session_id"] = parent_session_id
-            # Ensure engagement fields exist on records written by the
-            # Rust binary (which writes the v1 schema without them).
+            # Ensure engagement + optimize_mode fields exist on records
+            # written by older code paths (e.g. the Rust binary's v1
+            # schema without these fields).
             data.setdefault("has_evo_engaged", False)
             data.setdefault("engaged_at", None)
+            data.setdefault("optimize_mode", False)
+            data.setdefault("optimize_mode_at", None)
             atomic_write_json(path, data)
             return
     data = {
@@ -110,6 +113,12 @@ def register_session(
         "parent_session_id": parent_session_id,
         "has_evo_engaged": False,
         "engaged_at": None,
+        # v0.4.5+: optimize_mode tags a session as the orchestrator
+        # currently driving /evo:optimize. Set automatically when the
+        # user invokes /optimize (UserPromptSubmit pattern-match in
+        # drain.py). Drives the policy nudge + stop-hook continuation.
+        "optimize_mode": False,
+        "optimize_mode_at": None,
     }
     atomic_write_json(path, data)
     # Seed the workspace offset to the current queue tail so this session
@@ -119,6 +128,54 @@ def register_session(
     # engagement filter.
     from .queue import init_offset_to_latest
     init_offset_to_latest(root, session_id)
+
+
+def mark_optimize_mode(root: Path, session_id: str) -> bool:
+    """Flip `optimize_mode` true on the session record if currently false.
+
+    Refuses to flag a subagent session (one with exp_id set) — subagents
+    are never the optimize orchestrator. Returns True on the false→true
+    transition, False on no-op (already true, missing record, or
+    subagent). Caller should treat True as a signal to (optionally)
+    side-effect, e.g. write to telemetry.
+    """
+    path = session_file(root, session_id)
+    if not path.exists():
+        return False
+    try:
+        data = json.loads(path.read_text())
+    except (OSError, ValueError):
+        return False
+    if data.get("exp_id"):
+        return False  # subagent — never tag as orchestrator
+    if data.get("optimize_mode"):
+        return False
+    data["optimize_mode"] = True
+    data["optimize_mode_at"] = _now_iso()
+    atomic_write_json(path, data)
+    return True
+
+
+def unmark_optimize_mode(root: Path, session_id: str) -> bool:
+    """Flip `optimize_mode` false on the session record if currently true.
+
+    Used by the `evo exit-optimize-mode` CLI command. Returns True on
+    the true→false transition, False on no-op (already false, missing
+    record).
+    """
+    path = session_file(root, session_id)
+    if not path.exists():
+        return False
+    try:
+        data = json.loads(path.read_text())
+    except (OSError, ValueError):
+        return False
+    if not data.get("optimize_mode"):
+        return False
+    data["optimize_mode"] = False
+    data["optimize_mode_at"] = None
+    atomic_write_json(path, data)
+    return True
 
 
 def mark_engaged(root: Path, session_id: str) -> bool:

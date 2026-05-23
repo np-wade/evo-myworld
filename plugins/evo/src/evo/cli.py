@@ -3925,6 +3925,163 @@ def cmd_direct(args: argparse.Namespace) -> int:
     return 0
 
 
+# Hard cap so an orchestrator that miscomputes --timeout can't block its
+# session for hours. 1 hour matches the user's stated upper bound; users
+# who legitimately need longer should issue multiple `evo wait` calls.
+_WAIT_TIMEOUT_CAP = 3600
+
+
+def _wait_timeout_seconds(raw: float | int) -> int:
+    """Clamp the user-supplied timeout into [1, 3600]. Test seam."""
+    try:
+        n = int(raw)
+    except (TypeError, ValueError):
+        n = _WAIT_TIMEOUT_CAP
+    if n < 1:
+        return 1
+    if n > _WAIT_TIMEOUT_CAP:
+        return _WAIT_TIMEOUT_CAP
+    return n
+
+
+def _experiments_dir_snapshot(run_dir: Path) -> dict[str, float]:
+    """Snapshot the experiments/ tree as {relative_path: mtime}. Used by
+    cmd_wait to detect any change (new experiment dir, outcome.json
+    written or updated, or any other file under experiments/).
+    """
+    out: dict[str, float] = {}
+    exp_root = run_dir / "experiments"
+    if not exp_root.is_dir():
+        return out
+    try:
+        for child in exp_root.iterdir():
+            if not child.is_dir():
+                continue
+            # Track the dir itself (so an empty new exp dir counts as a change)
+            try:
+                out[child.name] = child.stat().st_mtime
+            except OSError:
+                continue
+            # And any files inside it (outcome.json mtime is the key signal)
+            for sub in child.rglob("*"):
+                if sub.is_file():
+                    try:
+                        out[f"{child.name}/{sub.relative_to(child)}"] = sub.stat().st_mtime
+                    except OSError:
+                        pass
+    except OSError:
+        pass
+    return out
+
+
+def _describe_change(before: dict[str, float], after: dict[str, float]) -> str:
+    """Produce a short summary of what changed between two snapshots."""
+    new_keys = set(after) - set(before)
+    if new_keys:
+        # Prefer outcome.json over the bare dir for the human-readable summary
+        outcomes = sorted(k for k in new_keys if k.endswith("outcome.json"))
+        if outcomes:
+            exp_id = outcomes[0].split("/", 1)[0]
+            return f"new experiment outcome: {exp_id}"
+        # Otherwise just name the first new key (experiment dir or file)
+        first = sorted(new_keys)[0]
+        exp_id = first.split("/", 1)[0]
+        return f"new experiment activity: {exp_id}"
+    changed = [k for k in after if k in before and after[k] > before[k]]
+    if changed:
+        outcomes = sorted(k for k in changed if k.endswith("outcome.json"))
+        if outcomes:
+            exp_id = outcomes[0].split("/", 1)[0]
+            return f"updated experiment outcome: {exp_id}"
+        first = sorted(changed)[0]
+        exp_id = first.split("/", 1)[0]
+        return f"updated: {exp_id}"
+    return "experiments dir changed"
+
+
+def cmd_exit_optimize_mode(args: argparse.Namespace) -> int:
+    """Clear the optimize_mode flag on the current session.
+
+    Used by agents that need to step out of `/optimize` protocol for a
+    legitimate one-off (e.g. the user explicitly asked for a manual edit,
+    or the experiment loop is genuinely done and the agent wants the
+    nudges off).
+
+    Resolves the session via the host's session-id env var (same set
+    that detect_session uses). Errors cleanly if no host session is
+    detected — the command doesn't make sense outside a registered
+    session.
+    """
+    from .inject.registry import detect_session, unmark_optimize_mode
+    try:
+        root = repo_root()
+    except Exception:  # noqa: BLE001
+        print("ERROR: not in an evo workspace", file=sys.stderr)
+        return 2
+    if not (root / ".evo").exists():
+        print("ERROR: not in an evo workspace", file=sys.stderr)
+        return 2
+    detected = detect_session()
+    if not detected:
+        print(
+            "ERROR: no host session detected (no CLAUDE_CODE_SESSION_ID / "
+            "CODEX_THREAD_ID / HERMES_SESSION_ID / OPENCODE_SESSION_ID). "
+            "Run this command from inside a host agent session.",
+            file=sys.stderr,
+        )
+        return 2
+    _host, sid = detected
+    transitioned = unmark_optimize_mode(root, sid)
+    if transitioned:
+        print(f"optimize_mode cleared for session {sid}")
+    else:
+        print(f"optimize_mode was already off for session {sid}")
+    return 0
+
+
+def cmd_wait(args: argparse.Namespace) -> int:
+    """Block until an experiment under <run_dir>/experiments/ is created
+    or updated, or until --timeout (default 3600, capped at 3600s).
+
+    Returns 0 on detected change with a one-line summary on stdout,
+    124 (POSIX timeout convention) on timeout. Polls every 1s.
+
+    Intended for the optimize orchestrator: after spawning subagents in
+    the background, call `evo wait` to block until any of them produces
+    a result instead of writing ad-hoc polling loops.
+    """
+    try:
+        root = repo_root()
+    except Exception:  # noqa: BLE001 — repo_root raises on non-git cwd
+        print("ERROR: not in an evo workspace", file=sys.stderr)
+        return 2
+    if not (root / ".evo").exists():
+        print("ERROR: not in an evo workspace", file=sys.stderr)
+        return 2
+    # Locate the active run dir (lexicographically last run_*).
+    evo_dir = root / ".evo"
+    runs = sorted(p for p in evo_dir.iterdir() if p.is_dir() and p.name.startswith("run_"))
+    if not runs:
+        print("ERROR: no run dir under .evo/", file=sys.stderr)
+        return 2
+    run_dir = runs[-1]
+
+    timeout = _wait_timeout_seconds(getattr(args, "timeout", _WAIT_TIMEOUT_CAP))
+
+    baseline = _experiments_dir_snapshot(run_dir)
+    deadline = time.time() + timeout
+    poll_interval = 1.0
+    while time.time() < deadline:
+        time.sleep(poll_interval)
+        now = _experiments_dir_snapshot(run_dir)
+        if now != baseline:
+            summary = _describe_change(baseline, now)
+            print(f"[evo wait] change detected: {summary}")
+            return 0
+    print(f"[evo wait] timed out after {timeout}s with no experiment activity")
+    return 124
+
+
 def cmd_ack(args: argparse.Namespace) -> int:
     """Record that the agent has acknowledged a directive.
 
@@ -4775,6 +4932,35 @@ def build_parser() -> argparse.ArgumentParser:
     )
     direct_status_p.add_argument("event_id")
     direct_status_p.set_defaults(func=cmd_direct_status)
+
+    exit_opt_p = sub.add_parser(
+        "exit-optimize-mode",
+        help="Clear the optimize_mode flag on this session (turn off safety nudges + stop-hook continuation)",
+        description=(
+            "Use when the agent needs to legitimately step out of /optimize "
+            "protocol (e.g. a one-off manual task the user explicitly asked "
+            "for) without being nudged. The flag is normally auto-set when "
+            "the user invokes /evo:optimize; this clears it."
+        ),
+    )
+    exit_opt_p.set_defaults(func=cmd_exit_optimize_mode)
+
+    wait_p = sub.add_parser(
+        "wait",
+        help="Block until an experiment is created/updated, or until --timeout (max 1h)",
+        description=(
+            "Polls <run_dir>/experiments/ for any new or updated experiment "
+            "directory. Returns exit code 0 with a one-line summary on the "
+            "first detected change, 124 on timeout. Intended for /optimize "
+            "orchestrators to block on subagent results instead of writing "
+            "ad-hoc bash polling loops."
+        ),
+    )
+    wait_p.add_argument(
+        "--timeout", type=float, default=3600,
+        help="Seconds to block before giving up. Default 3600, capped at 3600.",
+    )
+    wait_p.set_defaults(func=cmd_wait)
 
     return parser
 

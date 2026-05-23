@@ -251,6 +251,39 @@ evo infra log [--limit N]                          # read recorded events
   a specific node, and write workspace notes for round-level observations
   not tied to any one experiment.
 
+## Loop control (for the /optimize orchestrator)
+
+```bash
+evo wait [--timeout SEC]      # block until any experiment under
+                              # experiments/ is created or updated.
+                              # default 3600, capped at 3600 (1h).
+                              # exit 0 on change, 124 on timeout.
+
+evo exit-optimize-mode        # clear the optimize_mode flag on this
+                              # session — disables the policy nudge
+                              # and the stop-hook self-continuation.
+                              # Use only when stepping out of /optimize
+                              # for a legitimate one-off.
+```
+
+`evo wait` is the primitive the orchestrator uses to block on subagent
+results — replaces ad-hoc bash polling loops. `optimize_mode` is set
+automatically when the user invokes `/evo:optimize` (or the host's
+equivalent); no enter command needed.
+
+While `optimize_mode` is active, the runtime enforces:
+- File-mutation tools (Edit / Write / NotebookEdit, etc.) are denied on
+  the 1st violation and every 5th after, with a banner reminding the
+  orchestrator to spawn subagents instead.
+- Bash commands that aren't `evo …`, a host-spawn (claude/codex/cursor-
+  agent/opencode/hermes/pi/openclaw), or read-only inspection (git, ls,
+  cat, find, grep, …) are denied on the same cadence.
+- On `Stop` / `SubagentStop`, the orchestrator is re-prompted with a
+  continuation instruction (use `evo wait` to block, plan the next
+  round, etc.). The loop self-suppresses if no new experiment commits
+  between two consecutive Stop fires (so the agent can actually stop
+  when it's done).
+
 ## Mid-run directives
 
 ```bash
