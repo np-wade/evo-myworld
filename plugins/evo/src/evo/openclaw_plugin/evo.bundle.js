@@ -98,8 +98,18 @@ function writeOffset(runDir, sid, opts) {
 function formatDirectiveText(events) {
   const lines = [];
   for (const ev of events) {
-    if (ev.text)
-      lines.push(`[evo direct] ${ev.text}`);
+    if (!ev.text)
+      continue;
+    const id = ev.id || "";
+    if (id) {
+      lines.push(`[EVO DIRECTIVE id=${id}]`);
+      lines.push(ev.text);
+      lines.push(`[END EVO DIRECTIVE — when done, run: evo ack ${id}]`);
+    } else {
+      lines.push("[EVO DIRECTIVE]");
+      lines.push(ev.text);
+      lines.push("[END EVO DIRECTIVE]");
+    }
   }
   return lines.join(`
 `);
@@ -117,6 +127,12 @@ function registerSession(runDir, sid, host, expId = null) {
   const existing = readJsonOrNull(p);
   if (existing) {
     existing.last_seen_at = now;
+    if (expId && !existing.exp_id)
+      existing.exp_id = expId;
+    if (existing.has_evo_engaged === undefined)
+      existing.has_evo_engaged = false;
+    if (existing.engaged_at === undefined)
+      existing.engaged_at = null;
     atomicWriteJson(p, existing);
     return;
   }
@@ -128,9 +144,40 @@ function registerSession(runDir, sid, host, expId = null) {
     registered_at: now,
     last_seen_at: now,
     exp_id: expId,
-    parent_session_id: null
+    parent_session_id: null,
+    has_evo_engaged: false,
+    engaged_at: null
   };
   atomicWriteJson(p, rec);
+  initOffsetToLatest(runDir, sid);
+}
+function markEngaged(runDir, sid) {
+  const p = sessionFile(runDir, sid);
+  const rec = readJsonOrNull(p);
+  if (!rec)
+    return false;
+  if (rec.has_evo_engaged)
+    return false;
+  rec.has_evo_engaged = true;
+  rec.engaged_at = nowIso();
+  atomicWriteJson(p, rec);
+  return true;
+}
+function initOffsetToLatest(runDir, sid) {
+  const wsPath = workspaceEventsPath(runDir);
+  let latest = null;
+  if (fs.existsSync(wsPath)) {
+    const events = readEventsAfter(wsPath, null);
+    if (events.length > 0)
+      latest = events[events.length - 1].id;
+  }
+  writeOffset(runDir, sid, { workspaceId: latest });
+}
+var EVO_CMD_RE = /^\s*evo(\s|$)/;
+function isEvoCommand(command) {
+  if (!command || typeof command !== "string")
+    return false;
+  return EVO_CMD_RE.test(command);
 }
 function findEvoRunDir(cwd) {
   const envRunDir = process.env.EVO_RUN_DIR;
@@ -190,55 +237,92 @@ function drainSession(runDir, sessionId) {
   return { text, newWorkspaceOffset, newExpOffset };
 }
 
-// index.ts
+// factory.ts
 import * as crypto from "crypto";
-function deriveSessionId() {
-  const hash = crypto.createHash("sha256").update(process.cwd()).digest("hex").slice(0, 12);
-  return `openclaw-${hash}`;
-}
-function register(api) {
-  const drainedTexts = [];
-  const ensureRegistered = () => {
-    const runDir = findEvoRunDir();
-    if (!runDir)
-      return null;
-    const sid = deriveSessionId();
-    if (!isRegistered(runDir, sid)) {
-      registerSession(runDir, sid, "openclaw");
-    }
-    return { sid, runDir };
-  };
-  const appendToPayload = (event, text) => {
-    if (Array.isArray(event.payload?.input)) {
-      event.payload.input.push({
-        role: "user",
-        content: [{ type: "input_text", text }]
-      });
-    } else if (Array.isArray(event.payload?.messages)) {
-      event.payload.messages.push({
-        role: "user",
-        content: [{ type: "text", text }]
-      });
-    }
-  };
-  api.on("session_start", () => {
-    ensureRegistered();
-  });
-  api.on("before_provider_request", (event, _ctx) => {
-    const ctx = ensureRegistered();
-    if (!ctx)
-      return;
-    const result = drainSession(ctx.runDir, ctx.sid);
-    if (result.text)
-      drainedTexts.push(result.text);
-    if (drainedTexts.length === 0)
-      return;
-    const combined = drainedTexts.join(`
+function makeRegister(host) {
+  function deriveSessionId() {
+    const hash = crypto.createHash("sha256").update(process.cwd()).digest("hex").slice(0, 12);
+    return `${host}-${hash}`;
+  }
+  return function register(api) {
+    const drainedTexts = [];
+    const ensureRegistered = () => {
+      const runDir = findEvoRunDir();
+      if (!runDir)
+        return null;
+      const sid = deriveSessionId();
+      if (!isRegistered(runDir, sid)) {
+        registerSession(runDir, sid, host);
+      }
+      return { sid, runDir };
+    };
+    const appendToPayload = (event, text) => {
+      if (Array.isArray(event.payload?.input)) {
+        event.payload.input.push({
+          role: "user",
+          content: [{ type: "input_text", text }]
+        });
+      } else if (Array.isArray(event.payload?.messages)) {
+        event.payload.messages.push({
+          role: "user",
+          content: [{ type: "text", text }]
+        });
+      }
+    };
+    api.on("session_start", () => {
+      ensureRegistered();
+    });
+    const scanForEvoCommands = (payload) => {
+      try {
+        const items = Array.isArray(payload?.input) ? payload.input : [];
+        for (const it of items) {
+          const args = it?.arguments;
+          if (typeof args === "string" && isEvoCommand(args))
+            return true;
+          if (typeof args === "object" && args) {
+            const cmd = args.command ?? args.cmd ?? args.shell;
+            if (typeof cmd === "string" && isEvoCommand(cmd))
+              return true;
+          }
+        }
+        const msgs = Array.isArray(payload?.messages) ? payload.messages : [];
+        for (const m of msgs) {
+          const content = Array.isArray(m?.content) ? m.content : [];
+          for (const c of content) {
+            if (c?.type === "tool_use") {
+              const cmd = c?.input?.command ?? c?.input?.cmd;
+              if (typeof cmd === "string" && isEvoCommand(cmd))
+                return true;
+            }
+          }
+        }
+      } catch {}
+      return false;
+    };
+    api.on("before_provider_request", (event, _ctx) => {
+      const ctx = ensureRegistered();
+      if (!ctx)
+        return;
+      if (scanForEvoCommands(event.payload)) {
+        if (markEngaged(ctx.runDir, ctx.sid)) {
+          initOffsetToLatest(ctx.runDir, ctx.sid);
+        }
+      }
+      const result = drainSession(ctx.runDir, ctx.sid);
+      if (result.text)
+        drainedTexts.push(result.text);
+      if (drainedTexts.length === 0)
+        return;
+      const combined = drainedTexts.join(`
 `);
-    appendToPayload(event, combined);
-    return event.payload;
-  });
+      appendToPayload(event, combined);
+      return event.payload;
+    });
+  };
 }
+
+// index.ts
+var openclaw_plugin_default = makeRegister("openclaw");
 export {
-  register as default
+  openclaw_plugin_default as default
 };

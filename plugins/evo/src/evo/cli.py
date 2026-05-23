@@ -3797,6 +3797,37 @@ def cmd_update(args: argparse.Namespace) -> int:
     return overall_rc
 
 
+# Hosts whose registration pipeline reliably sets `has_evo_engaged`.
+# Three engagement-signal paths feed this set:
+#
+#   - claude-code / codex / hermes: Python `auto_register_from_env`
+#     flips the flag via host session-id env vars (CLAUDE_CODE_SESSION_ID,
+#     CODEX_THREAD_ID, HERMES_SESSION_ID). Verified — Hermes PR #23847
+#     ships HERMES_SESSION_ID into every tool subprocess.
+#   - cursor: the self-contained Python drain detects `evo …` shell
+#     commands in preToolUse payloads (no env-var path available).
+#   - opencode: in-process JS plugin detects `evo …` commands via the
+#     `tool.execute.before` hook (opencode doesn't export
+#     OPENCODE_SESSION_ID — sst/opencode#12158 closed unshipped).
+#   - openclaw / pi: in-process JS plugin scans `before_provider_request`
+#     payloads for tool calls running `evo …`. Best-effort heuristic.
+#
+# Sessions on hosts in this set are filtered out of `evo direct` broadcast
+# fanout when their engagement flag is false — they registered but never
+# ran `evo`, so they're not in the evo loop.
+HOSTS_WITH_ENGAGEMENT = frozenset({
+    "claude-code", "codex", "cursor", "hermes",
+    "opencode", "openclaw", "pi",
+})
+
+
+def _iso_now() -> str:
+    """UTC ISO-8601 timestamp with seconds precision. Matches the format
+    used in inject/sessions/*.json so ack records sort/compare cleanly."""
+    import datetime as _dt
+    return _dt.datetime.now(_dt.timezone.utc).isoformat(timespec="seconds")
+
+
 def cmd_direct(args: argparse.Namespace) -> int:
     """Send a directive to the workspace.
 
@@ -3836,16 +3867,178 @@ def cmd_direct(args: argparse.Namespace) -> int:
     event_id = queue.append_workspace_event(root, text)
     sessions = list_active_sessions(root)
     delivered = 0
+    skipped_subagent = 0
+    skipped_unengaged = 0
     for sess in sessions:
         if sess.get("exp_id"):
             # Skip subagents — workspace events go to orchestrators only
+            skipped_subagent += 1
+            continue
+        # Engagement filter: a session that registered (via Rust binary
+        # at SessionStart, or via host plugin on first event) but never
+        # ran any `evo` command is not in the evo loop. Imperative
+        # directives must not reach it. Filter only applies to hosts
+        # whose registration pipeline reliably sets the engagement flag;
+        # other hosts pass through unfiltered until they're wired in.
+        if (
+            sess.get("host") in HOSTS_WITH_ENGAGEMENT
+            and not sess.get("has_evo_engaged")
+        ):
+            skipped_unengaged += 1
             continue
         sid = sess.get("session_id")
         if not sid:
             continue
         marker.touch(root, sid)
         delivered += 1
-    print(f"directive queued (id={event_id}, fanout={delivered} sessions)")
+    print(
+        f"directive queued (id={event_id}, fanout={delivered} sessions, "
+        f"skipped_unengaged={skipped_unengaged}, "
+        f"skipped_subagent={skipped_subagent})"
+    )
+
+    # L2 ACK: optional --wait blocks until any session acks the directive
+    # (or until wait_timeout). Useful for imperative directives where the
+    # caller wants synchronous confirmation that the agent processed it.
+    if getattr(args, "wait", False):
+        from .inject.paths import ack_file
+        timeout = float(getattr(args, "wait_timeout", 60.0))
+        deadline = time.time() + timeout
+        ack_path = ack_file(root, event_id)
+        while time.time() < deadline:
+            if ack_path.exists():
+                try:
+                    rec = json.loads(ack_path.read_text())
+                    by = rec.get("session_id") or "(unattributed)"
+                    at = rec.get("acked_at") or "?"
+                    print(f"acked by {by} at {at}")
+                except (OSError, ValueError):
+                    print("acked (record unreadable)")
+                return 0
+            time.sleep(0.1)
+        print(
+            f"timed out after {timeout:.1f}s waiting for ack of {event_id} "
+            f"(directive remains in queue; run `evo direct status {event_id}` "
+            f"to check later)"
+        )
+        return 3
+    return 0
+
+
+def cmd_ack(args: argparse.Namespace) -> int:
+    """Record that the agent has acknowledged a directive.
+
+    Writes inject/acks/<event_id>.json with the host session that issued
+    the ack (best-effort attribution via session-id env vars). Idempotent:
+    a second ack on the same id increments ack_count rather than failing.
+    """
+    from .inject.paths import ack_file, acks_dir
+    from .inject.registry import detect_session
+
+    root = repo_root()
+    if not (root / ".evo").exists():
+        print("ERROR: not in an evo workspace", file=sys.stderr)
+        return 2
+
+    event_id = (args.event_id or "").strip()
+    if not event_id:
+        print("ERROR: usage: evo ack <event_id>", file=sys.stderr)
+        return 2
+
+    detected = detect_session()
+    host = detected[0] if detected else None
+    sid = detected[1] if detected else None
+
+    path = ack_file(root, event_id)
+    acks_dir(root).mkdir(parents=True, exist_ok=True)
+
+    now = _iso_now()
+    if path.exists():
+        try:
+            existing = json.loads(path.read_text())
+        except (OSError, ValueError):
+            existing = {}
+        existing["event_id"] = event_id
+        # Preserve original ack attribution; bump count and last_acked_at.
+        existing["ack_count"] = int(existing.get("ack_count", 1)) + 1
+        existing["last_acked_at"] = now
+        path.write_text(json.dumps(existing))
+        print(f"ack recorded (id={event_id}, ack_count={existing['ack_count']})")
+        return 0
+
+    rec = {
+        "event_id": event_id,
+        "session_id": sid,
+        "host": host,
+        "acked_at": now,
+        "ack_count": 1,
+    }
+    path.write_text(json.dumps(rec))
+    print(f"ack recorded (id={event_id})")
+    return 0
+
+
+def cmd_direct_status(args: argparse.Namespace) -> int:
+    """Show queue/delivery/ack state for a directive id.
+
+    Surfaces three things:
+      - was the event queued (does it exist in workspace.jsonl)?
+      - was it delivered to at least one session (drain wrote
+        inject/delivered/<id>.json)?
+      - has any session acked it via `evo ack <id>` (inject/acks/<id>.json)?
+    """
+    from .inject import queue
+    from .inject.paths import ack_file, delivered_file, workspace_events_path
+
+    root = repo_root()
+    if not (root / ".evo").exists():
+        print("ERROR: not in an evo workspace", file=sys.stderr)
+        return 2
+
+    event_id = (args.event_id or "").strip()
+    if not event_id:
+        print("ERROR: usage: evo direct status <event_id>", file=sys.stderr)
+        return 2
+
+    # Queued?
+    events = queue.read_events_after(workspace_events_path(root), None)
+    matched = next((e for e in events if e.get("id") == event_id), None)
+    if matched is None:
+        # Also scan exp queues — exp-targeted directives live in their
+        # own queue file. (Skip the exhaustive scan for now; report.)
+        print(f"event:    {event_id}")
+        print(f"queued:   not found in workspace.jsonl")
+    else:
+        print(f"event:    {event_id} ({matched.get('text', '')!r})")
+        print(f"queued:   {matched.get('ts', '?')}")
+
+    # Delivered?
+    d = delivered_file(root, event_id)
+    if d.exists():
+        try:
+            drec = json.loads(d.read_text())
+            print(
+                f"delivered to: {drec.get('session_id', '?')} "
+                f"(host={drec.get('host', '?')}) at {drec.get('delivered_at', '?')}"
+            )
+        except (OSError, ValueError):
+            print("delivered:    (record unreadable)")
+    else:
+        print("delivered:    (no record)")
+
+    # Acked?
+    a = ack_file(root, event_id)
+    if a.exists():
+        try:
+            arec = json.loads(a.read_text())
+            by = arec.get("session_id") or "(unattributed)"
+            cnt = arec.get("ack_count", 1)
+            at = arec.get("acked_at", "?")
+            print(f"acked by:     {by} at {at} (count={cnt})")
+        except (OSError, ValueError):
+            print("acked:        (record unreadable)")
+    else:
+        print("acked:        (no ack yet)")
     return 0
 
 
@@ -4538,10 +4731,11 @@ def build_parser() -> argparse.ArgumentParser:
         help="Send a directive to running orchestrator session(s) or a specific subagent (by exp_id)",
         description=(
             "Without exp_id: directive is delivered to every registered "
-            "orchestrator-class session in the workspace. With exp_id: "
-            "delivered only to that subagent's session. Sessions that "
-            "haven't registered (haven't run any `evo` command) receive "
-            "nothing."
+            "and engaged orchestrator-class session in the workspace. "
+            "With exp_id: delivered only to that subagent's session. "
+            "Sessions that registered but never ran any `evo` command "
+            "(unengaged) are filtered out for hosts that support the "
+            "engagement signal."
         ),
     )
     direct_p.add_argument(
@@ -4549,7 +4743,38 @@ def build_parser() -> argparse.ArgumentParser:
         nargs="+",
         help="Either '<text>' (broadcast) or '<exp_id> <text>' (targeted)",
     )
+    direct_p.add_argument(
+        "--wait",
+        action="store_true",
+        help="Block until a session acks the directive (or until --wait-timeout). "
+             "Returns exit code 0 on ack, 3 on timeout.",
+    )
+    direct_p.add_argument(
+        "--wait-timeout",
+        type=float,
+        default=60.0,
+        help="Seconds to wait for ack when --wait is set (default: 60).",
+    )
     direct_p.set_defaults(func=cmd_direct)
+
+    ack_p = sub.add_parser(
+        "ack",
+        help="Acknowledge an evo directive (called by agents after acting on a [EVO DIRECTIVE id=…] banner)",
+        description=(
+            "Records that the directive identified by <event_id> has been "
+            "processed. Writes inject/acks/<event_id>.json. Surfaces via "
+            "`evo direct status <event_id>` and `evo direct --wait`."
+        ),
+    )
+    ack_p.add_argument("event_id", help="The id from a [EVO DIRECTIVE id=…] banner")
+    ack_p.set_defaults(func=cmd_ack)
+
+    direct_status_p = sub.add_parser(
+        "direct-status",
+        help="Show queue / delivery / ack state for a directive id",
+    )
+    direct_status_p.add_argument("event_id")
+    direct_status_p.set_defaults(func=cmd_direct_status)
 
     return parser
 

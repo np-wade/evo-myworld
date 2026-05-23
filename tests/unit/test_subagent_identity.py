@@ -92,10 +92,22 @@ class HermesSubagentIdentityTests(unittest.TestCase):
 
     def test_offset_is_per_session_not_shared(self):
         """One subagent advancing its offset must not affect another's
-        view of the queue. Single workspace event delivered to each."""
+        view of the queue. Events queued AFTER both sessions register
+        deliver to each independently.
+
+        Under the v0.4.4 safety contract (sessions only see events queued
+        after they registered), the event MUST be queued after both
+        sessions exist — pre-staged events would be filtered out.
+        """
+        from evo.hermes_plugin import _on_session_start
+        # Both sessions register first (offsets seeded to current tail = empty)
+        _on_session_start(session_id="alpha")
+        _on_session_start(session_id="beta")
+
+        # Event queued AFTER both registered — both see it on next drain.
         ev_id = queue.append_workspace_event(self.root, "shared message")
 
-        # Alpha drains: should see the event
+        # Alpha drains: sees the event
         result_alpha_1 = self._hermes_pre_llm("alpha")
         self.assertIsNotNone(result_alpha_1)
         self.assertIn("shared message", result_alpha_1["context"])
@@ -118,14 +130,23 @@ class HermesSubagentIdentityTests(unittest.TestCase):
     def test_session_start_does_not_drain_under_pre_llm_only_design(self):
         """Hermes plugin keeps drain in pre_llm_call; on_session_start
         only registers. Verifies the design invariant — if drain ever
-        moves to on_session_start, broadcast semantics shift."""
+        moves to on_session_start, broadcast semantics shift.
+
+        Under v0.4.4, registration now also seeds the workspace offset
+        to the queue tail (safety: fresh sessions only see post-
+        registration events). The deeper invariant remains: session_start
+        returns no `context`, so no text is injected into the model.
+        """
         from evo.hermes_plugin import _on_session_start
-        queue.append_workspace_event(self.root, "early message")
-        # session_start: registers but does NOT drain
+        ev_id = queue.append_workspace_event(self.root, "early message")
+        # session_start: registers but returns no context (no drain emit)
         ret = _on_session_start(session_id="sub")
         self.assertIsNone(ret)
-        # No offset advance from session_start alone
-        self.assertIsNone(queue.read_offset(self.root, "sub", "workspace"))
+        # Offset is seeded to the current tail at registration time
+        # (safety contract). The "early message" was queued before
+        # registration so it sits past the offset and won't deliver.
+        offset = queue.read_offset(self.root, "sub", "workspace")
+        self.assertEqual(offset, ev_id)
 
 
 class CodexHotPathSubagentIdentityTests(unittest.TestCase):

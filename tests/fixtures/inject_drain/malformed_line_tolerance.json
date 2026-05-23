@@ -18,7 +18,7 @@
   "offsets": {},
   "markers": ["orch_tol"],
   "expected": {
-    "text": "[EVO DIRECTIVE]\nvalid event\n[END EVO DIRECTIVE]",
+    "text": "[EVO DIRECTIVE id=01EVENT0000000000000000A]\nvalid event\n[END EVO DIRECTIVE — when done, run: evo ack 01EVENT0000000000000000A]",
     "newWorkspaceOffset": "01EVENT0000000000000000A",
     "newExpOffset": null,
     "marker_after": false,

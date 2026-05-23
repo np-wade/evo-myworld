@@ -25,7 +25,10 @@ from .paths import (
 )
 
 REGISTRY_SCHEMA_VERSION = 1
-STALE_AFTER_SECONDS = 30 * 60  # 30 minutes; tune via config later
+# 30 days. The freshness signal is no longer used as an engagement
+# heuristic — `has_evo_engaged` is. This just prevents on-disk leakage
+# of records for sessions that genuinely died.
+STALE_AFTER_SECONDS = 30 * 24 * 60 * 60
 
 # Order matters: first hit wins. Each entry is (host, env_var_name).
 # Codex exposes the session as CODEX_THREAD_ID (verified empirically on
@@ -63,8 +66,17 @@ def register_session(
     parent_session_id: str | None = None,
 ) -> None:
     """Idempotent: write `<inject>/sessions/<sid>.json` if absent;
-    update `last_seen_at` if present. Caller is responsible for only
-    calling this when there's an active workspace.
+    update `last_seen_at` if present.
+
+    Merges non-null `exp_id` / `parent_session_id` into an existing
+    record when those fields are currently empty — covers the case
+    where the Rust binary registered at SessionStart with `exp_id=null`
+    and a later Python `auto_register_from_env` call sees `EVO_EXP_ID`
+    set (subagent dispatched into an experiment after registration).
+    Never clobbers a non-null existing value.
+
+    Caller is responsible for only calling this when there's an active
+    workspace.
     """
     ensure_dirs(root)
     path = session_file(root, session_id)
@@ -76,6 +88,15 @@ def register_session(
             data = None
         if data is not None:
             data["last_seen_at"] = now
+            # Merge-only: fill in fields that are currently null.
+            if exp_id is not None and not data.get("exp_id"):
+                data["exp_id"] = exp_id
+            if parent_session_id is not None and not data.get("parent_session_id"):
+                data["parent_session_id"] = parent_session_id
+            # Ensure engagement fields exist on records written by the
+            # Rust binary (which writes the v1 schema without them).
+            data.setdefault("has_evo_engaged", False)
+            data.setdefault("engaged_at", None)
             atomic_write_json(path, data)
             return
     data = {
@@ -87,8 +108,41 @@ def register_session(
         "last_seen_at": now,
         "exp_id": exp_id,
         "parent_session_id": parent_session_id,
+        "has_evo_engaged": False,
+        "engaged_at": None,
     }
     atomic_write_json(path, data)
+    # Seed the workspace offset to the current queue tail so this session
+    # only sees events queued AFTER it registered. Without this, the
+    # SessionStart-unconditional-drain in the Rust binary would backfill
+    # every pre-existing event in workspace.jsonl, bypassing the
+    # engagement filter.
+    from .queue import init_offset_to_latest
+    init_offset_to_latest(root, session_id)
+
+
+def mark_engaged(root: Path, session_id: str) -> bool:
+    """Flip `has_evo_engaged` true on the session record if currently
+    false. Returns True if a transition happened (caller should seed
+    the workspace offset to the queue tail to prevent backfill of
+    directives queued before engagement). Idempotent — returns False
+    on subsequent calls.
+
+    No-op if the session isn't registered.
+    """
+    path = session_file(root, session_id)
+    if not path.exists():
+        return False
+    try:
+        data = json.loads(path.read_text())
+    except (OSError, ValueError):
+        return False
+    if data.get("has_evo_engaged"):
+        return False
+    data["has_evo_engaged"] = True
+    data["engaged_at"] = _now_iso()
+    atomic_write_json(path, data)
+    return True
 
 
 def list_active_sessions(root: Path) -> list[dict]:
@@ -145,8 +199,17 @@ def is_registered(root: Path, session_id: str) -> bool:
 
 def auto_register_from_env(root: Path) -> None:
     """Best-effort: if a host session env var is set, register this
-    session. Called from evo CLI's main() on every command. No-op if
-    no host env var is set, or if root isn't a workspace.
+    session AND mark it as evo-engaged. Called from evo CLI's main()
+    on every command — running any `evo` subcommand is the engagement
+    signal.
+
+    The engagement transition (false → true) seeds the workspace
+    offset to the current tail so directives queued before the
+    session engaged don't replay on this session. This is the
+    "never reach sessions that never engaged" guarantee — once a
+    session does engage, only post-engagement directives can deliver.
+
+    No-op if no host env var is set, or if root isn't a workspace.
     """
     if not inject_root(root).parent.exists():
         # No active run dir — not a workspace; nothing to register against.
@@ -158,3 +221,10 @@ def auto_register_from_env(root: Path) -> None:
     # If running as a subagent, EVO_EXP_ID is set by the dispatch parent.
     exp_id = os.environ.get("EVO_EXP_ID")
     register_session(root, sid, host, exp_id=exp_id)
+    # Local import to avoid a circular module dependency
+    # (queue imports atomic_write_json from evo.core; registry doesn't
+    # need queue at module load time).
+    from .queue import init_offset_to_latest
+    transitioned = mark_engaged(root, sid)
+    if transitioned:
+        init_offset_to_latest(root, sid)

@@ -98,7 +98,14 @@ function writeOffset(runDir, sid, opts) {
 function formatDirectiveText(events) {
   const lines = [];
   for (const ev of events) {
-    if (ev.text) {
+    if (!ev.text)
+      continue;
+    const id = ev.id || "";
+    if (id) {
+      lines.push(`[EVO DIRECTIVE id=${id}]`);
+      lines.push(ev.text);
+      lines.push(`[END EVO DIRECTIVE — when done, run: evo ack ${id}]`);
+    } else {
       lines.push("[EVO DIRECTIVE]");
       lines.push(ev.text);
       lines.push("[END EVO DIRECTIVE]");
@@ -120,6 +127,12 @@ function registerSession(runDir, sid, host, expId = null) {
   const existing = readJsonOrNull(p);
   if (existing) {
     existing.last_seen_at = now;
+    if (expId && !existing.exp_id)
+      existing.exp_id = expId;
+    if (existing.has_evo_engaged === undefined)
+      existing.has_evo_engaged = false;
+    if (existing.engaged_at === undefined)
+      existing.engaged_at = null;
     atomicWriteJson(p, existing);
     return;
   }
@@ -131,9 +144,40 @@ function registerSession(runDir, sid, host, expId = null) {
     registered_at: now,
     last_seen_at: now,
     exp_id: expId,
-    parent_session_id: null
+    parent_session_id: null,
+    has_evo_engaged: false,
+    engaged_at: null
   };
   atomicWriteJson(p, rec);
+  initOffsetToLatest(runDir, sid);
+}
+function markEngaged(runDir, sid) {
+  const p = sessionFile(runDir, sid);
+  const rec = readJsonOrNull(p);
+  if (!rec)
+    return false;
+  if (rec.has_evo_engaged)
+    return false;
+  rec.has_evo_engaged = true;
+  rec.engaged_at = nowIso();
+  atomicWriteJson(p, rec);
+  return true;
+}
+function initOffsetToLatest(runDir, sid) {
+  const wsPath = workspaceEventsPath(runDir);
+  let latest = null;
+  if (fs.existsSync(wsPath)) {
+    const events = readEventsAfter(wsPath, null);
+    if (events.length > 0)
+      latest = events[events.length - 1].id;
+  }
+  writeOffset(runDir, sid, { workspaceId: latest });
+}
+var EVO_CMD_RE = /^\s*evo(\s|$)/;
+function isEvoCommand(command) {
+  if (!command || typeof command !== "string")
+    return false;
+  return EVO_CMD_RE.test(command);
 }
 function findEvoRunDir(cwd) {
   const envRunDir = process.env.EVO_RUN_DIR;
@@ -238,7 +282,21 @@ var EvoPlugin = async ({ project }) => {
       }
     },
     "tool.execute.before": async (input, _output) => {
-      ensureRegistered(input?.sessionID);
+      const runDir = ensureRegistered(input?.sessionID);
+      if (!runDir)
+        return;
+      const sid = input?.sessionID;
+      if (!sid)
+        return;
+      const toolName = (input?.tool || input?.toolName || "").toLowerCase();
+      if (toolName === "bash" || toolName === "shell") {
+        const cmd = input?.args?.command ?? input?.parameters?.command ?? "";
+        if (isEvoCommand(cmd)) {
+          if (markEngaged(runDir, sid)) {
+            initOffsetToLatest(runDir, sid);
+          }
+        }
+      }
     }
   };
 };

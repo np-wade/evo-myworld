@@ -26,6 +26,13 @@ export interface SessionRecord {
   last_seen_at: string
   exp_id: string | null
   parent_session_id: string | null
+  // v0.4.4: engagement flag set when the agent first runs an `evo`
+  // command. The Python `auto_register_from_env` handles this for hosts
+  // that export a session-id env var; in-process JS plugins (opencode,
+  // openclaw, pi) detect `evo` shell commands via tool hooks and call
+  // markEngaged() themselves.
+  has_evo_engaged?: boolean
+  engaged_at?: string | null
 }
 
 export interface DrainResult {
@@ -157,9 +164,18 @@ export function writeOffset(
 // ──────────────────────────────────────────────────────────────────────────
 
 export function formatDirectiveText(events: QueueEvent[]): string {
+  // Mirrors evo.inject.drain.format_directive_text — embeds the event id
+  // and an `evo ack <id>` instruction so the agent can acknowledge the
+  // directive via the L2 ACK channel.
   const lines: string[] = []
   for (const ev of events) {
-    if (ev.text) {
+    if (!ev.text) continue
+    const id = (ev as any).id || ""
+    if (id) {
+      lines.push(`[EVO DIRECTIVE id=${id}]`)
+      lines.push(ev.text)
+      lines.push(`[END EVO DIRECTIVE — when done, run: evo ack ${id}]`)
+    } else {
       lines.push("[EVO DIRECTIVE]")
       lines.push(ev.text)
       lines.push("[END EVO DIRECTIVE]")
@@ -193,6 +209,11 @@ export function registerSession(
   const existing = readJsonOrNull<SessionRecord>(p)
   if (existing) {
     existing.last_seen_at = now
+    // Merge: pick up exp_id if existing record lacked one. Mirrors the
+    // Python register_session behavior for the same field.
+    if (expId && !existing.exp_id) existing.exp_id = expId
+    if (existing.has_evo_engaged === undefined) existing.has_evo_engaged = false
+    if (existing.engaged_at === undefined) existing.engaged_at = null
     atomicWriteJson(p, existing)
     return
   }
@@ -205,8 +226,54 @@ export function registerSession(
     last_seen_at: now,
     exp_id: expId,
     parent_session_id: null,
+    has_evo_engaged: false,
+    engaged_at: null,
   }
   atomicWriteJson(p, rec)
+  // Seed offset to the queue tail at registration time so this session
+  // only sees events queued AFTER it registered — matches the v0.4.4
+  // safety contract in Python register_session.
+  initOffsetToLatest(runDir, sid)
+}
+
+
+/** Flip has_evo_engaged on the session record if currently false.
+ *  Returns true on the transition; caller should also seed offset.
+ *  Idempotent — no-op on subsequent calls. Mirrors Python mark_engaged. */
+export function markEngaged(runDir: string, sid: string): boolean {
+  const p = sessionFile(runDir, sid)
+  const rec = readJsonOrNull<SessionRecord>(p)
+  if (!rec) return false
+  if (rec.has_evo_engaged) return false
+  rec.has_evo_engaged = true
+  rec.engaged_at = nowIso()
+  atomicWriteJson(p, rec)
+  return true
+}
+
+
+/** Seed the workspace offset to the current queue tail. Called at
+ *  registration time + on engagement transition to prevent backfill
+ *  of pre-existing events. Mirrors Python init_offset_to_latest. */
+export function initOffsetToLatest(runDir: string, sid: string): void {
+  const wsPath = workspaceEventsPath(runDir)
+  let latest: string | null = null
+  if (fs.existsSync(wsPath)) {
+    const events = readEventsAfter(wsPath, null)
+    if (events.length > 0) latest = events[events.length - 1].id
+  }
+  writeOffset(runDir, sid, { workspaceId: latest })
+}
+
+
+/** Detect whether a shell command starts with `evo ` (or is just `evo`).
+ *  Used by in-process plugins to flip engagement when the agent shells
+ *  to the evo CLI. */
+const EVO_CMD_RE = /^\s*evo(\s|$)/
+
+export function isEvoCommand(command: string | undefined | null): boolean {
+  if (!command || typeof command !== "string") return false
+  return EVO_CMD_RE.test(command)
 }
 
 // ──────────────────────────────────────────────────────────────────────────

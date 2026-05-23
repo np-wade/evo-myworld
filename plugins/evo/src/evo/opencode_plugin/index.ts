@@ -17,7 +17,10 @@
 import {
   drainSession,
   findEvoRunDir,
+  initOffsetToLatest,
+  isEvoCommand,
   isRegistered,
+  markEngaged,
   registerSession,
 } from "./drain.js"
 import * as fs from "fs"
@@ -81,11 +84,29 @@ export const EvoPlugin = async ({ project }: any) => {
     },
 
     "tool.execute.before": async (input: any, _output: any) => {
-      // Fires before every tool call. Used purely to keep the session
-      // registered in the CURRENT active run — re-detection happens
-      // inside ensureRegistered (findEvoRunDir picks the latest run_*).
-      // Cheap: a single isRegistered check after the first call.
-      ensureRegistered(input?.sessionID)
+      // Fires before every tool call. Two jobs:
+      //  1. Keep the session registered in the CURRENT active run —
+      //     re-detection happens inside ensureRegistered (findEvoRunDir
+      //     picks the latest run_*).
+      //  2. Engagement detection — when the agent runs `evo …` via a
+      //     shell tool, flip has_evo_engaged so `evo direct` fanout can
+      //     reach this session. Mirrors the cursor drain's evo-command
+      //     detector for hosts where Python `auto_register_from_env`
+      //     can't run (opencode doesn't export OPENCODE_SESSION_ID to
+      //     subprocesses; verified via sst/opencode#12158).
+      const runDir = ensureRegistered(input?.sessionID)
+      if (!runDir) return
+      const sid: string | undefined = input?.sessionID
+      if (!sid) return
+      const toolName = (input?.tool || input?.toolName || "").toLowerCase()
+      if (toolName === "bash" || toolName === "shell") {
+        const cmd = input?.args?.command ?? input?.parameters?.command ?? ""
+        if (isEvoCommand(cmd)) {
+          if (markEngaged(runDir, sid)) {
+            initOffsetToLatest(runDir, sid)
+          }
+        }
+      }
     },
   }
 }

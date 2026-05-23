@@ -32,6 +32,7 @@ from . import marker, queue
 from .paths import (
     exp_events_path,
     inject_root,
+    offset_file,
     session_file,
     workspace_events_path,
 )
@@ -62,14 +63,21 @@ def _drain_debug(**fields) -> None:
 
 
 HOST_HOOK_EVENT_NAMES = {
-    "claude-code": ("PreToolUse", "UserPromptSubmit", "SessionStart", "PostToolUse"),
-    "codex": ("PreToolUse", "UserPromptSubmit", "SessionStart", "PostToolUse"),
+    # PreToolUse / PostToolUse / UserPromptSubmit / SessionStart use the
+    # hookSpecificOutput.additionalContext envelope; Stop / SubagentStop use
+    # the {decision: "block", reason: ...} envelope which Claude Code and
+    # Codex both feed back as the next continuation prompt (verified via
+    # the ralph-loop plugin's stop-hook.sh).
+    "claude-code": ("PreToolUse", "PostToolUse", "UserPromptSubmit", "SessionStart", "Stop", "SubagentStop"),
+    "codex": ("PreToolUse", "PostToolUse", "UserPromptSubmit", "SessionStart", "Stop", "SubagentStop"),
     # Cursor: sessionStart + beforeSubmitPrompt register the session; preToolUse
     # delivers mid-turn for SHELL tools only (updated_input echo into stdout);
     # every non-shell tool defers (no consume) and is delivered at turn end via
-    # stop -> followup_message. (additional_context is dropped by the IDE, and
-    # agent_message-on-deny consumes without the agent acting — both verified.)
-    "cursor": ("sessionStart", "beforeSubmitPrompt", "preToolUse", "stop"),
+    # stop -> followup_message. subagentStop fires at Task-subagent turn-end
+    # (Cursor 1.7+), same envelope as stop. (additional_context is dropped by
+    # the IDE, and agent_message-on-deny consumes without the agent acting —
+    # both verified.)
+    "cursor": ("sessionStart", "beforeSubmitPrompt", "preToolUse", "stop", "subagentStop"),
 }
 
 
@@ -158,6 +166,39 @@ def _cursor_tool_class(tool_name: str | None) -> str:
     return "other"
 
 
+import re as _re
+
+_EVO_CMD_RE = _re.compile(r"^\s*evo(\s|$)")
+
+
+def _maybe_mark_engaged_from_shell(
+    root: Path,
+    session_id: str,
+    host: str,
+    hook_event: str | None,
+    payload: dict | None,
+) -> None:
+    """For self-contained hosts (currently Cursor): if the agent's about
+    to run an `evo` shell command, mark the session as evo-engaged and
+    seed the workspace offset to the queue tail. Mirrors what
+    `auto_register_from_env` does for hosts that route engagement
+    through the Python CLI path.
+    """
+    if host != "cursor":
+        return
+    if hook_event != "preToolUse":
+        return
+    if _cursor_tool_class((payload or {}).get("tool_name")) != "shell":
+        return
+    cmd = ((payload or {}).get("tool_input") or {}).get("command", "")
+    if not isinstance(cmd, str) or not _EVO_CMD_RE.match(cmd):
+        return
+    # Idempotent: mark_engaged returns False after the first transition.
+    from .registry import mark_engaged
+    if mark_engaged(root, session_id):
+        queue.init_offset_to_latest(root, session_id)
+
+
 def _self_contained_gate(
     root: Path, session_id: str, host: str, hook_event: str | None,
     tool_name: str | None = None,
@@ -204,21 +245,73 @@ def format_directive_text(events: list[dict]) -> str:
     """Format events as a single text block to splice into the agent's
     next turn.
 
-    Wraps each event with the `[EVO DIRECTIVE]` / `[END EVO DIRECTIVE]`
+    Wraps each event with the `[EVO DIRECTIVE id=<id>]` / `[END EVO DIRECTIVE]`
     banner pair. The banner is the authenticity signal — `optimize` and
     `subagent` skills tell the agent that text inside this banner is
     user-authoritative (issued via `evo direct`), not tool-output prompt
     injection. Without the banner, models like gpt-5 / opus-4-7 may
     refuse the directive as suspicious.
+
+    The trailing `evo ack <id>` instruction tells the agent how to ack
+    the directive after acting on it; the CLI command writes
+    inject/acks/<id>.json which `evo direct status` and `evo direct --wait`
+    surface. Acks are best-effort — models sometimes forget — but presence
+    of an ack is a positive signal that the directive landed.
     """
     lines = []
     for ev in events:
         text = ev.get("text", "")
-        if text:
+        if not text:
+            continue
+        ev_id = ev.get("id", "")
+        if ev_id:
+            lines.append(f"[EVO DIRECTIVE id={ev_id}]")
+            lines.append(text)
+            lines.append(f"[END EVO DIRECTIVE — when done, run: evo ack {ev_id}]")
+        else:
+            # Legacy fallback for events without an id (shouldn't occur
+            # with the current queue, but be defensive).
             lines.append("[EVO DIRECTIVE]")
             lines.append(text)
             lines.append("[END EVO DIRECTIVE]")
     return "\n".join(lines)
+
+
+def _write_delivery_records(
+    root: Path,
+    events: list[dict],
+    session_id: str,
+    host: str,
+    hook_event: str | None,
+) -> None:
+    """L1 ACK: record per-event delivery. Best-effort; never raises.
+
+    Writes one file per event delivered, keyed by event id. Multiple
+    sessions delivering the same event each leave their own record
+    keyed by sid (the file's session_id field); since file names are
+    keyed only on event_id, later writes for the same event overwrite
+    earlier ones — `evo direct status` queries the file to know "this
+    event was delivered to at least one session," not exhaustive routing.
+    Good enough for the diagnostic role.
+    """
+    from .paths import delivered_file, delivered_dir
+    try:
+        delivered_dir(root).mkdir(parents=True, exist_ok=True)
+        now = dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds")
+        for ev in events:
+            ev_id = ev.get("id")
+            if not ev_id:
+                continue
+            rec = {
+                "event_id": ev_id,
+                "session_id": session_id,
+                "host": host,
+                "hook_event": hook_event,
+                "delivered_at": now,
+            }
+            delivered_file(root, ev_id).write_text(json.dumps(rec))
+    except OSError:  # pragma: no cover — never break the hot path
+        pass
 
 
 def emit_for_host(host: str, hook_event: str | None, text: str, payload: dict | None = None) -> None:
@@ -228,8 +321,17 @@ def emit_for_host(host: str, hook_event: str | None, text: str, payload: dict | 
         sys.stdout.write("{}")
         return
     if host in ("claude-code", "codex"):
-        # Both honor the same envelope shape. Default to PreToolUse if
-        # we couldn't read it from stdin.
+        # Stop / SubagentStop don't support additionalContext — they must
+        # return `{decision: "block", reason: text}`, which both hosts feed
+        # back as the next continuation prompt (verified via the ralph-loop
+        # plugin's stop-hook.sh on Claude Code; documented for Codex).
+        if hook_event in ("Stop", "SubagentStop"):
+            out = {"decision": "block", "reason": text}
+            sys.stdout.write(json.dumps(out, separators=(",", ":")))
+            return
+        # All other events (PreToolUse / PostToolUse / UserPromptSubmit /
+        # SessionStart) honor the same hookSpecificOutput envelope. Default
+        # to PreToolUse if we couldn't read it from stdin.
         evt = hook_event or "PreToolUse"
         payload = {
             "hookSpecificOutput": {
@@ -290,6 +392,16 @@ def drain_session(root: Path, session_id: str, host: str | None = None, hook_eve
         host = "claude-code"
     exp_id = sess.get("exp_id")
 
+    # Seed offset to the current queue tail for sessions that don't yet
+    # have an offset file. Closes the SessionStart-unconditional-drain
+    # leak: the Rust binary skips the marker check on SessionStart and
+    # hands off to this drain regardless, so without seeding, a fresh
+    # session would backfill every event in workspace.jsonl — bypassing
+    # the engagement filter. Contract: a session only sees events queued
+    # after it registered.
+    if not offset_file(root, session_id).exists():
+        queue.init_offset_to_latest(root, session_id)
+
     events: list[dict] = []
     new_workspace_offset: str | None = None
     new_exp_offset: str | None = None
@@ -311,6 +423,11 @@ def drain_session(root: Path, session_id: str, host: str | None = None, hook_eve
 
     text = format_directive_text(events)
     emit_for_host(host, hook_event, text, payload)
+
+    # L1 ACK: record delivery for each event so `evo direct status <id>`
+    # can show whether the drain emitted the directive to a session.
+    if events:
+        _write_delivery_records(root, events, session_id, host, hook_event)
 
     # Update offset and unlink marker — only after successful emit
     if new_workspace_offset or new_exp_offset:
@@ -369,6 +486,11 @@ def main(argv: list[str] | None = None) -> int:
     tool_name = payload.get("tool_name")
     registered = session_file(root, session).exists()
     has_marker = marker.exists(root, session)
+    # Cursor has no session-id env var that Python `auto_register_from_env`
+    # can detect, so the engagement signal can't be set via the CLI path
+    # used by other hosts. Detect it here instead: if the agent runs any
+    # `evo …` shell command, flip engagement on this session's record.
+    _maybe_mark_engaged_from_shell(root, session, host, hook_event, payload)
     gate = _self_contained_gate(root, session, host, hook_event, tool_name)
     _drain_debug(stage="gate", host=host, hook_event=hook_event, session=session,
                  root=str(root), tool_name=tool_name,

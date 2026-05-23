@@ -646,7 +646,9 @@ class TestCmdDirect(unittest.TestCase):
         assert events[0]["text"] == "be ambitious"
 
     def test_broadcast_touches_orchestrator_markers(self):
+        from evo.inject.registry import mark_engaged
         register_session(self.root, "orch", "claude-code")
+        mark_engaged(self.root, "orch")  # simulate the agent having run an evo command
         # subagent must be skipped for broadcast
         register_session(self.root, "sub", "claude-code", exp_id="exp_0001")
         self._cmd_direct("broadcast message")
@@ -654,7 +656,9 @@ class TestCmdDirect(unittest.TestCase):
         assert not marker.exists(self.root, "sub"), "subagent marker must not be set"
 
     def test_broadcast_fanout_skips_subagent_sessions(self):
+        from evo.inject.registry import mark_engaged
         register_session(self.root, "orch", "claude-code")
+        mark_engaged(self.root, "orch")
         register_session(self.root, "sub", "claude-code", exp_id="exp_0002")
 
         import io

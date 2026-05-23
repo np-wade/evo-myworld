@@ -52,6 +52,25 @@ def marker_file(root: Path, session_id: str) -> Path:
     return markers_dir(root) / f"{session_id}.flag"
 
 
+def delivered_dir(root: Path) -> Path:
+    """L1 ACK: where drain writes a record per directive emitted."""
+    return inject_root(root) / "delivered"
+
+
+def delivered_file(root: Path, event_id: str) -> Path:
+    return delivered_dir(root) / f"{event_id}.json"
+
+
+def acks_dir(root: Path) -> Path:
+    """L2 ACK: where `evo ack <id>` writes confirmation that the model
+    saw and processed a directive."""
+    return inject_root(root) / "acks"
+
+
+def ack_file(root: Path, event_id: str) -> Path:
+    return acks_dir(root) / f"{event_id}.json"
+
+
 def ensure_dirs(root: Path) -> None:
     """Create all subdirectories under inject_root. Idempotent."""
     for d in (
@@ -59,5 +78,7 @@ def ensure_dirs(root: Path) -> None:
         events_dir(root),
         offsets_dir(root),
         markers_dir(root),
+        delivered_dir(root),
+        acks_dir(root),
     ):
         d.mkdir(parents=True, exist_ok=True)

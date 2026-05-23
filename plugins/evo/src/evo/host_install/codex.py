@@ -315,6 +315,7 @@ def _hook_event_label(event_name: str) -> str | None:
         "SessionStart": "session_start",
         "UserPromptSubmit": "user_prompt_submit",
         "Stop": "stop",
+        "SubagentStop": "subagent_stop",
     }.get(event_name)
 
 
@@ -338,8 +339,9 @@ def _command_hook_hash(event_label: str, matcher: str | None,
       3. canonical JSON (sort keys recursively)
       4. compact serde_json::to_vec
       5. SHA256, prefixed with "sha256:"
-    Verified empirically against codex's `hooks/list` output across all
-    3 hook events (pre_tool_use, session_start, user_prompt_submit).
+    Verified empirically against codex's `hooks/list` output across the
+    initial 3 hook events (pre_tool_use, session_start, user_prompt_submit);
+    extended to also cover post_tool_use, stop, and subagent_stop in 0.4.4.
     """
     import hashlib as _hashlib
     import json as _json
