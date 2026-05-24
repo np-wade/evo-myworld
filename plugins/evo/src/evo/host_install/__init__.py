@@ -14,9 +14,9 @@ After every install/update, this module also keeps the global
 plugin's version. The CLI and the host's skills/hooks share a wire
 format — schema fields like `optimize_mode`, the policy banner shape,
 the hook event names — so drift breaks the loop silently. The
-`bin/evo-version-check` script still runs at skill-startup time as a
-defense-in-depth check, but auto-sync prevents the drift from
-appearing in the first place.
+`discover` skill's step-0 (`evo --version` must match the literal in
+its body) catches any residual drift, but auto-sync prevents the drift
+from appearing in the first place.
 
 See notes/cross-host-inject-design.md.
 """
@@ -195,8 +195,8 @@ def _sync_cli_to_plugin_version(args) -> int:
             f"  uv tool install --force {target}  # (manually)\n"
             "or:\n"
             "  pipx install --force evo-hq-cli\n"
-            "`bin/evo-version-check` will surface the drift on next "
-            "session start so the agent can flag it.",
+            "The discover skill's step-0 version check will surface the "
+            "drift on the next /discover invocation so the agent can flag it.",
             file=sys.stderr,
         )
     return rc
