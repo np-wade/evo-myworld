@@ -178,21 +178,36 @@ _EVO_CMD_RE = _re.compile(r"^\s*evo(\s|$)")
 #
 # Each host's value is a list of regexes; the prompt matches if any
 # regex matches.
-# Each pattern uses `[\s"']*` rather than `\s*` so that prompts wrapped
-# in quotes by the host (opencode/cursor-agent run with positional args
-# typically produces `"...prompt..."`) still match. Without that, the
-# leading `"` would push `/optimize` off position 0.
+#
+# Position-agnostic: match the invocation anywhere in the prompt, not
+# just at position 0. Users naturally type things like "lets try
+# /optimize on this file" or "actually $optimize first" and reasonably
+# expect the gates to arm. The boundary class `[^A-Za-z0-9_/:-]` before
+# the prefix sigil prevents false matches inside file paths
+# (`src/optimize.py`) and inside other identifiers (`auto-optimize`).
+#
+# Per-host invocation forms verified empirically + against host source:
+#   - claude-code: `/optimize` (bare alias) and `/evo:optimize`
+#     (plugin-namespaced). Both are registered as valid slash commands.
+#   - codex: `$optimize` (bare) and `$<ns>:optimize` (namespaced).
+#     codex-rs/core-skills/src/injection.rs scans for the `$` sigil
+#     anywhere in the prompt (no position-0 anchor), with name-chars
+#     `[A-Za-z0-9_:-]`. Defensive `/optimize` fallback covers users
+#     who mix slash-command muscle memory from other hosts.
+#   - cursor / hermes / opencode / openclaw / pi: just `/optimize`.
 _OPTIMIZE_INVOCATION_PATTERNS: dict[str, list[_re.Pattern[str]]] = {
-    "claude-code": [_re.compile(r"^[\s\"']*/evo:optimize\b", _re.IGNORECASE)],
-    "codex": [
-        _re.compile(r"^[\s\"']*\$evo:optimize\b", _re.IGNORECASE),
-        _re.compile(r"^[\s\"']*\$evo\s+optimize\b", _re.IGNORECASE),
+    "claude-code": [
+        _re.compile(r"(?:^|[^A-Za-z0-9_/:-])/(?:evo:)?optimize\b", _re.IGNORECASE),
     ],
-    "cursor": [_re.compile(r"^[\s\"']*/optimize\b", _re.IGNORECASE)],
-    "hermes": [_re.compile(r"^[\s\"']*/optimize\b", _re.IGNORECASE)],
-    "opencode": [_re.compile(r"^[\s\"']*/optimize\b", _re.IGNORECASE)],
-    "openclaw": [_re.compile(r"^[\s\"']*/optimize\b", _re.IGNORECASE)],
-    "pi": [_re.compile(r"^[\s\"']*/optimize\b", _re.IGNORECASE)],
+    "codex": [
+        _re.compile(r"(?:^|[^A-Za-z0-9_:-])\$(?:[A-Za-z0-9_-]+:)?optimize\b", _re.IGNORECASE),
+        _re.compile(r"(?:^|[^A-Za-z0-9_/:-])/optimize\b", _re.IGNORECASE),
+    ],
+    "cursor": [_re.compile(r"(?:^|[^A-Za-z0-9_/:-])/optimize\b", _re.IGNORECASE)],
+    "hermes": [_re.compile(r"(?:^|[^A-Za-z0-9_/:-])/optimize\b", _re.IGNORECASE)],
+    "opencode": [_re.compile(r"(?:^|[^A-Za-z0-9_/:-])/optimize\b", _re.IGNORECASE)],
+    "openclaw": [_re.compile(r"(?:^|[^A-Za-z0-9_/:-])/optimize\b", _re.IGNORECASE)],
+    "pi": [_re.compile(r"(?:^|[^A-Za-z0-9_/:-])/optimize\b", _re.IGNORECASE)],
 }
 
 

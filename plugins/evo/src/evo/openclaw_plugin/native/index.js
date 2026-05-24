@@ -566,9 +566,9 @@ function markOptimizeMode(runDir, sid) {
   return true;
 }
 var OPTIMIZE_PROMPT_RES = {
-  opencode: /^[\s"']*\/optimize\b/i,
-  openclaw: /^[\s"']*\/optimize\b/i,
-  pi: /^[\s"']*\/optimize\b/i
+  opencode: /(?:^|[^A-Za-z0-9_/:-])\/optimize\b/i,
+  openclaw: /(?:^|[^A-Za-z0-9_/:-])\/optimize\b/i,
+  pi: /(?:^|[^A-Za-z0-9_/:-])\/optimize\b/i
 };
 function maybeMarkOptimizeFromPrompt(runDir, sid, host, promptText) {
   if (!promptText)

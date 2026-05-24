@@ -137,21 +137,55 @@ class TestClaudeCodeDetection(_BaseDetectionTest):
             "regular prompts must not flip the flag"
         )
 
-    def test_brief_text_containing_invocation_mid_prompt_does_not_match(self):
-        """The orchestrator's brief to a subagent might mention '/evo:optimize'
-        as a literal string. The anchored regex must not match that — only
-        prompts that START with the invocation count."""
-        register_session(self.root, "cc_sid4", "claude-code")
+    def test_slash_optimize_alias_matches(self):
+        """`/optimize` is the un-namespaced alias claude-code registers
+        alongside `/evo:optimize`. Most users type the shorter form."""
+        register_session(self.root, "cc_alias", "claude-code")
+        self._fire_prompt_submit("cc_alias", "claude-code", "/optimize fix the bug")
+        rec = _read_record(self.root, "cc_alias")
+        self.assertTrue(rec["optimize_mode"])
+
+    def test_mid_prompt_invocation_matches(self):
+        """Position-agnostic by design: users naturally type
+        "lets try again /optimize on this" and expect the gates to arm.
+        Subagent fence (mark_optimize_mode refusing to flag a session
+        with exp_id) — not the regex anchor — is what protects subagent
+        briefs from accidental flipping."""
+        register_session(self.root, "cc_mid", "claude-code")
         self._fire_prompt_submit(
-            "cc_sid4", "claude-code",
-            "Here is your brief: you are working under the /evo:optimize "
-            "skill. Please run experiment exp_0042 and report results."
+            "cc_mid", "claude-code",
+            "lets try again /optimize on agent.py with budget 5"
         )
-        rec = _read_record(self.root, "cc_sid4")
+        rec = _read_record(self.root, "cc_mid")
+        self.assertTrue(
+            rec["optimize_mode"],
+            "mid-prompt invocations must arm (position-agnostic)"
+        )
+
+    def test_file_path_does_not_match(self):
+        """Boundary class excludes `/` so file paths like
+        `src/optimize.py` don't accidentally arm optimize_mode."""
+        register_session(self.root, "cc_path", "claude-code")
+        self._fire_prompt_submit(
+            "cc_path", "claude-code",
+            "Please look at src/optimize.py and tell me what it does"
+        )
+        rec = _read_record(self.root, "cc_path")
         self.assertFalse(
             rec["optimize_mode"],
-            "anchored regex must not match invocation mid-prompt"
+            "file path src/optimize.py must not arm — `/` before is in the boundary exclusion"
         )
+
+    def test_identifier_substring_does_not_match(self):
+        """`auto-optimize` is an identifier, not an invocation — no `/`
+        prefix means no match."""
+        register_session(self.root, "cc_ident", "claude-code")
+        self._fire_prompt_submit(
+            "cc_ident", "claude-code",
+            "Run the auto-optimize routine first, then check results"
+        )
+        rec = _read_record(self.root, "cc_ident")
+        self.assertFalse(rec["optimize_mode"])
 
 
 # ---------------------------------------------------------------------------
@@ -160,25 +194,69 @@ class TestClaudeCodeDetection(_BaseDetectionTest):
 
 class TestCodexDetection(_BaseDetectionTest):
 
+    def test_dollar_optimize_bare(self):
+        """Codex registers the skill as bare `optimize`, so the natural
+        invocation is `$optimize`. Verified against
+        codex-rs/core-skills/src/render.rs which documents
+        `$SkillName` as the canonical sigil form."""
+        register_session(self.root, "cdx_bare", "codex")
+        self._fire_prompt_submit("cdx_bare", "codex", "$optimize")
+        rec = _read_record(self.root, "cdx_bare")
+        self.assertTrue(rec["optimize_mode"])
+
     def test_dollar_evo_colon_optimize(self):
-        register_session(self.root, "cdx1", "codex")
-        self._fire_prompt_submit("cdx1", "codex", "$evo:optimize")
-        rec = _read_record(self.root, "cdx1")
+        """Plugin-namespaced form. Codex's name-char set is
+        [A-Za-z0-9_:-] (codex-rs/core-skills/src/injection.rs:506-508),
+        so `$evo:optimize` parses as one token."""
+        register_session(self.root, "cdx_ns", "codex")
+        self._fire_prompt_submit("cdx_ns", "codex", "$evo:optimize")
+        rec = _read_record(self.root, "cdx_ns")
         self.assertTrue(rec["optimize_mode"])
 
-    def test_dollar_evo_space_optimize(self):
-        register_session(self.root, "cdx2", "codex")
-        self._fire_prompt_submit("cdx2", "codex", "$evo optimize")
-        rec = _read_record(self.root, "cdx2")
+    def test_dollar_optimize_mid_prompt(self):
+        """Codex's scanner is position-agnostic — `$optimize` mid-prompt
+        is a real invocation. Mirrors codex's actual behavior; verified
+        by test_extract_tool_mentions_handles_plain_and_linked_mentions
+        in codex-rs/core-skills/src/injection_tests.rs:88-94."""
+        register_session(self.root, "cdx_mid", "codex")
+        self._fire_prompt_submit(
+            "cdx_mid", "codex",
+            "actually let me run $optimize on this first"
+        )
+        rec = _read_record(self.root, "cdx_mid")
         self.assertTrue(rec["optimize_mode"])
 
-    def test_codex_pattern_does_not_match_claude_form(self):
-        """A codex session that somehow received claude-code's slash form
-        shouldn't flip — patterns are host-specific."""
-        register_session(self.root, "cdx3", "codex")
-        self._fire_prompt_submit("cdx3", "codex", "/evo:optimize")
-        rec = _read_record(self.root, "cdx3")
+    def test_dollar_evo_space_optimize_does_not_match(self):
+        """Codex name tokens terminate at whitespace, so `$evo optimize`
+        is parsed as `$evo` followed by the literal word `optimize` —
+        NOT a single skill invocation. The prior regex matched this
+        incorrectly."""
+        register_session(self.root, "cdx_space", "codex")
+        self._fire_prompt_submit("cdx_space", "codex", "$evo optimize")
+        rec = _read_record(self.root, "cdx_space")
+        self.assertFalse(
+            rec["optimize_mode"],
+            "$evo<space>optimize is two tokens in codex, not one invocation"
+        )
+
+    def test_codex_dollar_does_not_match_claude_slash_form(self):
+        """A codex session that somehow received claude-code's slash-only
+        form shouldn't flip via the `$` regex. (The `/optimize` defensive
+        fallback still matches in codex — see test below.)"""
+        register_session(self.root, "cdx_claude", "codex")
+        self._fire_prompt_submit("cdx_claude", "codex", "$evo:other_skill")
+        rec = _read_record(self.root, "cdx_claude")
         self.assertFalse(rec["optimize_mode"])
+
+    def test_codex_accepts_slash_optimize_defensively(self):
+        """Defensive cross-host fallback — users mixing slash-command
+        muscle memory from claude-code/cursor type `/optimize` in codex
+        too. We accept it so the test-and-learn loop isn't broken by
+        client-convention drift."""
+        register_session(self.root, "cdx_slash", "codex")
+        self._fire_prompt_submit("cdx_slash", "codex", "/optimize")
+        rec = _read_record(self.root, "cdx_slash")
+        self.assertTrue(rec["optimize_mode"])
 
 
 # ---------------------------------------------------------------------------
@@ -210,20 +288,34 @@ class TestCursorDetection(_BaseDetectionTest):
 class TestSubagentFence(_BaseDetectionTest):
 
     def test_subagent_session_cannot_be_flipped_even_with_matching_prompt(self):
-        """A subagent's first prompt is a brief. If the orchestrator's brief
-        text happens to start with /evo:optimize (unusual but possible —
-        e.g. the orchestrator pasted the skill invocation as a quoted
-        instruction), the subagent must NOT be flipped."""
+        """Position-agnostic detection means orchestrator briefs that
+        mention `/evo:optimize` mid-text WILL hit the regex. The fence
+        is enforced inside mark_optimize_mode (refuses sessions with
+        exp_id set), not by the regex anchor. This test asserts the
+        fence still holds for both anchored and mid-prompt forms."""
         register_session(
-            self.root, "sub_sid", "claude-code", exp_id="exp_0099"
+            self.root, "sub_anchored", "claude-code", exp_id="exp_0099"
         )
         self._fire_prompt_submit(
-            "sub_sid", "claude-code", "/evo:optimize do this thing"
+            "sub_anchored", "claude-code", "/evo:optimize do this thing"
         )
-        rec = _read_record(self.root, "sub_sid")
+        rec = _read_record(self.root, "sub_anchored")
         self.assertFalse(
             rec["optimize_mode"],
             "subagent session (exp_id set) must never be flipped"
+        )
+
+        register_session(
+            self.root, "sub_midprompt", "claude-code", exp_id="exp_0100"
+        )
+        self._fire_prompt_submit(
+            "sub_midprompt", "claude-code",
+            "Brief: you are running under /evo:optimize. Run exp_0042.",
+        )
+        rec = _read_record(self.root, "sub_midprompt")
+        self.assertFalse(
+            rec["optimize_mode"],
+            "subagent fence must hold even when regex matches mid-prompt"
         )
 
 

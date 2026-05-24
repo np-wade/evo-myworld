@@ -860,10 +860,14 @@ export function unmarkOptimizeMode(runDir: string, sid: string): boolean {
 // shell-quoted invocations land in chat.message with the literal `"` as the
 // first character. Without this, the model never auto-arms optimize_mode
 // because the regex sees `"/optimize` and the `/` isn't at the start.
+// Position-agnostic: matches /optimize anywhere in the prompt, not
+// just at position 0. The boundary class `[^A-Za-z0-9_/:-]` before
+// the slash prevents file-path matches like `src/optimize.py`.
+// Mirrors Python `_OPTIMIZE_INVOCATION_PATTERNS` — keep in sync.
 const OPTIMIZE_PROMPT_RES: Record<string, RegExp> = {
-  opencode: /^[\s"']*\/optimize\b/i,
-  openclaw: /^[\s"']*\/optimize\b/i,
-  pi: /^[\s"']*\/optimize\b/i,
+  opencode: /(?:^|[^A-Za-z0-9_/:-])\/optimize\b/i,
+  openclaw: /(?:^|[^A-Za-z0-9_/:-])\/optimize\b/i,
+  pi: /(?:^|[^A-Za-z0-9_/:-])\/optimize\b/i,
 }
 
 /** Auto-arm optimize_mode if the user's prompt matches the host's
