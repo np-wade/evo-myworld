@@ -152,6 +152,16 @@ def _on_session_start(session_id: str | None = None, **kwargs):
 def _on_pre_llm_call(session_id: str | None = None, **kwargs):
     """Per-turn drain of pending `evo direct` events.
 
+    Delivery: appended to the current turn's user message as `{"context":
+    ...}`. Considered switching to `ctx.inject_message(role="user")` for
+    a fresh user-role turn — and that's the right path for interactive
+    `hermes chat` — but `inject_message` queues to `cli._pending_input`,
+    which only the interactive process_loop drains. The release-smoke
+    test drives hermes with `chat -q -Q` (single-shot non-interactive)
+    where `process_loop` isn't running, so a queued inject_message
+    never reaches the model. Context-append keeps the directive
+    visible to the current turn for the single-shot case.
+
     Also auto-arms `optimize_mode` if the user's prompt looks like
     `/optimize`. Hermes has no UserPromptSubmit hook; pre_llm_call is
     the per-turn analogue.

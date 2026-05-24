@@ -755,6 +755,9 @@ function makeRegister(host) {
       } catch {}
       return "";
     };
+    let turnCount = 0;
+    let lastEvoActivityTurn = 0;
+    const SATURATION_TURNS = 2;
     api.on("before_provider_request", (event, _ctx) => {
       const ctx = ensureRegistered();
       if (!ctx)
@@ -762,6 +765,7 @@ function makeRegister(host) {
       const promptText = extractLatestUserText(event.payload);
       maybeMarkOptimizeFromPrompt(ctx.runDir, ctx.sid, host, promptText);
       if (scanForEvoCommands(event.payload)) {
+        lastEvoActivityTurn = turnCount;
         if (markEngaged(ctx.runDir, ctx.sid)) {
           initOffsetToLatest(ctx.runDir, ctx.sid);
         }
@@ -796,6 +800,7 @@ function makeRegister(host) {
       }
     });
     api.on("turn_end", async (_event, _ctx) => {
+      turnCount += 1;
       if (typeof api.sendUserMessage !== "function")
         return;
       const ctx = ensureRegistered();
@@ -809,6 +814,9 @@ function makeRegister(host) {
       if (!sess.optimize_mode)
         return;
       const peek = peekDrainSession(ctx.runDir, ctx.sid);
+      if (!peek.text && turnCount - lastEvoActivityTurn > SATURATION_TURNS) {
+        return;
+      }
       const text = peek.text ? peek.text + `
 
 ` + STOP_NUDGE_TEMPLATE : STOP_NUDGE_TEMPLATE;
