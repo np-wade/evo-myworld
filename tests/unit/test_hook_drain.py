@@ -225,14 +225,23 @@ def _write_recording_drain(fake_bin: Path) -> Path:
     and prints {}. Used to assert what the Rust hook passes through."""
     fake_bin.mkdir(exist_ok=True)
     if sys.platform == "win32":
-        # On Windows the .cmd shim's argv path is awkward to record; use
-        # a simpler Python-via-py shim. The cargo-built binary spawns
-        # CreateProcess regardless.
+        # Mirror the bash shim's per-arg output. `%*` would dump every
+        # arg space-joined onto one line, defeating per-arg assertions
+        # like `args.index("--host")`. Loop with `shift` so each arg
+        # lands on its own line, matching `printf "%s\n" "$@"`.
         drain = fake_bin / "evo-drain.cmd"
+        argv_log = (fake_bin / "argv.log").as_posix()
         drain.write_text(
-            f"@echo off\r\n"
-            f'(echo %*) > "{(fake_bin / "argv.log").as_posix()}"\r\n'
-            f"echo {{}}\r\nexit /b 0\r\n"
+            "@echo off\r\n"
+            f'type nul > "{argv_log}"\r\n'
+            ":loop\r\n"
+            'if "%~1"=="" goto done\r\n'
+            f'>> "{argv_log}" echo %~1\r\n'
+            "shift\r\n"
+            "goto loop\r\n"
+            ":done\r\n"
+            "echo {}\r\n"
+            "exit /b 0\r\n"
         )
         return drain
     drain = fake_bin / "evo-drain"
