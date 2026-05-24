@@ -485,6 +485,8 @@ export const DENY_TOOL_NAMES: Set<string> = new Set([
   // opencode / openclaw / pi / hermes variants
   "file_write",
   "file_edit",
+  // hermes: registers `patch` as its primary file-edit tool
+  "patch",
 ])
 
 /** Shell-execution tool names. Only when the tool is in this set does the
@@ -854,10 +856,14 @@ export function unmarkOptimizeMode(runDir: string, sid: string): boolean {
 
 
 // `/optimize` prompt patterns per host. Mirrors `_OPTIMIZE_INVOCATION_PATTERNS`.
+// The leading `[\s"']*` tolerates wrapping quotes — `opencode run "..."` and
+// shell-quoted invocations land in chat.message with the literal `"` as the
+// first character. Without this, the model never auto-arms optimize_mode
+// because the regex sees `"/optimize` and the `/` isn't at the start.
 const OPTIMIZE_PROMPT_RES: Record<string, RegExp> = {
-  opencode: /^\s*\/optimize\b/i,
-  openclaw: /^\s*\/optimize\b/i,
-  pi: /^\s*\/optimize\b/i,
+  opencode: /^[\s"']*\/optimize\b/i,
+  openclaw: /^[\s"']*\/optimize\b/i,
+  pi: /^[\s"']*\/optimize\b/i,
 }
 
 /** Auto-arm optimize_mode if the user's prompt matches the host's

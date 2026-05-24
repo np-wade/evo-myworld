@@ -311,7 +311,8 @@ var DENY_TOOL_NAMES = new Set([
   "apply_patch",
   "delete_file",
   "file_write",
-  "file_edit"
+  "file_edit",
+  "patch"
 ]);
 var BASH_TOOL_NAMES = new Set([
   "bash",
@@ -617,9 +618,9 @@ function markOptimizeMode(runDir, sid) {
   return true;
 }
 var OPTIMIZE_PROMPT_RES = {
-  opencode: /^\s*\/optimize\b/i,
-  openclaw: /^\s*\/optimize\b/i,
-  pi: /^\s*\/optimize\b/i
+  opencode: /^[\s"']*\/optimize\b/i,
+  openclaw: /^[\s"']*\/optimize\b/i,
+  pi: /^[\s"']*\/optimize\b/i
 };
 function maybeMarkOptimizeFromPrompt(runDir, sid, host, promptText) {
   if (!promptText)

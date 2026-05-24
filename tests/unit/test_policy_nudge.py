@@ -117,6 +117,15 @@ class TestDenyListToolNames(unittest.TestCase):
             self.assertTrue(_is_denied_in_optimize_mode(t, {}),
                             f"{t!r} must be denied")
 
+    def test_hermes_patch_tool_denied(self):
+        """Hermes registers `patch` as its file-edit tool (see
+        hermes-agent file_tools.py — `registry.register(name="patch",
+        ...)`). Without this entry, hermes orchestrator file edits
+        slip past the policy gate."""
+        from evo.inject.drain import _is_denied_in_optimize_mode
+        self.assertTrue(_is_denied_in_optimize_mode("patch", {}),
+                        "hermes `patch` tool must be denied")
+
     def test_cursor_edit_tools_denied(self):
         from evo.inject.drain import _is_denied_in_optimize_mode
         for t in ("edit_file", "create_file", "search_replace",

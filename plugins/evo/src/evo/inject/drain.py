@@ -178,31 +178,38 @@ _EVO_CMD_RE = _re.compile(r"^\s*evo(\s|$)")
 #
 # Each host's value is a list of regexes; the prompt matches if any
 # regex matches.
+# Each pattern uses `[\s"']*` rather than `\s*` so that prompts wrapped
+# in quotes by the host (opencode/cursor-agent run with positional args
+# typically produces `"...prompt..."`) still match. Without that, the
+# leading `"` would push `/optimize` off position 0.
 _OPTIMIZE_INVOCATION_PATTERNS: dict[str, list[_re.Pattern[str]]] = {
-    "claude-code": [_re.compile(r"^\s*/evo:optimize\b", _re.IGNORECASE)],
+    "claude-code": [_re.compile(r"^[\s\"']*/evo:optimize\b", _re.IGNORECASE)],
     "codex": [
-        _re.compile(r"^\s*\$evo:optimize\b", _re.IGNORECASE),
-        _re.compile(r"^\s*\$evo\s+optimize\b", _re.IGNORECASE),
+        _re.compile(r"^[\s\"']*\$evo:optimize\b", _re.IGNORECASE),
+        _re.compile(r"^[\s\"']*\$evo\s+optimize\b", _re.IGNORECASE),
     ],
-    "cursor": [_re.compile(r"^\s*/optimize\b", _re.IGNORECASE)],
-    # hermes / opencode / openclaw / pi: TBD — confirm exact invocation
-    # syntax per host. Leaving empty for now means /optimize won't
-    # auto-flip on those hosts; manual `evo` commands during the loop
-    # will still trigger the existing engagement filter, just not the
-    # optimize_mode-specific behaviors (policy nudge, stop continuation).
-    "hermes": [_re.compile(r"^\s*/optimize\b", _re.IGNORECASE)],
-    "opencode": [_re.compile(r"^\s*/optimize\b", _re.IGNORECASE)],
-    "openclaw": [_re.compile(r"^\s*/optimize\b", _re.IGNORECASE)],
-    "pi": [_re.compile(r"^\s*/optimize\b", _re.IGNORECASE)],
+    "cursor": [_re.compile(r"^[\s\"']*/optimize\b", _re.IGNORECASE)],
+    "hermes": [_re.compile(r"^[\s\"']*/optimize\b", _re.IGNORECASE)],
+    "opencode": [_re.compile(r"^[\s\"']*/optimize\b", _re.IGNORECASE)],
+    "openclaw": [_re.compile(r"^[\s\"']*/optimize\b", _re.IGNORECASE)],
+    "pi": [_re.compile(r"^[\s\"']*/optimize\b", _re.IGNORECASE)],
 }
 
 
 def _extract_user_prompt(payload: dict | None) -> str:
     """Pull the user's prompt text out of a hook payload. Different hosts
-    name the field differently. Returns "" if nothing recognizable."""
+    name the field differently. Returns "" if nothing recognizable.
+
+    Field-name variants seen in the wild:
+      - `prompt` (claude-code / codex stdin payloads)
+      - `user_message` (hermes pre_llm_call kwargs — invokes via the
+        invoke_hook(..., user_message=...) call in run_agent.py)
+      - `message`, `userPrompt`, `input` (various other shapes).
+    """
     if not payload:
         return ""
-    for key in ("prompt", "user_prompt", "userPrompt", "message", "input"):
+    for key in ("prompt", "user_prompt", "userPrompt", "user_message",
+                "message", "input"):
         val = payload.get(key)
         if isinstance(val, str) and val:
             return val
@@ -598,6 +605,9 @@ _DENY_TOOL_NAMES = frozenset({
     "str_replace", "applypatch", "apply_patch", "delete_file",
     # opencode / openclaw / pi / hermes variants
     "file_write", "file_edit",
+    # hermes: registers `patch` as its primary file-edit tool
+    # (file_tools.py registers name="patch" with replace/patch modes).
+    "patch",
 })
 
 

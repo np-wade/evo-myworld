@@ -259,7 +259,8 @@ var DENY_TOOL_NAMES = new Set([
   "apply_patch",
   "delete_file",
   "file_write",
-  "file_edit"
+  "file_edit",
+  "patch"
 ]);
 var BASH_TOOL_NAMES = new Set([
   "bash",
