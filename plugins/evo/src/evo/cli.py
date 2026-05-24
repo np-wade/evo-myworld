@@ -3697,14 +3697,19 @@ def cmd_dashboard(args: argparse.Namespace) -> int:
 
 
 def cmd_install(args: argparse.Namespace) -> int:
-    """Install the evo plugin for the named host."""
+    """Install the evo plugin for the named host.
+
+    After the host install completes, the wrapper in `host_install.install`
+    syncs the global CLI (`evo-hq-cli`) to match the plugin version —
+    keeping skill content + hook protocol + CLI behavior in lockstep.
+    Editable installs are detected and left alone.
+    """
     from . import host_install
     try:
-        adapter = host_install.get(args.host)
+        return host_install.install(args.host, args)
     except ValueError as exc:
         print(f"ERROR: {exc}", file=sys.stderr)
         return 2
-    return adapter.install(args)
 
 
 def cmd_uninstall(args: argparse.Namespace) -> int:
@@ -3751,30 +3756,11 @@ def cmd_update(args: argparse.Namespace) -> int:
     # No host specified — refresh global CLI then iterate over hosts whose
     # current install is healthy (doctor returns 0). Hosts the user never
     # set up are skipped silently.
-    version = getattr(args, "version", None)
-    print(f"=== Refreshing global CLI ===")
-    if version and not host_install.claude_code._looks_like_pypi_release(version):
-        # Branch/SHA refs don't exist on PyPI — skip the CLI refresh and
-        # tell the user why. Plugin install (via git ref) will still proceed.
-        print(
-            f"(skipping global CLI refresh: --version {version!r} is not a "
-            "PyPI release; uv tool install only knows about published "
-            "versions. Plugins will install from the git ref.)"
-        )
-        rc = 0
-    else:
-        target = "evo-hq-cli"
-        if version:
-            target = f"evo-hq-cli=={version}"
-        cli_cmd = ["uv", "tool", "install", "--force", target]
-        print(f"$ {' '.join(cli_cmd)}")
-        rc = subprocess.call(cli_cmd)
-    if rc != 0:
-        print(
-            "WARNING: global CLI refresh failed. Try manually: "
-            "uv tool install --force evo-hq-cli  (or pipx install --force evo-hq-cli)",
-            file=sys.stderr,
-        )
+    #
+    # CLI sync runs ONCE here. Per-host `host_install.update()` calls
+    # also try to sync via the wrapper, but the module-level guard in
+    # `_sync_cli_to_plugin_version` makes subsequent calls a no-op.
+    host_install._sync_cli_to_plugin_version(args)
 
     overall_rc = 0
     for host in host_install.SUPPORTED_HOSTS:

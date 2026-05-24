@@ -149,9 +149,12 @@ uv run --project /path/to/evo/plugins/evo evo dashboard --port 8080
 ## Upgrading
 
 ```bash
-evo update <host>                    # host: claude-code | codex | cursor | hermes | opencode | openclaw | pi
+evo update                           # update CLI + every installed host
+evo update <host>                    # update one host (also bumps CLI to match)
 evo update <host> --version 0.4.1    # pin to a release
 ```
+
+Every `evo install` / `evo update` keeps the CLI on PATH in lockstep with the host plugin version it just installed (`uv tool install --force evo-hq-cli` under the hood). The CLI binary, the skill files, and the hook protocol share wire formats — letting them drift caused silent failures in earlier versions. Editable installs (`uv tool install --editable`, `pip install -e`) are detected and left untouched.
 
 See `evo update --help` for `--force`, `--scope`, and additional flags.
 
