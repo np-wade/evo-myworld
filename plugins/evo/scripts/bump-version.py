@@ -32,6 +32,8 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 PLUGIN_ROOT = REPO_ROOT / "plugins" / "evo"
+SDK_PYTHON_ROOT = REPO_ROOT / "sdk" / "python"
+SDK_NODE_ROOT = REPO_ROOT / "sdk" / "node"
 
 # Skills that ship `evo_version` frontmatter. Keep in sync with
 # plugins/evo/skills/ subdirs and npm/scripts/sync-from-source.sh.
@@ -58,9 +60,10 @@ def _read_current_version() -> str:
     return m.group(1)
 
 
-def _bump_pyproject(new: str) -> None:
-    p = PLUGIN_ROOT / "pyproject.toml"
-    text = p.read_text()
+def _bump_pyproject_version(path: Path, new: str) -> None:
+    if not path.exists():
+        return
+    text = path.read_text()
     new_text = re.sub(
         r'^version\s*=\s*"[^"]+"',
         f'version = "{new}"',
@@ -68,12 +71,13 @@ def _bump_pyproject(new: str) -> None:
         count=1,
         flags=re.MULTILINE,
     )
-    p.write_text(new_text)
+    path.write_text(new_text)
 
 
-def _bump_init_py(new: str) -> None:
-    p = PLUGIN_ROOT / "src" / "evo" / "__init__.py"
-    text = p.read_text()
+def _bump_init_dunder(path: Path, new: str) -> None:
+    if not path.exists():
+        return
+    text = path.read_text()
     new_text = re.sub(
         r'^__version__\s*=\s*"[^"]+"',
         f'__version__ = "{new}"',
@@ -81,7 +85,7 @@ def _bump_init_py(new: str) -> None:
         count=1,
         flags=re.MULTILINE,
     )
-    p.write_text(new_text)
+    path.write_text(new_text)
 
 
 def _bump_json_version(path: Path, new: str) -> None:
@@ -151,6 +155,9 @@ def _verify_no_leftover(old: str, new: str) -> list[Path]:
         PLUGIN_ROOT / ".claude-plugin" / "plugin.json",
         PLUGIN_ROOT / ".codex-plugin" / "plugin.json",
         PLUGIN_ROOT / "npm" / "package.json",
+        SDK_PYTHON_ROOT / "pyproject.toml",
+        SDK_PYTHON_ROOT / "src" / "evo_agent" / "__init__.py",
+        SDK_NODE_ROOT / "package.json",
     ]
     for name in SKILLS:
         candidates.append(PLUGIN_ROOT / "skills" / name / "SKILL.md")
@@ -183,16 +190,28 @@ def main() -> int:
         return 0
     print(f"bumping {old} → {new}")
 
-    _bump_pyproject(new)
-    print(f"  ✓ pyproject.toml")
-    _bump_init_py(new)
-    print(f"  ✓ src/evo/__init__.py")
+    _bump_pyproject_version(PLUGIN_ROOT / "pyproject.toml", new)
+    print(f"  ✓ plugins/evo/pyproject.toml (evo-hq-cli)")
+    _bump_init_dunder(PLUGIN_ROOT / "src" / "evo" / "__init__.py", new)
+    print(f"  ✓ plugins/evo/src/evo/__init__.py (__version__)")
     _bump_json_version(PLUGIN_ROOT / ".claude-plugin" / "plugin.json", new)
-    print(f"  ✓ .claude-plugin/plugin.json")
+    print(f"  ✓ plugins/evo/.claude-plugin/plugin.json")
     _bump_json_version(PLUGIN_ROOT / ".codex-plugin" / "plugin.json", new)
-    print(f"  ✓ .codex-plugin/plugin.json")
+    print(f"  ✓ plugins/evo/.codex-plugin/plugin.json")
     _bump_json_version(PLUGIN_ROOT / "npm" / "package.json", new)
-    print(f"  ✓ npm/package.json")
+    print(f"  ✓ plugins/evo/npm/package.json (@evo-hq/pi-evo)")
+
+    # SDKs ship in lockstep with the plugin (see check_versions.py and
+    # the project_evo_release_checklist memory). A bump that misses any
+    # of these makes CI fail.
+    _bump_pyproject_version(SDK_PYTHON_ROOT / "pyproject.toml", new)
+    print(f"  ✓ sdk/python/pyproject.toml (evo-hq-agent)")
+    _bump_init_dunder(
+        SDK_PYTHON_ROOT / "src" / "evo_agent" / "__init__.py", new,
+    )
+    print(f"  ✓ sdk/python/src/evo_agent/__init__.py (__version__)")
+    _bump_json_version(SDK_NODE_ROOT / "package.json", new)
+    print(f"  ✓ sdk/node/package.json (@evo-hq/evo-agent)")
 
     for name in SKILLS:
         skill_path = PLUGIN_ROOT / "skills" / name / "SKILL.md"
