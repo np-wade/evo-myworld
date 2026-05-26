@@ -1257,6 +1257,83 @@ def _cmd_dispatch_status(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_abort(args: argparse.Namespace) -> int:
+    """SIGTERM the driver process for the current attempt of <exp_id>.
+
+    Reads the driver PID stamped into attempt_state.json by `evo run` and
+    sends SIGTERM. After --timeout seconds (default 5), if the process is
+    still alive, escalates to SIGKILL. `--force` skips the grace period
+    and goes straight to SIGKILL.
+
+    Does not touch the experiment's graph state (status stays `active`
+    until evo's normal failure path runs). Once the driver exits, a
+    subsequent `evo run` will see the dead PID and reclaim the attempt.
+
+    Note: aborts only the driver process. If the benchmark spawned
+    workers detached via setsid/nohup, they survive — the driver was
+    coordinating them and is what `evo run` re-invocation gates on. For
+    a full process-tree kill across detached workers, see TODO #7.
+    """
+    import signal
+    import time as _time
+    root = repo_root()
+    _require_workspace(root)
+    node = _read_node(root, args.exp_id)
+    if node.get("status") != "active":
+        print(
+            f"NOTE: {args.exp_id} is {node.get('status')!r}, not active. "
+            f"Nothing to abort.",
+            file=sys.stderr,
+        )
+        return 0
+    attempt_n = int(node.get("current_attempt") or 0)
+    state = _read_attempt_state(root, args.exp_id, attempt_n) or {}
+    pid = int(state.get("pid") or 0)
+    if not pid:
+        print(
+            f"ERROR: no driver PID recorded for {args.exp_id} attempt "
+            f"{attempt_n:03d}. Pre-stamp attempts have no kill target; "
+            f"either let the driver finish or `evo discard --force` the "
+            f"experiment.",
+            file=sys.stderr,
+        )
+        return 1
+    if not _is_pid_alive(pid):
+        print(f"{args.exp_id}: driver PID {pid} already not alive")
+        return 0
+    sig = signal.SIGKILL if args.force else signal.SIGTERM
+    try:
+        os.kill(pid, sig)
+    except ProcessLookupError:
+        print(f"{args.exp_id}: driver PID {pid} exited before signal")
+        return 0
+    except OSError as exc:
+        print(f"ERROR: failed to signal PID {pid}: {exc}", file=sys.stderr)
+        return 1
+    if args.force:
+        print(f"{args.exp_id}: SIGKILL sent to driver PID {pid}")
+        return 0
+    print(
+        f"{args.exp_id}: SIGTERM sent to driver PID {pid}; "
+        f"waiting up to {args.timeout}s for clean exit..."
+    )
+    deadline = _time.time() + max(0.0, args.timeout)
+    while _time.time() < deadline:
+        if not _is_pid_alive(pid):
+            print(f"{args.exp_id}: driver PID {pid} exited cleanly")
+            return 0
+        _time.sleep(0.25)
+    try:
+        os.kill(pid, signal.SIGKILL)
+        print(
+            f"{args.exp_id}: driver PID {pid} did not exit in {args.timeout}s; "
+            f"escalated to SIGKILL"
+        )
+    except ProcessLookupError:
+        print(f"{args.exp_id}: driver PID {pid} exited during grace period")
+    return 0
+
+
 def _cmd_dispatch_kill(args: argparse.Namespace) -> int:
     import signal
     root = repo_root()
@@ -2151,6 +2228,36 @@ def _cmd_run_impl(
     max_attempts: int,
     evaluated_attempts: int,
 ) -> int:
+    # Concurrent-attempt guard: refuse a second `evo run` while a local
+    # attempt is in flight. The driver PID is stamped into attempt_state
+    # on initial write; if it's still alive, this is a real race (silent
+    # parallel attempts multiply API spend by N). Remote backend has its
+    # own resume mechanism further down and is skipped here. `--force`
+    # bypasses for legitimate parallel starts (e.g. PID was recycled).
+    if (
+        not executor.is_remote
+        and node.get("status") == "active"
+        and not getattr(args, "force", False)
+    ):
+        prior_attempt = int(node.get("current_attempt") or 0)
+        prior_state = _read_attempt_state(root, args.exp_id, prior_attempt) or {}
+        prior_pid = int(prior_state.get("pid") or 0)
+        if prior_pid and _is_pid_alive(prior_pid):
+            print(
+                f"ERROR: {args.exp_id} already has attempt "
+                f"{prior_attempt:03d} active (driver PID {prior_pid}). "
+                f"Wait for it to finish, run `evo abort {args.exp_id}` "
+                f"to stop it, or pass --force to start a parallel attempt.",
+                file=sys.stderr,
+            )
+            return 1
+        if prior_pid:
+            print(
+                f"NOTE: reclaiming stale attempt {prior_attempt:03d} for "
+                f"{args.exp_id} (driver PID {prior_pid} is not alive)",
+                file=sys.stderr,
+            )
+
     # Shisa-kanko ack for tracked-only mode: when the worktree has any
     # untracked, non-gitignored files, the agent must affirm with
     # --i-staged-new-files that they have either staged any new source files
@@ -2253,14 +2360,23 @@ def _cmd_run_impl(
     if remote:
         # Sandbox-internal paths anchored under the backend-provided
         # workspace root. Modal uses /workspace/repo; manual and SSH may
-        # resolve elsewhere.
-        sandbox_traces_dir = f"{worktree}/.evo/traces"
-        sandbox_result_path = f"{worktree}/.evo/result.json"
+        # resolve elsewhere. Paths are per-attempt — a re-invocation
+        # cannot collide with a previous attempt's result.json or traces.
+        sandbox_attempt_root = f"{worktree}/.evo/{args.exp_id}/{attempt_n:03d}"
+        sandbox_traces_dir = f"{sandbox_attempt_root}/traces"
+        sandbox_result_path = f"{sandbox_attempt_root}/result.json"
         sandbox_checkpoint_dir = f"{worktree}/.evo/checkpoints/{args.exp_id}/{attempt_n:03d}"
         run_cwd: Path | str = worktree
         env_traces_dir = sandbox_traces_dir
         env_result_path = sandbox_result_path
         env_checkpoint_dir = sandbox_checkpoint_dir
+        # Clear any leftover from a prior partial attempt (e.g. one that
+        # was abandoned before result.json was written) so the SDK's
+        # O_EXCL claim in _backend.emit_result starts from a clean slate.
+        executor.run(
+            ["rm", "-rf", sandbox_attempt_root],
+            cwd=worktree,
+        )
         # Pre-create the traces dir inside the sandbox so the benchmark
         # can write into it without checking exists().
         executor.run(
@@ -2290,6 +2406,12 @@ def _cmd_run_impl(
         env_result_path=env_result_path,
         env_checkpoint_dir=env_checkpoint_dir,
     )
+    # Stamp this driver's PID so a re-invocation of `evo run` can detect
+    # whether the attempt is actually still in flight (the concurrent-run
+    # guard at the top reads this). Survives crashes; a dead PID lets the
+    # next invocation reclaim. Remote backend keeps its own resume metadata
+    # (process_id from the stream journal) and doesn't depend on this.
+    driver_pid = os.getpid()
     if resume_existing_attempt:
         _write_attempt_state(
             root, args.exp_id, attempt_n,
@@ -2298,6 +2420,7 @@ def _cmd_run_impl(
             started_at=started_at,
             extra={
                 "resumed_at": utc_now(),
+                "pid": driver_pid,
                 "checkpoint_dir": str(checkpoint_dir),
                 "remote_checkpoint_dir": sandbox_checkpoint_dir if remote else None,
             },
@@ -2309,6 +2432,7 @@ def _cmd_run_impl(
             status="running",
             started_at=started_at,
             extra={
+                "pid": driver_pid,
                 "checkpoint_dir": str(checkpoint_dir),
                 "remote_checkpoint_dir": sandbox_checkpoint_dir if remote else None,
             },
@@ -4682,6 +4806,14 @@ def build_parser() -> argparse.ArgumentParser:
              "Required in tracked-only commit mode when the worktree has "
              "untracked, non-gitignored files. No-op in commit_strategy=all.",
     )
+    run_p.add_argument(
+        "--force",
+        action="store_true",
+        help="bypass the concurrent-attempt guard. Allow a new attempt "
+             "even if another attempt for this exp_id has an alive driver "
+             "PID. Use when you know the prior driver is gone but its "
+             "state wasn't reclaimed (e.g. PID was recycled by the OS).",
+    )
     run_p.set_defaults(func=cmd_run)
 
     done_p = sub.add_parser("done")
@@ -4778,6 +4910,28 @@ def build_parser() -> argparse.ArgumentParser:
              "still write a final outcome that contradicts this discard)",
     )
     discard_p.set_defaults(func=cmd_discard)
+
+    abort_p = sub.add_parser(
+        "abort",
+        help="SIGTERM the driver process for an experiment's current attempt",
+        description=(
+            "Reads the driver PID stamped into attempt_state.json by the "
+            "running `evo run` and sends SIGTERM. If the process is still "
+            "alive after --timeout seconds, escalates to SIGKILL. "
+            "Does not mutate graph state — once the driver exits, the next "
+            "`evo run` invocation sees the dead PID and reclaims the attempt."
+        ),
+    )
+    abort_p.add_argument("exp_id")
+    abort_p.add_argument(
+        "--timeout", type=float, default=5.0,
+        help="seconds to wait between SIGTERM and SIGKILL escalation (default 5)",
+    )
+    abort_p.add_argument(
+        "--force", action="store_true",
+        help="skip the SIGTERM grace period; signal SIGKILL immediately",
+    )
+    abort_p.set_defaults(func=cmd_abort)
 
     prune_p = sub.add_parser("prune")
     prune_p.add_argument("exp_id")

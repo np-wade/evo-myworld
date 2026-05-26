@@ -166,8 +166,9 @@ Provider auth and SDK packages are separate from benchmark runtime env.
 
 ```bash
 evo new --parent <parent_id> -m "<hypothesis>"
-evo run <exp_id> [--timeout <seconds>]
+evo run <exp_id> [--timeout <seconds>] [--force]
 evo run <exp_id> --check [--timeout <seconds>]
+evo abort <exp_id> [--timeout <seconds>] [--force]
 evo done <exp_id> --score <float> [--traces <dir>] [--no-compare]
 evo discard <exp_id> --reason "<why>" [--force]
 evo prune <exp_id> [--reason "<why>"]
@@ -177,6 +178,16 @@ evo gc
 
 Lifecycle command rules:
 
+- `evo run` refuses to start a second attempt while another attempt for
+  the same `exp_id` has an alive driver PID (silent concurrent attempts
+  multiply API spend by N). Pass `--force` to bypass when you know the
+  prior driver is gone but its state wasn't reclaimed (e.g. recycled
+  PID). Remote backend skips the guard — its resume logic handles
+  `status=active` natively.
+- `evo abort <exp_id>` SIGTERMs the driver process of the current
+  attempt; if it doesn't exit within `--timeout` seconds (default 5),
+  escalates to SIGKILL. `--force` skips the grace period. Aborts only
+  the driver — workers detached via setsid/nohup survive.
 - `evo discard` is for non-committed nodes (active/evaluated/failed).
   Refuses `committed` (use `evo prune` instead). Refuses `active` without
   `--force`. Refuses any node with non-discarded children.
