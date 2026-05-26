@@ -1,7 +1,6 @@
 ---
 name: subagent
-description: Internal protocol for evo optimization subagents. Not user-invocable -- read by subagents spawned from /optimize.
-disable-model-invocation: true
+description: Internal protocol for evo optimization subagents. Loaded by subagents spawned from /optimize via their host's skill loader. Not for orchestrator use.
 evo_version: 0.4.4
 ---
 
