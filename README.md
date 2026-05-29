@@ -197,14 +197,16 @@ uv tool install --editable plugins/evo
 If you use evo in your research, please cite it. GitHub generates a citation from
 [`CITATION.cff`](CITATION.cff) via the "Cite this repository" button in the sidebar.
 
-<!-- After minting a Zenodo concept DOI, add the badge and replace the DOI below. -->
-<!-- [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.XXXXXXX.svg)](https://doi.org/10.5281/zenodo.XXXXXXX) -->
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20447923.svg)](https://doi.org/10.5281/zenodo.20447923)
+
+The DOI above is the concept DOI — it always resolves to the latest version. Each release also gets its own version DOI on Zenodo.
 
 ```bibtex
 @software{bishoyi_evo,
   author  = {Bishoyi, Alok Kumar},
   title   = {{evo: an autoresearch orchestrator for codebases}},
   url      = {https://github.com/evo-hq/evo},
+  doi     = {10.5281/zenodo.20447923},
   license  = {Apache-2.0},
   year     = {2026}
 }

@@ -22,5 +22,5 @@ keywords:
   - agentic
   - tree-search
   - experiment-driven-development
-# Once you mint a Zenodo DOI (see README "Citation" section), add it here:
-# doi: 10.5281/zenodo.XXXXXXX
+# Zenodo concept DOI (resolves to the latest version).
+doi: 10.5281/zenodo.20447923
