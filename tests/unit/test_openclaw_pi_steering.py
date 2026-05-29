@@ -255,6 +255,73 @@ class TestOpenclawPiDenyGate(unittest.TestCase):
         self.assertEqual(result["num_calls"], 0,
                          "casual pi session must not be force-continued")
 
+    def test_tool_call_observes_evo_autonomous_on_then_nudges(self):
+        """End-to-end opt-in: optimize_mode on but autonomous OFF → turn_end
+        does NOT nudge; after the tool_call hook OBSERVES `evo autonomous on`
+        (the in-process arm path, since pi has no session env var), turn_end
+        nudges. Proves command-observation arming, not prompt prose."""
+        result = self._run_factory("pi", textwrap.dedent("""
+            const calls: any[] = []
+            api.sendUserMessage = (content: any, options: any) => {
+                calls.push({ content, options })
+            }
+            await handlers.session_start({}, {})
+            const fs = await import("fs")
+            const path = await import("path")
+            const cryp = await import("crypto")
+            const hash = cryp.createHash("sha256").update(process.cwd()).digest("hex").slice(0, 12)
+            const sid = `pi-${hash}`
+            const sfile = path.join(process.cwd(), ".evo", "run_0000", "inject", "sessions", `${sid}.json`)
+            let rec = JSON.parse(fs.readFileSync(sfile, "utf8"))
+            rec.optimize_mode = true
+            fs.writeFileSync(sfile, JSON.stringify(rec))
+
+            // turn_end WITHOUT autonomous → no nudge (opt-in default).
+            await handlers.turn_end({ turnIndex: 0 }, {})
+            const calls_before = calls.length
+
+            // tool_call OBSERVES `evo autonomous on` → arms autonomous in-process.
+            await handlers.tool_call(
+                { toolName: "bash", input: { command: "evo autonomous on" } }, {}
+            )
+            rec = JSON.parse(fs.readFileSync(sfile, "utf8"))
+            const armed = rec.autonomous === true
+
+            // turn_end WITH autonomous → nudge fires.
+            await handlers.turn_end({ turnIndex: 1 }, {})
+            process.stdout.write(JSON.stringify({
+                calls_before, armed, calls_after: calls.length,
+            }))
+        """))
+        self.assertEqual(result["calls_before"], 0,
+                         "no nudge before autonomous is armed (opt-in default)")
+        self.assertTrue(result["armed"],
+                        "tool_call observing `evo autonomous on` must arm autonomous")
+        self.assertEqual(result["calls_after"], 1,
+                         "nudge fires once autonomous is armed")
+
+    def test_tool_call_observes_evo_autonomous_off_disarms(self):
+        """`evo autonomous off` observed via tool_call disarms the loop."""
+        result = self._run_factory("pi", textwrap.dedent("""
+            await handlers.session_start({}, {})
+            const fs = await import("fs")
+            const path = await import("path")
+            const cryp = await import("crypto")
+            const hash = cryp.createHash("sha256").update(process.cwd()).digest("hex").slice(0, 12)
+            const sid = `pi-${hash}`
+            const sfile = path.join(process.cwd(), ".evo", "run_0000", "inject", "sessions", `${sid}.json`)
+            let rec = JSON.parse(fs.readFileSync(sfile, "utf8"))
+            rec.optimize_mode = true; rec.autonomous = true
+            fs.writeFileSync(sfile, JSON.stringify(rec))
+            await handlers.tool_call(
+                { toolName: "bash", input: { command: "evo autonomous off" } }, {}
+            )
+            rec = JSON.parse(fs.readFileSync(sfile, "utf8"))
+            process.stdout.write(JSON.stringify({ autonomous: rec.autonomous }))
+        """))
+        self.assertFalse(result["autonomous"],
+                         "observing `evo autonomous off` must disarm autonomous")
+
     def test_anthropic_payload_with_string_content_arms_mode(self):
         """Regression for the round-1 P2: openai-style `input` items
         with a plain-string `content` field (not parts array) must also
