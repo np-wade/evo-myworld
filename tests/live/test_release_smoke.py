@@ -1154,12 +1154,18 @@ def test_codex(sandbox):
         ],
         drive_cmd=(
             "export PATH=$HOME/.local/bin:$PATH; "
-            # gpt-5-mini reads detailed prompts as actionable and skips
-            # the optimize skill's protocol (writes loose `target_a.py`
-            # files instead of `evo new` + `evo run`). gpt-5 (full)
-            # respects skill mentions more reliably.
+            # Model: gpt-5-codex (codex's agent-tuned model). Plain `gpt-5`
+            # crashes codex's collab/subagent spawner — the subagents
+            # request reasoning_effort low/medium which gpt-5 rejects
+            # ("Reasoning effort `low` is not supported for model `gpt-5`"),
+            # so the orchestrator produces 0 experiments and the agent dies
+            # before the mid-run inject is ever exercised. gpt-5-codex
+            # supports codex's effort settings and still respects the
+            # skill (gpt-5-mini does not — it freelances loose target_a.py
+            # files instead of `evo new`/`evo run`). Pin effort high too.
             f"nohup codex exec --dangerously-bypass-approvals-and-sandbox "
-            f"--model gpt-5 {prompt} "
+            f"-c model_reasoning_effort=high "
+            f"--model gpt-5-codex {prompt} "
             "> /tmp/agent.log 2>&1 & echo $! > /tmp/agent.pid"
         ),
         env_keys={"OPENAI_API_KEY": openai_key},
