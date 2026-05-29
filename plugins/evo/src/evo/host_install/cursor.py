@@ -50,7 +50,12 @@ _RELEASE_VERSION_RE = re.compile(r"^\d+\.\d+\.\d+([.\-+a-zA-Z0-9]*)$")
 #     per tool_name.
 #   - stop: end of each agent turn -> followup_message; turn-end fallback for
 #     turns with no deliverable tool call.
-_INJECT_EVENTS = ("sessionStart", "beforeSubmitPrompt", "preToolUse", "stop")
+#   - subagentStop: end of a Task-spawned subagent's turn (Cursor 1.7+).
+#     Same followup_message envelope as stop, scoped to the subagent. Without
+#     this, directives queued during a long Task subagent run can't deliver at
+#     the subagent's natural turn boundary and have to wait for the outer
+#     agent's stop.
+_INJECT_EVENTS = ("sessionStart", "beforeSubmitPrompt", "preToolUse", "stop", "subagentStop")
 
 
 def _cursor_base() -> Path:

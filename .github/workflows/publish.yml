@@ -384,22 +384,34 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          # Linux: build STATIC musl binaries so they don't depend on the
+          # build runner's glibc. ubuntu-latest ships a newer glibc (2.39)
+          # than many targets (the e2b smoke sandbox + plenty of user
+          # machines run Ubuntu 22.04 / glibc 2.35); a dynamically-linked
+          # binary fails to exec there ("GLIBC_2.39 not found") and every
+          # hook silently fails. Static musl has no libc dependency and runs
+          # on any Linux. The binary is pure stdlib (no C deps), so the
+          # self-contained rustup musl target builds with no extra tooling.
           - runner: ubuntu-latest
             os: linux
             arch: amd64
             ext: ""
+            target: x86_64-unknown-linux-musl
           - runner: ubuntu-24.04-arm
             os: linux
             arch: arm64
             ext: ""
+            target: aarch64-unknown-linux-musl
           - runner: windows-latest
             os: windows
             arch: amd64
             ext: ".exe"
+            target: ""
           - runner: windows-11-arm
             os: windows
             arch: arm64
             ext: ".exe"
+            target: ""
     runs-on: ${{ matrix.runner }}
     steps:
       - uses: actions/checkout@v4
@@ -409,13 +421,26 @@ jobs:
           workspaces: plugins/evo/bin/evo-hook-drain-rs
       - name: Build release binary
         working-directory: plugins/evo/bin/evo-hook-drain-rs
-        run: cargo build --release
+        shell: bash
+        run: |
+          if [ -n "${{ matrix.target }}" ]; then
+            rustup target add "${{ matrix.target }}"
+            cargo build --release --target "${{ matrix.target }}"
+          else
+            cargo build --release
+          fi
       - name: Rename for distribution
         shell: bash
         run: |
-          src="plugins/evo/bin/evo-hook-drain-rs/target/release/evo-hook-drain${{ matrix.ext }}"
+          base="plugins/evo/bin/evo-hook-drain-rs/target"
+          if [ -n "${{ matrix.target }}" ]; then
+            src="$base/${{ matrix.target }}/release/evo-hook-drain${{ matrix.ext }}"
+          else
+            src="$base/release/evo-hook-drain${{ matrix.ext }}"
+          fi
           dst="evo-hook-drain-${{ matrix.os }}-${{ matrix.arch }}${{ matrix.ext }}"
           cp "$src" "$dst"
+          file "$dst" || true
           ls -lh "$dst"
       - uses: actions/upload-artifact@v4
         with:

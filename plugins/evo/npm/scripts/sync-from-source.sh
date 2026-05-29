@@ -13,14 +13,16 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../.." && pwd)"
 PKG="$ROOT/plugins/evo/npm"
 SRC="$ROOT/plugins/evo"
 
-# Bundle JS — the openclaw_plugin/evo.bundle.js targets pi's
-# ExtensionAPI directly; pi is the upstream SDK openclaw embeds.
+# Bundle JS — copy the pi-specific bundle (built from pi-entry.ts).
+# Both bundles share factory.ts; only the host string baked in differs
+# ("pi" vs "openclaw"). Correctly tagging pi sessions in the registry
+# is the fix for the pre-0.4.4 pi-tagged-as-openclaw bug.
 mkdir -p "$PKG/extensions/evo"
-cp "$SRC/src/evo/openclaw_plugin/evo.bundle.js" "$PKG/extensions/evo/index.js"
-echo "synced extension: $PKG/extensions/evo/index.js"
+cp "$SRC/src/evo/openclaw_plugin/pi.bundle.js" "$PKG/extensions/evo/index.js"
+echo "synced extension: $PKG/extensions/evo/index.js (host=pi)"
 
 # Skills — pi discovers each subdir under skills/ as a separate skill.
-for name in discover optimize subagent infra-setup; do
+for name in discover optimize subagent infra-setup report; do
     dest="$PKG/skills/$name"
     rm -rf "$dest"
     mkdir -p "$dest"

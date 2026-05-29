@@ -55,6 +55,7 @@ Pass `optimize` parameters as `key=value` after the skill name:
 
 ```
 /evo:optimize subagents=3 budget=10 stall=3
+/evo:optimize subagents=3 autonomous
 ```
 
 | Parameter | Default | Description |
@@ -62,6 +63,10 @@ Pass `optimize` parameters as `key=value` after the skill name:
 | `subagents` | 5 | Parallel subagents per round |
 | `budget` | 5 | Max iterations each subagent can run within its branch |
 | `stall` | 5 | Consecutive rounds with no improvement before auto-stopping |
+| `autonomous` | off | Bare word. Keep driving the loop at every turn boundary until `stall` or interrupt |
+| `subagents-only` | off | Bare word. Nudge the orchestrator to delegate edits to subagents |
+
+`autonomous` and `subagents-only` are opt-in bare-word flags, not `key=value`. Without `autonomous`, the agent stops at a turn boundary after finishing a round; stop the loop with `evo autonomous off` or `evo exit-optimize-mode`. With `subagents-only`, the orchestrator's file-mutation tools (Edit/Write, mutating Bash) are denied on an alternating cadence — 1st attempt blocked, 2nd allowed, 3rd blocked, and so on — each block nudging it to delegate the edit; it is a nudge, not a hard block, and subagent edits are never gated. Lift it with `evo subagents-only off` or `evo exit-optimize-mode`.
 
 Invocation syntax is host-specific: `/evo:` on Claude Code, `$evo` on Codex, `/` skill menu on Cursor, natural language on Hermes, Opencode, OpenClaw, and Pi.
 
@@ -149,15 +154,16 @@ uv run --project /path/to/evo/plugins/evo evo dashboard --port 8080
 ## Upgrading
 
 ```bash
-evo update <host>                    # host: claude-code | codex | cursor | hermes | opencode | openclaw | pi
+evo update                           # update CLI + every installed host
+evo update <host>                    # update one host (also bumps CLI to match)
 evo update <host> --version 0.4.1    # pin to a release
 ```
 
+Every `evo install` / `evo update` keeps the CLI on PATH in lockstep with the host plugin version it just installed (`uv tool install --force evo-hq-cli` under the hood). The CLI binary, the skill files, and the hook protocol share wire formats — letting them drift caused silent failures in earlier versions. Editable installs (`uv tool install --editable`, `pip install -e`) are detected and left untouched.
+
 See `evo update --help` for `--force`, `--scope`, and additional flags.
 
-### Migrating from v0.4.0 or earlier
-
-Reinstall the CLI and refresh the host plugin cache:
+### Migrating from any pre-0.4.4 version
 
 ```bash
 uv tool install --force evo-hq-cli && evo update --force
@@ -184,6 +190,26 @@ For development on evo:
 git clone https://github.com/evo-hq/evo
 cd evo
 uv tool install --editable plugins/evo
+```
+
+## Citation
+
+If you use evo in your research, please cite it. GitHub generates a citation from
+[`CITATION.cff`](CITATION.cff) via the "Cite this repository" button in the sidebar.
+
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20447923.svg)](https://doi.org/10.5281/zenodo.20447923)
+
+The DOI above is the concept DOI — it always resolves to the latest version. Each release also gets its own version DOI on Zenodo.
+
+```bibtex
+@software{bishoyi_evo,
+  author  = {Bishoyi, Alok Kumar},
+  title   = {{evo: an autoresearch orchestrator for codebases}},
+  url      = {https://github.com/evo-hq/evo},
+  doi     = {10.5281/zenodo.20447923},
+  license  = {Apache-2.0},
+  year     = {2026}
+}
 ```
 
 ## License

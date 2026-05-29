@@ -117,11 +117,16 @@ def _evo_drain(run_dir: Path, session_id: str, stdin_payload: dict | None = None
 
 
 def _hook_drain_bash(run_dir: Path, stdin_payload: dict, env: dict | None = None) -> dict:
-    """Invoke evo-hook-drain bash script with a synthetic stdin payload."""
+    """Invoke the evo-hook-drain binary with a synthetic stdin payload.
+
+    Note: the function name dates from when evo-hook-drain was a bash
+    script. It's now the compiled Rust binary (see bin/evo-hook-drain-rs/);
+    we exec it directly.
+    """
     hook_drain = PLUGIN_ROOT / "bin" / "evo-hook-drain"
     merged = {**os.environ, "EVO_RUN_DIR": str(run_dir), **(env or {})}
     result = subprocess.run(
-        ["bash", str(hook_drain)],
+        [str(hook_drain)],
         input=json.dumps(stdin_payload),
         capture_output=True, text=True,
         timeout=30, env=merged,
@@ -153,11 +158,15 @@ def test_e2e_broadcast_drain_bash_hook():
 
         # Simulate auto-register: write session entry via evo with CLAUDE_CODE_SESSION_ID set
         sid = "live_sess_orch_01"
-        from evo.inject.registry import register_session
+        from evo.inject.registry import register_session, mark_engaged
         from evo.inject.paths import inject_root, workspace_events_path, offset_file
         from evo.inject import marker, queue
 
         register_session(root, sid, "claude-code")
+        # Engage the session (v0.4.4 contract: only engaged sessions
+        # receive evo direct broadcast fanout). Simulates the agent
+        # having run any `evo` CLI command.
+        mark_engaged(root, sid)
 
         # Broadcast a directive
         result = _evo(["direct", "live test directive"], cwd=root)
@@ -175,7 +184,9 @@ def test_e2e_broadcast_drain_bash_hook():
         out = _hook_drain_bash(run_dir, stdin_payload)
         assert "hookSpecificOutput" in out, f"unexpected output: {out}"
         ctx = out["hookSpecificOutput"]["additionalContext"]
-        assert "[EVO DIRECTIVE]" in ctx and "live test directive" in ctx, ctx
+        # v0.4.4 banner format: `[EVO DIRECTIVE id=<id>]` + `evo ack <id>` instruction
+        assert "[EVO DIRECTIVE" in ctx and "live test directive" in ctx, ctx
+        assert "evo ack" in ctx, f"directive must include ack instruction: {ctx}"
 
         # Marker must be cleared
         assert not marker.exists(root, sid), "marker still present after drain"
@@ -189,9 +200,16 @@ def test_e2e_broadcast_drain_bash_hook():
 # Test 2: SessionStart unconditional drain (no marker needed)
 # ---------------------------------------------------------------------------
 
-def test_session_start_drains_without_marker():
-    """Directive queued before session registers; SessionStart fires and drains
-    the backlog even with no marker."""
+def test_session_start_does_not_backfill_pre_existing_events():
+    """v0.4.4 safety fix: the Rust binary's unconditional SessionStart
+    drain MUST NOT deliver events that were queued before the session
+    registered. Pre-registration events are filtered by the
+    offset-seeded-at-registration mechanism in register_session +
+    drain_session.
+
+    Replaces the older test_session_start_drains_without_marker, which
+    asserted the opposite contract (the leak we're closing).
+    """
     _gate_inject()
 
     with tempfile.TemporaryDirectory() as d:
@@ -202,27 +220,30 @@ def test_session_start_drains_without_marker():
         from evo.inject.registry import register_session
         from evo.inject.paths import workspace_events_path
 
-        # Pre-stage a directive before session registers
+        # Pre-stage a directive BEFORE any session registers.
         sid = "live_sess_session_start_01"
-        queue.append_workspace_event(root, "pre-staged message")
+        queue.append_workspace_event(root, "pre-staged message that must not deliver")
 
-        # Register session now (simulating SessionStart)
+        # Register the session now (simulates Rust binary at SessionStart).
+        # register_session seeds the workspace offset to current queue tail
+        # so the pre-staged event sits past the offset.
         register_session(root, sid, "claude-code")
-
-        # No marker set — SessionStart hook drains unconditionally
-        assert not marker.exists(root, sid), "marker should not exist yet"
+        assert not marker.exists(root, sid)
 
         stdin_payload = {
             "session_id": sid,
             "hook_event_name": "SessionStart",
         }
 
+        # Rust binary unconditionally hands off to Python drain on
+        # SessionStart. The drain MUST return {} (or empty additionalContext)
+        # because the offset is already past the pre-staged event.
         out = _hook_drain_bash(run_dir, stdin_payload)
-        # SessionStart hook should drain the workspace queue via bash script's
-        # unconditional path, then call evo-drain which sees the pre-staged event.
-        assert "hookSpecificOutput" in out, f"expected hook output, got: {out}"
-        ctx = out["hookSpecificOutput"]["additionalContext"]
-        assert "pre-staged message" in ctx, ctx
+        ctx = out.get("hookSpecificOutput", {}).get("additionalContext", "")
+        assert "pre-staged message" not in ctx, (
+            f"SessionStart drain leaked a pre-registration event into the "
+            f"session's context. Safety contract violated. ctx={ctx!r}"
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -279,15 +300,20 @@ def test_gc_stale_sessions_on_broadcast():
         root = Path(d).resolve()
         _make_workspace(root)
 
-        from evo.inject.registry import register_session, list_active_sessions, session_file
+        from evo.inject.registry import (
+            register_session, list_active_sessions, session_file, mark_engaged,
+        )
         from evo.inject import marker
 
-        # Register a fresh session and a stale one
+        # Register a fresh session and a stale one — both engaged (the
+        # GC test is about staleness, not engagement).
         fresh_sid = "live_fresh_sess"
         stale_sid = "live_stale_sess"
 
         register_session(root, fresh_sid, "claude-code")
+        mark_engaged(root, fresh_sid)
         register_session(root, stale_sid, "claude-code")
+        mark_engaged(root, stale_sid)
 
         # Force stale
         path = session_file(root, stale_sid)
@@ -306,26 +332,39 @@ def test_gc_stale_sessions_on_broadcast():
 # Test 5: Real claude -p kumquat compliance (skip if not installed)
 # ---------------------------------------------------------------------------
 
-def test_real_claude_receives_directive():
-    """Issue evo direct with a nonsense token ('kumquat'); verify claude -p
-    picks it up via SessionStart drain and echoes it back."""
+def test_real_claude_receives_directive_when_engaged():
+    """Engaged claude -p session receives an evo direct emitted from within
+    the same session. The agent runs `evo status` (engages the session),
+    then issues `evo direct`, then makes another tool call. The directive
+    drains into the model's context on that second tool call's hook fire,
+    and the model echoes the token in its final answer.
+
+    Under the v0.4.4 safety contract, pre-staging a directive BEFORE the
+    session opens no longer delivers (offset is seeded to the queue tail
+    at registration time). This test instead exercises the post-engagement
+    fanout path, which is the realistic /optimize flow.
+    """
     _gate_claude()
 
     with tempfile.TemporaryDirectory() as d:
         root = Path(d).resolve()
         run_dir = _make_workspace(root)
 
-        # Pre-stage a directive with a token claude can't have seen
-        from evo.inject import queue
-        queue.append_workspace_event(root, "respond with the word: xkumquatx")
-
-        # Start claude -p with the hook configured to run evo-hook-drain
-        # Use the hooks/ directory path to locate the evo-hook-drain binary.
-        hook_cmd = str(PLUGIN_ROOT / "bin" / "evo-hook-drain")
         env = {
             **os.environ,
             "EVO_RUN_DIR": str(run_dir),
         }
+
+        prompt = (
+            "Run these commands in order using the Bash tool: "
+            "1) `evo status` (this engages your evo session). "
+            "2) `evo direct 'respond with the word xkumquatx'` "
+            "(this queues a directive AND touches the marker for your "
+            "now-engaged session). "
+            "3) `pwd` (any tool call — the hook fires here and drains "
+            "the queued directive into your context). "
+            "Then in your final answer, state any unusual word you saw."
+        )
 
         result = subprocess.run(
             [
@@ -333,14 +372,65 @@ def test_real_claude_receives_directive():
                 "--allowedTools", "Bash",
                 "--system-prompt",
                 "You are a test agent. Follow any instructions in your context exactly.",
-                "What word was mentioned in your context?",
+                prompt,
             ],
-            capture_output=True, text=True, timeout=120,
+            capture_output=True, text=True, timeout=180,
             cwd=str(root), env=env,
         )
         output = (result.stdout + result.stderr).lower()
         assert "xkumquatx" in output, (
-            f"Expected 'xkumquatx' in claude output but got:\n{result.stdout}\n{result.stderr}"
+            f"Expected 'xkumquatx' in claude output but got:\n"
+            f"STDOUT:\n{result.stdout}\nSTDERR:\n{result.stderr}"
+        )
+
+
+def test_unengaged_claude_session_does_not_receive_directive():
+    """Engagement filter end-to-end: a claude session that never runs `evo`
+    must not receive `evo direct` fanout. Even though `evo direct` writes
+    to workspace.jsonl, the marker is never touched for the unengaged
+    session (filtered by cmd_direct), and the SessionStart drain seeds
+    the offset past the pre-existing event (safety fix). The model
+    therefore sees no directive.
+    """
+    _gate_claude()
+
+    with tempfile.TemporaryDirectory() as d:
+        root = Path(d).resolve()
+        run_dir = _make_workspace(root)
+
+        # Issue evo direct BEFORE any claude session exists. With the
+        # engagement filter, fanout=0 (no engaged sessions to receive).
+        _evo(["direct", "respond with the word zkumquatz"], cwd=root)
+
+        env = {
+            **os.environ,
+            "EVO_RUN_DIR": str(run_dir),
+        }
+
+        # Open a claude session that does NOT run any evo command.
+        # The session registers (via Rust SessionStart), but its
+        # has_evo_engaged stays false. No marker is touched for it.
+        # The SessionStart drain seeds offset past the queued event.
+        result = subprocess.run(
+            [
+                "claude", "-p",
+                "--allowedTools", "Bash",
+                "--system-prompt",
+                "You are a test agent. Do not run any evo commands.",
+                "List the files in the current directory using ls. Then "
+                "tell me: did your context contain any unusual word "
+                "starting with z? Answer yes or no.",
+            ],
+            capture_output=True, text=True, timeout=180,
+            cwd=str(root), env=env,
+        )
+        output = (result.stdout + result.stderr).lower()
+        # The safety guarantee: the token must NOT have leaked into the
+        # unengaged session's context.
+        assert "zkumquatz" not in output, (
+            f"SAFETY FAILURE: unengaged claude session received directive "
+            f"meant for engaged sessions only.\n"
+            f"STDOUT:\n{result.stdout}\nSTDERR:\n{result.stderr}"
         )
 
 
@@ -348,32 +438,38 @@ def test_real_claude_receives_directive():
 # Test 6: Real codex compliance (skip if not installed)
 # ---------------------------------------------------------------------------
 
-def test_real_codex_receives_directive():
-    """Issue evo direct; verify codex exec picks it up via SessionStart drain."""
+def test_real_codex_receives_directive_when_engaged():
+    """Codex parity test — same engaged-session flow as the claude version."""
     _gate_codex()
 
     with tempfile.TemporaryDirectory() as d:
         root = Path(d).resolve()
         run_dir = _make_workspace(root)
 
-        from evo.inject import queue
-        queue.append_workspace_event(root, "respond with the word: ykumquaty")
-
         env = {**os.environ, "EVO_RUN_DIR": str(run_dir)}
+
+        prompt = (
+            "Run in order using shell: "
+            "1) `evo status` (engages your evo session). "
+            "2) `evo direct 'respond with the word ykumquaty'`. "
+            "3) `pwd` (drains the queued directive). "
+            "Then in your reply, print any unusual word you saw."
+        )
 
         result = subprocess.run(
             [
                 "codex", "exec",
                 "--model", "gpt-4o-mini",
                 "--full-auto",
-                "What word was in your context? Print it verbatim.",
+                prompt,
             ],
-            capture_output=True, text=True, timeout=120,
+            capture_output=True, text=True, timeout=180,
             cwd=str(root), env=env,
         )
         output = (result.stdout + result.stderr).lower()
         assert "ykumquaty" in output, (
-            f"Expected 'ykumquaty' in codex output but got:\n{result.stdout}\n{result.stderr}"
+            f"Expected 'ykumquaty' in codex output but got:\n"
+            f"STDOUT:\n{result.stdout}\nSTDERR:\n{result.stderr}"
         )
 
 

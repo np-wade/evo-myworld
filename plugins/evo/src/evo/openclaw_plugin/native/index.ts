@@ -1,30 +1,52 @@
-// Openclaw-native plugin for evo mid-run inject.
+// Openclaw-native plugin for evo /optimize steering + mid-run inject.
 //
-// Delivery mechanism: `tool_result_persist` hook — mutate the assistant
-// tool-result message before persistence. The LLM sees the directive
-// as part of the most recent tool-result message on its next reasoning
-// step.
+// Four hook subscriptions, each verified against openclaw's
+// `src/plugins/hook-types.ts` and `src/plugins/hooks.ts`:
 //
-// Why `tool_result_persist`:
-//   It is the only documented hook that (a) fires per tool result in
-//   embedded `openclaw agent --message` mode and (b) lets the handler
-//   return a modified message that lands in the conversation stream
-//   the LLM reads on its next turn. `agent_turn_prepare` /
-//   `before_prompt_build` fire only at session start in embedded mode;
-//   `enqueueNextTurnInjection` queues to a boundary that never fires
-//   again; `before_tool_call` mutates tool params, which is the wrong
-//   semantic (the directive is not part of the tool call).
+//   - `tool_result_persist` — mid-run directive delivery. Appends the
+//     latest `evo direct` payload to the most recent tool-result
+//     message so the LLM sees it on its next reasoning step.
 //
-// Session register: subscribe to `session_start` for early register
-// so `evo direct` fanout includes this run before the first tool
-// result lands. A 1500ms poll covers runtimes where session_start
-// does not fire.
+//   - `before_prompt_build` — `/optimize` auto-arm. The hook receives
+//     the user prompt before the LLM call (docs/concepts/agent-loop.md:
+//     "runs after session load to inject prependContext... before
+//     prompt submission"). Pattern match flips optimize_mode on the
+//     session record.
+//
+//   - `before_tool_call` — synchronous deny gate. Returning
+//     `{ block: true, blockReason: ... }` short-circuits the tool and
+//     feeds blockReason back to the model as the error. Dispatcher at
+//     hooks.ts:569 (`shouldStop: result.block === true`, terminal).
+//
+//   - `before_agent_finalize` — stop nudge. Returning
+//     `{ action: "revise", retry: { instruction, idempotencyKey } }`
+//     forces another model pass with the EVO LOOP banner so the agent
+//     keeps driving /optimize autonomously. Merger at hooks.ts:166
+//     preserves `revise` over `continue`.
+//
+// Session register: subscribe to `session_start` + the prompt-build
+// events for early register so `evo direct` fanout includes this run
+// before the first tool result lands. A 1500ms poll covers runtimes
+// where none of the startup events fire.
 
 import {
+  POLICY_NUDGE_TEMPLATE,
+  STOP_NUDGE_TEMPLATE,
   drainSession,
   findEvoRunDir,
+  initOffsetToLatest,
+  isAcked,
   isRegistered,
+  markAutonomous,
+  markEngaged,
+  markSubagentsOnly,
+  maybeMarkOptimizeFromPrompt,
+  parseDirectiveIds,
+  maybeStopNudgeText,
   registerSession,
+  shouldPolicyBlock,
+  unmarkAutonomous,
+  unmarkSubagentsOnly,
 } from "../../opencode_plugin/drain.js"
 import * as crypto from "crypto"
 import * as fs from "fs"
@@ -63,7 +85,12 @@ function deriveSessionId(): string {
   const marker = "/.evo/"
   const idx = runDir.indexOf(marker)
   const workspace = idx >= 0 ? runDir.slice(0, idx) : process.cwd()
-  const hash = crypto.createHash("sha256").update(workspace).digest("hex").slice(0, 12)
+  // Include EVO_EXP_ID in the seed so subagents get a distinct sid
+  // from the parent and from each other. See factory.ts deriveSessionId
+  // for the design rationale.
+  const expId = process.env.EVO_EXP_ID || ""
+  const seed = expId ? `${workspace}|${expId}` : workspace
+  const hash = crypto.createHash("sha256").update(seed).digest("hex").slice(0, 12)
   return "openclaw-" + hash
 }
 
@@ -71,17 +98,26 @@ function deriveSessionId(): string {
 // the parent's drain advances the on-disk offset the subagent's drain
 // returns null. Cache the drained text so the directive re-appends
 // to every subsequent tool-result message until session end.
-const drainedTexts: string[] = []
+// Track each drained directive by its event ids so directiveBanner can
+// stop re-appending it once the agent acks (otherwise the same directive
+// re-appends to every tool-result message until session end → repeated
+// re-acks + context bloat).
+const drainedItems: { ids: string[]; text: string }[] = []
 
-function directiveBanner(): string {
-  if (drainedTexts.length === 0) return ""
-  // drainedTexts entries are already wrapped with
-  // [EVO DIRECTIVE]...[END EVO DIRECTIVE] by formatDirectiveText()
-  // inside drainSession() (shared with opencode plugin). Don't
-  // double-wrap — produces nested banners that violate the documented
-  // contract in optimize/subagent skills and that stricter models
-  // (opus-4-7) refuse outright.
-  return "\n" + drainedTexts.join("\n\n")
+function directiveBanner(runDir: string): string {
+  // Drop directives the agent has already acked, so a delivered+acked
+  // directive stops being re-injected. Legacy items with no parseable id
+  // are kept (can't track ack).
+  for (let i = drainedItems.length - 1; i >= 0; i--) {
+    const it = drainedItems[i]
+    if (it.ids.length > 0 && it.ids.every((id) => isAcked(runDir, id))) {
+      drainedItems.splice(i, 1)
+    }
+  }
+  if (drainedItems.length === 0) return ""
+  // entries are already wrapped with [EVO DIRECTIVE]...[END EVO DIRECTIVE]
+  // by formatDirectiveText() inside drainSession() — don't double-wrap.
+  return "\n" + drainedItems.map((it) => it.text).join("\n\n")
 }
 
 export default {
@@ -96,9 +132,27 @@ export default {
       const runDir = findOpenclawRunDir()
       if (!runDir) return null
       const sid = deriveSessionId()
+      // Subagent gets a distinct sid (via EVO_EXP_ID in the hash);
+      // pass exp_id at first registration so the record is tagged
+      // correctly from birth.
       if (!isRegistered(runDir, sid)) {
-        registerSession(runDir, sid, "openclaw")
-        log(`registered session ${sid} in ${runDir}`)
+        const expId = process.env.EVO_EXP_ID || null
+        registerSession(runDir, sid, "openclaw", expId)
+        log(`registered session ${sid} in ${runDir}${expId ? " (exp_id=" + expId + ")" : ""}`)
+        // Engage the session immediately. The original
+        // scan-the-LLM-payload engagement signal doesn't work for
+        // openclaw orchestrators that dispatch all evo work to
+        // subagents (claude-sonnet-4-5 commonly does this) — the
+        // parent's own payload never contains `evo …` so it stays
+        // unengaged forever and `evo direct` falls through with
+        // fanout=0 / skipped_unengaged=1. The engagement gate exists
+        // to filter stale registered-but-inactive sessions; for
+        // openclaw the host process IS the orchestrator, so its
+        // existence is the engagement signal. Same fix shape as the
+        // pi-extension bundle (see factory.ts).
+        if (markEngaged(runDir, sid)) {
+          initOffsetToLatest(runDir, sid)
+        }
       }
       return { runDir, sid }
     }
@@ -106,7 +160,7 @@ export default {
     const pumpDirectives = (runDir: string, sid: string) => {
       const result = drainSession(runDir, sid)
       if (result.text) {
-        drainedTexts.push(result.text)
+        drainedItems.push({ ids: parseDirectiveIds(result.text), text: result.text })
         log(`drained ${result.text.length} bytes`)
       }
     }
@@ -115,7 +169,9 @@ export default {
     // modes) emit different startup events. Subscribing to all keeps
     // session registration race-free across runtimes. `ensureRegistered`
     // is idempotent so duplicate calls cost nothing.
-    for (const ev of ["agent_turn_prepare", "before_prompt_build", "before_agent_run", "session_start"]) {
+    // `before_prompt_build` is handled below (it does both register and
+    // auto-arm); listing it here would register twice on the same hook.
+    for (const ev of ["agent_turn_prepare", "before_agent_run", "session_start"]) {
       try {
         api.on(ev, async () => {
           ensureRegistered()
@@ -135,11 +191,116 @@ export default {
       ;(interval as any).unref()
     }
 
-    api.on("tool_result_persist", async (event: any) => {
-      const ctx = ensureRegistered()
-      if (ctx) pumpDirectives(ctx.runDir, ctx.sid)
+    // Extract the most recent user-text from a before_prompt_build
+    // event payload. openclaw's prompt-build payload shape is not
+    // fully documented; sniff both `messages[]` (anthropic style) and
+    // `input[]` (openai style) and pick the trailing user message.
+    const extractLatestUserText = (event: any): string | null => {
+      try {
+        const sources = [event?.messages, event?.payload?.messages,
+                         event?.input, event?.payload?.input,
+                         event?.userMessage ? [event.userMessage] : null,
+                         event?.prompt ? [{ role: "user", content: event.prompt }] : null]
+        for (const arr of sources) {
+          if (!Array.isArray(arr)) continue
+          for (let i = arr.length - 1; i >= 0; i--) {
+            const m = arr[i]
+            if (!m || (m.role && m.role !== "user")) continue
+            if (typeof m.content === "string" && m.content) return m.content
+            if (Array.isArray(m.content)) {
+              for (const c of m.content) {
+                if (typeof c?.text === "string" && c.text) return c.text
+              }
+            }
+            if (typeof m.text === "string" && m.text) return m.text
+          }
+        }
+      } catch {}
+      return null
+    }
 
-      if (drainedTexts.length === 0) return undefined
+    api.on("before_prompt_build", async (event: any) => {
+      const ctx = ensureRegistered()
+      if (!ctx) return undefined
+      try {
+        const promptText = extractLatestUserText(event)
+        if (promptText) {
+          maybeMarkOptimizeFromPrompt(ctx.runDir, ctx.sid, "openclaw", promptText)
+        }
+      } catch {}
+      return undefined
+    })
+
+    // Deny gate. Failure policy is "fail-closed" (hooks.ts:842), so a
+    // thrown handler also denies the tool. Wrap everything defensively
+    // so transient errors (e.g. inject dir missing) fail-open instead.
+    api.on("before_tool_call", async (event: any) => {
+      try {
+        const ctx = ensureRegistered()
+        if (!ctx) return undefined
+        const toolName = event?.toolName ?? event?.tool_name ?? event?.tool?.name
+        const toolInput = event?.params ?? event?.input ?? event?.tool?.params ?? {}
+        // Autonomous arming via command observation (no session env var on
+        // openclaw/pi, so the CLI can't self-detect). Fires on the actual
+        // `evo autonomous on|off` / `evo exit-optimize-mode` command.
+        const cmd = (toolInput as any)?.command
+        if (typeof cmd === "string") {
+          if (/^\s*evo\s+exit-optimize-mode\b/.test(cmd)) {
+            unmarkAutonomous(ctx.runDir, ctx.sid)
+            unmarkSubagentsOnly(ctx.runDir, ctx.sid)
+          } else if (/^\s*evo\s+autonomous\s+off\s*$/.test(cmd)) {
+            unmarkAutonomous(ctx.runDir, ctx.sid)
+          } else if (/^\s*evo\s+autonomous(\s+on)?\s*$/.test(cmd)) {
+            markAutonomous(ctx.runDir, ctx.sid)
+          } else if (/^\s*evo\s+subagents-only\s+off\s*$/.test(cmd)) {
+            unmarkSubagentsOnly(ctx.runDir, ctx.sid)
+          } else if (/^\s*evo\s+subagents-only(\s+on)?\s*$/.test(cmd)) {
+            markSubagentsOnly(ctx.runDir, ctx.sid)
+          }
+        }
+        if (shouldPolicyBlock(ctx.runDir, ctx.sid, toolName, toolInput)) {
+          log(`deny ${toolName} in optimize_mode`)
+          return { block: true, blockReason: POLICY_NUDGE_TEMPLATE }
+        }
+      } catch (err: any) {
+        log(`before_tool_call error (fail-open): ${err?.message ?? err}`)
+      }
+      return undefined
+    })
+
+    // Stop nudge — keep /optimize running autonomously across turns.
+    // idempotencyKey is per-firing so each finalize gets its own retry.
+    api.on("before_agent_finalize", async (event: any) => {
+      try {
+        const ctx = ensureRegistered()
+        if (!ctx) return undefined
+        const instruction = maybeStopNudgeText(ctx.runDir, ctx.sid)
+        if (instruction) {
+          const turnId = event?.agentRunId ?? event?.runId ?? Date.now()
+          log(`stop nudge revise sid=${ctx.sid} turn=${turnId}`)
+          return {
+            action: "revise",
+            retry: {
+              instruction,
+              idempotencyKey: `evo-optimize-${ctx.sid}-${turnId}`,
+            },
+          }
+        }
+      } catch (err: any) {
+        log(`before_agent_finalize error: ${err?.message ?? err}`)
+      }
+      return undefined
+    })
+
+    // Synchronous in openclaw (hooks.ts:42) — async handler returns a
+    // Promise that the runtime discards, swallowing the mutation. Body
+    // is pure sync filesystem so the `async` is unneeded.
+    api.on("tool_result_persist", (event: any) => {
+      const ctx = ensureRegistered()
+      if (!ctx) return undefined
+      pumpDirectives(ctx.runDir, ctx.sid)
+
+      if (drainedItems.length === 0) return undefined
 
       // Per docs: handler returns the modified message (rewrites
       // `details` or `content`). Payload shape is not documented
@@ -148,7 +309,7 @@ export default {
       const msg = event?.message ?? event?.assistantMessage ?? event
       if (!msg || typeof msg !== "object") return undefined
 
-      const banner = directiveBanner()
+      const banner = directiveBanner(ctx.runDir)
       let mutated = false
       const tryAppendString = (obj: any, key: string) => {
         // Re-entry guard: skip if this message already contains the

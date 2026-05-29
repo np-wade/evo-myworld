@@ -69,6 +69,7 @@ from .core import (
     render_git_diff,
 )
 from .locking import advisory_lock
+from .report import build_report
 from .scratchpad import build_scratchpad
 
 
@@ -140,42 +141,80 @@ def _pick_free_port(preferred: int, max_tries: int = 20) -> int:
 
 
 def _start_dashboard_background(root: Path, port: int = 8080) -> None:
-    """Start the dashboard as a background process.
+    """Start the dashboard via the supervisor as a detached subprocess.
+
+    Spawns `python -m evo.dashboard_supervisor` rather than the dashboard
+    directly. The supervisor owns the dashboard's lifecycle: captures
+    stdout/stderr to a rotated log file, respawns on crash with capped
+    backoff, gives up cleanly after a crash-on-startup loop.
 
     Probes for a free port starting at *port* (auto-increments on collision),
     writes the actual port to .evo/dashboard.port, and prints a clickable URL.
     """
-    pid_file = evo_dir(root) / "dashboard.pid"
-    port_file = evo_dir(root) / "dashboard.port"
+    edir = evo_dir(root)
+    pid_file = edir / "dashboard.pid"
+    supervisor_pid_file = edir / "supervisor.pid"
+    port_file = edir / "dashboard.port"
 
-    # If already running, surface the existing URL instead of starting a second.
-    if pid_file.exists():
+    # If a supervisor (or a bare dashboard from an older install) is already
+    # running, surface the existing URL instead of starting a second.
+    for candidate in (supervisor_pid_file, pid_file):
+        if not candidate.exists():
+            continue
         try:
-            pid = int(pid_file.read_text().strip())
+            pid = int(candidate.read_text().strip())
             os.kill(pid, 0)
             existing = port_file.read_text().strip() if port_file.exists() else str(port)
-            print(f"Dashboard live: http://127.0.0.1:{existing} (pid {pid})")
+            label = "supervisor" if candidate is supervisor_pid_file else "pid"
+            print(f"Dashboard live: http://127.0.0.1:{existing} ({label} {pid})")
             return
         except (OSError, ValueError):
-            pid_file.unlink(missing_ok=True)
+            candidate.unlink(missing_ok=True)
 
     actual_port = _pick_free_port(port)
 
     env = os.environ.copy()
     env["EVO_DASHBOARD_PORT"] = str(actual_port)
+    env["EVO_SUPERVISOR_ROOT"] = str(root)
 
-    proc = subprocess.Popen(
-        [sys.executable, "-m", "evo.dashboard"],
-        cwd=root,
+    # Cross-platform detach so the supervisor outlives the `evo init`
+    # process and the calling terminal. POSIX uses `setsid` via
+    # start_new_session; Windows needs explicit creation flags
+    # (DETACHED_PROCESS | CREATE_NEW_PROCESS_GROUP | CREATE_NO_WINDOW) —
+    # `start_new_session` is silently ignored there.
+    spawn_kwargs: dict = dict(
+        cwd=str(root),
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
-        start_new_session=True,
+        stdin=subprocess.DEVNULL,
         env=env,
     )
-    pid_file.write_text(str(proc.pid))
+    if os.name == "nt":
+        # creationflags values per Windows API; integers because
+        # subprocess.DETACHED_PROCESS etc. are only defined on Windows.
+        DETACHED_PROCESS = 0x00000008
+        CREATE_NEW_PROCESS_GROUP = 0x00000200
+        CREATE_NO_WINDOW = 0x08000000
+        spawn_kwargs["creationflags"] = (
+            DETACHED_PROCESS | CREATE_NEW_PROCESS_GROUP | CREATE_NO_WINDOW
+        )
+        spawn_kwargs["close_fds"] = True
+    else:
+        spawn_kwargs["start_new_session"] = True
+
+    proc = subprocess.Popen(
+        [sys.executable, "-m", "evo.dashboard_supervisor"],
+        **spawn_kwargs,
+    )
+    # The supervisor writes its own pid file once it acquires the lock.
+    # We don't write dashboard.pid here — the supervisor does, after it
+    # spawns the actual dashboard child.
     port_file.write_text(str(actual_port))
     note = "" if actual_port == port else f" (port {port} busy, bumped to {actual_port})"
-    print(f"Dashboard live: http://127.0.0.1:{actual_port} (pid {proc.pid}){note}")
+    print(
+        f"Dashboard live: http://127.0.0.1:{actual_port} "
+        f"(supervisor pid {proc.pid}){note}"
+    )
 
 
 def _parse_provider_config_arg(raw: str | None) -> dict[str, str]:
@@ -458,6 +497,57 @@ def cmd_config(args: argparse.Namespace) -> int:
     raise RuntimeError(f"unknown config action: {args.config_action}")
 
 
+# Field name (CLI, dashed) -> stored key in the global defaults file.
+_DEFAULTS_FIELD_TO_KEY: dict[str, str] = {
+    "autonomous": "autonomous",
+    "subagents-only": "subagents_only",
+}
+
+
+def cmd_defaults(args: argparse.Namespace) -> int:
+    if args.defaults_action == "show":
+        return cmd_defaults_show(args)
+    if args.defaults_action == "set":
+        return cmd_defaults_set(args)
+    if args.defaults_action == "get":
+        return cmd_defaults_get(args)
+    raise RuntimeError(f"unknown defaults action: {args.defaults_action}")
+
+
+def cmd_defaults_show(args: argparse.Namespace) -> int:
+    from .user_defaults import load_user_defaults, global_defaults_path
+
+    data = load_user_defaults()
+    if getattr(args, "json", False):
+        print(json.dumps(data, indent=2, sort_keys=True))
+        return 0
+    print(f"path: {global_defaults_path()}")
+    for field, key in _DEFAULTS_FIELD_TO_KEY.items():
+        value = data.get(key)
+        shown = "unset" if value is None else str(bool(value)).lower()
+        print(f"{field}: {shown}")
+    return 0
+
+
+def cmd_defaults_get(args: argparse.Namespace) -> int:
+    from .user_defaults import get_user_default
+
+    value = get_user_default(_DEFAULTS_FIELD_TO_KEY[args.field])
+    if getattr(args, "json", False):
+        print(json.dumps(value))
+        return 0
+    print("" if value is None else str(value).lower())
+    return 0
+
+
+def cmd_defaults_set(args: argparse.Namespace) -> int:
+    from .user_defaults import set_user_default
+
+    set_user_default(_DEFAULTS_FIELD_TO_KEY[args.field], _parse_onoff(args.value))
+    print(f"default {args.field} set")
+    return 0
+
+
 def _redact_config_value(value: Any) -> Any:
     if isinstance(value, dict):
         redacted = {}
@@ -496,6 +586,8 @@ def cmd_config_show(args: argparse.Namespace) -> int:
     print(f"metric: {data.get('metric', '')}")
     print(f"host: {get_host(root) or '<not set>'}")
     print(f"commit_strategy: {data.get('commit_strategy', 'all')}")
+    print(f"default_autonomous: {str(bool(data.get('default_autonomous'))).lower()}")
+    print(f"default_subagents_only: {str(bool(data.get('default_subagents_only'))).lower()}")
     print(f"execution_backend: {data.get('execution_backend', 'worktree')}")
     backend_config = data.get("execution_backend_config") or {}
     if backend_config:
@@ -518,7 +610,26 @@ _CONFIG_FIELD_TO_KEY: dict[str, str] = {
     "max-attempts": "max_attempts",
     "gate": "gate",
     "frontier-strategy": "frontier_strategy",
+    "default-autonomous": "default_autonomous",
+    "default-subagents-only": "default_subagents_only",
 }
+
+# Workspace run-behavior defaults captured at discover time. Off by default;
+# optimize reads these at startup and arms the matching per-session command.
+_CONFIG_BOOL_FIELDS: frozenset[str] = frozenset(
+    {"default-autonomous", "default-subagents-only"}
+)
+
+
+def _parse_onoff(value: str) -> bool:
+    """Parse an on/off-style config value into a bool. Accepts
+    on/off, true/false, yes/no, 1/0 (case-insensitive)."""
+    norm = value.strip().lower()
+    if norm in {"on", "true", "yes", "1"}:
+        return True
+    if norm in {"off", "false", "no", "0"}:
+        return False
+    raise RuntimeError(f"value must be on/off (got {value!r})")
 
 
 def cmd_config_get(args: argparse.Namespace) -> int:
@@ -585,6 +696,8 @@ def cmd_config_set(args: argparse.Namespace) -> int:
                 config["frontier_strategy"] = fs.validate_frontier_strategy(parsed)
             except ValueError as exc:
                 raise RuntimeError(str(exc))
+        elif args.field in _CONFIG_BOOL_FIELDS:
+            config[_CONFIG_FIELD_TO_KEY[args.field]] = _parse_onoff(args.value)
         else:
             raise RuntimeError(f"unknown config field: {args.field}")
         atomic_write_json(config_path(root), config)
@@ -939,9 +1052,37 @@ def _read_status(root: Path, exp_id: str) -> str:
     return p.read_text(encoding="utf-8").strip()
 
 
+def _win_pid_alive(pid: int) -> bool:
+    """Windows liveness probe. os.kill(pid, 0) is unusable here — signal 0
+    is CTRL_C_EVENT on Windows, not a "does this process exist" check — so
+    query the OS directly: open the process and ask whether its handle is
+    still un-signaled (WAIT_TIMEOUT) vs. signaled/exited (WAIT_OBJECT_0)."""
+    import ctypes
+
+    SYNCHRONIZE = 0x00100000
+    PROCESS_QUERY_LIMITED_INFORMATION = 0x1000
+    WAIT_TIMEOUT = 0x102
+    ERROR_ACCESS_DENIED = 5
+
+    kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
+    handle = kernel32.OpenProcess(
+        SYNCHRONIZE | PROCESS_QUERY_LIMITED_INFORMATION, False, pid
+    )
+    if not handle:
+        # Can't open: access-denied means the process exists but isn't ours
+        # (alive); anything else (e.g. invalid parameter) means no such pid.
+        return ctypes.get_last_error() == ERROR_ACCESS_DENIED
+    try:
+        return kernel32.WaitForSingleObject(handle, 0) == WAIT_TIMEOUT
+    finally:
+        kernel32.CloseHandle(handle)
+
+
 def _is_pid_alive(pid: int) -> bool:
     if pid <= 0:
         return False
+    if os.name == "nt":
+        return _win_pid_alive(pid)
     try:
         os.kill(pid, 0)
         return True
@@ -951,8 +1092,6 @@ def _is_pid_alive(pid: int) -> bool:
         # pid exists but isn't ours — treat as alive
         return True
     except OSError:
-        # Windows: os.kill(pid, 0) on a dead pid raises generic OSError
-        # (errno EINVAL from OpenProcess), not ProcessLookupError.
         return False
 
 
@@ -1253,6 +1392,86 @@ def _cmd_dispatch_status(args: argparse.Namespace) -> int:
     if rp.exists():
         out["result"] = json.loads(rp.read_text(encoding="utf-8"))
     print(json.dumps(out, indent=2))
+    return 0
+
+
+def cmd_abort(args: argparse.Namespace) -> int:
+    """SIGTERM the driver process for the current attempt of <exp_id>.
+
+    Reads the driver PID stamped into attempt_state.json by `evo run` and
+    sends SIGTERM. After --timeout seconds (default 5), if the process is
+    still alive, escalates to SIGKILL. `--force` skips the grace period
+    and goes straight to SIGKILL.
+
+    Does not touch the experiment's graph state (status stays `active`
+    until evo's normal failure path runs). Once the driver exits, a
+    subsequent `evo run` will see the dead PID and reclaim the attempt.
+
+    Note: aborts only the driver process. If the benchmark spawned
+    workers detached via setsid/nohup, they survive — the driver was
+    coordinating them and is what `evo run` re-invocation gates on. For
+    a full process-tree kill across detached workers, see TODO #7.
+    """
+    import signal
+    import time as _time
+    root = repo_root()
+    _require_workspace(root)
+    node = _read_node(root, args.exp_id)
+    if node.get("status") != "active":
+        print(
+            f"NOTE: {args.exp_id} is {node.get('status')!r}, not active. "
+            f"Nothing to abort.",
+            file=sys.stderr,
+        )
+        return 0
+    attempt_n = int(node.get("current_attempt") or 0)
+    state = _read_attempt_state(root, args.exp_id, attempt_n) or {}
+    pid = int(state.get("pid") or 0)
+    if not pid:
+        print(
+            f"ERROR: no driver PID recorded for {args.exp_id} attempt "
+            f"{attempt_n:03d}. Pre-stamp attempts have no kill target; "
+            f"either let the driver finish or `evo discard --force` the "
+            f"experiment.",
+            file=sys.stderr,
+        )
+        return 1
+    if not _is_pid_alive(pid):
+        print(f"{args.exp_id}: driver PID {pid} already not alive")
+        return 0
+    # Windows has no SIGKILL; there os.kill(pid, SIGTERM) already maps to
+    # TerminateProcess (a hard kill), so SIGTERM is the forceful signal.
+    sigkill = getattr(signal, "SIGKILL", signal.SIGTERM)
+    sig = sigkill if args.force else signal.SIGTERM
+    try:
+        os.kill(pid, sig)
+    except ProcessLookupError:
+        print(f"{args.exp_id}: driver PID {pid} exited before signal")
+        return 0
+    except OSError as exc:
+        print(f"ERROR: failed to signal PID {pid}: {exc}", file=sys.stderr)
+        return 1
+    if args.force:
+        print(f"{args.exp_id}: SIGKILL sent to driver PID {pid}")
+        return 0
+    print(
+        f"{args.exp_id}: SIGTERM sent to driver PID {pid}; "
+        f"waiting up to {args.timeout}s for clean exit..."
+    )
+    deadline = _time.time() + max(0.0, args.timeout)
+    while _time.time() < deadline:
+        if not _is_pid_alive(pid):
+            print(f"{args.exp_id}: driver PID {pid} exited cleanly")
+            return 0
+        _time.sleep(0.25)
+    try:
+        os.kill(pid, sigkill)
+        print(
+            f"{args.exp_id}: driver PID {pid} did not exit in {args.timeout}s; "
+            f"escalated to SIGKILL"
+        )
+    except ProcessLookupError:
+        print(f"{args.exp_id}: driver PID {pid} exited during grace period")
     return 0
 
 
@@ -1912,6 +2131,73 @@ def _inherited_gate_specs(config: dict, graph: dict, parent_id: str) -> tuple[li
     return inherited_gates, gate_origins
 
 
+def _split_gates_by_phase(gates: list[dict]) -> tuple[list[dict], list[dict]]:
+    """Partition gates into (pre, post). Missing `phase` defaults to "post"
+    so gates registered before the pre/post split was introduced keep their
+    original behavior (run after the benchmark)."""
+    pre = [g for g in gates if g.get("phase", "post") == "pre"]
+    post = [g for g in gates if g.get("phase", "post") != "pre"]
+    return pre, post
+
+
+def _run_gate_batch(
+    gates: list[dict],
+    *,
+    gate_origins: dict[str, str],
+    config: dict,
+    target: Path,
+    worktree: Path,
+    run_cwd: Any,
+    gate_env: dict[str, str],
+    timeout: float | None,
+    log_dir: Path,
+    executor: Any,
+    mirror_dirs: list | None = None,
+    phase: str,
+    raise_on_timeout: bool,
+) -> tuple[list[dict], list[str]]:
+    """Run a list of gates; return (records, failures).
+
+    `raise_on_timeout=True` matches the real-run path: a timeout aborts
+    the run immediately (hard fail). `raise_on_timeout=False` matches
+    --check: timeout is recorded as a failure but the batch continues so
+    all gate issues surface in a single check.
+    """
+    records: list[dict] = []
+    failures: list[str] = []
+    for g in gates:
+        gate_cmd = _apply_runtime_prefix(
+            config,
+            fill_command_template(g["command"], target=target, worktree=worktree),
+        )
+        log_file = log_dir / f"gate_{g['name']}.log"
+        result = executor.stream(
+            ["sh", "-c", gate_cmd],
+            cwd=run_cwd, env=gate_env, timeout=timeout,
+            stdout_path=log_file, stderr_path=log_file,
+            mirror_dirs=mirror_dirs,
+        )
+        if result.timed_out:
+            records.append({
+                "name": g["name"], "from": gate_origins.get(g["name"], "config"),
+                "command": gate_cmd, "phase": phase,
+                "passed": False, "returncode": None, "error": "gate_timeout",
+            })
+            if raise_on_timeout:
+                raise RuntimeError(f"gate_timeout:{g['name']}")
+            failures.append(g["name"])
+            continue
+        passed = (result.exit_code or 0) == 0
+        records.append({
+            "name": g["name"], "from": gate_origins.get(g["name"], "config"),
+            "command": gate_cmd, "phase": phase,
+            "passed": passed, "returncode": result.exit_code,
+        })
+        if not passed:
+            failures.append(g["name"])
+    return records, failures
+
+
 def _cmd_run_check(
     args: argparse.Namespace,
     root: Path,
@@ -1994,6 +2280,25 @@ def _cmd_run_check(
             if record is not None:
                 runtime_records.append(record)
 
+        # Split gates by phase up front so pre-gates can run before the
+        # benchmark fires. A pre-gate failure aborts the check with no
+        # spend on the benchmark itself.
+        inherited_gates, gate_origins = _inherited_gate_specs(config, graph, node["parent"])
+        pre_gates, post_gates = _split_gates_by_phase(inherited_gates)
+        gate_env = {k: v for k, v in env.items() if not k.startswith("EVO_")}
+
+        if pre_gates:
+            pre_records, pre_failures = _run_gate_batch(
+                pre_gates, gate_origins=gate_origins, config=config,
+                target=target, worktree=worktree, run_cwd=run_cwd,
+                gate_env=gate_env, timeout=args.timeout,
+                log_dir=check_dir, executor=executor,
+                phase="pre", raise_on_timeout=False,
+            )
+            gate_records.extend(pre_records)
+            if pre_failures:
+                raise RuntimeError(f"pre_gate_failed:{','.join(pre_failures)}")
+
         bench = executor.stream(
             ["sh", "-c", benchmark_cmd],
             cwd=run_cwd, env=env, timeout=args.timeout,
@@ -2019,35 +2324,16 @@ def _cmd_run_check(
         score, parsed = load_result(result_path, bench.stdout)
         benchmark_record = {"command": benchmark_cmd, "returncode": 0, "result": parsed}
 
-        inherited_gates, gate_origins = _inherited_gate_specs(config, graph, node["parent"])
-        gate_env = {k: v for k, v in env.items() if not k.startswith("EVO_")}
-        gate_failures: list[str] = []
-        for g in inherited_gates:
-            gate_cmd = _apply_runtime_prefix(
-                config,
-                fill_command_template(g["command"], target=target, worktree=worktree),
-            )
-            gate_log_file = check_dir / f"gate_{g['name']}.log"
-            gate_result = executor.stream(
-                ["sh", "-c", gate_cmd],
-                cwd=run_cwd, env=gate_env, timeout=args.timeout,
-                stdout_path=gate_log_file, stderr_path=gate_log_file,
-            )
-            passed = not gate_result.timed_out and (gate_result.exit_code or 0) == 0
-            record = {
-                "name": g["name"],
-                "from": gate_origins.get(g["name"], "config"),
-                "command": gate_cmd,
-                "passed": passed,
-                "returncode": gate_result.exit_code,
-            }
-            if gate_result.timed_out:
-                record["error"] = "gate_timeout"
-            gate_records.append(record)
-            if not passed:
-                gate_failures.append(g["name"])
-        if gate_failures:
-            raise RuntimeError(f"gate_failed:{','.join(gate_failures)}")
+        post_records, post_failures = _run_gate_batch(
+            post_gates, gate_origins=gate_origins, config=config,
+            target=target, worktree=worktree, run_cwd=run_cwd,
+            gate_env=gate_env, timeout=args.timeout,
+            log_dir=check_dir, executor=executor,
+            phase="post", raise_on_timeout=False,
+        )
+        gate_records.extend(post_records)
+        if post_failures:
+            raise RuntimeError(f"gate_failed:{','.join(post_failures)}")
         status = "passed"
         print(f"CHECK_PASSED {args.exp_id} score={score} artifacts={check_dir}")
         return 0
@@ -2083,6 +2369,36 @@ def _cmd_run_impl(
     max_attempts: int,
     evaluated_attempts: int,
 ) -> int:
+    # Concurrent-attempt guard: refuse a second `evo run` while a local
+    # attempt is in flight. The driver PID is stamped into attempt_state
+    # on initial write; if it's still alive, this is a real race (silent
+    # parallel attempts multiply API spend by N). Remote backend has its
+    # own resume mechanism further down and is skipped here. `--force`
+    # bypasses for legitimate parallel starts (e.g. PID was recycled).
+    if (
+        not executor.is_remote
+        and node.get("status") == "active"
+        and not getattr(args, "force", False)
+    ):
+        prior_attempt = int(node.get("current_attempt") or 0)
+        prior_state = _read_attempt_state(root, args.exp_id, prior_attempt) or {}
+        prior_pid = int(prior_state.get("pid") or 0)
+        if prior_pid and _is_pid_alive(prior_pid):
+            print(
+                f"ERROR: {args.exp_id} already has attempt "
+                f"{prior_attempt:03d} active (driver PID {prior_pid}). "
+                f"Wait for it to finish, run `evo abort {args.exp_id}` "
+                f"to stop it, or pass --force to start a parallel attempt.",
+                file=sys.stderr,
+            )
+            return 1
+        if prior_pid:
+            print(
+                f"NOTE: reclaiming stale attempt {prior_attempt:03d} for "
+                f"{args.exp_id} (driver PID {prior_pid} is not alive)",
+                file=sys.stderr,
+            )
+
     # Shisa-kanko ack for tracked-only mode: when the worktree has any
     # untracked, non-gitignored files, the agent must affirm with
     # --i-staged-new-files that they have either staged any new source files
@@ -2185,14 +2501,23 @@ def _cmd_run_impl(
     if remote:
         # Sandbox-internal paths anchored under the backend-provided
         # workspace root. Modal uses /workspace/repo; manual and SSH may
-        # resolve elsewhere.
-        sandbox_traces_dir = f"{worktree}/.evo/traces"
-        sandbox_result_path = f"{worktree}/.evo/result.json"
+        # resolve elsewhere. Paths are per-attempt — a re-invocation
+        # cannot collide with a previous attempt's result.json or traces.
+        sandbox_attempt_root = f"{worktree}/.evo/{args.exp_id}/{attempt_n:03d}"
+        sandbox_traces_dir = f"{sandbox_attempt_root}/traces"
+        sandbox_result_path = f"{sandbox_attempt_root}/result.json"
         sandbox_checkpoint_dir = f"{worktree}/.evo/checkpoints/{args.exp_id}/{attempt_n:03d}"
         run_cwd: Path | str = worktree
         env_traces_dir = sandbox_traces_dir
         env_result_path = sandbox_result_path
         env_checkpoint_dir = sandbox_checkpoint_dir
+        # Clear any leftover from a prior partial attempt (e.g. one that
+        # was abandoned before result.json was written) so the SDK's
+        # O_EXCL claim in _backend.emit_result starts from a clean slate.
+        executor.run(
+            ["rm", "-rf", sandbox_attempt_root],
+            cwd=worktree,
+        )
         # Pre-create the traces dir inside the sandbox so the benchmark
         # can write into it without checking exists().
         executor.run(
@@ -2222,6 +2547,12 @@ def _cmd_run_impl(
         env_result_path=env_result_path,
         env_checkpoint_dir=env_checkpoint_dir,
     )
+    # Stamp this driver's PID so a re-invocation of `evo run` can detect
+    # whether the attempt is actually still in flight (the concurrent-run
+    # guard at the top reads this). Survives crashes; a dead PID lets the
+    # next invocation reclaim. Remote backend keeps its own resume metadata
+    # (process_id from the stream journal) and doesn't depend on this.
+    driver_pid = os.getpid()
     if resume_existing_attempt:
         _write_attempt_state(
             root, args.exp_id, attempt_n,
@@ -2230,6 +2561,7 @@ def _cmd_run_impl(
             started_at=started_at,
             extra={
                 "resumed_at": utc_now(),
+                "pid": driver_pid,
                 "checkpoint_dir": str(checkpoint_dir),
                 "remote_checkpoint_dir": sandbox_checkpoint_dir if remote else None,
             },
@@ -2241,6 +2573,7 @@ def _cmd_run_impl(
             status="running",
             started_at=started_at,
             extra={
+                "pid": driver_pid,
                 "checkpoint_dir": str(checkpoint_dir),
                 "remote_checkpoint_dir": sandbox_checkpoint_dir if remote else None,
             },
@@ -2305,6 +2638,32 @@ def _cmd_run_impl(
                 root, args.exp_id, attempt_n,
                 phase=phase_name, status="completed", started_at=started_at,
             )
+
+        # Split gates by phase up front so pre-gates can run before the
+        # benchmark. A pre-gate failure aborts the run before any
+        # benchmark spend — useful for cheap-detectable issues
+        # (cheat checks, file-hash checks, eval-data presence guards).
+        inherited_gates, gate_origins = _inherited_gate_specs(config, graph, node["parent"])
+        pre_gates, post_gates = _split_gates_by_phase(inherited_gates)
+        gate_env = {k: v for k, v in env.items() if not k.startswith("EVO_")}
+
+        if pre_gates and not benchmark_completed:
+            _write_attempt_state(
+                root, args.exp_id, attempt_n,
+                phase="pre_gates", status="running", started_at=started_at,
+            )
+            pre_records, pre_failures = _run_gate_batch(
+                pre_gates, gate_origins=gate_origins, config=config,
+                target=target, worktree=worktree, run_cwd=run_cwd,
+                gate_env=gate_env, timeout=args.timeout,
+                log_dir=a_dir, executor=executor,
+                mirror_dirs=[(sandbox_checkpoint_dir, checkpoint_dir)] if remote else None,
+                phase="pre", raise_on_timeout=True,
+            )
+            gate_records.extend(pre_records)
+            if pre_failures:
+                print(f"PRE_GATE_FAILED {' '.join(pre_failures)}")
+                raise RuntimeError(f"pre_gate_failed:{','.join(pre_failures)}")
 
         # Run benchmark via sh -c so the user-provided command string
         # (with placeholders interpolated) executes through a shell, same
@@ -2400,52 +2759,20 @@ def _cmd_run_impl(
             extra={"score": score},
         )
 
-        gate_passed = True
-        gate_failures: list[str] = []
-
-        inherited_gates, gate_origins = _inherited_gate_specs(config, graph, node["parent"])
-
-        # Strip EVO_* so an SDK-using gate can't clobber result.json or
-        # the benchmark's task_*.json traces.
-        gate_env = {k: v for k, v in env.items() if not k.startswith("EVO_")}
-
         _write_attempt_state(
             root, args.exp_id, attempt_n,
             phase="gates", status="running", started_at=started_at,
         )
-        for g in inherited_gates:
-            gate_cmd = _apply_runtime_prefix(
-                config,
-                fill_command_template(g["command"], target=target, worktree=worktree),
-            )
-            gate_log_file = a_dir / f"gate_{g['name']}.log"
-            gate_result = executor.stream(
-                ["sh", "-c", gate_cmd],
-                cwd=run_cwd, env=gate_env, timeout=args.timeout,
-                stdout_path=gate_log_file, stderr_path=gate_log_file,
-                mirror_dirs=[(sandbox_checkpoint_dir, checkpoint_dir)] if remote else None,
-            )
-            if gate_result.timed_out:
-                gate_records.append({
-                    "name": g["name"],
-                    "from": gate_origins.get(g["name"], "config"),
-                    "command": gate_cmd,
-                    "passed": False,
-                    "returncode": None,
-                    "error": "gate_timeout",
-                })
-                raise RuntimeError(f"gate_timeout:{g['name']}")
-            passed = (gate_result.exit_code or 0) == 0
-            gate_records.append({
-                "name": g["name"],
-                "from": gate_origins.get(g["name"], "config"),
-                "command": gate_cmd,
-                "passed": passed,
-                "returncode": gate_result.exit_code,
-            })
-            if not passed:
-                gate_failures.append(g["name"])
-                gate_passed = False
+        post_records, gate_failures = _run_gate_batch(
+            post_gates, gate_origins=gate_origins, config=config,
+            target=target, worktree=worktree, run_cwd=run_cwd,
+            gate_env=gate_env, timeout=args.timeout,
+            log_dir=a_dir, executor=executor,
+            mirror_dirs=[(sandbox_checkpoint_dir, checkpoint_dir)] if remote else None,
+            phase="post", raise_on_timeout=True,
+        )
+        gate_records.extend(post_records)
+        gate_passed = not gate_failures
 
         if gate_failures:
             print(f"GATE_FAILED {' '.join(gate_failures)}")
@@ -2878,7 +3205,15 @@ def cmd_prune(args: argparse.Namespace) -> int:
         current_node["pruned_reason"] = args.reason
 
     update_node(root, args.exp_id, _mark)
-    print(f"PRUNED {args.exp_id}: {args.reason}")
+    if args.reason is None:
+        print(
+            f"WARNING: pruning {args.exp_id} without a reason "
+            f"— pass `--reason \"...\"` to record one.",
+            file=sys.stderr,
+        )
+        print(f"PRUNED {args.exp_id}")
+    else:
+        print(f"PRUNED {args.exp_id}: {args.reason}")
     return 0
 
 
@@ -3038,17 +3373,62 @@ def cmd_gc(args: argparse.Namespace) -> int:
 
 
 def _stop_dashboard(root: Path) -> None:
-    """Stop the background dashboard if running."""
-    pid_file = evo_dir(root) / "dashboard.pid"
-    port_file = evo_dir(root) / "dashboard.port"
+    """Stop the background dashboard if running.
+
+    Asks the supervisor to shut down via the shutdown sentinel first — the
+    only portable mechanism, since on Windows an external SIGTERM is an
+    uncatchable hard kill that would orphan the dashboard child. On POSIX
+    also sends SIGTERM as a fast path. Falls back to signalling the
+    dashboard directly if the supervisor already died (older installs).
+    """
+    import signal as _signal
+    import time as _time
+    from .dashboard_supervisor import SHUTDOWN_SENTINEL_NAME
+
+    edir = evo_dir(root)
+    supervisor_pid_file = edir / "supervisor.pid"
+    pid_file = edir / "dashboard.pid"
+    port_file = edir / "dashboard.port"
+    dead_sentinel = edir / "dashboard.dead"
+    shutdown_sentinel = edir / SHUTDOWN_SENTINEL_NAME
+
+    sup_pid = None
+    if supervisor_pid_file.exists():
+        try:
+            sup_pid = int(supervisor_pid_file.read_text().strip())
+        except (OSError, ValueError):
+            sup_pid = None
+
+    if sup_pid:
+        # Clean shutdown: the supervisor watches this file, kills its child,
+        # and removes its own pid files — same path on every OS.
+        try:
+            shutdown_sentinel.write_text("stop\n", encoding="utf-8")
+        except OSError:
+            pass
+        if os.name != "nt":
+            try:
+                os.kill(sup_pid, _signal.SIGTERM)
+            except OSError:
+                pass
+        deadline = _time.time() + 6.0
+        while _time.time() < deadline and _is_pid_alive(sup_pid):
+            _time.sleep(0.1)
+        if _is_pid_alive(sup_pid):
+            try:  # last resort so it can't keep respawning the dashboard
+                os.kill(sup_pid, getattr(_signal, "SIGKILL", _signal.SIGTERM))
+            except OSError:
+                pass
+
     if pid_file.exists():
         try:
-            pid = int(pid_file.read_text().strip())
-            os.kill(pid, 15)  # SIGTERM
+            os.kill(int(pid_file.read_text().strip()), _signal.SIGTERM)
         except (OSError, ValueError):
             pass
-        pid_file.unlink(missing_ok=True)
-    port_file.unlink(missing_ok=True)
+
+    for f in (supervisor_pid_file, pid_file, port_file, dead_sentinel,
+              shutdown_sentinel):
+        f.unlink(missing_ok=True)
 
 
 def cmd_reset(args: argparse.Namespace) -> int:
@@ -3204,6 +3584,65 @@ def cmd_scratchpad(args: argparse.Namespace) -> int:
     root = repo_root()
     print(build_scratchpad(root))
     return 0
+
+
+def cmd_report(args: argparse.Namespace) -> int:
+    root = repo_root()
+    use_color: bool | None = None
+    if getattr(args, "color", None) == "always":
+        use_color = True
+    elif getattr(args, "color", None) == "never":
+        use_color = False
+    w = getattr(args, "width", None)
+    h = getattr(args, "height", None)
+    margin = getattr(args, "margin", None)
+    dots = getattr(args, "dots", None)
+    if dots == "auto":
+        dots = None
+    watch = getattr(args, "watch", None)
+
+    def _render_once() -> str:
+        size: tuple[int, int] | None = None
+        if w or h:
+            from .report import _detect_terminal_size
+            det_w, det_h = _detect_terminal_size()
+            size = (w or det_w, h or det_h)
+        return build_report(
+            root, use_color=use_color, size=size, margin=margin, dots=dots,
+        )
+
+    if watch is None:
+        sys.stdout.write(_render_once())
+        return 0
+
+    # nvidia-smi style live refresh. Cursor-home + clear-to-end on every
+    # tick so the new render overwrites the old without a visible blank.
+    # Hide the cursor during refresh so the user doesn't see it skipping
+    # around mid-redraw; restore on exit (including Ctrl-C).
+    interval = max(0.25, float(watch))
+    use_ansi = (use_color is True) or (use_color is None and sys.stdout.isatty())
+    HIDE, SHOW = "\033[?25l", "\033[?25h"
+    HOME_CLEAR = "\033[H\033[J"
+
+    if use_ansi:
+        sys.stdout.write(HIDE)
+        sys.stdout.flush()
+    try:
+        while True:
+            ts = time.strftime("%H:%M:%S")
+            banner = f"evo report — live · refresh every {interval:g}s · {ts}   (Ctrl-C to exit)\n"
+            if use_ansi:
+                sys.stdout.write(HOME_CLEAR + banner + _render_once())
+            else:
+                sys.stdout.write(banner + _render_once() + "\n")
+            sys.stdout.flush()
+            time.sleep(interval)
+    except KeyboardInterrupt:
+        return 0
+    finally:
+        if use_ansi:
+            sys.stdout.write(SHOW + "\n")
+            sys.stdout.flush()
 
 
 def cmd_awaiting(args: argparse.Namespace) -> int:
@@ -3522,7 +3961,10 @@ def cmd_gate(args: argparse.Namespace) -> int:
     config, graph = _require_workspace(root)
 
     if args.gate_action == "add":
-        entry = add_gate(root, args.exp_id, args.name, args.command)
+        entry = add_gate(
+            root, args.exp_id, args.name, args.command,
+            phase=getattr(args, "phase", "post"),
+        )
         print(json.dumps(entry, indent=2))
         return 0
 
@@ -3543,6 +3985,7 @@ def cmd_gate(args: argparse.Namespace) -> int:
             output.append({
                 "name": g["name"],
                 "command": g["command"],
+                "phase": g.get("phase", "post"),
                 "from": node_gates_map.get(g["name"], "unknown"),
             })
         print(json.dumps(output, indent=2))
@@ -3697,14 +4140,19 @@ def cmd_dashboard(args: argparse.Namespace) -> int:
 
 
 def cmd_install(args: argparse.Namespace) -> int:
-    """Install the evo plugin for the named host."""
+    """Install the evo plugin for the named host.
+
+    After the host install completes, the wrapper in `host_install.install`
+    syncs the global CLI (`evo-hq-cli`) to match the plugin version —
+    keeping skill content + hook protocol + CLI behavior in lockstep.
+    Editable installs are detected and left alone.
+    """
     from . import host_install
     try:
-        adapter = host_install.get(args.host)
+        return host_install.install(args.host, args)
     except ValueError as exc:
         print(f"ERROR: {exc}", file=sys.stderr)
         return 2
-    return adapter.install(args)
 
 
 def cmd_uninstall(args: argparse.Namespace) -> int:
@@ -3751,30 +4199,11 @@ def cmd_update(args: argparse.Namespace) -> int:
     # No host specified — refresh global CLI then iterate over hosts whose
     # current install is healthy (doctor returns 0). Hosts the user never
     # set up are skipped silently.
-    version = getattr(args, "version", None)
-    print(f"=== Refreshing global CLI ===")
-    if version and not host_install.claude_code._looks_like_pypi_release(version):
-        # Branch/SHA refs don't exist on PyPI — skip the CLI refresh and
-        # tell the user why. Plugin install (via git ref) will still proceed.
-        print(
-            f"(skipping global CLI refresh: --version {version!r} is not a "
-            "PyPI release; uv tool install only knows about published "
-            "versions. Plugins will install from the git ref.)"
-        )
-        rc = 0
-    else:
-        target = "evo-hq-cli"
-        if version:
-            target = f"evo-hq-cli=={version}"
-        cli_cmd = ["uv", "tool", "install", "--force", target]
-        print(f"$ {' '.join(cli_cmd)}")
-        rc = subprocess.call(cli_cmd)
-    if rc != 0:
-        print(
-            "WARNING: global CLI refresh failed. Try manually: "
-            "uv tool install --force evo-hq-cli  (or pipx install --force evo-hq-cli)",
-            file=sys.stderr,
-        )
+    #
+    # CLI sync runs ONCE here. Per-host `host_install.update()` calls
+    # also try to sync via the wrapper, but the module-level guard in
+    # `_sync_cli_to_plugin_version` makes subsequent calls a no-op.
+    host_install._sync_cli_to_plugin_version(args)
 
     overall_rc = 0
     for host in host_install.SUPPORTED_HOSTS:
@@ -3795,6 +4224,37 @@ def cmd_update(args: argparse.Namespace) -> int:
         if host_rc != 0:
             overall_rc = host_rc
     return overall_rc
+
+
+# Hosts whose registration pipeline reliably sets `has_evo_engaged`.
+# Three engagement-signal paths feed this set:
+#
+#   - claude-code / codex / hermes: Python `auto_register_from_env`
+#     flips the flag via host session-id env vars (CLAUDE_CODE_SESSION_ID,
+#     CODEX_THREAD_ID, HERMES_SESSION_ID). Verified — Hermes PR #23847
+#     ships HERMES_SESSION_ID into every tool subprocess.
+#   - cursor: the self-contained Python drain detects `evo …` shell
+#     commands in preToolUse payloads (no env-var path available).
+#   - opencode: in-process JS plugin detects `evo …` commands via the
+#     `tool.execute.before` hook (opencode doesn't export
+#     OPENCODE_SESSION_ID — sst/opencode#12158 closed unshipped).
+#   - openclaw / pi: in-process JS plugin scans `before_provider_request`
+#     payloads for tool calls running `evo …`. Best-effort heuristic.
+#
+# Sessions on hosts in this set are filtered out of `evo direct` broadcast
+# fanout when their engagement flag is false — they registered but never
+# ran `evo`, so they're not in the evo loop.
+HOSTS_WITH_ENGAGEMENT = frozenset({
+    "claude-code", "codex", "cursor", "hermes",
+    "opencode", "openclaw", "pi",
+})
+
+
+def _iso_now() -> str:
+    """UTC ISO-8601 timestamp with seconds precision. Matches the format
+    used in inject/sessions/*.json so ack records sort/compare cleanly."""
+    import datetime as _dt
+    return _dt.datetime.now(_dt.timezone.utc).isoformat(timespec="seconds")
 
 
 def cmd_direct(args: argparse.Namespace) -> int:
@@ -3827,25 +4287,599 @@ def cmd_direct(args: argparse.Namespace) -> int:
 
     if exp_id:
         event_id = queue.append_exp_event(root, exp_id, text)
-        # Touch only the subagent's marker. The subagent's session_id
-        # is the same as exp_id-keyed marker for routing simplicity.
+        # Touch the per-session markers for every registered session
+        # whose `exp_id` matches. The Rust hook + self-contained gates
+        # both key the marker check on the session's own `sid`, NOT on
+        # exp_id — so touching `markers/<exp_id>.flag` (the historical
+        # convention from when subagent sid == exp_id) wakes up zero
+        # drains in current hosts. Without this, exp-targeted directives
+        # queued AFTER the subagent's SessionStart get stranded until
+        # something else triggers a drain.
+        #
+        # Pre-registration window: if the subagent hasn't registered yet
+        # (queued before dispatch), there's no sid to wake. That's OK —
+        # the subagent's SessionStart unconditionally drains the exp
+        # queue from offset 0, so it'll find the event then.
+        sessions = list_active_sessions(root)
+        woken = 0
+        for sess in sessions:
+            if sess.get("exp_id") != exp_id:
+                continue
+            sid = sess.get("session_id")
+            if not sid:
+                continue
+            marker.touch(root, sid)
+            woken += 1
+        # Keep the legacy exp_id-keyed marker for any external observer
+        # that grep'd for it; it's a no-op for routing but harmless.
         marker.touch(root, exp_id)
-        print(f"directive queued (exp={exp_id}, id={event_id})")
+        print(f"directive queued (exp={exp_id}, id={event_id}, woken={woken})")
         return 0
 
     event_id = queue.append_workspace_event(root, text)
     sessions = list_active_sessions(root)
     delivered = 0
+    skipped_subagent = 0
+    skipped_unengaged = 0
     for sess in sessions:
         if sess.get("exp_id"):
             # Skip subagents — workspace events go to orchestrators only
+            skipped_subagent += 1
+            continue
+        # Engagement filter: a session that registered (via Rust binary
+        # at SessionStart, or via host plugin on first event) but never
+        # ran any `evo` command is not in the evo loop. Imperative
+        # directives must not reach it. Filter only applies to hosts
+        # whose registration pipeline reliably sets the engagement flag;
+        # other hosts pass through unfiltered until they're wired in.
+        if (
+            sess.get("host") in HOSTS_WITH_ENGAGEMENT
+            and not sess.get("has_evo_engaged")
+        ):
+            skipped_unengaged += 1
             continue
         sid = sess.get("session_id")
         if not sid:
             continue
         marker.touch(root, sid)
         delivered += 1
-    print(f"directive queued (id={event_id}, fanout={delivered} sessions)")
+    print(
+        f"directive queued (id={event_id}, fanout={delivered} sessions, "
+        f"skipped_unengaged={skipped_unengaged}, "
+        f"skipped_subagent={skipped_subagent})"
+    )
+
+    # L2 ACK: optional --wait blocks until any session acks the directive
+    # (or until wait_timeout). Useful for imperative directives where the
+    # caller wants synchronous confirmation that the agent processed it.
+    if getattr(args, "wait", False):
+        from .inject.paths import ack_file
+        timeout = float(getattr(args, "wait_timeout", 60.0))
+        deadline = time.time() + timeout
+        ack_path = ack_file(root, event_id)
+        while time.time() < deadline:
+            if ack_path.exists():
+                try:
+                    rec = json.loads(ack_path.read_text())
+                    by = rec.get("session_id") or "(unattributed)"
+                    at = rec.get("acked_at") or "?"
+                    print(f"acked by {by} at {at}")
+                except (OSError, ValueError):
+                    print("acked (record unreadable)")
+                return 0
+            time.sleep(0.1)
+        print(
+            f"timed out after {timeout:.1f}s waiting for ack of {event_id} "
+            f"(directive remains in queue; run `evo direct status {event_id}` "
+            f"to check later)"
+        )
+        return 3
+    return 0
+
+
+# Hard cap so an orchestrator that miscomputes --timeout can't block its
+# session for hours. 1 hour matches the user's stated upper bound; users
+# who legitimately need longer should issue multiple `evo wait` calls.
+_WAIT_TIMEOUT_CAP = 3600
+
+
+def _wait_timeout_seconds(raw: float | int) -> int:
+    """Clamp the user-supplied timeout into [1, 3600]. Test seam."""
+    try:
+        n = int(raw)
+    except (TypeError, ValueError):
+        n = _WAIT_TIMEOUT_CAP
+    if n < 1:
+        return 1
+    if n > _WAIT_TIMEOUT_CAP:
+        return _WAIT_TIMEOUT_CAP
+    return n
+
+
+def _experiments_dir_snapshot(run_dir: Path) -> dict[str, float]:
+    """Snapshot outcome.json mtimes under experiments/ — the terminal-state signal.
+
+    outcome.json is written atomically by _write_attempt_outcome when an
+    attempt reaches a terminal state (success / committed / evaluated /
+    failed). Per-task trace files, heartbeats, and other in-flight writes
+    are intentionally ignored — `evo wait` exists to wake the orchestrator
+    when an experiment attempt finishes, not on every byte of in-flight
+    work. Tracking those would cause spurious wake-ups: a 20-task bench
+    that writes one trace per task would fire 20 wait events per attempt.
+    """
+    out: dict[str, float] = {}
+    exp_root = run_dir / "experiments"
+    if not exp_root.is_dir():
+        return out
+    try:
+        for outcome in exp_root.rglob("outcome.json"):
+            if outcome.is_file():
+                try:
+                    rel = outcome.relative_to(exp_root)
+                    out[str(rel)] = outcome.stat().st_mtime
+                except OSError:
+                    pass
+    except OSError:
+        pass
+    return out
+
+
+def _describe_change(before: dict[str, float], after: dict[str, float]) -> str:
+    """Produce a short summary of what changed between two snapshots."""
+    new_keys = set(after) - set(before)
+    if new_keys:
+        # Prefer outcome.json over the bare dir for the human-readable summary
+        outcomes = sorted(k for k in new_keys if k.endswith("outcome.json"))
+        if outcomes:
+            exp_id = outcomes[0].split("/", 1)[0]
+            return f"new experiment outcome: {exp_id}"
+        # Otherwise just name the first new key (experiment dir or file)
+        first = sorted(new_keys)[0]
+        exp_id = first.split("/", 1)[0]
+        return f"new experiment activity: {exp_id}"
+    # Deletions catch `evo discard`: the experiment dir is removed wholesale,
+    # so its outcome.json key vanishes from the snapshot. Check before
+    # `changed` so a discard wave is named even if other experiments are
+    # concurrently updating.
+    deleted = set(before) - set(after)
+    if deleted:
+        exp_id = sorted(deleted)[0].split("/", 1)[0]
+        return f"discarded experiment: {exp_id}"
+    changed = [k for k in after if k in before and after[k] > before[k]]
+    if changed:
+        outcomes = sorted(k for k in changed if k.endswith("outcome.json"))
+        if outcomes:
+            exp_id = outcomes[0].split("/", 1)[0]
+            return f"updated experiment outcome: {exp_id}"
+        first = sorted(changed)[0]
+        exp_id = first.split("/", 1)[0]
+        return f"updated: {exp_id}"
+    return "experiments dir changed"
+
+
+def _halt_discard_active(root: Path) -> tuple[list[str], list[tuple[str, str]]]:
+    """Discard every `active` experiment in the workspace.
+
+    Returns (discarded_ids, skipped) where `skipped` is a list of
+    (exp_id, reason) for nodes the halt couldn't safely discard
+    (e.g. live children). Halt collateral; the caller surfaces them.
+    """
+    graph = load_graph(root)
+    discarded: list[str] = []
+    skipped: list[tuple[str, str]] = []
+    for exp_id, node in graph.get("nodes", {}).items():
+        if node.get("status") != "active":
+            continue
+        live_children = [
+            cid for cid in node.get("children", [])
+            if cid in graph["nodes"]
+            and graph["nodes"][cid].get("status") != "discarded"
+        ]
+        if live_children:
+            skipped.append((exp_id, f"has {len(live_children)} live child(ren)"))
+            continue
+        try:
+            def _mark(current_node: dict, _graph: dict) -> None:
+                current_node["status"] = "discarded"
+                current_node["discard_reason"] = "halt: exit-optimize-mode"
+            update_node(root, exp_id, _mark)
+            node_after = _read_node(root, exp_id)
+            _finalize_result(
+                root, exp_id, node_after, node_after.get("score"),
+                "discarded", {"reason": "halt: exit-optimize-mode"},
+            )
+            delete_discarded_experiment(root, node_after)
+            discarded.append(exp_id)
+        except Exception as exc:  # noqa: BLE001
+            skipped.append((exp_id, f"discard failed: {exc}"))
+    return discarded, skipped
+
+
+def _scan_orphan_evo_runs() -> list[tuple[int, str]]:
+    """Best-effort ps-grep for `evo run` processes, excluding self/parent.
+
+    Returns [(pid, cmdline)]. Returns [] on Windows or if `ps` is
+    unavailable — the report is informational, not the primary halt
+    mechanism. Match is by substring on the command line; false
+    positives are acceptable since we only report, never kill.
+    """
+    own = {os.getpid(), os.getppid()}
+    if os.name == "nt":
+        return []
+    try:
+        out = subprocess.run(
+            ["ps", "-eo", "pid=,command="],
+            capture_output=True, text=True, timeout=5,
+        )
+    except (OSError, subprocess.SubprocessError):
+        return []
+    if out.returncode != 0:
+        return []
+    results: list[tuple[int, str]] = []
+    for line in out.stdout.splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        parts = line.split(None, 1)
+        if len(parts) != 2:
+            continue
+        try:
+            pid = int(parts[0])
+        except ValueError:
+            continue
+        cmd = parts[1]
+        if pid in own:
+            continue
+        if "evo run" not in cmd:
+            continue
+        if "exit-optimize-mode" in cmd:
+            continue
+        results.append((pid, cmd))
+    return results
+
+
+def cmd_exit_optimize_mode(args: argparse.Namespace) -> int:
+    """Halt the optimize-mode protocol for the current session.
+
+    Clears the optimize-mode safety nudges, discards `active` experiments
+    in this workspace, reports any orphan `evo run` subprocess trees, and
+    prints the host-specific follow-up steps the orchestrator must take
+    (stopping subagents is a host-runtime concern this command cannot
+    reach).
+    """
+    from .inject.registry import (
+        detect_session,
+        unmark_autonomous,
+        unmark_optimize_mode,
+        unmark_subagents_only,
+    )
+    try:
+        root = repo_root()
+    except Exception:  # noqa: BLE001
+        print("ERROR: not in an evo workspace", file=sys.stderr)
+        return 2
+    if not (root / ".evo").exists():
+        print("ERROR: not in an evo workspace", file=sys.stderr)
+        return 2
+    detected = detect_session()
+    if not detected:
+        print(
+            "ERROR: no host session detected (no CLAUDE_CODE_SESSION_ID / "
+            "CODEX_THREAD_ID / HERMES_SESSION_ID / OPENCODE_SESSION_ID). "
+            "Run this command from inside a host agent session.",
+            file=sys.stderr,
+        )
+        return 2
+    _host, sid = detected
+    transitioned = unmark_optimize_mode(root, sid)
+    # Also clear autonomous (stop-nudge loop) and subagents_only (policy gate)
+    # so exiting the protocol fully resets both opt-in controls.
+    unmark_autonomous(root, sid)
+    unmark_subagents_only(root, sid)
+    if transitioned:
+        print(f"optimize_mode cleared for session {sid}")
+    else:
+        print(f"optimize_mode was already off for session {sid}")
+
+    discarded, skipped = _halt_discard_active(root)
+    for exp_id in discarded:
+        print(f"DISCARDED active {exp_id} (reason: halt: exit-optimize-mode)")
+    for exp_id, why in skipped:
+        print(f"SKIPPED  active {exp_id} ({why})", file=sys.stderr)
+
+    orphans = _scan_orphan_evo_runs()
+    if orphans:
+        print("")
+        print(f"Orphan `evo run` processes ({len(orphans)}):")
+        for pid, cmd in orphans:
+            print(f"  pid {pid}  {cmd}")
+
+    print("")
+    print("To complete the halt:")
+    print("1. Stop any running subagents using your host's stop API")
+    print("   (claude-code: TaskStop on the agentId; codex: equivalent).")
+    print("   evo cannot reach the host runtime from here.")
+    step = 2
+    if orphans:
+        print(f"{step}. Decide per PID above: `kill <pid>` to abort, or let it finish.")
+        step += 1
+    print(f"{step}. Re-run `evo status` and confirm no experiment shows `active`.")
+    print(f"   `evo discard <id> --force --reason \"manual halt\"` cleans any stragglers.")
+
+    return 0
+
+
+def cmd_autonomous(args: argparse.Namespace) -> int:
+    """Arm or disarm autonomous mode for the current orchestrator session.
+
+    Autonomous mode enables the always-fire stop nudge: at every turn
+    boundary the orchestrator is re-prompted to keep driving the optimize
+    loop, instead of stopping. It is opt-in — the orchestrator runs
+    `evo autonomous on` when /optimize is invoked with the `autonomous`
+    param. A plain /optimize keeps the policy gate but stops naturally.
+    `evo autonomous off` (and `evo exit-optimize-mode`) disarm it.
+    """
+    from .inject.registry import detect_session, mark_autonomous, unmark_autonomous
+    # Explicit --run-dir override (resolve workspace without repo_root()).
+    run_dir = getattr(args, "run_dir", None)
+    if run_dir:
+        root = Path(run_dir).resolve()
+    else:
+        try:
+            root = repo_root()
+        except Exception:  # noqa: BLE001
+            print("ERROR: not in an evo workspace", file=sys.stderr)
+            return 2
+    if not (root / ".evo").exists():
+        print("ERROR: not in an evo workspace", file=sys.stderr)
+        return 2
+    state = (getattr(args, "state", None) or "on").lower()
+    # Session resolution: explicit --session wins; else env-var detection.
+    sid = getattr(args, "session", None)
+    if not sid:
+        detected = detect_session()
+        if not detected:
+            # Hosts without a session env var (cursor / openclaw / pi) arm
+            # autonomous by having their plugin OBSERVE this command and
+            # write the flag in-process — the CLI itself can't resolve the
+            # session here. Exit 0 (not an error): the plugin handles it.
+            print(
+                "note: no host session env var detected; if you are on "
+                "cursor/openclaw/pi the plugin arms autonomous by observing "
+                "this command. Otherwise pass --session <id>.",
+            )
+            return 0
+        _host, sid = detected
+    if state == "on":
+        changed = mark_autonomous(root, sid)
+        print(
+            f"autonomous mode {'armed' if changed else 'was already on'} "
+            f"for session {sid}"
+        )
+    elif state == "off":
+        changed = unmark_autonomous(root, sid)
+        print(
+            f"autonomous mode {'disarmed' if changed else 'was already off'} "
+            f"for session {sid}"
+        )
+    else:
+        print(f"ERROR: usage: evo autonomous [on|off] (got {state!r})", file=sys.stderr)
+        return 2
+    return 0
+
+
+def cmd_subagents_only(args: argparse.Namespace) -> int:
+    """Arm or disarm subagents-only mode for the current orchestrator session.
+
+    When armed, the policy deny-gate blocks the orchestrator from editing
+    files / running experiments by hand — only subagents do (the
+    delegate-to-subagents discipline). Opt-in: the orchestrator runs
+    `evo subagents-only on` when /optimize is invoked with the
+    `subagents-only` param. A plain /optimize ALLOWS orchestrator edits.
+    `evo subagents-only off` (and `evo exit-optimize-mode`) disarm it.
+    """
+    from .inject.registry import (
+        detect_session, mark_subagents_only, unmark_subagents_only,
+    )
+    run_dir = getattr(args, "run_dir", None)
+    if run_dir:
+        root = Path(run_dir).resolve()
+    else:
+        try:
+            root = repo_root()
+        except Exception:  # noqa: BLE001
+            print("ERROR: not in an evo workspace", file=sys.stderr)
+            return 2
+    if not (root / ".evo").exists():
+        print("ERROR: not in an evo workspace", file=sys.stderr)
+        return 2
+    state = (getattr(args, "state", None) or "on").lower()
+    sid = getattr(args, "session", None)
+    if not sid:
+        detected = detect_session()
+        if not detected:
+            # cursor/openclaw/pi have no session env var — their plugin arms
+            # this by OBSERVING the command in-process. Exit 0, not an error.
+            print(
+                "note: no host session env var detected; on cursor/openclaw/pi "
+                "the plugin arms subagents-only by observing this command. "
+                "Otherwise pass --session <id>.",
+            )
+            return 0
+        _host, sid = detected
+    if state == "on":
+        changed = mark_subagents_only(root, sid)
+        print(f"subagents-only {'armed' if changed else 'was already on'} for session {sid}")
+    elif state == "off":
+        changed = unmark_subagents_only(root, sid)
+        print(f"subagents-only {'disarmed' if changed else 'was already off'} for session {sid}")
+    else:
+        print(f"ERROR: usage: evo subagents-only [on|off] (got {state!r})", file=sys.stderr)
+        return 2
+    return 0
+
+
+def cmd_wait(args: argparse.Namespace) -> int:
+    """Block until any experiment reaches a terminal state, or --timeout.
+
+    Wakes on outcome.json appearing (committed / evaluated / failed) or
+    an experiment dir vanishing (discarded). Per-task trace flushes and
+    other in-flight writes are ignored — only terminal transitions count.
+
+    Returns 0 on detected transition with a one-line summary on stdout,
+    124 (POSIX timeout convention) on timeout. Polls every 1s.
+
+    Intended for the optimize orchestrator: after spawning N subagents in
+    parallel, call `evo wait` to block until any of them finishes (commit,
+    discard, fail — whichever happens first surfaces) instead of writing
+    ad-hoc polling loops.
+    """
+    try:
+        root = repo_root()
+    except Exception:  # noqa: BLE001 — repo_root raises on non-git cwd
+        print("ERROR: not in an evo workspace", file=sys.stderr)
+        return 2
+    if not (root / ".evo").exists():
+        print("ERROR: not in an evo workspace", file=sys.stderr)
+        return 2
+    # Locate the active run dir (lexicographically last run_*).
+    evo_dir = root / ".evo"
+    runs = sorted(p for p in evo_dir.iterdir() if p.is_dir() and p.name.startswith("run_"))
+    if not runs:
+        print("ERROR: no run dir under .evo/", file=sys.stderr)
+        return 2
+    run_dir = runs[-1]
+
+    timeout = _wait_timeout_seconds(getattr(args, "timeout", _WAIT_TIMEOUT_CAP))
+
+    baseline = _experiments_dir_snapshot(run_dir)
+    deadline = time.time() + timeout
+    poll_interval = 1.0
+    while time.time() < deadline:
+        time.sleep(poll_interval)
+        now = _experiments_dir_snapshot(run_dir)
+        if now != baseline:
+            summary = _describe_change(baseline, now)
+            print(f"[evo wait] change detected: {summary}")
+            return 0
+    print(f"[evo wait] timed out after {timeout}s with no experiment activity")
+    return 124
+
+
+def cmd_ack(args: argparse.Namespace) -> int:
+    """Record that the agent has acknowledged a directive.
+
+    Writes inject/acks/<event_id>.json with the host session that issued
+    the ack (best-effort attribution via session-id env vars). Idempotent:
+    a second ack on the same id increments ack_count rather than failing.
+    """
+    from .inject.paths import ack_file, acks_dir
+    from .inject.registry import detect_session
+
+    root = repo_root()
+    if not (root / ".evo").exists():
+        print("ERROR: not in an evo workspace", file=sys.stderr)
+        return 2
+
+    event_id = (args.event_id or "").strip()
+    if not event_id:
+        print("ERROR: usage: evo ack <event_id>", file=sys.stderr)
+        return 2
+
+    detected = detect_session()
+    host = detected[0] if detected else None
+    sid = detected[1] if detected else None
+
+    path = ack_file(root, event_id)
+    acks_dir(root).mkdir(parents=True, exist_ok=True)
+
+    now = _iso_now()
+    if path.exists():
+        try:
+            existing = json.loads(path.read_text())
+        except (OSError, ValueError):
+            existing = {}
+        existing["event_id"] = event_id
+        # Preserve original ack attribution; bump count and last_acked_at.
+        existing["ack_count"] = int(existing.get("ack_count", 1)) + 1
+        existing["last_acked_at"] = now
+        path.write_text(json.dumps(existing))
+        print(f"ack recorded (id={event_id}, ack_count={existing['ack_count']})")
+        return 0
+
+    rec = {
+        "event_id": event_id,
+        "session_id": sid,
+        "host": host,
+        "acked_at": now,
+        "ack_count": 1,
+    }
+    path.write_text(json.dumps(rec))
+    print(f"ack recorded (id={event_id})")
+    return 0
+
+
+def cmd_direct_status(args: argparse.Namespace) -> int:
+    """Show queue/delivery/ack state for a directive id.
+
+    Surfaces three things:
+      - was the event queued (does it exist in workspace.jsonl)?
+      - was it delivered to at least one session (drain wrote
+        inject/delivered/<id>.json)?
+      - has any session acked it via `evo ack <id>` (inject/acks/<id>.json)?
+    """
+    from .inject import queue
+    from .inject.paths import ack_file, delivered_file, workspace_events_path
+
+    root = repo_root()
+    if not (root / ".evo").exists():
+        print("ERROR: not in an evo workspace", file=sys.stderr)
+        return 2
+
+    event_id = (args.event_id or "").strip()
+    if not event_id:
+        print("ERROR: usage: evo direct status <event_id>", file=sys.stderr)
+        return 2
+
+    # Queued?
+    events = queue.read_events_after(workspace_events_path(root), None)
+    matched = next((e for e in events if e.get("id") == event_id), None)
+    if matched is None:
+        # Also scan exp queues — exp-targeted directives live in their
+        # own queue file. (Skip the exhaustive scan for now; report.)
+        print(f"event:    {event_id}")
+        print(f"queued:   not found in workspace.jsonl")
+    else:
+        print(f"event:    {event_id} ({matched.get('text', '')!r})")
+        print(f"queued:   {matched.get('ts', '?')}")
+
+    # Delivered?
+    d = delivered_file(root, event_id)
+    if d.exists():
+        try:
+            drec = json.loads(d.read_text())
+            print(
+                f"delivered to: {drec.get('session_id', '?')} "
+                f"(host={drec.get('host', '?')}) at {drec.get('delivered_at', '?')}"
+            )
+        except (OSError, ValueError):
+            print("delivered:    (record unreadable)")
+    else:
+        print("delivered:    (no record)")
+
+    # Acked?
+    a = ack_file(root, event_id)
+    if a.exists():
+        try:
+            arec = json.loads(a.read_text())
+            by = arec.get("session_id") or "(unattributed)"
+            cnt = arec.get("ack_count", 1)
+            at = arec.get("acked_at", "?")
+            print(f"acked by:     {by} at {at} (count={cnt})")
+        except (OSError, ValueError):
+            print("acked:        (record unreadable)")
+    else:
+        print("acked:        (no ack yet)")
     return 0
 
 
@@ -3895,6 +4929,24 @@ def build_parser() -> argparse.ArgumentParser:
     host_set_p.add_argument("value", choices=sorted(SUPPORTED_HOSTS))
     host_set_p.set_defaults(func=cmd_host)
 
+    defaults_p = sub.add_parser(
+        "defaults",
+        help="cross-project run-behavior defaults (user-level, remembered across projects)",
+    )
+    defaults_sub = defaults_p.add_subparsers(dest="defaults_action", required=True)
+    defaults_show_p = defaults_sub.add_parser("show", help="show stored user defaults")
+    defaults_show_p.add_argument("--json", action="store_true", help="emit JSON")
+    defaults_show_p.set_defaults(func=cmd_defaults)
+    defaults_get_p = defaults_sub.add_parser("get", help="print one user default")
+    defaults_get_p.add_argument("field", choices=["autonomous", "subagents-only"])
+    defaults_get_p.add_argument("--json", action="store_true",
+                                help="emit JSON (true/false/null)")
+    defaults_get_p.set_defaults(func=cmd_defaults)
+    defaults_set_p = defaults_sub.add_parser("set", help="set one user default")
+    defaults_set_p.add_argument("field", choices=["autonomous", "subagents-only"])
+    defaults_set_p.add_argument("value", help="on or off")
+    defaults_set_p.set_defaults(func=cmd_defaults)
+
     config_p = sub.add_parser(
         "config",
         help="mutate workspace configuration",
@@ -3915,6 +4967,8 @@ def build_parser() -> argparse.ArgumentParser:
             "max-attempts",
             "gate",
             "frontier-strategy",
+            "default-autonomous",
+            "default-subagents-only",
         ],
     )
     config_set_p.add_argument(
@@ -3922,7 +4976,8 @@ def build_parser() -> argparse.ArgumentParser:
         help=(
             "field value. For frontier-strategy pass the kind (e.g. 'argmax', "
             "'epsilon_greedy') or a JSON object like '{\"kind\": ..., \"params\": {...}}'. "
-            "For gate pass the command string (empty string clears it)."
+            "For gate pass the command string (empty string clears it). For "
+            "default-autonomous / default-subagents-only pass on or off."
         ),
     )
     config_set_p.set_defaults(func=cmd_config)
@@ -3941,6 +4996,8 @@ def build_parser() -> argparse.ArgumentParser:
             "max-attempts",
             "gate",
             "frontier-strategy",
+            "default-autonomous",
+            "default-subagents-only",
         ],
     )
     config_get_p.add_argument("--json", action="store_true",
@@ -4077,6 +5134,14 @@ def build_parser() -> argparse.ArgumentParser:
              "Required in tracked-only commit mode when the worktree has "
              "untracked, non-gitignored files. No-op in commit_strategy=all.",
     )
+    run_p.add_argument(
+        "--force",
+        action="store_true",
+        help="bypass the concurrent-attempt guard. Allow a new attempt "
+             "even if another attempt for this exp_id has an alive driver "
+             "PID. Use when you know the prior driver is gone but its "
+             "state wasn't reclaimed (e.g. PID was recycled by the OS).",
+    )
     run_p.set_defaults(func=cmd_run)
 
     done_p = sub.add_parser("done")
@@ -4174,9 +5239,35 @@ def build_parser() -> argparse.ArgumentParser:
     )
     discard_p.set_defaults(func=cmd_discard)
 
+    abort_p = sub.add_parser(
+        "abort",
+        help="SIGTERM the driver process for an experiment's current attempt",
+        description=(
+            "Reads the driver PID stamped into attempt_state.json by the "
+            "running `evo run` and sends SIGTERM. If the process is still "
+            "alive after --timeout seconds, escalates to SIGKILL. "
+            "Does not mutate graph state — once the driver exits, the next "
+            "`evo run` invocation sees the dead PID and reclaims the attempt."
+        ),
+    )
+    abort_p.add_argument("exp_id")
+    abort_p.add_argument(
+        "--timeout", type=float, default=5.0,
+        help="seconds to wait between SIGTERM and SIGKILL escalation (default 5)",
+    )
+    abort_p.add_argument(
+        "--force", action="store_true",
+        help="skip the SIGTERM grace period; signal SIGKILL immediately",
+    )
+    abort_p.set_defaults(func=cmd_abort)
+
     prune_p = sub.add_parser("prune")
     prune_p.add_argument("exp_id")
-    prune_p.add_argument("--reason", required=True)
+    prune_p.add_argument(
+        "--reason", default=None,
+        help="why this lineage is being pruned (optional; omit for routine "
+             "round-N cleanups where the parent prune already explained the why)",
+    )
     prune_p.set_defaults(func=cmd_prune)
 
     restore_p = sub.add_parser(
@@ -4220,6 +5311,46 @@ def build_parser() -> argparse.ArgumentParser:
 
     scratchpad_p = sub.add_parser("scratchpad")
     scratchpad_p.set_defaults(func=cmd_scratchpad)
+
+    report_p = sub.add_parser(
+        "report",
+        help="print the dashboard dot chart (score over experiment order) "
+             "for every run, sized to the current terminal",
+        description="Terminal version of the web dashboard's scatter plot. "
+                    "Renders one chart per run, stacked, with status colors, "
+                    "best dot highlighted, spine ringed, and a cumulative-best "
+                    "stair line. Adapts width and height to the current TTY.",
+    )
+    report_p.add_argument(
+        "--color",
+        choices=("auto", "always", "never"),
+        default="auto",
+        help="control ANSI color output (default: auto — color when stdout is a TTY)",
+    )
+    report_p.add_argument(
+        "--width", type=int,
+        help="override terminal width in columns (default: auto-detect from /dev/tty)",
+    )
+    report_p.add_argument(
+        "--height", type=int,
+        help="override terminal height in rows (default: auto-detect from /dev/tty)",
+    )
+    report_p.add_argument(
+        "--margin", type=int,
+        help="extra right-side margin in columns to leave for host framing "
+             "(default: 6 under Claude Code, 0 elsewhere; pass 0 to reclaim all width)",
+    )
+    report_p.add_argument(
+        "--dots", choices=("auto", "compact", "standard"), default="auto",
+        help="dot-glyph tier: 'compact' (•·*) for narrow/dense charts, "
+             "'standard' (●○★) for normal charts (default: auto)",
+    )
+    report_p.add_argument(
+        "--watch", nargs="?", const=2.0, type=float, default=None, metavar="SECONDS",
+        help="live-refresh the report every SECONDS (default 2). Ctrl-C to exit. "
+             "Like `nvidia-smi -l`: re-reads the workspace and redraws in place.",
+    )
+    report_p.set_defaults(func=cmd_report)
 
     awaiting_p = sub.add_parser(
         "awaiting",
@@ -4340,6 +5471,15 @@ def build_parser() -> argparse.ArgumentParser:
     gate_add_p.add_argument("exp_id")
     gate_add_p.add_argument("--name", required=True)
     gate_add_p.add_argument("--command", required=True)
+    gate_add_p.add_argument(
+        "--phase", choices=("pre", "post"), default="post",
+        help="when the gate runs relative to the benchmark. "
+             "'pre' = before benchmark (failure aborts the run with no "
+             "benchmark spend; use for cheat checks, file-hash checks, "
+             "anything decidable from the worktree alone). "
+             "'post' = after benchmark (default; use for score-regression, "
+             "output-schema, or anything that needs benchmark output).",
+    )
     gate_add_p.set_defaults(func=cmd_gate)
 
     gate_list_p = gate_sub.add_parser("list")
@@ -4538,10 +5678,11 @@ def build_parser() -> argparse.ArgumentParser:
         help="Send a directive to running orchestrator session(s) or a specific subagent (by exp_id)",
         description=(
             "Without exp_id: directive is delivered to every registered "
-            "orchestrator-class session in the workspace. With exp_id: "
-            "delivered only to that subagent's session. Sessions that "
-            "haven't registered (haven't run any `evo` command) receive "
-            "nothing."
+            "and engaged orchestrator-class session in the workspace. "
+            "With exp_id: delivered only to that subagent's session. "
+            "Sessions that registered but never ran any `evo` command "
+            "(unengaged) are filtered out for hosts that support the "
+            "engagement signal."
         ),
     )
     direct_p.add_argument(
@@ -4549,7 +5690,120 @@ def build_parser() -> argparse.ArgumentParser:
         nargs="+",
         help="Either '<text>' (broadcast) or '<exp_id> <text>' (targeted)",
     )
+    direct_p.add_argument(
+        "--wait",
+        action="store_true",
+        help="Block until a session acks the directive (or until --wait-timeout). "
+             "Returns exit code 0 on ack, 3 on timeout.",
+    )
+    direct_p.add_argument(
+        "--wait-timeout",
+        type=float,
+        default=60.0,
+        help="Seconds to wait for ack when --wait is set (default: 60).",
+    )
     direct_p.set_defaults(func=cmd_direct)
+
+    ack_p = sub.add_parser(
+        "ack",
+        help="Acknowledge an evo directive (run by agents to confirm receipt of an [EVO DIRECTIVE id=…] banner)",
+        description=(
+            "Records that the directive identified by <event_id> has been "
+            "processed. Writes inject/acks/<event_id>.json. Surfaces via "
+            "`evo direct status <event_id>` and `evo direct --wait`."
+        ),
+    )
+    ack_p.add_argument("event_id", help="The id from a [EVO DIRECTIVE id=…] banner")
+    ack_p.set_defaults(func=cmd_ack)
+
+    direct_status_p = sub.add_parser(
+        "direct-status",
+        help="Show queue / delivery / ack state for a directive id",
+    )
+    direct_status_p.add_argument("event_id")
+    direct_status_p.set_defaults(func=cmd_direct_status)
+
+    exit_opt_p = sub.add_parser(
+        "exit-optimize-mode",
+        help="Clear the optimize_mode flag on this session (turn off safety nudges + stop-hook continuation)",
+        description=(
+            "Use when the agent needs to legitimately step out of /optimize "
+            "protocol (e.g. a one-off manual task the user explicitly asked "
+            "for) without being nudged. The flag is normally auto-set when "
+            "the user invokes /evo:optimize; this clears it."
+        ),
+    )
+    exit_opt_p.set_defaults(func=cmd_exit_optimize_mode)
+
+    autonomous_p = sub.add_parser(
+        "autonomous",
+        help="Arm/disarm autonomous mode (the always-fire stop-nudge loop) for this session",
+        description=(
+            "Opt-in to the autonomous optimize loop: when armed, the "
+            "orchestrator is re-prompted at every turn boundary to keep "
+            "driving the loop until its stall limit or interruption. The "
+            "orchestrator runs `evo autonomous on` when /optimize is invoked "
+            "with the `autonomous` param. Default (disarmed) /optimize keeps "
+            "the policy gate but stops naturally. `off` (or "
+            "`evo exit-optimize-mode`) disarms it."
+        ),
+    )
+    autonomous_p.add_argument(
+        "state", nargs="?", choices=["on", "off"], default="on",
+        help="on to arm (default), off to disarm",
+    )
+    autonomous_p.add_argument(
+        "--session", default=None,
+        help="target a specific session id instead of env-var detection",
+    )
+    autonomous_p.add_argument(
+        "--run-dir", default=None,
+        help="workspace root to operate on (default: repo root)",
+    )
+    autonomous_p.set_defaults(func=cmd_autonomous)
+
+    subagents_only_p = sub.add_parser(
+        "subagents-only",
+        help="Arm/disarm subagents-only mode (orchestrator may not edit; only subagents do)",
+        description=(
+            "Opt-in to the delegate-to-subagents policy gate: when armed, the "
+            "orchestrator is blocked from editing files / running experiments "
+            "by hand, forcing it to dispatch to subagents. The orchestrator "
+            "runs `evo subagents-only on` when /optimize is invoked with the "
+            "`subagents-only` param. Default (disarmed) /optimize ALLOWS the "
+            "orchestrator to edit directly. `off` (or `evo exit-optimize-mode`) "
+            "disarms it."
+        ),
+    )
+    subagents_only_p.add_argument(
+        "state", nargs="?", choices=["on", "off"], default="on",
+        help="on to enforce subagents-only (default), off to allow orchestrator edits",
+    )
+    subagents_only_p.add_argument("--session", default=None,
+                                  help="target a specific session id instead of env-var detection")
+    subagents_only_p.add_argument("--run-dir", default=None,
+                                  help="workspace root to operate on (default: repo root)")
+    subagents_only_p.set_defaults(func=cmd_subagents_only)
+
+    wait_p = sub.add_parser(
+        "wait",
+        help="Block until any experiment reaches a terminal state, or until --timeout (max 1h)",
+        description=(
+            "Polls <run_dir>/experiments/ for terminal-state transitions on "
+            "any experiment in the active run — outcome.json appearing "
+            "(committed / evaluated / failed) or an experiment dir vanishing "
+            "(discarded). Per-task trace writes and other in-flight activity "
+            "are ignored. Returns exit code 0 with a one-line summary on the "
+            "first detected transition, 124 on timeout. Intended for /optimize "
+            "orchestrators to block on subagent results instead of writing "
+            "ad-hoc bash polling loops."
+        ),
+    )
+    wait_p.add_argument(
+        "--timeout", type=float, default=3600,
+        help="Seconds to block before giving up. Default 3600, capped at 3600.",
+    )
+    wait_p.set_defaults(func=cmd_wait)
 
     return parser
 

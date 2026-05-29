@@ -264,6 +264,7 @@ class _Harness:
         self.run(
             f"{self._sudo}apt-get update -qq && {self._sudo}apt-get install -y "
             f"--no-install-recommends git curl ca-certificates python3 python3-venv "
+            f"gcc libc6-dev "  # `cc` linker for cargo-built evo-hook-drain in dry-run mode
             f">/dev/null",
             timeout=300,
         )
@@ -291,6 +292,42 @@ class _Harness:
             # /tmp/evo-local-repo/ now has:
             #   .claude-plugin/marketplace.json
             #   plugins/evo/   (CLI source + skills + hooks + plugin.json)
+
+            # The tarball includes the host's local-built `evo-hook-drain`
+            # binary at plugins/evo/bin/evo-hook-drain. When the host is
+            # macOS-arm64 and the sandbox is Linux-x86_64, that binary
+            # exec-format-errors on every hook fire (Exec format error,
+            # exit 126) → no drain ever runs → mid-run directives never
+            # reach the agent. Build a sandbox-native binary from source
+            # before any `evo install <host>` runs, so the freshly-staged
+            # cache picks up a binary that actually executes.
+            self.run(
+                f"{self._sudo}rm -f /tmp/evo-local-repo/plugins/evo/bin/evo-hook-drain",
+            )
+            # Use rustup, not apt's rustc. Ubuntu 22.04 ships rustc 1.66
+            # which is missing `std::io::IsTerminal` (stabilized 1.70).
+            # Cargo.lock v4 also requires cargo >= 1.78 — apt's is too
+            # old. Minimal-profile rustup install is ~80 MB, ~30s.
+            self.run(
+                "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | "
+                "sh -s -- -y --default-toolchain stable --profile minimal "
+                "> /tmp/rustup-install.log 2>&1 || "
+                "(tail -30 /tmp/rustup-install.log; exit 1)",
+                timeout=180,
+            )
+            self.run(
+                "source $HOME/.cargo/env && "
+                "cd /tmp/evo-local-repo/plugins/evo/bin/evo-hook-drain-rs && "
+                "cargo build --release > /tmp/cargo-hook-build.log 2>&1 || "
+                "(tail -30 /tmp/cargo-hook-build.log; exit 1)",
+                timeout=300,
+            )
+            self.run(
+                "cp /tmp/evo-local-repo/plugins/evo/bin/evo-hook-drain-rs/"
+                "target/release/evo-hook-drain "
+                "/tmp/evo-local-repo/plugins/evo/bin/evo-hook-drain"
+            )
+
             self.run(
                 "export PATH=$HOME/.local/bin:$PATH; "
                 "uv tool install /tmp/evo-local-repo/plugins/evo "
@@ -314,7 +351,7 @@ class _Harness:
 def sandbox(fixture_repo_tarball, evo_local_tarball):
     _gate_release_smoke()
     from e2b import Sandbox
-    sbx = Sandbox.create(timeout=1800)
+    sbx = Sandbox.create(timeout=3600)
     h = _Harness(sbx, fixture_repo_tarball, evo_local_tarball)
     try:
         h.install_base_deps()
@@ -411,6 +448,19 @@ def _parse_directive_id(direct_output: str) -> str:
     return m.group(1)
 
 
+def _parse_fanout(direct_output: str) -> tuple[int, int]:
+    """Parse `fanout=N sessions, skipped_unengaged=M` from the workspace
+    `evo direct` line. Returns (fanout, skipped_unengaged). Returns
+    (-1, -1) if the line isn't the workspace broadcast form (e.g. an
+    exp-targeted `directive queued (exp=..., woken=N)` form, which has
+    no fanout field)."""
+    fm = re.search(r"fanout=(\d+)", direct_output)
+    sm = re.search(r"skipped_unengaged=(\d+)", direct_output)
+    if not fm or not sm:
+        return (-1, -1)
+    return (int(fm.group(1)), int(sm.group(1)))
+
+
 def _verify_directive_consumed(h: _Harness, ws_root: str, directive_id: str) -> int:
     """Count sessions (across ALL run_* dirs) whose offset file matches
     the directive id. Cross-run because the agent can re-`evo init`
@@ -422,6 +472,22 @@ def _verify_directive_consumed(h: _Harness, ws_root: str, directive_id: str) -> 
         must_succeed=False,
     ).strip()
     return int(out) if out.isdigit() else 0
+
+
+def _verify_directive_acked(h: _Harness, ws_root: str, directive_id: str) -> bool:
+    """Did the agent run `evo ack <id>`? Checks for inject/acks/<id>.json
+    across all run_* dirs (the L2 ACK record written by `evo ack`). This is
+    the strongest receipt signal — model-level "I saw and acknowledged this
+    directive" — distinct from consumed_by (offset advanced = drain
+    delivered) and from shaped-work (model acted on the content). The
+    ack-on-receipt skill instruction tells the agent to run it immediately
+    on seeing the banner."""
+    out = h.run(
+        f"ls {ws_root}/run_*/inject/acks/{directive_id}.json "
+        f"2>/dev/null | wc -l",
+        must_succeed=False,
+    ).strip()
+    return out.isdigit() and int(out) >= 1
 
 
 def _read_graph(h: _Harness, run_dir: str) -> dict | None:
@@ -484,6 +550,17 @@ def _drive_smoke(
     # `printenv` / `$VAR` references inside install bash see them. Build
     # env_export once; reuse for drive_cmd below.
     env_export = "".join(f'export {k}="{v}"; ' for k, v in env_keys.items() if v)
+    # DEBUG (opt-in via EVO_RELEASE_SMOKE_INJECT_DEBUG=1 on the host running
+    # pytest): turn on the inject-pipeline trace inside the sandbox so the
+    # agent's hook subprocesses (Rust evo-hook-drain → Python evo-drain) log
+    # every gate/fence/handoff/emit/offset decision to a retrievable file.
+    # Inherited by the agent process from drive_cmd's env_export, hence by
+    # its hook subprocesses.
+    if os.environ.get("EVO_RELEASE_SMOKE_INJECT_DEBUG"):
+        env_export += (
+            'export EVO_DRAIN_DEBUG=1; '
+            'export EVO_DRAIN_DEBUG_LOG=/tmp/evo-drain-debug.log; '
+        )
     for step in install_steps:
         h.run(f"{env_export}{step}", timeout=600)
 
@@ -573,15 +650,88 @@ def _drive_smoke(
     )
     directive_id = _parse_directive_id(direct_out)
 
-    # Wait for the agent to exit naturally (or timeout). 30 minutes upper
-    # bound — round 2 should finish well within that.
-    h.run(
-        "for i in $(seq 1 60); do "
-        "  if ! kill -0 $(cat /tmp/agent.pid) 2>/dev/null; then break; fi; "
-        "  sleep 30; "
-        "done",
-        timeout=2000,
-    )
+    # Engagement-regression early-catch. The orchestrator session must be
+    # engaged at SessionStart (hook hosts via the Rust binary / Python
+    # drain; hermes via on_session_start; pi/openclaw via their JS
+    # plugins) so `evo direct` fans the directive out to it. Under
+    # /optimize the orchestrator dispatches every `evo` command to
+    # subagents and never runs `evo` itself, so the env-var engagement
+    # path never fires — SessionStart is the only signal. If fanout=0 /
+    # skipped_unengaged>=1 here, the directive was filtered out and
+    # consumed_by would be 0 after a 15-minute poll. Fail fast instead.
+    fanout, skipped_unengaged = _parse_fanout(direct_out)
+    if fanout >= 0:  # workspace broadcast form (not exp-targeted)
+        assert fanout >= 1, (
+            f"[{host}] evo direct fanout={fanout} skipped_unengaged="
+            f"{skipped_unengaged}: orchestrator session not engaged — "
+            f"mid-run directive filtered out before delivery. "
+            f"direct output: {direct_out!r}"
+        )
+        assert skipped_unengaged == 0, (
+            f"[{host}] evo direct skipped_unengaged={skipped_unengaged}: "
+            f"an orchestrator session registered but was not engaged at "
+            f"SessionStart. direct output: {direct_out!r}"
+        )
+
+    # Harness-side poll with hard ceilings. e2b kills long-lived HTTP/2
+    # streams server-side regardless of heartbeat output (verified v17/v18),
+    # so we do many short `kill -0` calls instead of one long bash loop.
+    # Two ceilings: wall clock and committed-experiment count. Either one
+    # triggers a clean kill so we always reach the assertion phase.
+    POLL_MAX_SECONDS = 900   # 15 min after directive injection
+    POLL_MAX_EXPERIMENTS = 8  # safety net: planned A/B/C/D + slack
+    poll_start = time.time()
+    poll_iter = 0
+    last_exp_count = -1
+    final_state = "unknown"
+    while time.time() - poll_start < POLL_MAX_SECONDS:
+        poll_iter += 1
+        # Single shell call returns both liveness and experiment count.
+        # Wrapped in try/except so a transient e2b slowness on one poll
+        # doesn't abort the whole wait — verified pi v22 failure where
+        # one kill -0 timed out at 15s and crashed the loop.
+        try:
+            out = h.run(
+                "kill -0 $(cat /tmp/agent.pid) 2>/dev/null "
+                "&& echo alive || echo dead; "
+                f"find {ws_root}/run_*/experiments -mindepth 1 -maxdepth 1 "
+                "-type d 2>/dev/null | wc -l",
+                must_succeed=False, timeout=30,
+            ).strip().splitlines()
+        except Exception as e:  # noqa: BLE001 — e2b/httpcore exceptions vary
+            print(f"  [wait] iter={poll_iter} poll error: {type(e).__name__}; "
+                  f"sleeping 30s and retrying", flush=True)
+            time.sleep(30)
+            continue
+        alive = (out[0].strip() == "alive") if out else False
+        exp_count = int(out[1].strip()) if len(out) > 1 and out[1].strip().isdigit() else 0
+        elapsed = int(time.time() - poll_start)
+        if exp_count != last_exp_count or not alive:
+            print(f"  [wait] iter={poll_iter} elapsed={elapsed}s "
+                  f"experiments={exp_count} agent={'alive' if alive else 'dead'}",
+                  flush=True)
+            last_exp_count = exp_count
+        if not alive:
+            final_state = f"exited naturally after {elapsed}s, {exp_count} experiments"
+            break
+        if exp_count >= POLL_MAX_EXPERIMENTS:
+            final_state = f"hit max_experiments={POLL_MAX_EXPERIMENTS} at {elapsed}s — killing"
+            print(f"  [wait] {final_state}", flush=True)
+            _best_effort_kill(h)
+            break
+        # Dump agent.log tail every 5 minutes for forensic visibility.
+        if poll_iter % 10 == 0:
+            h.run(
+                "echo '--- agent.log tail (last 60 lines) ---'; "
+                "tail -60 /tmp/agent.log 2>&1 || true",
+                must_succeed=False, timeout=20,
+            )
+        time.sleep(30)
+    else:
+        final_state = f"hit max_seconds={POLL_MAX_SECONDS}s — killing"
+        print(f"  [wait] {final_state}", flush=True)
+        _best_effort_kill(h)
+    print(f"  [wait] final: {final_state}", flush=True)
 
     # ---------- assertions ----------
     # Every assertion below globs across ALL `ws_root/run_*` rather than
@@ -625,24 +775,89 @@ def _drive_smoke(
               "echo; tail -100 /tmp/agent.log",
               must_succeed=False, timeout=10)
 
+    # DEBUG: dump the inject-pipeline trace from inside the sandbox so we can
+    # see, hook-by-hook, why the directive did or didn't drain (Rust gate/
+    # fence/handoff + Python emit/offset). Always runs when debug is on,
+    # regardless of pass/fail, so a failing run still yields the trace.
+    if os.environ.get("EVO_RELEASE_SMOKE_INJECT_DEBUG"):
+        h.run(f"echo '=== INJECT DEBUG TRACE [{host}] (/tmp/evo-drain-debug.log) ==='; "
+              "cat /tmp/evo-drain-debug.log 2>&1 || echo '(no debug log — hooks never fired with EVO_DRAIN_DEBUG)'",
+              must_succeed=False, timeout=10)
+
     consumed_by = _verify_directive_consumed(h, ws_root, directive_id)
+    # ACK is the strongest receipt signal: the agent ran `evo ack <id>`
+    # (ack-on-receipt) → the directive content reached the MODEL, not just
+    # the offset. Captured for diagnosis so a shaped-work failure can be
+    # classified: acked → model saw it and chose not to implement (model
+    # issue); not acked → delivery may not have surfaced (real concern,
+    # even though the offset advanced).
+    acked = _verify_directive_acked(h, ws_root, directive_id)
+    h.run(f"echo '=== RECEIPT [{host}] consumed_by={consumed_by} acked={acked} ==='; "
+          f"echo '--- evo direct-status ---'; "
+          f"export PATH=$HOME/.local/bin:$PATH; cd /tmp/ws && "
+          f"evo direct-status {directive_id} 2>&1 | head -20 || true",
+          must_succeed=False, timeout=10)
     assert consumed_by >= 1, (
-        f"[{host}] directive {directive_id} not consumed by any session; "
-        f"mid-run inject did not reach the agent"
+        f"[{host}] directive {directive_id} not consumed by any session "
+        f"(acked={acked}); mid-run inject did not reach the agent"
     )
 
-    # The directive embedded a unique tag (_DIRECTIVE_TAG = "<uuid>") and
-    # instructed Experiment D to include it in its committed target.py. Look
-    # for at least one committed worktree containing the tag — that's the
-    # deepest signal that the directive's CONTENT (not just the event id)
-    # reached the subagent's reasoning and shaped its work.
-    tag_count_str = h.run(
+    # Two independent evidence channels for "directive content shaped the
+    # work": (1) marker tag present in a committed target.py — literal
+    # copy of the directive's text; (2) best/baseline ratio in the O(n)
+    # range — algorithmic effect of the directive's specified strategy.
+    # Either passes. Why permissive: well-aligned models (Claude
+    # especially) sometimes silently drop "embed this build-tracking
+    # marker line" as suspicious prompt-injection but still apply the
+    # algorithmic directive, producing 100×+ scores without the literal
+    # marker. Conversely, weaker models may copy the marker but
+    # implement the algorithm incorrectly (verified on opencode-gpt-5:
+    # marker present, O(n²) in disguise, 1× score). Either signal
+    # alone is strong enough; both being absent means the directive
+    # was delivered but ignored.
+    # Two places the marker can live: (a) on-disk worktrees for
+    # active/evaluated experiments, (b) git commits for COMMITTED
+    # experiments (evo removes the worktree on commit and the content
+    # only exists in the experiment's branch). Check both — committed
+    # experiments are the most common pass case.
+    worktree_hits_str = h.run(
         f"grep -rl '{directive_tag}' {ws_root}/run_*/worktrees/*/target.py "
         f"2>/dev/null | wc -l",
         must_succeed=False,
     ).strip()
-    tag_count = int(tag_count_str) if tag_count_str.isdigit() else 0
-    if tag_count < 1:
+    worktree_hits = int(worktree_hits_str) if worktree_hits_str.isdigit() else 0
+    # `git log -S` finds any commit that added or removed the marker
+    # string — catches the committed-and-pruned case.
+    git_hits_str = h.run(
+        f"cd /tmp/ws && git --no-pager log --all -S '{directive_tag}' "
+        f"--format='%H' 2>/dev/null | wc -l",
+        must_succeed=False,
+    ).strip()
+    git_hits = int(git_hits_str) if git_hits_str.isdigit() else 0
+    tag_count = worktree_hits + git_hits
+
+    best = _read_best_score(h, ws_root)
+    assert best is not None, f"[{host}] no committed score in any run's graph.json"
+    ratio = best / baseline
+    # Round-1 strategies (cache xs[i], itertools.combinations) are both
+    # O(n²) — capped at constant-factor speedups, ~3-10x baseline in
+    # practice. The directive's hash-map approach is O(n) — typically
+    # 100×+ baseline. A ratio > 50 means the agent applied the directive.
+
+    marker_ok = tag_count >= 1
+    score_ok = ratio > 50
+    # This smoke verifies the inject pipeline's DELIVERY, which is the
+    # plugin's responsibility. A confirmed ack is unfakeable proof the
+    # directive reached the model: the agent had to read the directive to
+    # learn its id before it could run `evo ack <id>`. So acked=True is
+    # delivery success on its own. marker/score are evidence the model also
+    # *implemented* the directive — a separate, model-dependent axis (a
+    # compliant model can ack then drop a verbatim sub-instruction when
+    # briefing a subagent). They remain the fallback proof when the model
+    # never acked (acked=False is the real "did it surface?" concern, since
+    # the offset can advance without the content reaching the model).
+    delivered_ok = acked or marker_ok or score_ok
+    if not delivered_ok:
         h.run("echo '--- /tmp/agent.log (last 300 lines) ---'; "
               "tail -300 /tmp/agent.log 2>&1 || echo '(no agent log)'",
               must_succeed=False, timeout=10)
@@ -660,36 +875,18 @@ def _drive_smoke(
               f"  echo \"=== $f ===\"; head -8 \"$f\" 2>/dev/null; "
               f"done",
               must_succeed=False, timeout=10)
-        h.run("echo '--- /tmp/evo-inject.log (openclaw plugin diagnostic) ---'; "
+        h.run("echo '--- /tmp/evo-inject.log (host plugin diagnostic) ---'; "
               "cat /tmp/evo-inject.log 2>&1 || echo '(no inject log)'",
               must_succeed=False, timeout=5)
-    # The marker-tag assertion is the contract check: the directive
-    # explicitly requested a specific literal string be written into a
-    # committed target.py. If the agent skipped the marker, it didn't
-    # follow the directive verbatim — and `evo direct` is meaningless if
-    # agents can choose which parts of a directive to honor.
-    assert tag_count >= 1, (
-        f"[{host}] directive's marker tag '{directive_tag}' found in "
-        f"{tag_count} committed target.py files (expected ≥1 — Experiment D "
-        f"per the directive). directive event arrived but the subagent did "
-        f"not act on its content."
-    )
-
-    best = _read_best_score(h, ws_root)
-    assert best is not None, f"[{host}] no committed score in any run's graph.json"
-    # baseline was measured above (before agent launch) by running bench.py
-    # against the unmodified target.py — that's the true reference.
-    ratio = best / baseline
-    # Round-1 strategies (cache xs[i], itertools.combinations) are both
-    # O(n²) — capped at constant-factor speedups, ~3-10x baseline in
-    # practice. The directive's hash-map approach is O(n) — typically
-    # 100x+ baseline. A ratio > 50 therefore means the agent applied
-    # the directive (no other path reaches that range from the briefed
-    # round-1 strategies).
-    assert ratio > 50, (
-        f"[{host}] best/baseline ratio {ratio:.1f}x (best={best:.1f}, "
-        f"baseline={baseline:.1f}) suggests round-2 directive was not "
-        f"applied — round-1 O(n²) strategies cap around ~10x baseline"
+    assert delivered_ok, (
+        f"[{host}] directive {directive_id} consumed (consumed_by="
+        f"{consumed_by}) but NOT delivered to the model: acked={acked}, "
+        f"marker '_DIRECTIVE_TAG' not in any committed target.py "
+        f"(tag_count={tag_count}), best/baseline ratio {ratio:.1f}x "
+        f"(best={best:.1f}, baseline={baseline:.1f}). acked=False with no "
+        f"marker and a round-1 O(n²) score (cap ~10x; the directive's O(n) "
+        f"hashmap is 100×+) means the offset advanced without the content "
+        f"surfacing to the model — a delivery failure, not model compliance."
     )
 
 
@@ -700,6 +897,70 @@ def _shell_quote(s: str) -> str:
 
 def _read_prompt() -> str:
     return FIXTURE_PROMPT.read_text()
+
+
+def _best_effort_kill(h: _Harness) -> None:
+    """Kill the agent process inside the sandbox. Swallows transport
+    failures (httpcore timeouts during extended e2b outages) — by the
+    time we're calling this, the wait loop has already exited and we
+    want the test to proceed to assertion regardless. The sandbox
+    teardown will kill the agent eventually anyway."""
+    try:
+        h.run(
+            "pkill -TERM -P $(cat /tmp/agent.pid) 2>/dev/null; "
+            "kill $(cat /tmp/agent.pid) 2>/dev/null; true",
+            must_succeed=False, timeout=10,
+        )
+    except Exception as e:  # noqa: BLE001
+        print(f"  [wait] kill failed ({type(e).__name__}); "
+              "sandbox teardown will clean up", flush=True)
+
+
+# Pty driver for `hermes chat` (interactive). `-q -Q` non-interactive mode
+# was the original driver but it has no `process_loop`, so the plugin's
+# `inject_message`-based stop-nudge and autonomous continuation don't fire
+# (verified — see plugins/evo/src/evo/hermes_plugin/__init__.py docstring).
+# Driving interactive `hermes chat` via a pty gives us a real REPL with
+# `process_loop` running, so mid-run inject and stop-nudge work the same
+# way as on the other hosts. Reads the prompt from `/tmp/hermes-prompt.txt`
+# and the model from `/tmp/hermes-model.txt` so we don't have to bash-quote
+# them into the Python source.
+_HERMES_PTY_DRIVER = r'''
+import os, pty, select, subprocess, sys, time
+prompt = open("/tmp/hermes-prompt.txt").read()
+model = open("/tmp/hermes-model.txt").read().strip()
+log = open("/tmp/agent.log", "wb", buffering=0)
+master, slave = pty.openpty()
+proc = subprocess.Popen(
+    ["hermes", "chat", "--provider", "anthropic", "-m", model],
+    stdin=slave, stdout=slave, stderr=slave,
+    start_new_session=True,
+)
+os.close(slave)
+# Wait for the REPL prompt to be ready. Hermes prints a banner + ">" before
+# accepting input; if we write too early the keystrokes hit a buffer that
+# hasn't started reading yet.
+time.sleep(5)
+os.write(master, prompt.encode())
+# Single \r submits the multi-line prompt. Embedded \n stay as literal
+# newlines in the input buffer — hermes accepts multi-line input in REPL.
+os.write(master, b"\r")
+deadline = time.time() + 2400  # 40 min — must be less than the sandbox's 3600s so we exit cleanly and the test reaches its assertions instead of timing out at the e2b layer
+while proc.poll() is None:
+    if time.time() > deadline:
+        proc.terminate()
+        break
+    try:
+        r, _, _ = select.select([master], [], [], 0.5)
+        if r:
+            data = os.read(master, 4096)
+            if data:
+                log.write(data)
+    except OSError:
+        break
+proc.wait()
+log.close()
+'''
 
 
 # ---------------------------------------------------------------------------
@@ -731,7 +992,12 @@ def test_opencode(sandbox_4g):
     )
     sandbox_4g.run(f"{sudo}apt-get install -y nodejs >/dev/null", timeout=180)
 
-    prompt = _shell_quote(_read_prompt())
+    # Prepend the host's optimize-skill invocation so the auto-arm regex
+    # in drain.py flips optimize_mode → true on UserPromptSubmit. Without
+    # this, optimize_mode stays false, the deny gate doesn't engage, and
+    # the optimize skill body isn't promoted into the conversation —
+    # mid-run directives end up as observations the model can ignore.
+    prompt = _shell_quote("/optimize autonomous\n\n" + _read_prompt())
 
     # `evo install opencode` now installs skills itself (via npx skills
     # add). In local-source mode pass --from-path so skills come from the
@@ -792,7 +1058,13 @@ def test_claude_code(sandbox):
         timeout=300,
     )
 
-    prompt = _shell_quote(_read_prompt())
+    # Prepend `/optimize autonomous` so (a) the auto-arm regex flips
+    # optimize_mode → true on UserPromptSubmit (deny gate engages), and
+    # (b) the `autonomous` param makes the agent run `evo autonomous on`,
+    # arming the stop-nudge. Without `autonomous` the default is stop-
+    # naturally, so the single --print turn would end after round 1 and
+    # the mid-run directive (injected post-round-1) would never be consumed.
+    prompt = _shell_quote("/optimize autonomous\n\n" + _read_prompt())
     # `evo install claude-code` is required (not optional) post-0.4.1: it
     # fetches the platform-native evo-hook-drain binary from the release's
     # uploaded assets (or via --from-path in local-source mode). Without
@@ -860,7 +1132,7 @@ def test_codex(sandbox):
     # host-agnostic prompt body is just translation, not protocol leakage.
     # Without it, codex's gpt-5-mini reads the round-1/round-2 specs as
     # actionable shell tasks and skips the skill entirely.
-    prompt = _shell_quote("$evo:optimize\n\n" + _read_prompt())
+    prompt = _shell_quote("$evo:optimize autonomous\n\n" + _read_prompt())
     # In local-source mode, point `evo install codex` at the marketplace
     # root (contains .claude-plugin/marketplace.json) — it drives codex's
     # `plugin/install` RPC against that marketplace.json. PyPI/GitHub mode
@@ -891,12 +1163,18 @@ def test_codex(sandbox):
         ],
         drive_cmd=(
             "export PATH=$HOME/.local/bin:$PATH; "
-            # gpt-5-mini reads detailed prompts as actionable and skips
-            # the optimize skill's protocol (writes loose `target_a.py`
-            # files instead of `evo new` + `evo run`). gpt-5 (full)
-            # respects skill mentions more reliably.
+            # Model: gpt-5-codex (codex's agent-tuned model). Plain `gpt-5`
+            # crashes codex's collab/subagent spawner — the subagents
+            # request reasoning_effort low/medium which gpt-5 rejects
+            # ("Reasoning effort `low` is not supported for model `gpt-5`"),
+            # so the orchestrator produces 0 experiments and the agent dies
+            # before the mid-run inject is ever exercised. gpt-5-codex
+            # supports codex's effort settings and still respects the
+            # skill (gpt-5-mini does not — it freelances loose target_a.py
+            # files instead of `evo new`/`evo run`). Pin effort high too.
             f"nohup codex exec --dangerously-bypass-approvals-and-sandbox "
-            f"--model gpt-5 {prompt} "
+            f"-c model_reasoning_effort=high "
+            f"--model gpt-5-codex {prompt} "
             "> /tmp/agent.log 2>&1 & echo $! > /tmp/agent.pid"
         ),
         env_keys={"OPENAI_API_KEY": openai_key},
@@ -951,7 +1229,26 @@ def test_hermes(sandbox):
         else ""
     )
 
-    prompt = _shell_quote(_read_prompt())
+    # Upload the pty driver script + prompt + model to /tmp so the
+    # drive_cmd is a clean one-liner. Interactive `hermes chat` (not
+    # `-q -Q`) is the only mode with a `process_loop` for autonomous
+    # continuation. See _HERMES_PTY_DRIVER for the full rationale.
+    sandbox.sbx.files.write(
+        "/tmp/hermes-pty-driver.py",
+        _HERMES_PTY_DRIVER,
+    )
+    sandbox.sbx.files.write(
+        "/tmp/hermes-prompt.txt",
+        "/optimize autonomous\n\n" + _read_prompt(),
+    )
+    sandbox.sbx.files.write(
+        "/tmp/hermes-model.txt",
+        # claude-haiku-4-5 follows the directive (creates exp_D with the
+        # marker tag) but implements the O(n) hash-map incorrectly — score
+        # caps ~16x. claude-sonnet-4-5 produces a correct O(n) impl.
+        "anthropic/claude-sonnet-4-5\n",
+    )
+
     _drive_smoke(
         sandbox,
         host="hermes",
@@ -967,13 +1264,7 @@ def test_hermes(sandbox):
         ],
         drive_cmd=(
             "export PATH=$HOME/.local/bin:$PATH; "
-            # claude-haiku-4-5 follows the directive (creates exp_D with
-            # the marker tag) but implements the O(n) hash-map
-            # incorrectly — actual score caps at ~16x baseline instead
-            # of the expected 100x+, tripping the score-ratio assertion.
-            # claude-sonnet-4-5 produces a correct O(n) implementation.
-            f"nohup hermes chat -q {prompt} -Q --provider anthropic "
-            f"-m anthropic/claude-sonnet-4-5 "
+            "nohup python3 /tmp/hermes-pty-driver.py "
             "> /tmp/agent.log 2>&1 & echo $! > /tmp/agent.pid"
         ),
         env_keys={"ANTHROPIC_API_KEY": anthropic_key},
@@ -990,7 +1281,7 @@ def sandbox_4g(fixture_repo_tarball, evo_local_tarball):
     """
     _gate_release_smoke()
     from e2b import Sandbox
-    sbx = Sandbox.create(template="evo-test-4g", timeout=1800)
+    sbx = Sandbox.create(template="evo-test-4g", timeout=3600)
     h = _Harness(sbx, fixture_repo_tarball, evo_local_tarball)
     try:
         h.install_base_deps()
@@ -1022,7 +1313,8 @@ def test_openclaw(sandbox_4g):
         timeout=600,
     )
 
-    prompt = _shell_quote(_read_prompt())
+    # Prepend openclaw's `/optimize` to fire the auto-arm regex.
+    prompt = _shell_quote("/optimize autonomous\n\n" + _read_prompt())
     _drive_smoke(
         sandbox_4g,
         host="openclaw",
@@ -1046,7 +1338,14 @@ def test_openclaw(sandbox_4g):
             # not main (which lags behind alpha tags).
             f"openclaw plugins install evo --marketplace "
             f"{sandbox_4g.marketplace_source_url} 2>&1 | tail -3",
-            "export PATH=$HOME/.local/bin:$PATH; evo install openclaw",
+            # In local-source mode, suppress the CLI auto-sync's default
+            # `uv tool install --force evo-hq-cli` (which pulls PyPI's
+            # last published version, currently behind the local tree).
+            # Pass --from-path so the sync routine recognizes we're
+            # already on a local CLI and skips.
+            "export PATH=$HOME/.local/bin:$PATH; evo install openclaw "
+            + ("--from-path /tmp/evo-local-repo"
+               if sandbox_4g.marketplace_source.startswith("/") else ""),
         ],
         drive_cmd=(
             "export PATH=$HOME/.local/bin:$PATH; "
@@ -1123,7 +1422,11 @@ def test_pi(sandbox):
     )
     sandbox.run("pi --version")
 
-    prompt = _shell_quote(_read_prompt())
+    # Pi requires `/skill:<name>` for skill invocation (per
+    # agent-session.ts:1149 — `if (!text.startsWith("/skill:")) return text;`).
+    # Without this prefix, pi never expands the optimize skill body and
+    # the auto-arm regex doesn't fire.
+    prompt = _shell_quote("/skill:optimize\n\n" + _read_prompt())
     # In local-source mode the harness uploads the repo tarball to
     # /tmp/evo-local-repo; pass --from-path so the install picks up
     # skills from there (the installed wheel doesn't ship them — same

@@ -25,6 +25,33 @@ fn emit_ok() -> ! {
     process::exit(0);
 }
 
+/// Append a diagnostic JSON line tracing this hook invocation's decisions.
+/// Opt-in: only writes when EVO_DRAIN_DEBUG is set (non-empty). Log path is
+/// EVO_DRAIN_DEBUG_LOG or, by default, $HOME/.evo-drain.log. `fields` is a
+/// JSON fragment WITHOUT the surrounding braces (e.g. `"stage":"gate"`).
+/// Diagnostics must never break the hot path — all failures are swallowed.
+fn debug_log(fields: &str) {
+    if env::var("EVO_DRAIN_DEBUG").map(|v| !v.is_empty()).unwrap_or(false) == false {
+        return;
+    }
+    let path = env::var("EVO_DRAIN_DEBUG_LOG")
+        .ok()
+        .filter(|s| !s.is_empty())
+        .unwrap_or_else(|| {
+            let home = env::var("HOME").unwrap_or_else(|_| "/tmp".to_string());
+            format!("{}/.evo-drain.log", home)
+        });
+    let line = format!(
+        "{{\"ts\":\"{}\",\"src\":\"rust\",\"pid\":{},{}}}\n",
+        iso8601_utc_now(),
+        process::id(),
+        fields
+    );
+    if let Ok(mut f) = fs::OpenOptions::new().create(true).append(true).open(&path) {
+        let _ = f.write_all(line.as_bytes());
+    }
+}
+
 fn read_stdin() -> String {
     use std::io::IsTerminal;
     let mut buf = String::new();
@@ -51,23 +78,61 @@ fn find_json_string(buf: &str, key: &str) -> Option<String> {
     Some(after_quote[..end].to_string())
 }
 
-fn find_session_id(stdin_buf: &str) -> String {
-    if let Some(sid) = find_json_string(stdin_buf, "session_id") {
-        return sid;
+/// Per-host env var → host string. Ordered for stable fallback when
+/// no payload session_id is present and multiple env vars are set
+/// (nested env corner case). The match-by-value path in
+/// `resolve_session` makes the order irrelevant when a payload sid is
+/// available — we pick the env var whose value equals the payload sid.
+const HOST_ENV_VARS: &[(&str, &str)] = &[
+    ("CLAUDE_CODE_SESSION_ID", "claude-code"),
+    ("CODEX_THREAD_ID", "codex"),
+    ("HERMES_SESSION_ID", "hermes"),
+    ("OPENCODE_SESSION_ID", "opencode"),
+];
+
+fn detect_host_from_path(buf: &str) -> &'static str {
+    if buf.contains(".codex/") || buf.contains("\\.codex\\") {
+        "codex"
+    } else if buf.contains(".hermes/") || buf.contains("\\.hermes\\") {
+        "hermes"
+    } else if buf.contains(".opencode/") || buf.contains("\\.opencode\\") {
+        "opencode"
+    } else {
+        "claude-code"
     }
-    for env_var in [
-        "CLAUDE_CODE_SESSION_ID",
-        "CODEX_THREAD_ID",
-        "HERMES_SESSION_ID",
-        "OPENCODE_SESSION_ID",
-    ] {
-        if let Ok(v) = env::var(env_var) {
+}
+
+/// Resolve (session_id, host) together. The payload session_id wins;
+/// host is the env var whose value matches that sid. If no env var
+/// matches, fall back to path-fragment detection. With no payload sid,
+/// the first non-empty env var in `HOST_ENV_VARS` order supplies both
+/// sid and host — that handles the standalone case while keeping
+/// matched-sid the priority signal in nested envs.
+fn resolve_session(stdin_buf: &str) -> (String, &'static str) {
+    if let Some(sid) = find_json_string(stdin_buf, "session_id") {
+        // Pick the env var whose value matches; that's authoritative
+        // for which host owns this session.
+        for (var, host) in HOST_ENV_VARS {
+            if let Ok(v) = env::var(var) {
+                if v == sid {
+                    return (sid, host);
+                }
+            }
+        }
+        // No env var matches the payload sid — fall back to path
+        // detection. Common in test harnesses + nested cases where the
+        // outer host's env vars don't reflect this inner session.
+        return (sid, detect_host_from_path(stdin_buf));
+    }
+    // No payload sid — pick the first env var set.
+    for (var, host) in HOST_ENV_VARS {
+        if let Ok(v) = env::var(var) {
             if !v.is_empty() {
-                return v;
+                return (v, host);
             }
         }
     }
-    String::new()
+    (String::new(), "claude-code")
 }
 
 fn find_evo_run_dir() -> Option<PathBuf> {
@@ -100,17 +165,6 @@ fn find_evo_run_dir() -> Option<PathBuf> {
     }
 }
 
-fn detect_host_from_stdin(buf: &str) -> &'static str {
-    if buf.contains(".codex/") || buf.contains("\\.codex\\") {
-        "codex"
-    } else if buf.contains(".hermes/") || buf.contains("\\.hermes\\") {
-        "hermes"
-    } else if buf.contains(".opencode/") || buf.contains("\\.opencode\\") {
-        "opencode"
-    } else {
-        "claude-code"
-    }
-}
 
 fn iso8601_utc_now() -> String {
     let secs = SystemTime::now()
@@ -127,7 +181,11 @@ fn iso8601_utc_now() -> String {
     let mm = (remaining % 3600) / 60;
     let ss = remaining % 60;
     let (y, mo, d) = civil_from_days(days);
-    format!("{:04}-{:02}-{:02}T{:02}:{:02}:{:02}Z", y, mo, d, hh, mm, ss)
+    // `+00:00` (not `Z`) so Python `datetime.fromisoformat()` parses it
+    // on 3.10 — that version doesn't accept the `Z` suffix. The Python
+    // side uses `.isoformat()` which already emits `+00:00`, so this
+    // also makes the two writers byte-compatible.
+    format!("{:04}-{:02}-{:02}T{:02}:{:02}:{:02}+00:00", y, mo, d, hh, mm, ss)
 }
 
 /// Howard Hinnant's date algorithm — convert days-since-1970 to (Y, M, D).
@@ -145,19 +203,68 @@ fn civil_from_days(z: i64) -> (i64, u32, u32) {
     (y, m, d)
 }
 
-fn register_session(run_dir: &Path, sid: &str, host: &str) -> io::Result<()> {
+fn register_session(run_dir: &Path, sid: &str, host: &str, engage: bool) -> io::Result<()> {
     let sessions_dir = run_dir.join("inject").join("sessions");
     fs::create_dir_all(&sessions_dir)?;
     let now = iso8601_utc_now();
+    // Honor EVO_EXP_ID at first registration so a subagent's first
+    // SessionStart drain correctly routes to the exp queue (drain.py
+    // chooses workspace-vs-exp based on `sess.exp_id`). Without this,
+    // a directive queued by `evo direct --to exp_id` BEFORE the Python
+    // `auto_register_from_env` merge can be missed.
+    let exp_id = match env::var("EVO_EXP_ID") {
+        Ok(v) if !v.is_empty() => Some(v),
+        _ => None,
+    };
+    let exp_id_json = match &exp_id {
+        Some(v) => format!(r#""{}""#, escape_json_str(v)),
+        None => "null".to_string(),
+    };
+    // Engage the orchestrator at SessionStart. The hook-host process that
+    // fired SessionStart IS the orchestrator, so SessionStart is its
+    // engagement signal — same as the in-process JS plugins (pi/openclaw)
+    // marking engaged at session_start. Under /optimize the orchestrator
+    // dispatches every `evo` command to subagents, so it never runs `evo`
+    // itself; without engaging here, the Python `evo direct` broadcast
+    // filters it out (skipped_unengaged) and mid-run directives never
+    // land. NEVER engage a subagent registration (EVO_EXP_ID set) — a
+    // subagent must not engage the workspace loop on its own.
+    let engaged = engage && exp_id.is_none();
+    let (engaged_json, engaged_at_json) = if engaged {
+        ("true".to_string(), format!(r#""{}""#, now))
+    } else {
+        ("false".to_string(), "null".to_string())
+    };
     let payload = format!(
-        r#"{{"schema_version":1,"session_id":"{}","host":"{}","pid":{},"registered_at":"{}","last_seen_at":"{}","exp_id":null,"parent_session_id":null}}"#,
+        r#"{{"schema_version":1,"session_id":"{}","host":"{}","pid":{},"registered_at":"{}","last_seen_at":"{}","exp_id":{},"parent_session_id":null,"has_evo_engaged":{},"engaged_at":{},"optimize_mode":false,"optimize_mode_at":null}}"#,
         sid,
         host,
         process::id(),
         now,
-        now
+        now,
+        exp_id_json,
+        engaged_json,
+        engaged_at_json,
     );
     fs::write(sessions_dir.join(format!("{}.json", sid)), payload)
+}
+
+/// Minimal JSON-string escape for the small set of chars likely to
+/// appear in session/exp ids. We never expect quotes or backslashes,
+/// but be defensive.
+fn escape_json_str(s: &str) -> String {
+    let mut out = String::with_capacity(s.len());
+    for c in s.chars() {
+        match c {
+            '"' => out.push_str("\\\""),
+            '\\' => out.push_str("\\\\"),
+            '\n' => out.push_str("\\n"),
+            '\r' => out.push_str("\\r"),
+            '\t' => out.push_str("\\t"),
+            _ => out.push(c),
+        }
+    }
+    out
 }
 
 fn read_version(manifest: &Path) -> Option<String> {
@@ -248,7 +355,7 @@ fn session_start_drift_checks(plugin_root: &Path) {
     }
 }
 
-fn handoff_to_drain(run_dir: &Path, sid: &str, stdin_buf: &str) -> ! {
+fn handoff_to_drain(run_dir: &Path, sid: &str, host: &str, stdin_buf: &str) -> ! {
     let drain = match which("evo-drain") {
         Some(p) => p,
         None => {
@@ -266,6 +373,8 @@ fn handoff_to_drain(run_dir: &Path, sid: &str, stdin_buf: &str) -> ! {
         .arg(run_dir)
         .arg("--session")
         .arg(sid)
+        .arg("--host")
+        .arg(host)
         .stdin(Stdio::piped())
         .stdout(Stdio::inherit())
         .stderr(Stdio::inherit())
@@ -285,10 +394,54 @@ fn handoff_to_drain(run_dir: &Path, sid: &str, stdin_buf: &str) -> ! {
     process::exit(status);
 }
 
+
+/// Returns true if `<run_dir>/inject/markers/<sid>.flag` exists.
+fn marker_exists(run_dir: &Path, sid: &str) -> bool {
+    run_dir
+        .join("inject")
+        .join("markers")
+        .join(format!("{}.flag", sid))
+        .is_file()
+}
+
+/// Returns true if `<run_dir>/inject/optimize_mode/<sid>.flag` exists.
+/// This is the side-channel signal that says "this session is the
+/// orchestrator driving /evo:optimize" — the deny gate + stop nudge
+/// need drain to run on tool/stop events.
+fn optimize_flag_exists(run_dir: &Path, sid: &str) -> bool {
+    run_dir
+        .join("inject")
+        .join("optimize_mode")
+        .join(format!("{}.flag", sid))
+        .is_file()
+}
+
+/// Decide whether to hand off to the Python drain. Inputs are the three
+/// fast-path stat results. SessionStart is handled before this; here we
+/// gate everything else.
+///
+/// Rules:
+///   - marker exists                       → hand off (deliver directive)
+///   - optimize flag on + tool/stop event  → hand off (policy / stop nudge)
+///   - optimize flag off + UserPromptSubmit → hand off (might detect /optimize)
+///   - otherwise                            → fast exit ({})
+fn should_handoff(hook_event: &str, marker: bool, opt_flag: bool) -> bool {
+    if marker {
+        return true;
+    }
+    if opt_flag {
+        return matches!(hook_event, "PreToolUse" | "Stop" | "SubagentStop");
+    }
+    matches!(hook_event, "UserPromptSubmit")
+}
+
 fn main() {
     let stdin_buf = read_stdin();
 
-    let sid = find_session_id(&stdin_buf);
+    // Resolve session id + host together. Matching env var value to
+    // payload sid is what makes nested envs (codex spawned from claude
+    // and vice versa) classify correctly.
+    let (sid, host) = resolve_session(&stdin_buf);
     if sid.is_empty() {
         emit_ok();
     }
@@ -302,10 +455,18 @@ fn main() {
 
     let sessions_file = run_dir.join("inject").join("sessions").join(format!("{}.json", sid));
 
+    let subagent = is_subagent_context(&stdin_buf);
+    debug_log(&format!(
+        "\"stage\":\"entry\",\"sid\":\"{}\",\"host\":\"{}\",\"event\":\"{}\",\"subagent\":{},\"sess_exists\":{}",
+        sid, host, hook_event, subagent, sessions_file.is_file()
+    ));
+
     if hook_event == "SessionStart" {
         if !sessions_file.is_file() {
-            let host = detect_host_from_stdin(&stdin_buf);
-            let _ = register_session(&run_dir, &sid, host);
+            // engage=true: SessionStart on the hook host IS the orchestrator
+            // engagement signal. register_session refuses to engage if
+            // EVO_EXP_ID is set (subagent context).
+            let _ = register_session(&run_dir, &sid, host, true);
         }
         // Plugin root = parent of the directory containing this executable.
         let exe = env::current_exe().ok();
@@ -317,18 +478,89 @@ fn main() {
         if let Some(root) = plugin_root {
             session_start_drift_checks(&root);
         }
+        // Fall through to handoff: drain seeds offsets + emits empty
+        // additionalContext envelope. Cheap and matches prior behavior.
+        debug_log("\"stage\":\"session_start_handoff\"");
+        handoff_to_drain(&run_dir, &sid, host, &stdin_buf);
     }
 
+    // Resume support: claude-code resumes (and `evo init` mid-session)
+    // don't fire SessionStart, so the session may not be registered yet
+    // when UserPromptSubmit arrives. Lazy-register on first prompt so the
+    // /optimize matcher in Python actually has a session record to flip.
     if !sessions_file.is_file() {
-        emit_ok();
-    }
-
-    if hook_event != "SessionStart" {
-        let marker = run_dir.join("inject").join("markers").join(format!("{}.flag", sid));
-        if !marker.is_file() {
+        if hook_event == "UserPromptSubmit" {
+            // A resumed orchestrator's first prompt. Engage unless this is
+            // a subagent-originated prompt (agent_id present) — a subagent
+            // must not engage the workspace loop on its own. register_session
+            // additionally refuses to engage when EVO_EXP_ID is set.
+            let engage = !is_subagent_context(&stdin_buf);
+            let _ = register_session(&run_dir, &sid, host, engage);
+        } else {
             emit_ok();
         }
     }
 
-    handoff_to_drain(&run_dir, &sid, &stdin_buf);
+    let marker = marker_exists(&run_dir, &sid);
+    let opt_flag = optimize_flag_exists(&run_dir, &sid);
+    let handoff = should_handoff(&hook_event, marker, opt_flag);
+    debug_log(&format!(
+        "\"stage\":\"gate\",\"event\":\"{}\",\"marker\":{},\"opt_flag\":{},\"should_handoff\":{}",
+        hook_event, marker, opt_flag, handoff
+    ));
+    if !handoff {
+        debug_log("\"stage\":\"fast_exit\",\"reason\":\"no_handoff\"");
+        emit_ok();
+    }
+
+    // Subagent fence: claude-code (and codex) inherit the parent's
+    // CLAUDE_CODE_SESSION_ID env var when spawning subagents via the
+    // Task tool. So when a subagent makes a tool call and PreToolUse
+    // fires, this hook resolves to the parent's session_id — same as
+    // the orchestrator. If we drain here, the directive's
+    // additionalContext flows into the SUBAGENT's API call, not the
+    // orchestrator's. The subagent finishes its narrow task, context
+    // is discarded, the orchestrator never sees the directive.
+    //
+    // Discriminator: the hook payload's `agent_id` field. Claude-code
+    // includes it (along with `agent_type`) in PreToolUse payloads
+    // for subagent (Task tool) tool calls; the orchestrator's own
+    // tool calls have it absent. Verified empirically.
+    //
+    // On subagent context: fast-exit. The queue stays pending until a
+    // main-session hook (typically the orchestrator's next Stop or a
+    // top-level Bash/Read call) consumes it and delivers as a new
+    // user turn / additionalContext.
+    if subagent {
+        debug_log("\"stage\":\"fast_exit\",\"reason\":\"subagent_fence\"");
+        emit_ok();
+    }
+
+    debug_log(&format!(
+        "\"stage\":\"handoff\",\"event\":\"{}\",\"marker\":{}",
+        hook_event, marker
+    ));
+    handoff_to_drain(&run_dir, &sid, host, &stdin_buf);
+}
+
+
+fn is_subagent_context(stdin_buf: &str) -> bool {
+    // Claude-code includes `agent_id` (and `agent_type`) fields in hook
+    // payloads triggered by subagent (Task tool) tool calls. The
+    // orchestrator's own tool calls have these fields absent. This is
+    // the canonical discriminator — verified empirically by dumping
+    // every hook payload across a release-smoke run:
+    //   - 20 PreToolUse with agent_id present: every one originated
+    //     from a subagent (file edits in worktrees/exp_*/, evo run
+    //     commands inside subagents)
+    //   - 12 PreToolUse with agent_id absent: every one originated
+    //     from the orchestrator (Skill, top-level Bash, Agent/Task
+    //     spawn, evo ack)
+    //
+    // Earlier `transcript_path` check was wrong — claude-code passes
+    // the MAIN session's transcript_path even for subagent tool calls.
+    match find_json_string(stdin_buf, "agent_id") {
+        Some(aid) => !aid.is_empty(),
+        None => false,
+    }
 }
