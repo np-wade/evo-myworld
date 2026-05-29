@@ -10,7 +10,7 @@
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 [![Tests](https://github.com/evo-hq/evo/actions/workflows/ci.yml/badge.svg)](https://github.com/evo-hq/evo/actions/workflows/ci.yml)
 
-**Get started with autoresearch on any codebase — two commands.**
+**Get started with autoresearch on any codebase — with two simple commands.**
 
 **[Try it](#try-it)** · **[Install](#install)** · **[How it works](#how-it-works)** · **[Dashboard](#dashboard)** · **[Upgrading](#upgrading)**
 
