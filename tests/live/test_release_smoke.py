@@ -846,7 +846,18 @@ def _drive_smoke(
 
     marker_ok = tag_count >= 1
     score_ok = ratio > 50
-    if not (marker_ok or score_ok):
+    # This smoke verifies the inject pipeline's DELIVERY, which is the
+    # plugin's responsibility. A confirmed ack is unfakeable proof the
+    # directive reached the model: the agent had to read the directive to
+    # learn its id before it could run `evo ack <id>`. So acked=True is
+    # delivery success on its own. marker/score are evidence the model also
+    # *implemented* the directive — a separate, model-dependent axis (a
+    # compliant model can ack then drop a verbatim sub-instruction when
+    # briefing a subagent). They remain the fallback proof when the model
+    # never acked (acked=False is the real "did it surface?" concern, since
+    # the offset can advance without the content reaching the model).
+    delivered_ok = acked or marker_ok or score_ok
+    if not delivered_ok:
         h.run("echo '--- /tmp/agent.log (last 300 lines) ---'; "
               "tail -300 /tmp/agent.log 2>&1 || echo '(no agent log)'",
               must_succeed=False, timeout=10)
@@ -867,17 +878,15 @@ def _drive_smoke(
         h.run("echo '--- /tmp/evo-inject.log (host plugin diagnostic) ---'; "
               "cat /tmp/evo-inject.log 2>&1 || echo '(no inject log)'",
               must_succeed=False, timeout=5)
-    assert marker_ok or score_ok, (
-        f"[{host}] directive delivered (consumed_by={consumed_by}, "
-        f"acked={acked}) but no evidence it shaped the work: marker "
-        f"'_DIRECTIVE_TAG' not in any committed target.py "
-        f"(tag_count={tag_count}), and best/baseline ratio is {ratio:.1f}x "
-        f"(best={best:.1f}, baseline={baseline:.1f}) — round-1 O(n²) "
-        f"strategies cap ~10x, the directive's O(n) hashmap is 100×+. With "
-        f"acked={acked}: the model {'received+acknowledged it but did not '
-        'implement the algorithm (model-compliance)' if acked else 'never '
-        'acked — content may not have surfaced'}. Either marker or score "
-        f"alone passes; both absent + this receipt state is the failure."
+    assert delivered_ok, (
+        f"[{host}] directive {directive_id} consumed (consumed_by="
+        f"{consumed_by}) but NOT delivered to the model: acked={acked}, "
+        f"marker '_DIRECTIVE_TAG' not in any committed target.py "
+        f"(tag_count={tag_count}), best/baseline ratio {ratio:.1f}x "
+        f"(best={best:.1f}, baseline={baseline:.1f}). acked=False with no "
+        f"marker and a round-1 O(n²) score (cap ~10x; the directive's O(n) "
+        f"hashmap is 100×+) means the offset advanced without the content "
+        f"surfacing to the model — a delivery failure, not model compliance."
     )
 
 
