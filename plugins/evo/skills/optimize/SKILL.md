@@ -35,10 +35,14 @@ These defaults can be overridden via arguments: `/optimize [subagents=N] [budget
 - **subagents**: number of parallel subagents per round (default: 5)
 - **budget**: max iterations each subagent can run within its branch (default: 5)
 - **stall**: consecutive rounds with no improvement before auto-stopping (default: 5)
-- **autonomous**: opt-in to the keep-going loop (default: off). See below.
-- **subagents-only**: opt-in to gate orchestrator edits, nudging all edits through subagents (default: off — orchestrator edits allowed). See below.
+- **autonomous**: the keep-going loop. **Default: on** — evo is autoresearch; it runs unattended. Turn off for a run with `evo autonomous off`.
+- **subagents-only**: gate orchestrator edits, pushing all edits through subagents. **Default: on**. Turn off for a run with `evo subagents-only off`.
 
-**Resolving autonomous / subagents-only at startup.** Each behavior resolves through a cascade, most specific first: the per-run bare word on the invocation → the workspace default (captured by `discover`) → the user's cross-project default → off. As your **very first actions, before the loop**, resolve and arm each:
+**Resolving autonomous / subagents-only at startup.** Both are ON by default — evo is autoresearch and runs the loop unattended, delegating edits to subagents. Do not ask the user about either. Resolve each through a cascade, most specific first:
+
+1. **An explicit instruction from the user this run wins — on or off.** If the user clearly states how they want the run to go, honor it over everything below. "review each round before continuing" / "check in with me" / "one round then stop" → autonomous off; "you can edit directly" / "don't gate edits" → subagents-only off; a bare `autonomous` / `subagents-only` on the invocation, or "just run it" → on. Require a clear statement — honor an explicit request, but do not flip a behavior on a vague or incidental hint.
+2. **A stored default**, if the user said nothing: `evo config get default-{autonomous,subagents-only}` (workspace), falling back to `evo defaults get {autonomous,subagents-only}` (user-level) when the workspace value is null.
+3. **Otherwise → on** — the framework default.
 
 ```bash
 evo config get default-autonomous --json        # workspace → true | false | null
@@ -47,12 +51,7 @@ evo config get default-subagents-only --json
 evo defaults get subagents-only --json
 ```
 
-For each behavior: if the bare word is on the invocation → on; else if the workspace value is non-null → use it; else if the user-level value is non-null → use it; else off. When the resolved value is on, run the matching command before the loop:
-
-- `autonomous` resolved on → run `evo autonomous on`.
-- `subagents-only` resolved on → run `evo subagents-only on`.
-
-If a value comes from a stored default (not a bare word on this invocation), say so in your opening message — e.g. "autonomous on (from your saved default)" — so an inherited setting is never invisible. Never infer either from the user's free-form task description; only the invocation argument or a stored default may turn them on.
+As your **very first actions, before the loop**, resolve each and arm it: run `evo autonomous on` / `evo subagents-only on` when it resolves on, or `evo autonomous off` / `evo subagents-only off` when an explicit instruction or stored default turned it off. If a behavior resolves off — whether from the user's instruction this run or a stored default — say so in your opening message (e.g. "autonomous off — running one round at a time, as you asked") so it's never invisible.
 
 **Autonomous mode.** Off lets you stop naturally at a turn boundary — finish a round, report, and stop. On arms the stop-nudge: at every turn boundary you are re-prompted to keep driving the loop until the **stall** limit is hit or the user interrupts. Without it, the loop does NOT force-continue across turn boundaries. To stop an autonomous run, the user runs `evo autonomous off` or `evo exit-optimize-mode`.
 
