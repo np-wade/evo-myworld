@@ -36,18 +36,17 @@ A user can override any of these with `/optimize [subagents=N] [budget=N] [stall
 
 **Picking `subagents` and `budget` is load-bearing -- do not skim.**
 
-Mandatory before the first round (and again any time the backend or benchmark changes): **READ `plugins/evo/skills/optimize/references/sizing-the-round.md` IN FULL.** That doc enumerates the resource-binding cases (exclusive accelerator, memory-heavy, shared mutable fixture, latency/timing measurement, external rate-limit, CPU-light isolated) and gives the specific width formula for each. Do not infer the value from any inline summary in this skill -- the cases that matter most (latency benchmarks, shared-state contention) are exactly the ones that don't compress to a one-liner safely.
+Mandatory before the first round (and again any time the backend or benchmark changes): **READ `plugins/evo/skills/optimize/references/sizing-the-round.md` IN FULL.** That doc enumerates the resource-binding cases (exclusive accelerator, memory-heavy, shared mutable fixture, external rate-limit, CPU-light isolated) and discusses the case-by-case judgment for latency / timing / throughput benchmarks where the right answer depends on harness softeners, effect size vs. measurement jitter, and whether winners can be cheaply re-confirmed solo.
 
-Under-subscribing wastes wall-clock. Over-subscribing CORRUPTS RESULTS -- e.g., a latency benchmark with two concurrent runs measures contended timings, not the optimization's real effect, and the orchestrator may promote a "winner" that's just a contention artifact.
+Under-subscribing wastes wall-clock. Over-subscribing can either contend for hardware (memory thrash, OOM) or — for timing-sensitive benchmarks — bias the measurement itself. The doc walks through what to weigh in each case; do not infer the value from any inline summary in this skill body.
 
 Common ways agents get this wrong by skimming:
-- "8-core machine, CPU-light → width 5" sounds right but assumes the measurement isn't contention-sensitive. Latency / timing / throughput benchmarks are corrupted by sibling-process CPU pressure even when the scoring code is "light."
+- "8-core machine, CPU-light → width 5" sounds right but skips the question of whether the metric is corruptible by sibling-process pressure. The doc has the judgment framing.
 - "Worktree backend has no slot cap so I can go higher" — worktree just shifts the cap from infrastructure to the binding resource. Same hardware, no safety net.
-- "The harness has warmup + min-over-N batches" softens noise but doesn't eliminate contention bias.
 
 If `.evo/project.md` records a resource profile (it should, after `/evo:discover`), START from that. The reference doc is what you use to APPLY it. If the profile is missing or thin, that's a discover-step bug — fix it (write a resource profile that names the binding resource explicitly) before continuing.
 
-In your opening message, state the width/budget you chose AND the one-line reason tied to the binding-resource case FROM THE DOC (e.g. "width 1 — latency benchmark, sibling CPU contention corrupts ns measurements; budget 8 — runs are deterministic, deeper iteration before re-plan is cheap"). If you can't cite the binding-resource case by name, you skipped the doc -- go back and read it.
+In your opening message, state the width/budget you chose AND a one-line reason that references the binding-resource framing FROM THE DOC (e.g. "width 1 — exclusive GPU; budget 8 — runs deterministic"; or "width 3 — CPU-light isolated, but harness reports stable jitter at this concurrency so promoting solo-confirm gate; budget 5"). If your reason doesn't connect to the doc's framing, go back and read it.
 
 - **autonomous**: the keep-going loop. **Default: on** — evo is autoresearch; it runs unattended. Turn off for a run with `evo autonomous off`.
 - **subagents-only**: gate orchestrator edits, pushing all edits through subagents. **Default: on**. Turn off for a run with `evo subagents-only off`.
