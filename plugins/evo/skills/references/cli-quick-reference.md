@@ -279,11 +279,18 @@ evo infra log [--limit N]                          # read recorded events
 ## Loop control (for the /optimize orchestrator)
 
 ```bash
-evo wait [--timeout SEC]      # block until any experiment reaches a
-                              # terminal state (committed / evaluated /
-                              # failed / discarded). Per-task traces and
-                              # other in-flight writes are ignored.
-                              # default 3600, capped at 3600 (1h).
+evo wait [--for experiments|ideators] [--count N] [--timeout SEC]
+                              # --for experiments (default): block until
+                              # any experiment reaches a terminal state
+                              # (committed / evaluated / failed / discarded).
+                              # Per-task traces and other in-flight writes
+                              # are ignored.
+                              # --for ideators: block until N additional
+                              # proposals append to <run>/ideator/proposals.jsonl
+                              # since wait started (default --count 1).
+                              # Use after spawning parallel ideators in
+                              # /optimize step 6b.
+                              # --timeout default 3600, capped at 3600 (1h).
                               # exit 0 with one-line summary on transition,
                               # 124 on timeout.
 

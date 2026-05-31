@@ -2,7 +2,7 @@
 name: optimize
 description: Run the evo optimization loop with parallel subagents until interrupted.
 argument-hint: "[subagents=N] [budget=N] [stall=N]"
-evo_version: 0.5.0-alpha.2
+evo_version: 0.5.0-alpha.3
 ---
 
 Run the `evo` optimization loop. Each round, the orchestrator writes structured briefs and spawns parallel subagents that execute within them. Each subagent is semi-autonomous: it reads the pointer traces, forms the concrete edit, runs experiments, and can iterate within its branch. Runs until interrupted or the stall limit is reached.
@@ -297,7 +297,7 @@ Update notes with cross-cutting learnings:
   evo set <exp_id> --note "key insight from round N"
   ```
 
-### 6b. Periodically spawn ideators (in parallel, non-blocking)
+### 6b. Periodically spawn ideators (in parallel)
 
 The optimize loop's scan sub-agents (step 3) read the CURRENT round's evaluated experiments for failure patterns. They don't do deep cross-graph analysis or external literature scans -- that work belongs to the ideator skill (`evo:ideator`).
 
@@ -318,7 +318,15 @@ brief: frontier_extrapolation -- deeper variants of the steepest score gradient 
 
 Each subagent loads the **evo ideator skill** (named `ideator` under the evo plugin in your host's skill registry) as its first action, then runs the brief. They write to `.evo/run_<run_id>/ideator/proposals.jsonl` (append-only). See `plugins/evo/skills/ideator/SKILL.md` for the full procedure each ideator follows.
 
-Do not block on ideators -- they take 5-10 min and you have a next round to plan. Fire them, exit the turn, continue the loop. The proposals are consumed at decision time (step 4 of the next round).
+Ideators take 5-10 min while the optimize loop's next round is typically 1-2 min away. If you fire and continue, proposals miss the next round's brief-writing every time. Two patterns work:
+
+- **Block here briefly.** If the trigger was a STALL or FAILURE CLUSTER, the next round's quality depends on fresh ideas -- block until enough proposals land:
+  ```bash
+  evo wait --for ideators --count 3 --timeout 900   # 15 min cap, fail-open
+  ```
+  Exit 0 means the proposals are ready; exit 124 (timeout) means proceed with whatever's available -- proposals.jsonl may have partial results.
+
+- **Fire and continue for periodic spawns** (every-N-commits trigger). The next round can run without proposals; the round after that will read them once they land. Use this when there's plenty of in-graph signal still to extract.
 
 ### 6c. Reconcile ideator proposals at brief-writing time
 
@@ -330,6 +338,12 @@ test -f .evo/run_*/ideator/proposals.jsonl && \
   tail -n +1 .evo/run_*/ideator/proposals.jsonl | \
   jq -s --argjson cutoff "$LAST_ROUND_END_TS" \
     'map(select(.generated_at > $cutoff))'
+```
+
+If you fired ideators in 6b WITHOUT blocking (periodic trigger) and they haven't landed yet, you can also wait here -- but only a short timeout, since brief-writing should not stall indefinitely:
+
+```bash
+evo wait --for ideators --count 1 --timeout 120   # 2 min cap, fail-open
 ```
 
 For each new proposal:

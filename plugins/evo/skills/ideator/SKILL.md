@@ -2,7 +2,7 @@
 name: ideator
 description: Generate new experiment proposals by cross-cutting analysis of the experiment graph plus targeted literature/web scans. Spawned in parallel as multiple briefs (failure analysis, literature, frontier extrapolation) that reconcile via append-only proposals file. Use when the user invokes /evo:ideator, the optimize loop wants fresh directions after a stall, or after every N committed experiments.
 argument-hint: "--brief <failure_analysis|literature|frontier_extrapolation> [--k <count>]"
-evo_version: 0.5.0-alpha.2
+evo_version: 0.5.0-alpha.3
 ---
 
 # Ideator
@@ -112,7 +112,15 @@ Task(subagent_type="general-purpose",
      prompt=<ideator skill body with --brief frontier_extrapolation filled in>)
 ```
 
-Each runs ~5-10 min, independently, in its own context. None blocks the orchestrator's main loop -- the orchestrator continues normal optimize work (spawning experiment subagents, reading results) and checks the proposals file at its next `evo new` decision.
+Each runs ~5-10 min, independently, in its own context. The orchestrator chooses whether to block on them or fire-and-continue -- see the optimize skill's step 6b for the policy. In either case, the orchestrator blocks/checks via `evo wait`:
+
+```bash
+# Block until N ideator proposals have landed since wait started (caps at --timeout)
+evo wait --for ideators --count 3 --timeout 900
+# Exit 0 = ready; exit 124 = timeout (proposals may be partial -- check the file)
+```
+
+`evo wait` watches `proposals.jsonl` for new lines. Each ideator's terminal action is appending its proposals; so line growth IS the completion signal. No separate done-file or session-id bookkeeping needed.
 
 When the orchestrator picks the next experiment:
 
@@ -122,6 +130,18 @@ When the orchestrator picks the next experiment:
 4. The top 1-2 proposals get spawned as the next `evo new`s; the rest stay in the queue
 
 The proposals file is the reconciliation surface -- no other coordination between parallel ideators.
+
+## Append-at-end discipline (recommended)
+
+Each ideator subagent SHOULD hold its proposals in memory while running, then append ALL of them to `proposals.jsonl` in a SINGLE FINAL WRITE at the end of its work, rather than streaming them as they're produced.
+
+Reasons:
+- **Failure atomicity.** A crashed mid-stream ideator leaves ambiguous partial output: did 2 proposals arrive because the ideator finished early with 2 ideas, or because it crashed after writing 2? Single-write-at-end means "if you see proposals from this ideator, the ideator finished successfully" -- the orchestrator can trust each line.
+- **Per-ideator atomicity for the reconciler.** The orchestrator's reconciliation step at brief-writing dedupes against the graph. If proposals stream out, the reconciler may see (and act on) proposal 1 before proposal 2 lands -- and proposal 2 might supersede proposal 1.
+
+`evo wait --for ideators --count N` counts NEW LINES added to `proposals.jsonl` since wait started, NOT ideator completions. So if you spawn 3 ideators that each produce ~3 proposals, `--count 9` waits for all of them to finish; `--count 1` returns as soon as any ideator finishes its single final write (regardless of how many proposals were in it). Pick N based on what you actually need from the round.
+
+Use atomic append (write to a temp file, then `cat tmp >> proposals.jsonl`) if your host's file tools don't guarantee multi-line write atomicity.
 
 ## What the ideator deliberately does NOT do
 

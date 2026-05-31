@@ -200,5 +200,114 @@ class TestEvoWait(unittest.TestCase):
                       "can branch on it without parsing the exp dir state")
 
 
+class TestEvoWaitForIdeators(unittest.TestCase):
+    """The --for ideators path: orchestrator blocks on proposals.jsonl
+    line growth instead of experiment-dir activity. Each ideator subagent
+    appends ALL its proposals in one final write at the end of its run,
+    so line growth IS the completion signal."""
+
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory()
+        self.root = Path(self._tmp.name).resolve()
+        self.run_dir = _make_workspace(self.root)
+        (self.run_dir / "ideator").mkdir(parents=True, exist_ok=True)
+        self.proposals = self.run_dir / "ideator" / "proposals.jsonl"
+        self._old_cwd = Path.cwd()
+        os.chdir(self.root)
+
+    def tearDown(self):
+        os.chdir(self._old_cwd)
+        self._tmp.cleanup()
+
+    def _run_wait(self, *, count: int = 1, timeout: float = 1.0) -> tuple[int, str]:
+        from evo.cli import cmd_wait
+        import argparse
+        buf = io.StringIO()
+        with patch("sys.stdout", buf):
+            rc = cmd_wait(argparse.Namespace(
+                wait_for="ideators", count=count, timeout=timeout,
+            ))
+        return rc, buf.getvalue()
+
+    def test_timeout_when_no_proposals_arrive(self):
+        rc, out = self._run_wait(count=1, timeout=0.3)
+        self.assertEqual(rc, 124, f"want 124 (timeout), got {rc}; output: {out!r}")
+        self.assertIn("no new ideator proposals", out)
+
+    def test_returns_0_when_proposals_appended_during_wait(self):
+        def appender() -> None:
+            time.sleep(0.4)
+            with self.proposals.open("a") as f:
+                f.write('{"brief":"failure_analysis","hypothesis":"x"}\n')
+
+        t = threading.Thread(target=appender, daemon=True)
+        t.start()
+        rc, out = self._run_wait(count=1, timeout=5.0)
+        t.join(timeout=2)
+        self.assertEqual(rc, 0, f"want 0 on proposal arrival; got {rc}; out={out!r}")
+        self.assertIn("1 new ideator proposal", out)
+
+    def test_count_3_returns_only_after_third_proposal(self):
+        """With --count 3, single-line bumps should NOT return; only the
+        third bump satisfies the wait."""
+        def appender() -> None:
+            for i in range(3):
+                time.sleep(0.3)
+                with self.proposals.open("a") as f:
+                    f.write(f'{{"brief":"b{i}","hypothesis":"x{i}"}}\n')
+
+        t = threading.Thread(target=appender, daemon=True)
+        t.start()
+        rc, out = self._run_wait(count=3, timeout=5.0)
+        t.join(timeout=2)
+        self.assertEqual(rc, 0, f"want 0 after 3rd proposal; got {rc}; out={out!r}")
+        self.assertIn("3 new ideator proposal", out)
+
+    def test_count_3_partial_progress_on_timeout(self):
+        """If only 1 of 3 expected proposals lands before timeout, exit 124
+        but surface partial progress so the caller can decide to proceed."""
+        def appender() -> None:
+            time.sleep(0.2)
+            with self.proposals.open("a") as f:
+                f.write('{"brief":"b","hypothesis":"x"}\n')
+
+        t = threading.Thread(target=appender, daemon=True)
+        t.start()
+        rc, out = self._run_wait(count=3, timeout=1.0)
+        t.join(timeout=2)
+        self.assertEqual(rc, 124, f"want 124 (timeout w/ partial); got {rc}; out={out!r}")
+        self.assertIn("partial", out, f"timeout output must surface partial count: {out!r}")
+        self.assertIn("1/3", out, f"output must show partial vs target count: {out!r}")
+
+    def test_baseline_existing_lines_dont_satisfy_wait(self):
+        """If proposals.jsonl already has 2 lines when wait starts, that
+        baseline must NOT satisfy --count 1 -- only NEW additions count."""
+        with self.proposals.open("w") as f:
+            f.write('{"brief":"old1","hypothesis":"x"}\n')
+            f.write('{"brief":"old2","hypothesis":"x"}\n')
+
+        rc, out = self._run_wait(count=1, timeout=0.3)
+        self.assertEqual(rc, 124,
+            f"existing lines must be baseline-only; want 124, got {rc}; out={out!r}")
+
+    def test_existing_baseline_plus_new_proposal_wakes(self):
+        """Baseline at 2 lines; ideator adds a 3rd line; wait --count 1 returns."""
+        with self.proposals.open("w") as f:
+            f.write('{"brief":"old1","hypothesis":"x"}\n')
+            f.write('{"brief":"old2","hypothesis":"x"}\n')
+
+        def appender() -> None:
+            time.sleep(0.4)
+            with self.proposals.open("a") as f:
+                f.write('{"brief":"new","hypothesis":"y"}\n')
+
+        t = threading.Thread(target=appender, daemon=True)
+        t.start()
+        rc, out = self._run_wait(count=1, timeout=5.0)
+        t.join(timeout=2)
+        self.assertEqual(rc, 0, f"new proposal beyond baseline must wake; out={out!r}")
+        self.assertIn("1 new ideator proposal", out)
+
+
 if __name__ == "__main__":
     unittest.main()
