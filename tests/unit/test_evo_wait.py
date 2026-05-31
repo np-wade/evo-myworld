@@ -200,6 +200,85 @@ class TestEvoWait(unittest.TestCase):
                       "can branch on it without parsing the exp dir state")
 
 
+class TestEvoWaitDefaultWatchesBoth(unittest.TestCase):
+    """No --for: wait watches BOTH experiments and ideators, wakes on
+    whichever changes first. Existing test_returns_0_when_outcome_json_*
+    cases (TestEvoWait) cover the experiment side of this -- here we
+    cover that the default also wakes on ideator proposals AND that
+    --count > 1 without --for is rejected."""
+
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory()
+        self.root = Path(self._tmp.name).resolve()
+        self.run_dir = _make_workspace(self.root)
+        (self.run_dir / "ideator").mkdir(parents=True, exist_ok=True)
+        self.proposals = self.run_dir / "ideator" / "proposals.jsonl"
+        self._old_cwd = Path.cwd()
+        os.chdir(self.root)
+
+    def tearDown(self):
+        os.chdir(self._old_cwd)
+        self._tmp.cleanup()
+
+    def _run_wait(self, **kwargs) -> tuple[int, str, str]:
+        """Run cmd_wait with kwargs as the namespace; capture stdout AND stderr."""
+        from evo.cli import cmd_wait
+        import argparse
+        ns_kwargs = {"wait_for": None, "count": None, "timeout": 1.0}
+        ns_kwargs.update(kwargs)
+        out_buf = io.StringIO()
+        err_buf = io.StringIO()
+        with patch("sys.stdout", out_buf), patch("sys.stderr", err_buf):
+            rc = cmd_wait(argparse.Namespace(**ns_kwargs))
+        return rc, out_buf.getvalue(), err_buf.getvalue()
+
+    def test_default_wakes_on_ideator_proposal_too(self):
+        """No --for: ideator proposal landing should wake the default wait."""
+        def appender() -> None:
+            time.sleep(0.4)
+            with self.proposals.open("a") as f:
+                f.write('{"brief":"x","hypothesis":"y"}\n')
+
+        t = threading.Thread(target=appender, daemon=True)
+        t.start()
+        rc, out, err = self._run_wait(timeout=5.0)
+        t.join(timeout=2)
+        self.assertEqual(rc, 0, f"default wait must wake on proposal; got {rc}")
+        self.assertIn("ideator proposal", out)
+
+    def test_default_wakes_on_experiment_outcome_too(self):
+        """Existing experiment-wake path still works under the new default."""
+        def writer() -> None:
+            time.sleep(0.4)
+            exp_dir = self.run_dir / "experiments" / "exp_0099"
+            exp_dir.mkdir(parents=True, exist_ok=True)
+            (exp_dir / "outcome.json").write_text(json.dumps({"score": 1.0}))
+
+        t = threading.Thread(target=writer, daemon=True)
+        t.start()
+        rc, out, err = self._run_wait(timeout=5.0)
+        t.join(timeout=2)
+        self.assertEqual(rc, 0)
+        self.assertIn("exp_0099", out)
+
+    def test_default_timeout_message_names_both_sources(self):
+        rc, out, err = self._run_wait(timeout=0.3)
+        self.assertEqual(rc, 124)
+        # message should mention both subjects so the agent knows what was watched
+        self.assertIn("experiment or ideator", out)
+
+    def test_count_without_for_is_rejected(self):
+        """--count > 1 without --for is ambiguous; CLI must reject."""
+        rc, out, err = self._run_wait(count=3, timeout=0.3)
+        self.assertEqual(rc, 2, f"want 2 (usage error); got {rc}; err={err!r}")
+        self.assertIn("--count > 1 requires --for", err)
+
+    def test_count_1_without_for_is_allowed(self):
+        """--count=1 (or unset) is the default; should still work without --for."""
+        rc, out, err = self._run_wait(count=1, timeout=0.3)
+        self.assertEqual(rc, 124, f"timeout expected; got {rc}; out={out!r}")
+
+
 class TestEvoWaitForIdeators(unittest.TestCase):
     """The --for ideators path: orchestrator blocks on proposals.jsonl
     line growth instead of experiment-dir activity. Each ideator subagent
@@ -232,7 +311,8 @@ class TestEvoWaitForIdeators(unittest.TestCase):
     def test_timeout_when_no_proposals_arrive(self):
         rc, out = self._run_wait(count=1, timeout=0.3)
         self.assertEqual(rc, 124, f"want 124 (timeout), got {rc}; output: {out!r}")
-        self.assertIn("no new ideator proposals", out)
+        self.assertIn("new ideator proposal", out)
+        self.assertIn("timed out", out)
 
     def test_returns_0_when_proposals_appended_during_wait(self):
         def appender() -> None:

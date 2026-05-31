@@ -2,7 +2,7 @@
 name: ideator
 description: Generate new experiment proposals by cross-cutting analysis of the experiment graph plus targeted literature/web scans. Spawned in parallel as multiple briefs (failure analysis, literature, frontier extrapolation) that reconcile via append-only proposals file. Use when the user invokes /evo:ideator, the optimize loop wants fresh directions after a stall, or after every N committed experiments.
 argument-hint: "--brief <failure_analysis|literature|frontier_extrapolation> [--k <count>]"
-evo_version: 0.5.0-alpha.3
+evo_version: 0.5.0-alpha.4
 ---
 
 # Ideator

@@ -280,19 +280,20 @@ evo infra log [--limit N]                          # read recorded events
 
 ```bash
 evo wait [--for experiments|ideators] [--count N] [--timeout SEC]
-                              # --for experiments (default): block until
-                              # any experiment reaches a terminal state
-                              # (committed / evaluated / failed / discarded).
-                              # Per-task traces and other in-flight writes
-                              # are ignored.
-                              # --for ideators: block until N additional
-                              # proposals append to <run>/ideator/proposals.jsonl
-                              # since wait started (default --count 1).
-                              # Use after spawning parallel ideators in
-                              # /optimize step 6b.
+                              # default: watches BOTH experiments and
+                              # ideators; wakes on whichever changes first.
+                              # --for narrows the watch (a filter, not
+                              # a selector). Use --for ideators when
+                              # blocking specifically for proposals and
+                              # incidental experiment activity should not
+                              # wake the wait.
+                              # --count N (requires --for) blocks until
+                              # N additional items of that kind land.
+                              # Without --for, --count > 1 is rejected.
                               # --timeout default 3600, capped at 3600 (1h).
-                              # exit 0 with one-line summary on transition,
-                              # 124 on timeout.
+                              # exit 0 with one-line summary on transition;
+                              # 124 on timeout (partial ideator counts
+                              # surfaced in the summary).
 
 evo autonomous on|off         # arm/disarm the stop-nudge (keep-going
                               # loop). Off by default. Run `on` when

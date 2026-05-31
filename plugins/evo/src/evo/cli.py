@@ -4777,23 +4777,25 @@ def cmd_subagents_only(args: argparse.Namespace) -> int:
 
 
 def cmd_wait(args: argparse.Namespace) -> int:
-    """Block until activity is detected for the selected subject, or --timeout.
+    """Block until something interesting happens in the active run, or --timeout.
 
-    `--for experiments` (default): wakes on outcome.json appearing
-        (committed / evaluated / failed) or an experiment dir vanishing
-        (discarded). Per-task trace flushes are ignored — only terminal
-        transitions count.
-    `--for ideators`: wakes on new proposals appended to
-        `<run>/ideator/proposals.jsonl`. With `--count N`, blocks until
-        N additional proposals have landed since wait started (use this
-        when the orchestrator wants all spawned ideators to land before
-        consuming proposals).
+    Default watches BOTH:
+      - experiments: outcome.json appearing (committed/evaluated/failed) or
+        an experiment dir vanishing (discarded). Per-task trace flushes ignored.
+      - ideators: new proposals appended to `<run>/ideator/proposals.jsonl`.
+    Wakes on whichever changes first; prints which source woke it.
 
-    Returns 0 on detected change with a one-line summary on stdout,
-    124 (POSIX timeout convention) on timeout. Polls every 1s.
+    `--for {experiments,ideators}` narrows the watch to one source (a filter,
+    not a selector). Useful when the orchestrator is blocking specifically
+    for ideators after a stall and doesn't want incidental experiment
+    activity to wake it.
 
-    Intended for the optimize orchestrator: block on subagent results or
-    ideator proposals instead of ad-hoc polling loops.
+    `--count N` (only meaningful with `--for`) blocks until N additional
+    items of that kind have landed since wait started. Without `--for`,
+    `--count` is rejected as ambiguous.
+
+    Returns 0 on detected change with a one-line summary, 124 (POSIX
+    timeout convention) on timeout. Polls every 1s.
     """
     try:
         root = repo_root()
@@ -4812,44 +4814,62 @@ def cmd_wait(args: argparse.Namespace) -> int:
     run_dir = runs[-1]
 
     timeout = _wait_timeout_seconds(getattr(args, "timeout", _WAIT_TIMEOUT_CAP))
-    subject = getattr(args, "wait_for", "experiments")
-    count = max(1, int(getattr(args, "count", 1) or 1))
+    subject = getattr(args, "wait_for", None)  # None = watch both
+    count_raw = getattr(args, "count", 1)
+    count = max(1, int(count_raw or 1))
 
-    if subject == "ideators":
-        baseline_mtime, baseline_lines = _ideator_proposals_snapshot(run_dir)
-        deadline = time.time() + timeout
-        poll_interval = 1.0
-        while time.time() < deadline:
-            time.sleep(poll_interval)
+    # --count > 1 only makes sense paired with --for (otherwise: count what?)
+    if subject is None and count_raw is not None and int(count_raw or 1) > 1:
+        print(
+            "ERROR: --count > 1 requires --for {experiments|ideators} "
+            "(otherwise ambiguous which kind to count)",
+            file=sys.stderr,
+        )
+        return 2
+
+    watch_exp = subject in (None, "experiments")
+    watch_ide = subject in (None, "ideators")
+
+    baseline_exp = _experiments_dir_snapshot(run_dir) if watch_exp else None
+    base_ide_mtime, base_ide_lines = (
+        _ideator_proposals_snapshot(run_dir) if watch_ide else (0.0, 0)
+    )
+
+    deadline = time.time() + timeout
+    poll_interval = 1.0
+    while time.time() < deadline:
+        time.sleep(poll_interval)
+        if watch_exp:
+            now_exp = _experiments_dir_snapshot(run_dir)
+            if now_exp != baseline_exp:
+                summary = _describe_change(baseline_exp, now_exp)
+                print(f"[evo wait] change detected: {summary}")
+                return 0
+        if watch_ide:
             now_mtime, now_lines = _ideator_proposals_snapshot(run_dir)
-            new_proposals = now_lines - baseline_lines
+            new_proposals = now_lines - base_ide_lines
             if new_proposals >= count:
                 print(f"[evo wait] {new_proposals} new ideator proposal(s) landed")
                 return 0
-        # Partial progress is still useful to surface for the caller.
-        now_mtime, now_lines = _ideator_proposals_snapshot(run_dir)
-        new_proposals = now_lines - baseline_lines
+
+    # Timeout. Surface partial progress for ideator-counted waits; otherwise
+    # the standard "nothing happened" message.
+    if watch_ide and subject == "ideators" and count > 1:
+        _, now_lines = _ideator_proposals_snapshot(run_dir)
+        new_proposals = now_lines - base_ide_lines
         if new_proposals > 0:
             print(
                 f"[evo wait] timed out after {timeout}s with {new_proposals}/"
                 f"{count} ideator proposals (partial)"
             )
-        else:
-            print(f"[evo wait] timed out after {timeout}s with no new ideator proposals")
-        return 124
+            return 124
 
-    # Default: experiments
-    baseline = _experiments_dir_snapshot(run_dir)
-    deadline = time.time() + timeout
-    poll_interval = 1.0
-    while time.time() < deadline:
-        time.sleep(poll_interval)
-        now = _experiments_dir_snapshot(run_dir)
-        if now != baseline:
-            summary = _describe_change(baseline, now)
-            print(f"[evo wait] change detected: {summary}")
-            return 0
-    print(f"[evo wait] timed out after {timeout}s with no experiment activity")
+    what = {
+        None: "experiment or ideator",
+        "experiments": "experiment",
+        "ideators": "new ideator proposal",
+    }[subject]
+    print(f"[evo wait] timed out after {timeout}s with no {what} activity")
     return 124
 
 
@@ -5894,33 +5914,38 @@ def build_parser() -> argparse.ArgumentParser:
 
     wait_p = sub.add_parser(
         "wait",
-        help="Block on experiment terminal state OR ideator proposals; --timeout caps wait (max 1h)",
+        help="Block until experiment or ideator activity in the active run; --timeout caps (max 1h)",
         description=(
-            "Polls the active run for activity on the selected subject.\n"
-            "  --for experiments (default): wakes on outcome.json appearing "
-            "(committed/evaluated/failed) or an experiment dir vanishing "
-            "(discarded). Per-task trace writes are ignored.\n"
-            "  --for ideators: wakes on new lines appended to "
-            "<run>/ideator/proposals.jsonl. With --count N, blocks until N "
-            "additional proposals have landed since wait started -- use this "
-            "when /optimize wants spawned ideators to land before consuming "
-            "proposals.\n"
-            "Returns exit code 0 with a one-line summary on detected change, "
-            "124 on timeout."
+            "Default: watches BOTH experiments and ideators; wakes on whichever "
+            "changes first.\n"
+            "  Experiments wake on outcome.json appearing (committed/evaluated/"
+            "failed) or an experiment dir vanishing (discarded). Per-task trace "
+            "writes are ignored.\n"
+            "  Ideators wake on new lines appended to <run>/ideator/proposals.jsonl.\n"
+            "\n"
+            "--for {experiments,ideators} narrows the watch to one source (a "
+            "filter). Use when blocking specifically for ideators after a stall "
+            "and incidental experiment activity should not wake the wait.\n"
+            "\n"
+            "--count N (requires --for) blocks until N additional items of that "
+            "kind land. Without --for, --count > 1 is rejected as ambiguous.\n"
+            "\n"
+            "Exit 0 with one-line summary on change; 124 on timeout (partial "
+            "ideator counts surfaced in the summary)."
         ),
     )
     wait_p.add_argument(
         "--for",
         dest="wait_for",
         choices=["experiments", "ideators"],
-        default="experiments",
-        help="Subject to wait on. Default: experiments.",
+        default=None,
+        help="Narrow the watch to one source. Default: both.",
     )
     wait_p.add_argument(
         "--count",
         type=int,
-        default=1,
-        help="(--for ideators only) block until N additional proposals land. Default 1.",
+        default=None,
+        help="Block until N items of --for's kind land. Requires --for.",
     )
     wait_p.add_argument(
         "--timeout", type=float, default=3600,
