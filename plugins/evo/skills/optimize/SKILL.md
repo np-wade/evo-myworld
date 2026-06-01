@@ -320,15 +320,21 @@ Spawn ideators in parallel when ANY of these triggers fire:
 - **Failure cluster**: M=3 consecutive discards with related root causes (use the `evo discards` output)
 - **User-triggered**: a directive (`evo direct`) asks for fresh ideas
 
-When a trigger fires, spawn three parallel ideator subagents -- one per brief -- using your host's parallel-subagent tool (same mechanism as step 5):
+When a trigger fires, spawn three parallel **evo ideator subagents** via your host's Task tool -- one per brief:
 
 ```
-brief: failure_analysis     -- cross-graph clustering of discards/failures
-brief: literature           -- web/arxiv scan for untried techniques in the workspace domain
-brief: frontier_extrapolation -- deeper variants of the steepest score gradient on the best path
+Task(subagent_type="evo:ideator", prompt="workspace=<path>\nbrief=failure_analysis")
+Task(subagent_type="evo:ideator", prompt="workspace=<path>\nbrief=literature")
+Task(subagent_type="evo:ideator", prompt="workspace=<path>\nbrief=frontier_extrapolation")
 ```
 
-Each subagent loads the **evo ideator skill** (named `ideator` under the evo plugin in your host's skill registry) as its first action, then runs the brief. They write to `.evo/run_<run_id>/ideator/proposals.jsonl` (append-only). See `plugins/evo/skills/ideator/SKILL.md` for the full procedure each ideator follows.
+| Brief | What it does |
+|---|---|
+| `failure_analysis` | Cross-graph clustering of discards/failures |
+| `literature` | Web/arXiv scan for untried techniques in the workspace domain |
+| `frontier_extrapolation` | Deeper variants of the steepest score gradient on the best path |
+
+Each subagent runs the brief in its own context, appends proposals as JSONL lines to `.evo/run_<run_id>/ideator/proposals.jsonl` (single final write), and returns a JSON summary. See `plugins/evo/agents/ideator.md` for the full procedure each ideator follows.
 
 Ideators take 5-10 min while the optimize loop's next round is typically 1-2 min away. If you fire and continue, proposals miss the next round's brief-writing every time. Two patterns work:
 
