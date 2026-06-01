@@ -488,6 +488,14 @@ fn main() {
     // don't fire SessionStart, so the session may not be registered yet
     // when UserPromptSubmit arrives. Lazy-register on first prompt so the
     // /optimize matcher in Python actually has a session record to flip.
+    //
+    // Batch mode (`claude --print`) never fires UserPromptSubmit, so the
+    // UserPromptSubmit recovery path above misses any session whose `.evo/`
+    // is created after SessionStart (e.g. the agent runs `evo init`
+    // mid-session). PostToolUse fires on every tool call, so the first tool
+    // the agent runs after `evo init` registers the session and `evo direct`
+    // fanout can reach it. engage=false: PostToolUse is a tool callback, not
+    // an orchestrator engagement signal.
     if !sessions_file.is_file() {
         if hook_event == "UserPromptSubmit" {
             // A resumed orchestrator's first prompt. Engage unless this is
@@ -496,6 +504,8 @@ fn main() {
             // additionally refuses to engage when EVO_EXP_ID is set.
             let engage = !is_subagent_context(&stdin_buf);
             let _ = register_session(&run_dir, &sid, host, engage);
+        } else if hook_event == "PostToolUse" {
+            let _ = register_session(&run_dir, &sid, host, false);
         } else {
             emit_ok();
         }
