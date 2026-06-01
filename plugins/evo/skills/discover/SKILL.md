@@ -324,7 +324,22 @@ Paths below are relative to this `SKILL.md` file (resolve them against the skill
 
 **Per-task emission is load-bearing.** If your benchmark evaluates N independent items (per-question math, per-test-case unit tests, per-document QA, per-sample reasoning trace), emit ONE `log_task` / `report` / trace file PER ITEM -- not one aggregate. Include the item's input, expected output, model output, and any per-item metadata as extras; that detail is what the dashboard's per-task panel + the verifier's reproducibility spot-check + the ideator's failure-clustering all rely on. Wrappers that compute the average score themselves and emit a single aggregate task entry look like they work but lose every diagnostic capability evo provides. The reference files have explicit USAGE EXAMPLES showing the per-item loop AND an ANTI-PATTERN block showing what NOT to do. Follow them. Single-aggregate emission is only valid when the benchmark really is one indivisible measurement (one e2e workflow, one perf number) -- and even then, attach every observable as extras.
 
-### 10d. Cheap validation run
+### 10d. Audit with benchmark-reviewer (mandatory before baseline)
+
+Before `evo run` is invoked for the first time, audit the harness via the bundled subagent:
+
+```
+Task(subagent_type="evo:benchmark-reviewer",
+     prompt="workspace=<absolute path to dir containing .evo/>\nbenchmark_command=<the literal --benchmark string from evo init>\nunit=<one-line description of an item, e.g. 'AIME problem', 'HumanEval task', 'BFCL turn'>")
+```
+
+The subagent returns a JSON report with `passed`, `findings[]`. Each finding has `severity: block|warn|note`.
+
+**Gate the baseline on this.** If `passed: false`, address every `block` finding before re-invoking the reviewer. Do **not** proceed to `evo run` until the report comes back clean. Typical `block` findings: aggregate-only emission (most common -- see step 10c), training source that overlaps the held-out set, no real gate registered for a constructed benchmark, harness silently writes `{"score": 0.0}` on error instead of crashing.
+
+`warn` and `note` findings are informational -- record them in `.evo/project.md` and proceed.
+
+### 10e. Cheap validation run
 
 Before the full baseline, validate the toolchain with the cheapest possible end-to-end run (single task, smallest split, dry-run flag -- whatever is fastest). Run the check from the main repo root:
 
@@ -345,7 +360,7 @@ This is the authoritative wiring check, and it is language-agnostic -- it runs t
 
 Fix any issues and re-validate before proceeding.
 
-### 10e. Commit inside the worktree
+### 10f. Commit inside the worktree
 
 Logical commits are ideal but not required. Minimal acceptable:
 
