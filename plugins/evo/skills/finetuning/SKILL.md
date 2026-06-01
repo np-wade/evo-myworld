@@ -21,6 +21,25 @@ Decide on the reward first, technique second. Choosing the comfortable technique
 
 "SFT-then-RL" is not a law. For a competent base model on a verifiable benchmark, RL-from-base often beats SFT-then-RL end-to-end.
 
+## Research the literature before the first commit
+
+The decision tree above is the structural prior. The empirical answer for *this* model on *this* benchmark usually has a recent paper, blog, or HF Space recipe behind it -- and what beats baseline on a 4B base model in 2026 is not what the agent's pre-training data captures. Before picking the technique for `exp_0001` (the first experiment after baseline), invoke `evo:ideator` with a `literature` brief:
+
+```
+Task(
+    subagent_type="evo:ideator",
+    prompt="brief=literature\n"
+           "model_family=<e.g. Qwen3-4B-Base, Llama-3.1-8B-Base>\n"
+           "benchmark=<name + URL/paper if known>\n"
+           "objective=<one line: what beats baseline looks like>\n"
+           "constraints=<budget, data sources allowed, gated models forbidden, etc>"
+)
+```
+
+The ideator returns ranked proposals with references (arXiv, HF Hub, GitHub, blogs). Read them before picking from the reward-shape table. A paper showing GRPO-from-base works on `<model_family>` for a similar verifiable benchmark beats applying the table cold.
+
+Run this **once before `exp_0001`**, and again whenever the optimize loop hits a plateau (the "stuck across distinct techniques" diagnostic below). Not every subsequent experiment needs a literature pass -- the table + diagnostics carry the rest.
+
 ## Before committing the budget: smoke-run
 
 Run the full pipeline on ~10 examples for ~1 minute. Must produce: a checkpoint the benchmark can load AND a non-zero eval on a held-out item. If not, the recipe is broken — fix it, don't scale it. dtype mismatch, tokenizer/template drift, OOM at this batch size, empty artifacts dir despite falling loss — all surface on 10 examples. Running longer doesn't surface them differently, just more expensively.

@@ -229,6 +229,14 @@ Dashboard live: http://127.0.0.1:8080 (pid 12345)
 
 **Relay that line back to the user verbatim.** If port 8080 is busy, evo auto-increments -- show whatever port prints. The URL is how the user watches the run.
 
+**Benchmark commands must be eval-only.** Do NOT wrap training and evaluation into a single benchmark command. If your benchmark command runs training before scoring, every gate revalidation and every `evo run --check` retrains from scratch, and the experiment budget burns on duplicated training instead of new experiments. Training is a separate step the agent invokes BEFORE `evo run`:
+
+1. The agent makes changes (data curation, hyperparameter selection, technique choice, training code edits).
+2. The agent runs training to produce a checkpoint at the experiment worktree's `final_model/` (or wherever the technique's recipe in `evo:finetuning/references/glue.md` specifies).
+3. THEN `evo run <exp_id>` invokes the registered benchmark command, which loads the produced checkpoint and emits a score.
+
+The registered benchmark command should call `evaluate.py`, `run_eval.py`, or equivalent -- NOT `train.py`. If the project's only existing evaluation tool runs train+eval together with no eval-only mode, wrap it: add a `--skip-train` flag, or have the wrapper detect an existing checkpoint at `final_model/` and short-circuit the train step. Without this, evo's gate-recheck and re-score mechanics retrain repeatedly and the budget evaporates.
+
 **Runtime environment.** If the benchmark needs keys or other runtime variables, configure them through evo rather than copying `.env` into worktrees or hand-editing `config.json`:
 
 ```bash
