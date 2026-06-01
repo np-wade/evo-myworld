@@ -162,13 +162,18 @@ You may edit anything within the target scope. Do NOT modify benchmark, gate, or
 
 ### 4. Verify the experiment design (pre-`evo run`)
 
-Before `evo run` burns compute, load the **evo verifier skill** (named `verifier` under the evo plugin in your host's skill registry — use your host's skill loader) with args `--phase pre --target <your exp_id>`. Static analysis, ~30s.
+Before `evo run` burns compute, invoke the **evo verifier subagent** via your host's Task tool. Static analysis, ~30s.
 
-The verifier checks for test-set leakage in your training data, subsetted eval commands, missing gates for new artifacts, generic hypotheses, and concurrent-resource conflicts. See `plugins/evo/skills/verifier/SKILL.md` for the full check list.
+```
+Task(subagent_type="evo:verifier",
+     prompt="workspace=<workspace abs path>\nexperiment_id=<your exp_id>\nphase=pre")
+```
 
-If the verifier returns FAIL, address every flagged issue and re-verify. Only proceed to `evo run` when it returns PASS. Skipping or fudging a FAIL verdict is a stop-the-line bug -- the verdict is the precondition for compute spend.
+The verifier checks for test-set leakage in your training data, subsetted eval commands, missing gates for new artifacts, generic hypotheses, and concurrent-resource conflicts. It returns a JSON report (`{passed, verdict, findings}`) and writes the same verdict as an `evo annotation` on the experiment. See `plugins/evo/agents/verifier.md` for the full check list.
 
-If the verifier returns WARN, you may proceed but address the warnings in your annotation (step 7).
+If the verifier returns `passed: false` (verdict `fail`), address every flagged `block` finding and re-invoke until it returns `passed: true`. Skipping or fudging a `fail` verdict is a stop-the-line bug -- the verdict is the precondition for compute spend.
+
+If the verifier returns verdict `warn`, you may proceed but address the warnings in your annotation (step 7).
 
 ### 5. Run the experiment
 
