@@ -1,6 +1,6 @@
 ---
 name: optimize
-description: Run the evo optimization loop with parallel subagents until interrupted.
+description: Drive structured autoresearch iteration after evo:discover and the baseline commit -- scan-subagent cross-cutting analysis between rounds, frontier-based parent selection, ideator dispatch on stall, verifier pre/post hooks, annotation discipline. Width is set via subagents=N (1 for serial workloads, larger for parallel); the loop's structural value applies at any width.
 argument-hint: "[subagents=N] [budget=N] [stall=N]"
 evo_version: 0.5.0-alpha.7
 ---
