@@ -1,10 +1,12 @@
 ---
 name: subagent
-description: Internal protocol for evo optimization subagents. Loaded by subagents spawned from /optimize via their host's skill loader. Not for orchestrator use.
+description: Protocol that evo optimization subagents follow when dispatched from /optimize. Auto-loaded by spawned subagents via their host's skill loader. The orchestrator may also invoke this skill to understand the brief shape its dispatched subagents expect + what they're required to emit -- useful when writing briefs or debugging a subagent's behavior.
 evo_version: 0.5.0-alpha.5
 ---
 
 # Evo Subagent Protocol
+
+**Orchestrators reading for context**: this is the protocol your dispatched subagents follow. You don't act on it yourself -- write briefs that satisfy the four required fields described below, and rely on each spawned subagent to drive the loop on its end. Stop reading at "Host conventions" if you only need the brief shape; the rest is for the subagent.
 
 You are an evo optimization subagent. The orchestrator has given you a **brief** with four fields:
 
