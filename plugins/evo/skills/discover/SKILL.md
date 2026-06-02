@@ -9,6 +9,80 @@ evo_version: 0.5.0-alpha.5
 
 Internal procedure for `evo:discover`. The user only sees the user-facing prompts, the dashboard URL, and the baseline score -- everything else is the agent's choreography.
 
+## Evo surface
+
+What you can invoke / dispatch / read. Each line is a triggering condition: if you're about to do X, pull/dispatch/read this. Don't preload -- act when the trigger fires.
+
+```
+evo plugin
+│
+├── Main thread  (the orchestrator -- you, inside /evo:discover or /evo:optimize)
+│   │
+│   ├── Skills (Skill tool)
+│   │   ├── evo:discover       starting a new evo workspace / instrumenting a project
+│   │   ├── evo:optimize       after discover commits the baseline -- drives the loop.
+│   │   │                      Args: subagents=N (read sizing-the-round FIRST),
+│   │   │                            autonomous, subagents-only, budget=N, stall=N
+│   │   ├── evo:finetuning     task is finetuning / post-training / training a model
+│   │   └── evo:infra-setup    need a remote backend, pooled workspaces, lease/slot
+│   │                          management, or specific provider auth/setup
+│   │
+│   └── Subagents to dispatch (Task tool, subagent_type=...)
+│       ├── evo:benchmark-reviewer  before the baseline run, or whenever the
+│       │                           benchmark command / harness changes
+│       └── evo:ideator             stalled, or every ~5 committed experiments.
+│                                   One subagent per brief:
+│                                   failure_analysis, literature, frontier_extrapolation
+│
+├── Subagent thread  (each subagent spawned by /optimize step 5)
+│   │
+│   ├── Skills  (the subagent loads this on first turn -- the brief's first
+│   │            sentence mandates it; not auto-loaded by the host)
+│   │   └── evo:subagent     load FIRST -- defines the iteration protocol
+│   │                        + brief field shape the subagent operates under
+│   │
+│   └── Subagents to dispatch (Task tool, subagent_type=...)
+│       └── evo:verifier      ALWAYS dispatch pre AND post every evo run.
+│                             Pre: ~30s static analysis before the experiment runs.
+│                             Post: result-validity audit after it commits.
+│                             Not optional. Not ad-hoc.
+│
+└── Key references (Read tool, on demand)
+    ├── discover/references/
+    │   ├── constructing-benchmark.md      designing + assembling a benchmark from scratch
+    │   ├── sdk_python.py / sdk_node.js    wiring per-task instrumentation -- preferred path
+    │   ├── inline_instrumentation.py      inline fallback when SDK can't be used.
+    │   │                                  Copy as-is; do not reimplement (file header
+    │   │                                  explains why)
+    │   ├── sizing-the-round.md            BEFORE invoking /evo:optimize with any
+    │   │                                  specific subagents=N. Single-GPU /
+    │   │                                  single-exclusive-resource -> subagents=1
+    │   ├── proposing-dimensions.md        choosing what to optimize when not obvious
+    │   └── instrumentation-contract.md    the format evo reads (result + traces shapes)
+    │
+    ├── finetuning/references/
+    │   ├── glue.md                         writing train.py -- I/O contract evo expects
+    │   ├── diagnostics.md                  per-failure-mode diagnostics
+    │   ├── false-progress.md               what doesn't count as improvement
+    │   ├── trace-schema.md                 per-task trace JSON schema for training runs
+    │   ├── rl/                             RL framework references
+    │   │   └── art.md                       ART (Algorithm-Refined Training)
+    │   ├── sft/                            SFT framework references
+    │   │   └── tinker.md                    Tinker SFT
+    │   └── serving/                        eval-time inference references
+    │       └── vllm.md                      vLLM serving config + LoRA-multi
+    │
+    ├── infra-setup/references/
+    │   └── provider-matrix.md              provider/backend summary (auth, setup, costs)
+    │
+    └── references/                          (shared across skills)
+        ├── evo-wait.md                      any time you need to wait without burning
+        │                                    context (subagent completion, training,
+        │                                    ideators, GPU activity, any long-running)
+        ├── agent-sdk-reference.md           SDK API surface
+        └── cli-quick-reference.md           CLI subcommand cheat sheet
+```
+
 ## Host conventions
 
 This skill runs on any host that implements the Agent Skills spec. When the body uses generic phrases, apply the host's best-fit equivalent:

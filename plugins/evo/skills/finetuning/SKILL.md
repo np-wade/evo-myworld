@@ -144,8 +144,34 @@ A first-class named registry (`evo asset put/get/list/use`) for these is tracked
 
 ## References
 
-- `references/glue.md` — training I/O contract: what evo provides, what to emit.
-- `references/trace-schema.md` — `TrainingTrace` JSON shapes.
-- `references/diagnostics.md` — `held_out_score` / `delta` / `reward_saturation` / `generalization_gap`.
-- `references/false-progress.md` — the five patterns, examples + detection.
-- `references/{sft,rl,serving}/` — provider recipes (`sft/tinker.md`, `rl/art.md`, `serving/vllm.md`).
+Pull via Read tool when the trigger applies. Tree organized by category --
+core contracts first, then provider-specific recipes under `rl/`, `sft/`, `serving/`.
+
+```
+finetuning/references/
+│
+├── glue.md             writing train.py -- I/O contract evo expects.
+│                       Read FIRST when starting any training code.
+├── trace-schema.md     TrainingTrace JSON shape (per-step train trace fields)
+├── diagnostics.md      held_out_score / delta / reward_saturation /
+│                       generalization_gap -- read when interpreting a result
+├── false-progress.md   the five patterns + how to detect them.
+│                       Read when a score improves implausibly fast or
+│                       breaks the smoke gate.
+│
+├── rl/                 RL framework recipes (rollouts + reward + policy update)
+│   └── art.md          ART (Algorithm-Refined Training)
+│
+├── sft/                SFT framework recipes
+│   └── tinker.md       Tinker SFT runner
+│
+└── serving/            Eval-time inference framework references
+    └── vllm.md         vLLM serving config + LoRA-multi (load multiple
+                        adapters in one server -- saves cold-start per experiment)
+```
+
+Cross-skill references also worth pulling during finetuning work:
+
+- `discover/references/sdk_python.py` / `sdk_node.js` -- wiring per-task instrumentation in the benchmark
+- `discover/references/inline_instrumentation.py` -- inline fallback when SDK can't be used (copy as-is)
+- `references/evo-wait.md` -- waiting for training / eval without burning context

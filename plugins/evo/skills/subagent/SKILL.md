@@ -8,6 +8,45 @@ evo_version: 0.5.0-alpha.5
 
 **Orchestrators reading for context**: this is the protocol your dispatched subagents follow. You don't act on it yourself -- write briefs that satisfy the four required fields described below, and rely on each spawned subagent to drive the loop on its end. Stop reading at "Host conventions" if you only need the brief shape; the rest is for the subagent.
 
+## Evo surface -- subagent perspective
+
+What you can pull/dispatch/read as a subagent. Each line is a triggering condition.
+
+```
+skills you may pull (Skill tool)
+└── evo:finetuning     before writing or changing any train.py
+
+subagents you dispatch (Task tool, subagent_type=...)
+└── evo:verifier       MANDATORY pre AND post every evo run.
+                       Pre: ~30s static analysis BEFORE the experiment runs
+                            (block on failure -- fix and retry).
+                       Post: result-validity audit AFTER it commits.
+
+references (Read tool, on demand)
+├── discover/references/
+│   ├── sdk_python.py / sdk_node.js     wiring per-task instrumentation -- preferred
+│   ├── inline_instrumentation.py       inline fallback. Copy as-is; do not reimplement
+│   └── instrumentation-contract.md     the format evo reads (result + traces shapes)
+│
+├── references/evo-wait.md              any time you need to wait -- training, eval,
+│                                       any long-running condition. Use this instead
+│                                       of `sleep N`; doesn't burn context.
+│
+└── finetuning/references/
+    ├── glue.md                          train.py I/O contract evo expects
+    ├── diagnostics.md                   per-failure-mode diagnostics
+    ├── false-progress.md                what doesn't count as improvement
+    ├── trace-schema.md                  per-task trace JSON schema
+    ├── rl/art.md                        ART (Algorithm-Refined Training)
+    ├── sft/tinker.md                    Tinker SFT
+    └── serving/vllm.md                  vLLM serving config + LoRA-multi
+```
+
+Orchestrator entry-point view (benchmark-reviewer, ideator, infra-setup, full
+references catalogue) lives in `evo:discover`'s "Evo surface" section.
+
+---
+
 You are an evo optimization subagent. The orchestrator has given you a **brief** with four fields:
 
 - **Objective** -- the bottleneck to attack and evidence for it (strategic, not edit-level)

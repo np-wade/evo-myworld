@@ -9,6 +9,40 @@ Run the `evo` optimization loop. Each round, the orchestrator writes structured 
 
 **This skill is the canonical loop for ALL post-discover work — including serial workloads.** If the workspace's resource profile forces width 1 (single GPU, single-process benchmark, etc.), you still invoke `/evo:optimize` -- just pass `subagents=1`. The loop's value is the STRUCTURE around each experiment (scan-subagent cross-cutting analysis between rounds, verifier pre/post hooks via the subagent skill, ideator spawning on stall, frontier reconciliation, stop-hook discipline), NOT just parallelism. Bypassing optimize because "I'm running serial work anyway" loses every piece of that structure -- you've reverted to ad-hoc experiment iteration with none of evo's loop benefits, just the bookkeeping.
 
+## Evo surface -- loop-relevant
+
+You're inside `/evo:optimize`. Things you'll pull/dispatch during the loop:
+
+```
+main thread (you)
+├── Skills (Skill tool)
+│   └── evo:finetuning     before writing or changing any train.py
+│
+└── Subagents to dispatch (Task tool, subagent_type=...)
+    └── evo:ideator        stalled, or every ~5 committed experiments.
+                           One subagent per brief:
+                           failure_analysis, literature, frontier_extrapolation
+
+subagent thread (each subagent spawned by step 5)
+├── evo:subagent skill     loaded by the subagent on first turn -- the brief's
+│                          first sentence mandates it (not auto-loaded)
+└── evo:verifier subagent  MANDATORY pre AND post every evo run.
+                           Pre: ~30s static analysis before the experiment runs.
+                           Post: result-validity audit after it commits.
+
+references (Read tool, on demand)
+├── discover/references/sizing-the-round.md      pick subagents=N
+├── references/evo-wait.md                       waiting without burning context
+├── finetuning/references/glue.md                train.py I/O contract
+└── finetuning/references/{rl,sft,serving}/      provider-specific recipes
+                                                  (rl/art.md, sft/tinker.md,
+                                                  serving/vllm.md)
+```
+
+Full surface tree (orchestrator entry-point view, including benchmark-reviewer,
+infra-setup, and the complete references catalogue) lives in `evo:discover`'s
+"Evo surface" section.
+
 ## Host conventions
 
 This skill runs on any host that implements the Agent Skills spec. When the body uses generic phrases, apply the host's best-fit equivalent:
@@ -38,7 +72,7 @@ A user can override any of these with `/optimize [subagents=N] [budget=N] [stall
 
 **Picking `subagents` and `budget` is load-bearing -- do not skim.**
 
-Mandatory before the first round (and again any time the backend or benchmark changes): **READ `plugins/evo/skills/optimize/references/sizing-the-round.md` IN FULL.** That doc enumerates the resource-binding cases (exclusive accelerator, memory-heavy, shared mutable fixture, external rate-limit, CPU-light isolated) and discusses the case-by-case judgment for latency / timing / throughput benchmarks where the right answer depends on harness softeners, effect size vs. measurement jitter, and whether winners can be cheaply re-confirmed solo.
+Mandatory before the first round (and again any time the backend or benchmark changes): **READ `plugins/evo/skills/discover/references/sizing-the-round.md` IN FULL.** That doc enumerates the resource-binding cases (exclusive accelerator, memory-heavy, shared mutable fixture, external rate-limit, CPU-light isolated) and discusses the case-by-case judgment for latency / timing / throughput benchmarks where the right answer depends on harness softeners, effect size vs. measurement jitter, and whether winners can be cheaply re-confirmed solo.
 
 Under-subscribing wastes wall-clock. Over-subscribing can either contend for hardware (memory thrash, OOM) or — for timing-sensitive benchmarks — bias the measurement itself. The doc walks through what to weigh in each case; do not infer the value from any inline summary in this skill body.
 
