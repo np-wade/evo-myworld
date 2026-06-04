@@ -38,3 +38,6 @@ node_modules/
 
 # Claude Code local project settings
 .claude/
+
+# Claude Code dynamic-workflow worktrees
+.claude/worktrees/
