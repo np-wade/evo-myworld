@@ -1377,6 +1377,9 @@ def _maybe_stop_nudge_text(
       - session must be orchestrator-class (no exp_id).
       - optimize_mode must be true on the session record.
       - autonomous must be true on the session record (the opt-in).
+      - default-orchestrator must NOT be `workflow`: the dynamic workflow
+        self-drives the round loop in-process, so the always-fire nudge
+        would double-drive (re-prompt after the workflow already finished).
       - host must have a working stop-continuation envelope:
         claude-code/codex use `{decision: "block", reason: …}`; cursor
         uses `{followup_message: …}` (auto-submitted at turn end).
@@ -1394,6 +1397,18 @@ def _maybe_stop_nudge_text(
         return None  # opt-in only; default /optimize stops naturally
     if host not in ("claude-code", "codex", "cursor"):
         return None  # no known stop-continuation envelope on this host
+    # Workflow driver self-drives: the dynamic workflow runs the whole round loop in-process
+    # (one long Workflow tool call) until its own stall limit. The always-fire stop nudge is the
+    # PROSE-loop driver; under the workflow it is redundant and would just re-prompt the agent to
+    # relaunch after the workflow already finished. Suppress it when default-orchestrator=workflow
+    # so the two drivers never both drive. (Best-effort: if config can't be read, fall through to
+    # the nudge, preserving prior behavior.)
+    try:
+        from ..core import load_config
+        if (load_config(root) or {}).get("default_orchestrator") == "workflow":
+            return None
+    except Exception:  # noqa: BLE001 — config unreadable: don't change behavior
+        pass
     return _STOP_NUDGE_TEMPLATE
 
 

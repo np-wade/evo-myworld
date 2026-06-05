@@ -373,5 +373,50 @@ class TestAutonomousArming(_Base):
         self.assertFalse(rec.get("autonomous"))
 
 
+# ---------------------------------------------------------------------------
+# Workflow driver suppresses the nudge: the dynamic workflow self-drives the
+# round loop in-process, so the always-fire stop nudge would double-drive.
+# ---------------------------------------------------------------------------
+
+class TestStopNudgeWorkflowSuppression(_Base):
+
+    def _arm(self, sid: str = "orch") -> None:
+        register_session(self.root, sid, "claude-code")
+        mark_engaged(self.root, sid)
+        mark_optimize_mode(self.root, sid)
+        mark_autonomous(self.root, sid)
+
+    def _set_orchestrator(self, value: str) -> None:
+        from evo.core import load_config, save_config
+        cfg = load_config(self.root)
+        cfg["default_orchestrator"] = value
+        save_config(self.root, cfg)
+
+    def test_workflow_mode_suppresses_nudge(self):
+        self._arm()
+        # control: prose default (no orchestrator set) nudges
+        self.assertEqual(
+            _drain_stop(self.root, "orch", hook_event="Stop").get("decision"), "block",
+            "sanity: prose default should nudge before we switch to workflow",
+        )
+        # flip to the workflow driver -> nudge must be suppressed
+        self._set_orchestrator("workflow")
+        out = _drain_stop(self.root, "orch", hook_event="Stop")
+        self.assertNotEqual(
+            out.get("decision"), "block",
+            "under default-orchestrator=workflow the stop nudge must be suppressed "
+            "(the workflow self-drives the round loop in-process)",
+        )
+
+    def test_prose_orchestrator_still_nudges(self):
+        self._arm()
+        self._set_orchestrator("prose")
+        out = _drain_stop(self.root, "orch", hook_event="Stop")
+        self.assertEqual(
+            out.get("decision"), "block",
+            "the prose driver must still nudge (autonomous keep-going is its driver)",
+        )
+
+
 if __name__ == "__main__":
     unittest.main()

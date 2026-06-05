@@ -5,7 +5,7 @@
  * opt-in, Claude-Code-only driver; the prose skill remains the canonical, host-agnostic
  * default. The workflow encodes the loop CONTROL: while/stall, mandatory scan + cross-history
  * axis check, research escalation (ideators on stall / every ~5 commits), brief + diversity,
- * fan-out + verify, collect + frontier-select. A concurrent ANALYST thread (Opus, self-paced,
+ * fan-out + verify, collect + frontier-select. A concurrent META thread (Opus, self-paced,
  * read-only) runs alongside the round loop via Promise.all — host + cross-history checks during
  * rounds, feeding hints into the next brief. All domain work goes through the `evo` CLI inside
  * agents — the script itself never touches the filesystem/shell.
@@ -27,7 +27,7 @@
 
 export const meta = {
   name: 'evo-optimize',
-  description: 'Deterministic evo tree-search loop over the evo CLI (orient, scan, ideate-on-stall, brief, fan-out, verify, collect).',
+  description: 'evo tree-search loop over the evo CLI (orient, scan, ideate-on-stall, brief, fan-out, verify, collect) with a concurrent meta controller that stops doomed experiments and restructures the workflow (logic flow + prompts) live.',
   phases: [
     { title: 'Orient',   detail: 'read state + select frontier parents to extend' },
     { title: 'Scan',     detail: 'mandatory parallel cross-cutting scan + structural aggregation (incl. cross-history axis check)' },
@@ -36,7 +36,8 @@ export const meta = {
     { title: 'Optimize', detail: 'parallel optimization subagents (evo new/run)' },
     { title: 'Verify',   detail: 'validity audit + benchmark-noise confirm' },
     { title: 'Collect',  detail: 'prune dead lineages, record cross-cutting notes' },
-    { title: 'Analyst',  detail: 'concurrent independent observer (Opus) — host + cross-history checks during rounds' },
+    { title: 'Meta',      detail: 'concurrent controller (Opus) — host/cross-history checks, STOP doomed runs, suggest directions, AND restructure the workflow live (logic flow + prompts)' },
+    { title: 'Meta-step', detail: 'extra agent step the meta injected into the round via an inject-step harness edit' },
   ],
 }
 
@@ -180,8 +181,8 @@ const PREVERDICT = {
   },
 }
 
-// Analyst tick output: work-quality hints (fed into the next brief) + runtime/host alerts (surfaced).
-const ANALYST_FINDINGS = {
+// Meta tick output: work-quality hints (fed into the next brief) + runtime/host alerts (surfaced).
+const META_FINDINGS = {
   type: 'object',
   required: ['briefHints', 'alerts', 'stops'],
   properties: {
@@ -201,6 +202,35 @@ const ANALYST_FINDINGS = {
           failureClass: { enum: ['build', 'eval', 'hypothesis'] },
           reason: { type: 'string' },    // what's wrong + the concrete evidence
           fixHint: { type: 'string' },   // what the NEXT experiment must change
+        },
+      },
+    },
+    // FREE-WILL harness edits: the meta agent restructures the WORKFLOW itself, live
+    // (its logic flow + prompts). Applied directly each tick — no allow-list, no caps —
+    // and audited (editLog + run log + returned state). It edits only the search harness;
+    // it never touches the benchmark / grader / verifier (those are not part of the
+    // workflow it controls, so they stay fixed and the score stays comparable).
+    harnessEdits: {
+      type: 'array',
+      items: {
+        type: 'object',
+        required: ['op', 'rationale'],
+        properties: {
+          op: { enum: ['set-knob', 'toggle-phase', 'set-prompt', 'inject-step'] },
+          rationale: { type: 'string' },   // why this edit, with evidence
+          // set-knob — retune the loop's control flow
+          knob: { enum: ['width', 'budget', 'stall', 'ideateEvery', 'ideateStall'] },
+          value: { type: 'number' },
+          // toggle-phase — turn a discretionary phase on/off
+          phaseName: { enum: ['scan', 'ideate'] },
+          enabled: { type: 'boolean' },
+          // set-prompt — edit a prompt the workflow uses (append a directive or replace it wholesale)
+          target: { enum: ['state', 'scan', 'aggregate', 'brief', 'implement', 'run', 'ideator', 'collect'] },
+          mode: { enum: ['append', 'replace'] },
+          text: { type: 'string' },
+          // inject-step — add an extra agent step at a fixed seam each round
+          at: { enum: ['before-scan', 'after-scan', 'before-brief', 'after-collect'] },
+          label: { type: 'string' },
         },
       },
     },
@@ -225,17 +255,17 @@ const LIMIT = Number(A.stall) || 5
 const IDEATE_STALL = Math.max(1, Math.min(3, LIMIT - 1))
 const IDEATE_EVERY_COMMITS = 5   // periodic research cadence (matches prose step 6b)
 const PREVERIFY_MAX = 3          // pre-run verify <-> revise attempts before discarding a rigged edit
-// Concurrent analyst thread (runs alongside the round loop, NOT per-round).
-const ANALYST_ENABLED = true
-const ANALYST_MODEL = 'opus'    // the analyst always reasons with Opus (judgment-heavy)
-const ANALYST_INTERVAL_S = 300  // self-pace: observe ~every 5 min, during rounds
-const ANALYST_HOP_S = 15        // the wait is INTERRUPTIBLE in hops of this size: when the optimize loop
-                                // ends mid-wait it drops a sentinel the analyst polls, so the in-flight
-                                // tick exits within ~ANALYST_HOP_S instead of stalling the run for the
+// Concurrent meta thread (runs alongside the round loop, NOT per-round).
+const META_ENABLED = true
+const META_MODEL = 'opus'    // the meta always reasons with Opus (judgment-heavy)
+const META_INTERVAL_S = 300  // self-pace: observe ~every 5 min, during rounds
+const META_HOP_S = 15        // the wait is INTERRUPTIBLE in hops of this size: when the optimize loop
+                                // ends mid-wait it drops a sentinel the meta polls, so the in-flight
+                                // tick exits within ~META_HOP_S instead of stalling the run for the
                                 // full interval (the script can't interrupt an agent's `sleep` directly).
-const DONE_SENTINEL = '.evo/.wf_optimize_done'  // optimize -> analyst "loop is over" signal (a file,
+const DONE_SENTINEL = '.evo/.wf_optimize_done'  // optimize -> meta "loop is over" signal (a file,
                                 // since the in-memory `done` flag isn't visible to the agent's process)
-const ANALYST_MAX_FAILS = 3     // consecutive failed ticks before the advisory analyst self-disables
+const META_MAX_FAILS = 3     // consecutive failed ticks before the advisory meta self-disables
                                 // (guards against a hot-spin when ticks fail instantly, e.g. a bad schema)
 // Experiments per scan agent. Heuristic for the prose "small enough to read in one pass" rule —
 // the workflow can't recursively self-partition like the prose loop, so this is fixed up front.
@@ -357,7 +387,7 @@ function aggregatePrompt(ids) {
   ].join(' ')
 }
 
-function briefPrompt(state, findings, patterns, parents, ideated, analystHints) {
+function briefPrompt(state, findings, patterns, parents, ideated, metaHints) {
   return [
     'You are the evo orchestrator\'s brief writer.',
     'State summary:', state.summary || '',
@@ -368,10 +398,10 @@ function briefPrompt(state, findings, patterns, parents, ideated, analystHints) 
       ? '\nFRESH IDEATOR PROPOSALS may be available — read `.evo/run_*/ideator/proposals.jsonl` and reconcile BEFORE writing: skip any whose technique was already tried (`evo discards --like "<keyword>"`); score the rest by expected_score_uplift x confidence (frontier_extrapolation > failure_analysis > literature, all else equal); let the top 1-2 become brief objectives, citing the proposal\'s hypothesis/technique. Proposals are advisory — if none beat the in-graph scan findings, ignore them.'
       : '',
     '\nIf the patterns include an "axis-warning", the current axis is saturated — target the ORTHOGONAL axis it names rather than iterating the plateaued one.',
-    (analystHints && analystHints.length)
-      ? '\nLIVE ANALYST SIGNALS (from the concurrent observer — fold relevant ones into objectives/boundaries, e.g. switch off a saturated axis, avoid a flagged dead direction): ' + JSON.stringify(analystHints)
+    (metaHints && metaHints.length)
+      ? '\nLIVE META SIGNALS (from the concurrent observer — fold relevant ones into objectives/boundaries, e.g. switch off a saturated axis, avoid a flagged dead direction): ' + JSON.stringify(metaHints)
       : '',
-    `\nWrite up to ${WIDTH} briefs (use the full round width of ${WIDTH} whenever you can find that many genuinely DISTINCT objectives — multiple briefs MAY branch from the SAME parent when fewer than ${WIDTH} frontier parents exist, as long as each attacks a different surface; do not pad with redundant briefs). One per subagent, each with four fields:`,
+    `\nWrite up to ${harness.width} briefs (use the full round width of ${harness.width} whenever you can find that many genuinely DISTINCT objectives — multiple briefs MAY branch from the SAME parent when fewer than ${harness.width} frontier parents exist, as long as each attacks a different surface; do not pad with redundant briefs). One per subagent, each with four fields:`,
     '1. objective -- one sentence naming WHERE in system behavior the gain hides, with evidence; NO file/function/edit names.',
     '2. parent -- which experiment id to branch from (choose from the selected parents).',
     '3. boundaries -- what NOT to try and why (discarded approaches, gates not to regress, what adjacent briefs this round do).',
@@ -446,7 +476,7 @@ function runPrompt(expId, state) {
     `CRITICAL ordering: if this experiment produces an output artifact through a build or training step (whatever your recipe declares — a checkpoint dir, adapter, merged model, index, etc.), run that step to COMPLETION and confirm the artifact exists BEFORE the real run. Never call \`evo run\` while that step is still in flight or before its output exists — evaluating a not-yet-produced artifact wastes the attempt. If the experiment warm-starts, the parent's reusable artifact is in EVO_PARENT_POLICY (start from it; do not redo from scratch).`,
     `Then run \`evo run ${expId}\` to evaluate and (if it improves and passes gates) commit it.`,
     'If it exits GATE_FAILED, do not fight the gate — report status=evaluated.',
-    'If `evo run` is terminated externally mid-flight (the concurrent analyst can STOP a doomed experiment — it aborts the run and discards this node with a diagnosis), do NOT retry: report status:none and stop. The diagnosis is already recorded as an annotation and will steer the next brief.',
+    'If `evo run` is terminated externally mid-flight (the concurrent meta can STOP a doomed experiment — it aborts the run and discards this node with a diagnosis), do NOT retry: report status:none and stop. The diagnosis is already recorded as an annotation and will steer the next brief.',
     `Return: expIds:["${expId}"]; status (committed|evaluated|failed|none); committedImprover = true ONLY if evo printed COMMITTED;`,
     'bestExpId + bestScore (required when committedImprover is true); any gates added; learnings.',
   ].join(' ')
@@ -494,16 +524,16 @@ function collectPrompt(results, round) {
   ].join(' ')
 }
 
-// One analyst tick (a FRESH Opus agent each call — no memory across ticks, so `reported` carries
+// One meta tick (a FRESH Opus agent each call — no memory across ticks, so `reported` carries
 // the dedup state in the loop's closure). Read-only: observes host + cross-history signals DURING
 // rounds, returns work-quality briefHints (folded into the next brief) + runtime alerts (surfaced).
-function analystPrompt(ctx, intervalS, reported) {
+function metaPrompt(ctx, intervalS, reported) {
   return [
-    'You are the evo ANALYST — an independent observer running CONCURRENTLY with the optimize loop.',
-    'Read-only: do NOT edit code, run experiments, or mutate evo state.',
+    'You are the evo META agent — an independent controller running CONCURRENTLY with the optimize loop.',
+    'You do NOT edit experiment code, run experiments, or touch the benchmark/grader/verifier. But you DO shape the optimize WORKFLOW: stop doomed experiments, suggest next directions (briefHints), AND restructure the running workflow itself — its logic flow + prompts — via harnessEdits (your distinctive power, detailed below).',
     `FIRST pace yourself with an INTERRUPTIBLE wait, so you stop promptly when the optimize loop ends. Run this single Bash command with a tool timeout of at least ${(intervalS + 30) * 1000} ms:`,
-    `  \`if [ -f ${DONE_SENTINEL} ]; then echo OPTIMIZE_DONE; else for i in $(seq 1 ${Math.ceil(intervalS / ANALYST_HOP_S)}); do sleep ${ANALYST_HOP_S}; [ -f ${DONE_SENTINEL} ] && { echo OPTIMIZE_DONE; break; }; done; fi\``,
-    `If that prints OPTIMIZE_DONE, the optimize loop has finished — return {"briefHints":[],"alerts":[]} immediately WITHOUT gathering any signals. Otherwise the full interval elapsed: now gather signals and report.`,
+    `  \`if [ -f ${DONE_SENTINEL} ]; then echo OPTIMIZE_DONE; else for i in $(seq 1 ${Math.ceil(intervalS / META_HOP_S)}); do sleep ${META_HOP_S}; [ -f ${DONE_SENTINEL} ] && { echo OPTIMIZE_DONE; break; }; done; fi\``,
+    `If that prints OPTIMIZE_DONE, the optimize loop has finished — return {"briefHints":[],"alerts":[],"stops":[],"harnessEdits":[]} immediately WITHOUT gathering any signals. Otherwise the full interval elapsed: now gather signals and report.`,
     `Current loop state: round=${ctx.round}, stall=${ctx.stall}/${LIMIT}, best=${ctx.bestScore}.`,
     `Already reported (do NOT repeat — only emit findings NEW since these): ${JSON.stringify(reported || [])}.`,
     'Walk these checks (skip any whose inputs are unavailable; cite evidence; nothing speculative):',
@@ -513,8 +543,12 @@ function analystPrompt(ctx, intervalS, reported) {
     '- Stuck axis: from `evo tree`, 3+ structurally-distinct committed hypotheses plateaued at ~the same score → name the saturated axis + one orthogonal axis. BRIEF HINT.',
     '- Dead direction / ignored mechanism: annotations repeatedly naming a mechanism the recent work ignores, or a direction that keeps regressing. BRIEF HINT.',
     '- Heading toward failure (STOP): an in-flight experiment that is CLEARLY doomed or wasting the budget — a divergent / NaN / flatlined progress metric; projected completion beyond the remaining time budget; or a known-fatal signature (e.g. output the scorer cannot parse; a silent resource mis-placement that tanks throughput with no error; a corrupt input/format that invalidates the result). HIGH PRECISION ONLY: default to NOT stopping — recommend a STOP only with concrete evidence that finishing is wasted, and only for an experiment still `active`. Emit a stop with: expId; failureClass (build = the build/produce step is broken; eval = artifact is fine but scoring/serving is wrong; hypothesis = it runs but won\'t help); reason (the diagnosis + the evidence you saw); fixHint (what the NEXT experiment must change).',
-    'You stay READ-ONLY: do NOT run `evo abort` / `evo discard` yourself. A gated enforcer acts on each stop — it aborts the run + its subprocess tree, annotates your diagnosis (so it outlives the worktree and feeds the next round), and discards with the failureClass so the partial artifact is preserved. A STOP is a diagnosed, recoverable stop, never a silent kill.',
-    'Return {briefHints:[...], alerts:[...], stops:[...]}. briefHints feed the NEXT round\'s briefs; alerts surface to the user; each stop triggers the gated enforcer (and its fixHint also feeds the next brief). All-empty is fine — most ticks should be quiet.',
+    'For STOPs you stay READ-ONLY: do NOT run `evo abort` / `evo discard` yourself. A gated enforcer acts on each stop — it aborts the run + its subprocess tree, annotates your diagnosis (so it outlives the worktree and feeds the next round), and discards with the failureClass so the partial artifact is preserved. A STOP is a diagnosed, recoverable stop, never a silent kill.',
+    '',
+    'HARNESS CONTROL (your distinctive power): you may restructure the optimize workflow itself, live, when you judge it will help — edits apply directly (free will) and take effect next round. Current harness state: ' + JSON.stringify(harnessSummary()) + '.',
+    'harnessEdits ops: (1) set-knob {knob: width|budget|stall|ideateEvery|ideateStall, value} — retune the loop (widen the round, deepen branches, change the stall limit or ideation cadence). (2) toggle-phase {phaseName: scan|ideate, enabled} — turn a phase off/on (e.g. skip scan when traces are uninformative; force ideation early). (3) set-prompt {target: state|scan|aggregate|brief|implement|run|ideator|collect, mode: append|replace, text} — edit the prompt that step uses (append a directive, or replace it wholesale). (4) inject-step {at: before-scan|after-scan|before-brief|after-collect, text, label} — add an extra agent step at that seam each round. Every edit needs a rationale citing the evidence.',
+    'HARD CONSTRAINT: edit ONLY the search harness above. NEVER propose edits to the benchmark, grader, scorer, held-out test, or any gate — those define how results are judged; if you change them the score stops meaning anything. Emit harnessEdits ONLY with concrete evidence the current workflow SHAPE is the bottleneck; most ticks should emit none.',
+    'Return {briefHints:[...], alerts:[...], stops:[...], harnessEdits:[...]}. briefHints feed the NEXT round\'s briefs; alerts surface to the user; each stop triggers the gated enforcer; each harnessEdit is applied directly to the running workflow. All-empty is fine — most ticks should be quiet.',
   ].join('\n')
 }
 
@@ -535,8 +569,8 @@ function analystPrompt(ctx, intervalS, reported) {
 async function runBrief(brief, state) {
   let parent = brief.parent
   let best = null
-  for (let depth = 0; depth < ITER; depth++) {
-    const impl = await agent(implementPrompt(brief, parent, state), {
+  for (let depth = 0; depth < harness.budget; depth++) {
+    const impl = await agent(withHarnessPrompt('implement', implementPrompt(brief, parent, state)), {
       schema: IMPL_RESULT, model: brief.hard ? 'opus' : 'sonnet', phase: 'Optimize', label: `impl:${parent}#${depth}`,
     })
     if (!impl || !impl.expId) break
@@ -560,7 +594,7 @@ async function runBrief(brief, state) {
     }
 
     // run -> evaluate + commit
-    const r = await agent(runPrompt(impl.expId, state), { schema: SUBAGENT_RESULT, phase: 'Optimize', label: `run:${impl.expId}` })
+    const r = await agent(withHarnessPrompt('run', runPrompt(impl.expId, state)), { schema: SUBAGENT_RESULT, phase: 'Optimize', label: `run:${impl.expId}` })
     if (!r) break
 
     // post-run validity audit (evo:verifier, post-phase) on committed improvers
@@ -595,51 +629,131 @@ let stall = 0
 let round = 0
 let lastIdeatedCommit = 0      // committedCount at the last ideator dispatch (periodic cadence)
 let ideatedThisStall = false   // fire ideators once per stall episode, not every stalled round
-let lastBestScore = null       // latest best score, surfaced to the concurrent analyst thread
-let done = false               // set when the optimize loop ends -> stops the analyst thread
-const analystSignals = []      // briefHints the analyst pushes; drained into the next round's brief
+let lastBestScore = null       // latest best score, surfaced to the concurrent meta thread
+let done = false               // set when the optimize loop ends -> stops the meta thread
+const metaSignals = []      // briefHints the meta pushes; drained into the next round's brief
 
-log(`evo-optimize start: subagents=${WIDTH} budget=${ITER} stall=${LIMIT} analyst=${ANALYST_ENABLED ? ANALYST_MODEL : 'off'} | argsType=${typeof args} A.subagents=${A.subagents} A.budget=${A.budget} A.stall=${A.stall}`)
+// ---------------------------------------------------------------------------
+// Mutable HARNESS (the round-plan + prompts the meta agent edits live, free-will).
+// Initialized to the resolved defaults, so a run where the meta emits no edits behaves
+// byte-identically to before. The optimize loop READS this object each round; the meta
+// thread WRITES it via applyHarnessEdit. Single-threaded event loop => edits applied in a
+// meta tick land between optimize-loop awaits and take effect at the next read (next round).
+// Every edit is audited: harness.editLog + a run-log line + the workflow's return value.
+// Scope boundary: this controls the SEARCH harness only — never the grader/verifier.
+// ---------------------------------------------------------------------------
+const harness = {
+  width: WIDTH,
+  budget: ITER,
+  stall: LIMIT,
+  ideateEvery: IDEATE_EVERY_COMMITS,
+  ideateStall: IDEATE_STALL,
+  phases: { scan: true, ideate: true },
+  prompts: {},          // target -> { mode: 'append'|'replace', text }
+  injectedSteps: [],    // { at, prompt, label }
+  editLog: [],          // audit trail: { round, op, ...spec, rationale }
+}
 
-// The optimize round loop (runs concurrently with analystLoop via Promise.all).
+// Apply a meta prompt override (append a directive, or replace wholesale) to a base prompt.
+function withHarnessPrompt(target, baseText) {
+  const o = harness.prompts[target]
+  if (!o || !o.text) return baseText
+  return o.mode === 'replace'
+    ? o.text
+    : baseText + '\n\n[META-ADDED DIRECTIVE — injected live by the meta agent]: ' + o.text
+}
+
+// Run any meta-injected extra steps registered at a given seam (insert-step op).
+async function runInjected(at, ctxLabel) {
+  for (const s of harness.injectedSteps.filter((x) => x.at === at)) {
+    try {
+      await agent(s.prompt, { phase: 'Meta-step', label: s.label || `injected:${at}:${ctxLabel}` })
+    } catch (e) {
+      log(`META injected step (${at}) errored (ignored): ${(e && e.message) || e}`)
+    }
+  }
+}
+
+// Apply ONE harness edit with free will (no validation gate, no caps) — then audit it.
+function applyHarnessEdit(e, atRound) {
+  if (!e || !e.op) return
+  const rec = { round: atRound, op: e.op, rationale: e.rationale || '' }
+  if (e.op === 'set-knob' && e.knob && typeof e.value === 'number') {
+    harness[e.knob] = e.value; rec.knob = e.knob; rec.value = e.value
+  } else if (e.op === 'toggle-phase' && e.phaseName) {
+    harness.phases[e.phaseName] = e.enabled !== false; rec.phaseName = e.phaseName; rec.enabled = harness.phases[e.phaseName]
+  } else if (e.op === 'set-prompt' && e.target && e.text) {
+    harness.prompts[e.target] = { mode: e.mode === 'replace' ? 'replace' : 'append', text: e.text }
+    rec.target = e.target; rec.mode = harness.prompts[e.target].mode
+  } else if (e.op === 'inject-step' && e.at && e.text) {
+    harness.injectedSteps.push({ at: e.at, prompt: e.text, label: e.label || `meta:${e.at}` }); rec.at = e.at; rec.label = e.label || `meta:${e.at}`
+  } else {
+    log(`META harness edit IGNORED (incomplete spec for op=${e.op}): ${JSON.stringify(e)}`); return
+  }
+  harness.editLog.push(rec)
+  log(`META HARNESS EDIT [r${atRound}] ${JSON.stringify(rec)}`)
+}
+
+function harnessSummary() {
+  return {
+    width: harness.width, budget: harness.budget, stall: harness.stall,
+    ideateEvery: harness.ideateEvery, ideateStall: harness.ideateStall,
+    phases: harness.phases,
+    promptsOverridden: Object.entries(harness.prompts).map(([k, v]) => `${k}:${v.mode}`),
+    injectedSteps: harness.injectedSteps.map((s) => `${s.at}:${s.label}`),
+    edits: harness.editLog.length,
+  }
+}
+
+log(`evo-optimize start: subagents=${WIDTH} budget=${ITER} stall=${LIMIT} meta=${META_ENABLED ? META_MODEL : 'off'} | argsType=${typeof args} A.subagents=${A.subagents} A.budget=${A.budget} A.stall=${A.stall}`)
+
+// The optimize round loop (runs concurrently with metaLoop via Promise.all).
 async function optimizeLoop() {
-  while (stall < LIMIT) {
+  while (stall < harness.stall) {
     round += 1
 
     phase('Orient')
-    const state = await agent(statePrompt(), { schema: STATE, agentType: 'Explore', model: 'sonnet', phase: 'Orient', label: `state:r${round}` })
+    await runInjected('before-scan', `r${round}`)   // meta seam (pre-orient/scan)
+    const state = await agent(withHarnessPrompt('state', statePrompt()), { schema: STATE, agentType: 'Explore', model: 'sonnet', phase: 'Orient', label: `state:r${round}` })
     lastBestScore = state.bestScore
     if (state.bestScore === state.ceiling) { log(`ceiling reached (best=${state.bestScore}) — stopping`); break }
-    const parents = (state.frontier || []).slice(0, WIDTH)
+    const parents = (state.frontier || []).slice(0, harness.width)
     if (parents.length === 0) { log('no explorable frontier nodes — stopping'); break }
 
-    // N1 + N1.5 — mandatory parallel scan + structural aggregation (barrier). Scan runs EVERY round
-    // (hard rule); when there are no evaluated-undecided nodes yet (round 1) it falls back to the
-    // committed frontier so at least one scan agent still runs before briefs.
-    phase('Scan')
-    const evaluatedIds = state.evaluatedIds || []
-    const frontierIds = (state.frontier || []).map((f) => f.id).filter(Boolean)
-    const scanTargets = evaluatedIds.length ? evaluatedIds : frontierIds
-    const batches = chunk(scanTargets, SCAN_BATCH)
-    const scanThunks = batches.map((b) => () => agent(scanBrief(b), { schema: FINDINGS, agentType: 'Explore', phase: 'Scan', label: `scan ${b.length}: ${batchLabel(b)}` }))
-    const aggregateIds = [...new Set([...evaluatedIds, ...frontierIds])]
-    const aggThunk = aggregateIds.length
-      ? [() => agent(aggregatePrompt(aggregateIds), { schema: PATTERNS, agentType: 'Explore', phase: 'Scan', label: 'aggregate' })]
-      : []
-    const scanResults = (await parallel([...scanThunks, ...aggThunk])).filter(Boolean)
-    const findings = scanResults.flatMap((r) => (r && r.findings) ? r.findings : [])
-    const patterns = scanResults.flatMap((r) => (r && r.patterns) ? r.patterns : [])
+    // N1 + N1.5 — parallel scan + structural aggregation (barrier). Scan normally runs EVERY round
+    // (hard rule), but the meta agent MAY disable it via a toggle-phase edit (free will) — when off,
+    // the round briefs from prior signals only. Round 1 falls back to the committed frontier.
+    let findings = []
+    let patterns = []
+    if (harness.phases.scan) {
+      phase('Scan')
+      const evaluatedIds = state.evaluatedIds || []
+      const frontierIds = (state.frontier || []).map((f) => f.id).filter(Boolean)
+      const scanTargets = evaluatedIds.length ? evaluatedIds : frontierIds
+      const batches = chunk(scanTargets, SCAN_BATCH)
+      const scanThunks = batches.map((b) => () => agent(withHarnessPrompt('scan', scanBrief(b)), { schema: FINDINGS, agentType: 'Explore', phase: 'Scan', label: `scan ${b.length}: ${batchLabel(b)}` }))
+      const aggregateIds = [...new Set([...evaluatedIds, ...frontierIds])]
+      const aggThunk = aggregateIds.length
+        ? [() => agent(withHarnessPrompt('aggregate', aggregatePrompt(aggregateIds)), { schema: PATTERNS, agentType: 'Explore', phase: 'Scan', label: 'aggregate' })]
+        : []
+      const scanResults = (await parallel([...scanThunks, ...aggThunk])).filter(Boolean)
+      findings = scanResults.flatMap((r) => (r && r.findings) ? r.findings : [])
+      patterns = scanResults.flatMap((r) => (r && r.patterns) ? r.patterns : [])
+    } else {
+      log('scan phase disabled by meta — briefing from prior signals only')
+    }
+    await runInjected('after-scan', `r${round}`)
 
-    // N1.7 — research escalation (6b): on stall (before the hard limit) or every ~5 commits, fire the
-    // three ideators in parallel. parallel() blocks until all return (proposals land before briefing).
+    // N1.7 — research escalation (6b): on stall (before the hard limit) or every ~N commits, fire the
+    // three ideators in parallel. Gated by harness.phases.ideate + the harness cadence knobs (meta-tunable).
     const commits = Number(state.committedCount) || 0
-    const stalledTrigger = stall >= IDEATE_STALL && !ideatedThisStall
-    const periodicTrigger = commits - lastIdeatedCommit >= IDEATE_EVERY_COMMITS
+    const stalledTrigger = stall >= harness.ideateStall && !ideatedThisStall
+    const periodicTrigger = commits - lastIdeatedCommit >= harness.ideateEvery
     let ideated = false
-    if (stalledTrigger || periodicTrigger) {
+    if (harness.phases.ideate && (stalledTrigger || periodicTrigger)) {
       phase('Ideate')
       await parallel(['frontier_extrapolation', 'failure_analysis', 'literature'].map((b) => () =>
-        agent(ideatorPrompt(b), { agentType: 'evo:ideator', phase: 'Ideate', label: `ideate:${b}` })))
+        agent(withHarnessPrompt('ideator', ideatorPrompt(b)), { agentType: 'evo:ideator', phase: 'Ideate', label: `ideate:${b}` })))
       lastIdeatedCommit = commits
       if (stalledTrigger) ideatedThisStall = true
       ideated = true
@@ -647,10 +761,11 @@ async function optimizeLoop() {
     }
 
     // N2 — brief writer: reconciles ideator proposals (6c), acts on axis-warning, and folds in any
-    // live analyst hints accumulated since the last round; JS diversity dedupe afterwards.
+    // live meta hints accumulated since the last round; JS diversity dedupe afterwards.
+    await runInjected('before-brief', `r${round}`)
     phase('Brief')
-    const analystHints = analystSignals.splice(0)
-    const briefOut = await agent(briefPrompt(state, findings, patterns, parents, ideated, analystHints), { schema: BRIEFS, phase: 'Brief', label: `briefs:r${round}` })
+    const metaHints = metaSignals.splice(0)
+    const briefOut = await agent(withHarnessPrompt('brief', briefPrompt(state, findings, patterns, parents, ideated, metaHints)), { schema: BRIEFS, phase: 'Brief', label: `briefs:r${round}` })
     const briefs = dedupeBriefs((briefOut && briefOut.briefs) || [])
     if (briefs.length === 0) { log('no briefs produced — stopping'); break }
 
@@ -659,7 +774,8 @@ async function optimizeLoop() {
 
     // N5 — collect: prune dead lineages, record notes.
     phase('Collect')
-    await agent(collectPrompt(results, round), { phase: 'Collect', label: `collect:r${round}` })
+    await agent(withHarnessPrompt('collect', collectPrompt(results, round)), { phase: 'Collect', label: `collect:r${round}` })
+    await runInjected('after-collect', `r${round}`)
 
     // Loop control: stall resets only when this round produced a VERIFIED committed score that beats
     // the PRIOR BEST in the metric direction (a beat-its-own-parent commit is branch progress, not a
@@ -675,55 +791,59 @@ async function optimizeLoop() {
     log(`round ${round}: improved=${improved} roundBest=${roundBest} prevBest=${state.bestScore} stall=${stall}/${LIMIT} spent=${budget.spent()}`)
   }
   done = true
-  // Wake any in-flight analyst tick now (its `sleep` can't see the in-memory `done`): the sentinel
-  // makes the tick's interruptible wait exit within ~ANALYST_HOP_S instead of running the full interval.
-  if (ANALYST_ENABLED) await agent(`mkdir -p .evo && : > ${DONE_SENTINEL} && echo signalled`, { phase: 'Collect', label: 'signal:optimize-done' })
+  // Wake any in-flight meta tick now (its `sleep` can't see the in-memory `done`): the sentinel
+  // makes the tick's interruptible wait exit within ~META_HOP_S instead of running the full interval.
+  if (META_ENABLED) await agent(`mkdir -p .evo && : > ${DONE_SENTINEL} && echo signalled`, { phase: 'Collect', label: 'signal:optimize-done' })
   log(`optimize loop finished after ${round} round(s), final stall=${stall}/${LIMIT}`)
   return { rounds: round, finalStall: stall }
 }
 
-// Concurrent analyst thread (P1-sliver/P2-P5/P7): an independent, self-paced Opus observer that runs
+// Concurrent meta thread (P1-sliver/P2-P5/P7): an independent, self-paced Opus observer that runs
 // DURING rounds (not per-round). Each tick is a FRESH agent (no cross-tick memory), so `reported`
-// holds the dedup state in this closure. Work-quality findings -> analystSignals (next brief);
+// holds the dedup state in this closure. Work-quality findings -> metaSignals (next brief);
 // runtime/host alerts -> the run log. Stops when optimizeLoop sets `done`.
-// Gated ENFORCER for an analyst STOP: detect (analyst) and act (this agent) stay separate. Verifies
+// Gated ENFORCER for an meta STOP: detect (meta) and act (this agent) stay separate. Verifies
 // the experiment is still active, then aborts its run (driver + subprocess tree), annotates the
 // diagnosis (survives the worktree + feeds the next round via knownLearnings), and discards with the
 // failure class so the partial artifact is preserved + classified. A STOP is a diagnosed, recoverable
 // stop — never a silent kill.
 function enforceStopPrompt(s) {
   return [
-    `A concurrent analyst flagged experiment ${s.expId} as heading toward failure and recommends STOPPING it. You are the gated ENFORCER — read-only except for the three evo commands below; do NOT edit code or run training.`,
+    `A concurrent meta flagged experiment ${s.expId} as heading toward failure and recommends STOPPING it. You are the gated ENFORCER — read-only except for the three evo commands below; do NOT edit code or run training.`,
     `First VERIFY: run \`evo show ${s.expId}\`. Only proceed if its status is still \`active\`. If it is committed / evaluated / discarded / not found, do NOTHING and report skipped (it already resolved).`,
     `If still active, run in order:`,
     `  1. \`evo abort ${s.expId}\` — stop the evo run driver and its subprocess tree.`,
     `  2. annotate the diagnosis so it outlives the worktree and feeds the next round: \`evo annotate ${s.expId} "STOPPED (${s.failureClass}): ${s.reason} | FIX: ${s.fixHint}"\` (quote carefully).`,
-    `  3. classify + preserve: \`evo discard ${s.expId} --force --failure-class ${s.failureClass} --reason "analyst stop: ${s.reason}"\` (--force because abort already killed the driver; declared artifacts are preserved).`,
+    `  3. classify + preserve: \`evo discard ${s.expId} --force --failure-class ${s.failureClass} --reason "meta stop: ${s.reason}"\` (--force because abort already killed the driver; declared artifacts are preserved).`,
     `Report what you did (aborted / annotated / discarded) or that you skipped because it was no longer active. This is a diagnosed, recoverable stop, not a crash.`,
   ].join('\n')
 }
 
-async function analystLoop() {
-  if (!ANALYST_ENABLED) return
+async function metaLoop() {
+  if (!META_ENABLED) return
   const reported = []   // closure memory across the stateless ticks (caps re-alerting)
   let t = 0
   let fails = 0   // consecutive tick failures; trips the self-disable below
   while (!done) {
     t += 1
-    // The analyst is purely advisory and read-only: a failed tick must NEVER reject this loop and
+    // The meta is purely advisory and read-only: a failed tick must NEVER reject this loop and
     // abort the optimizer. Swallow any tick error, log it, and continue (or exit if `done` flipped).
     let tick = null
     try {
-      tick = await agent(analystPrompt({ round, stall, bestScore: lastBestScore }, ANALYST_INTERVAL_S, reported.slice(-30)), {
-        agentType: 'Explore', model: ANALYST_MODEL, schema: ANALYST_FINDINGS, phase: 'Analyst', label: `analyst#${t}`,
+      tick = await agent(metaPrompt({ round, stall, bestScore: lastBestScore }, META_INTERVAL_S, reported.slice(-30)), {
+        agentType: 'Explore', model: META_MODEL, schema: META_FINDINGS, phase: 'Meta', label: `meta#${t}`,
       })
     } catch (e) {
-      log(`ANALYST tick #${t} errored (ignored, optimize unaffected): ${(e && e.message) || e}`)
+      log(`META tick #${t} errored (ignored, optimize unaffected): ${(e && e.message) || e}`)
     }
     if (tick) {
       fails = 0   // a real tick resets the failure streak
-      for (const h of (tick.briefHints || [])) { analystSignals.push(h); reported.push(h) }
-      for (const a of (tick.alerts || [])) { log(`ANALYST ALERT: ${a}`); reported.push(a) }
+      for (const h of (tick.briefHints || [])) { metaSignals.push(h); reported.push(h) }
+      for (const a of (tick.alerts || [])) { log(`META ALERT: ${a}`); reported.push(a) }
+      // HARNESS EDITS (new ability): the meta restructures the workflow itself live — applied
+      // directly with free will (no gate, no caps), audited via harness.editLog + the run log.
+      // Takes effect at the next round (the optimize loop reads `harness` at each round start).
+      for (const e of (tick.harnessEdits || [])) applyHarnessEdit(e, round)
       // STOP recommendations: hand each to a gated enforcer (detect/act separation). The fix also
       // feeds the next round's brief so the loop corrects rather than just abandons.
       for (const s of (tick.stops || [])) {
@@ -731,32 +851,35 @@ async function analystLoop() {
         const stopKey = `stop:${s.expId}`
         if (reported.includes(stopKey)) continue   // never re-enforce the same experiment
         reported.push(stopKey)
-        log(`ANALYST STOP: ${s.expId} [${s.failureClass}] ${s.reason}`)
-        analystSignals.push(`Experiment ${s.expId} was stopped (${s.failureClass}): ${s.reason} — next: ${s.fixHint}`)
+        log(`META STOP: ${s.expId} [${s.failureClass}] ${s.reason}`)
+        metaSignals.push(`Experiment ${s.expId} was stopped (${s.failureClass}): ${s.reason} — next: ${s.fixHint}`)
         try {
-          await agent(enforceStopPrompt(s), { phase: 'Analyst', label: `enforce-stop:${s.expId}` })
+          await agent(enforceStopPrompt(s), { phase: 'Meta', label: `enforce-stop:${s.expId}` })
         } catch (e) {
-          log(`ANALYST enforce-stop ${s.expId} errored (ignored): ${(e && e.message) || e}`)
+          log(`META enforce-stop ${s.expId} errored (ignored): ${(e && e.message) || e}`)
         }
       }
-    } else if (++fails >= ANALYST_MAX_FAILS) {
+    } else if (++fails >= META_MAX_FAILS) {
       // The pacing wait lives INSIDE the agent, so a tick that fails before sleeping (e.g. a schema
       // reject) leaves nothing to pace the retry — left unchecked the loop hot-spins agents. The
-      // analyst is optional, so after a short streak of failures, disable it for the rest of the run.
-      log(`ANALYST disabled after ${fails} consecutive failed ticks — optimize continues without it.`)
+      // meta is optional, so after a short streak of failures, disable it for the rest of the run.
+      log(`META disabled after ${fails} consecutive failed ticks — optimize continues without it.`)
       return
     }
   }
 }
 
-// Clear any stale sentinel from a prior run BEFORE the threads start, else the analyst's first wait
+// Clear any stale sentinel from a prior run BEFORE the threads start, else the meta's first wait
 // would see it and exit instantly. The script can't touch the filesystem itself, so an agent does it.
-if (ANALYST_ENABLED) await agent(`rm -f ${DONE_SENTINEL}; echo cleared`, { phase: 'Orient', label: 'init:clear-sentinel' })
+if (META_ENABLED) await agent(`rm -f ${DONE_SENTINEL}; echo cleared`, { phase: 'Orient', label: 'init:clear-sentinel' })
 
-// optimizeLoop is the run's result; analystLoop is advisory. The `.catch` is the definitive guard that
+// optimizeLoop is the run's result; metaLoop is advisory. The `.catch` is the definitive guard that
 // the observer thread can NEVER reject the combined promise and fail an otherwise-good optimize run.
 const [optimizeResult] = await Promise.all([
   optimizeLoop(),
-  analystLoop().catch((e) => log(`ANALYST thread exited abnormally (ignored): ${(e && e.message) || e}`)),
+  metaLoop().catch((e) => log(`META thread exited abnormally (ignored): ${(e && e.message) || e}`)),
 ])
-return optimizeResult
+// Surface the harness audit alongside the optimize result: final round-plan + every live edit the
+// meta agent applied (knobs, phase toggles, prompt overrides, injected steps), so the run is fully
+// reconstructable from the return value + the run log.
+return { ...optimizeResult, harness: harnessSummary(), harnessEditLog: harness.editLog }
