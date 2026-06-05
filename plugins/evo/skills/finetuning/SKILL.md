@@ -132,23 +132,25 @@ For custom training loops, use `tracker.init(project=..., name=f"exp_{exp_id}") 
 
 Use `EVO_EXPERIMENT_ID` as the run name so each experiment shows up as its own line in the tracker dashboard. The same env detection applies to HuggingFace datasets / Hub uploads: if `HF_TOKEN` is set, treat gated datasets and private Hub pushes as available.
 
-## Warm-start from parent (default for non-root experiments)
+## Warm-start from a parent / prior checkpoint
 
-`evo run` populates the `EVO_PARENT_POLICY` env var pointing at the parent experiment's checkpoint URI. The training script should warm-start from this checkpoint by default for any non-root experiment, rather than re-training from base. Re-training from base for every experiment burns the budget on duplicated work and prevents the experiment tree from accumulating capability across generations.
+When the orchestrator branches an experiment from a committed or preserved checkpoint with `evo new --from-artifact <exp[:label]>`, evo exposes that artifact's path to your recipe as `EVO_SEED_ARTIFACT` (and, for back-compat, the same value as `EVO_PARENT_POLICY`). Warm-start from it rather than re-training from base — re-training from base every time burns the budget on duplicated work and stops the tree from accumulating capability across generations. To *make* a run reusable this way you must DECLARE your checkpoint as an artifact: write it to `EVO_CHECKPOINT_DIR` and name it in the benchmark result's `artifacts` field (full contract in `references/glue.md`). Only declared artifacts are preserved on discard and seedable via `--from-artifact`.
 
 Concrete pattern:
 
 ```python
-parent_policy = os.environ.get("EVO_PARENT_POLICY")
-if parent_policy and os.path.exists(parent_policy):
-    print(f"warm-starting from parent: {parent_policy}")
-    model = AutoModelForCausalLM.from_pretrained(parent_policy, ...)
+seed = os.environ.get("EVO_SEED_ARTIFACT") or os.environ.get("EVO_PARENT_POLICY")
+if seed and os.path.exists(seed):
+    print(f"warm-starting from {seed}")
+    model = AutoModelForCausalLM.from_pretrained(seed, ...)
 else:
-    print("no parent policy; loading base")
+    print("no seed; loading base")
     model = AutoModelForCausalLM.from_pretrained(BASE_MODEL, ...)
 ```
 
-Override only when the brief explicitly asks for a fresh-from-base ablation (e.g. comparing a new technique against the base, or when parent is suspected of overfitting in a way the current method should not inherit). The full I/O contract is in `references/glue.md`.
+Override only when the brief explicitly asks for a fresh-from-base ablation. The full I/O contract is in `references/glue.md`.
+
+**Device placement (single-GPU training).** Load the model onto the GPU directly — `from_pretrained(..., device_map={"": 0})` (or `.to("cuda")`). Do NOT use `device_map="auto"` for training: it is an *inference*-sharding feature that spreads layers across meta/CPU/GPU and either crashes the backward pass (`RuntimeError: ... expected device meta but got cuda:0`) or silently offloads to CPU — training appears to work but runs ~5× slower at a fraction of GPU memory, which is hard to diagnose because nothing errors. A 4–8B model fits one 80GB GPU with room; there is nothing to shard. Use multi-GPU launchers (`accelerate`/FSDP/DDP), not `device_map`, when you genuinely need to shard.
 
 ## Cache expensive intermediates
 

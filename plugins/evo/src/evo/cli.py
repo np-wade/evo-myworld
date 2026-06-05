@@ -1414,8 +1414,47 @@ def _cmd_dispatch_status(args: argparse.Namespace) -> int:
     return 0
 
 
+def _descendant_pids(pid: int) -> list[int]:
+    """Best-effort descendant PIDs of `pid` (children, grandchildren, ...).
+
+    Unix-only via `ps -eo pid=,ppid=`; returns [] on any failure (Windows,
+    missing ps). Used so `evo abort` can take down the benchmark subprocess
+    tree, not just the driver — otherwise a detached/long benchmark child
+    (e.g. a training process) survives as an orphan after the driver dies.
+    Children are captured BEFORE the parent is signalled, while the tree is
+    still intact. killpg is deliberately avoided: the driver may share the
+    caller's process group, and killing the group could take down the shell.
+    """
+    try:
+        out = subprocess.run(
+            ["ps", "-eo", "pid=,ppid="], capture_output=True, text=True, timeout=5,
+        ).stdout
+    except Exception:
+        return []
+    kids: dict[int, list[int]] = {}
+    for line in out.splitlines():
+        parts = line.split()
+        if len(parts) != 2:
+            continue
+        try:
+            p, pp = int(parts[0]), int(parts[1])
+        except ValueError:
+            continue
+        kids.setdefault(pp, []).append(p)
+    out_pids: list[int] = []
+    stack = [pid]
+    seen = {pid}
+    while stack:
+        for child in kids.get(stack.pop(), []):
+            if child not in seen:
+                seen.add(child)
+                out_pids.append(child)
+                stack.append(child)
+    return out_pids
+
+
 def cmd_abort(args: argparse.Namespace) -> int:
-    """SIGTERM the driver process for the current attempt of <exp_id>.
+    """SIGTERM the driver process (and its subprocess tree) for <exp_id>.
 
     Reads the driver PID stamped into attempt_state.json by `evo run` and
     sends SIGTERM. After --timeout seconds (default 5), if the process is
@@ -1426,10 +1465,12 @@ def cmd_abort(args: argparse.Namespace) -> int:
     until evo's normal failure path runs). Once the driver exits, a
     subsequent `evo run` will see the dead PID and reclaim the attempt.
 
-    Note: aborts only the driver process. If the benchmark spawned
-    workers detached via setsid/nohup, they survive — the driver was
-    coordinating them and is what `evo run` re-invocation gates on. For
-    a full process-tree kill across detached workers, see TODO #7.
+    Aborts the driver AND its descendant process tree (the benchmark/training
+    subprocess and its children), captured before the parent is signalled, so a
+    long benchmark child doesn't survive as an orphan. Workers fully detached
+    into a new session (setsid/nohup) still escape a tree walk; for those the
+    recipe must honour SIGTERM. killpg is avoided on purpose — the driver may
+    share the caller's process group.
     """
     import signal
     import time as _time
@@ -1460,37 +1501,51 @@ def cmd_abort(args: argparse.Namespace) -> int:
         return 0
     # Windows has no SIGKILL; there os.kill(pid, SIGTERM) already maps to
     # TerminateProcess (a hard kill), so SIGTERM is the forceful signal.
+    # Windows has no SIGKILL; there os.kill(pid, SIGTERM) already maps to
+    # TerminateProcess (a hard kill), so SIGTERM is the forceful signal.
     sigkill = getattr(signal, "SIGKILL", signal.SIGTERM)
     sig = sigkill if args.force else signal.SIGTERM
+    # Capture the descendant tree BEFORE signalling the parent (once the driver
+    # dies, children reparent to init and the ppid links are lost).
+    kids = _descendant_pids(pid)
+    targets = [pid, *kids]
+
+    def _signal(targs: list[int], signum: int) -> None:
+        for tp in targs:
+            try:
+                os.kill(tp, signum)
+            except (ProcessLookupError, OSError):
+                pass
+
     try:
-        os.kill(pid, sig)
+        os.kill(pid, sig)  # validate the driver PID is signalable first
     except ProcessLookupError:
-        print(f"{args.exp_id}: driver PID {pid} exited before signal")
+        print(f"{args.exp_id}: driver PID {pid} exited before signal; sweeping {len(kids)} child(ren)")
+        _signal(kids, sigkill)
         return 0
     except OSError as exc:
         print(f"ERROR: failed to signal PID {pid}: {exc}", file=sys.stderr)
         return 1
+    _signal(kids, sig)  # take down the rest of the tree
+    tree_note = f" (+{len(kids)} child process(es))" if kids else ""
     if args.force:
-        print(f"{args.exp_id}: SIGKILL sent to driver PID {pid}")
+        print(f"{args.exp_id}: SIGKILL sent to driver PID {pid}{tree_note}")
         return 0
     print(
-        f"{args.exp_id}: SIGTERM sent to driver PID {pid}; "
+        f"{args.exp_id}: SIGTERM sent to driver PID {pid}{tree_note}; "
         f"waiting up to {args.timeout}s for clean exit..."
     )
     deadline = _time.time() + max(0.0, args.timeout)
     while _time.time() < deadline:
         if not _is_pid_alive(pid):
-            print(f"{args.exp_id}: driver PID {pid} exited cleanly")
-            return 0
+            break
         _time.sleep(0.25)
-    try:
-        os.kill(pid, sigkill)
-        print(
-            f"{args.exp_id}: driver PID {pid} did not exit in {args.timeout}s; "
-            f"escalated to SIGKILL"
-        )
-    except ProcessLookupError:
-        print(f"{args.exp_id}: driver PID {pid} exited during grace period")
+    alive = [tp for tp in targets if _is_pid_alive(tp)]
+    if alive:
+        _signal(alive, sigkill)
+        print(f"{args.exp_id}: escalated to SIGKILL for {len(alive)} still-alive process(es): {alive}")
+    else:
+        print(f"{args.exp_id}: driver PID {pid} and its tree exited cleanly")
     return 0
 
 
@@ -1517,6 +1572,54 @@ def _cmd_dispatch_kill(args: argparse.Namespace) -> int:
     return 0
 
 
+def _resolve_preserved_artifact(root: Path, spec: str) -> dict[str, str]:
+    """Resolve `exp_id[:label]` to a preserved artifact from that experiment's
+    discard manifest (written by `_preserve_discard_artifacts`). Returns
+    {source_exp, label, path}. Category-agnostic — the artifact is whatever the
+    recipe declared (checkpoint, adapter, index, prompt, ...)."""
+    src_exp, _, label = spec.partition(":")
+    src_exp = src_exp.strip()
+    label = label.strip()
+    if not src_exp:
+        raise RuntimeError("--from-artifact requires an experiment id, e.g. exp_0007 or exp_0007:<label>")
+    exp_dir = experiments_dir_for(root, src_exp)
+    manifest = exp_dir / "artifacts" / "discarded" / "manifest.json"
+    if not manifest.exists():
+        raise RuntimeError(
+            f"no preserved artifacts for {src_exp} (expected {manifest}). "
+            f"Only experiments discarded after DECLARING artifacts have a manifest."
+        )
+    arts = (json.loads(manifest.read_text()).get("artifacts")) or []
+    if not arts:
+        raise RuntimeError(f"{src_exp} preserved no artifacts (manifest is empty).")
+    # The same artifact is recorded once per declaring source (benchmark_result,
+    # outcome.json, result.json); collapse to unique (label, stored_path) so a
+    # single logical artifact isn't mistaken for several.
+    _uniq: dict[tuple, dict] = {}
+    for a in arts:
+        _uniq.setdefault((a.get("label"), a.get("stored_path")), a)
+    arts = list(_uniq.values())
+    if label:
+        chosen = next((a for a in arts if a.get("label") == label), None)
+        if chosen is None:
+            raise RuntimeError(
+                f"{src_exp} has no preserved artifact labeled '{label}'. "
+                f"Available: {[a.get('label') for a in arts]}"
+            )
+    elif len(arts) == 1:
+        chosen = arts[0]
+    else:
+        raise RuntimeError(
+            f"{src_exp} has multiple preserved artifacts; pick one as {src_exp}:<label>. "
+            f"Available: {[a.get('label') for a in arts]}"
+        )
+    stored = chosen.get("stored_path")
+    abs_path = (exp_dir / stored).resolve(strict=False) if stored else None
+    if not abs_path or not abs_path.exists():
+        raise RuntimeError(f"preserved artifact is missing on disk: {abs_path}")
+    return {"source_exp": src_exp, "label": chosen.get("label", ""), "path": str(abs_path)}
+
+
 def cmd_new(args: argparse.Namespace) -> int:
     root = repo_root()
     config, graph = _require_workspace(root)
@@ -1540,8 +1643,20 @@ def cmd_new(args: argparse.Namespace) -> int:
         hypothesis=args.message,
         backend_override=backend_override,
     )
+    seed = None
+    seed_spec = getattr(args, "from_artifact", None)
+    if seed_spec:
+        seed = _resolve_preserved_artifact(root, seed_spec)
+
+        def _seed(n: dict, _g: dict) -> None:
+            n["from_artifact"] = seed
+
+        update_node(root, node["id"], _seed)
     target = node_target_path(root, config, node)
-    print(json.dumps({"id": node["id"], "worktree": node["worktree"], "target": str(target)}, indent=2))
+    out = {"id": node["id"], "worktree": node["worktree"], "target": str(target)}
+    if seed:
+        out["from_artifact"] = seed
+    print(json.dumps(out, indent=2))
     return 0
 
 
@@ -1792,11 +1907,18 @@ def _preserve_discard_artifacts(root: Path, node: dict) -> dict[str, Any]:
         if key in seen:
             copied.append({**record, **seen[key]})
             continue
-        if _artifact_path_within(src_resolved, exp_dir):
-            skipped.append({**record, "reason": "already_persistent"})
-            continue
         if not src.exists():
             skipped.append({**record, "reason": "missing"})
+            continue
+        if _artifact_path_within(src_resolved, exp_dir):
+            # Already durable (e.g. written to EVO_CHECKPOINT_DIR, which lives under
+            # the experiment record, not the worktree). No copy needed — but still
+            # record it as a reusable artifact so `evo new --from-artifact` can find
+            # it. (Without this, persistent artifacts were silently un-reusable.)
+            stored = str(src_resolved.relative_to(exp_dir.resolve(strict=False)))
+            saved = {"stored_path": stored, "source_path": raw_path, "already_persistent": True}
+            seen[key] = saved
+            copied.append({**record, **saved})
             continue
 
         dest = dest_root / _safe_artifact_name(record["label"], src)
@@ -2320,6 +2442,20 @@ def _runtime_env_for_attempt(
     env["EVO_ATTEMPT"] = attempt_label
     env["EVO_RESULT_PATH"] = env_result_path
     env["EVO_CHECKPOINT_DIR"] = env_checkpoint_dir
+    # Reuse path: if this experiment was created with `evo new --from-artifact`,
+    # expose the preserved artifact's path so the recipe can warm-start / retest
+    # instead of rebuilding from scratch. Category-agnostic (checkpoint/index/...).
+    try:
+        _node = (load_graph(root).get("nodes") or {}).get(exp_id) or {}
+        _seed = (_node.get("from_artifact") or {}).get("path")
+        if _seed:
+            env["EVO_SEED_ARTIFACT"] = _seed
+            # Back-compat alias: recipes that read EVO_PARENT_POLICY (warm-start
+            # source) get the same path when the experiment was seeded from a
+            # parent/prior checkpoint via `evo new --from-artifact`.
+            env["EVO_PARENT_POLICY"] = _seed
+    except Exception:
+        pass  # best-effort; never block a run on seed-env resolution
     return env
 
 
@@ -3347,13 +3483,19 @@ def cmd_discard(args: argparse.Namespace) -> int:
             f"Discard or commit-and-prune those first."
         )
 
+    fclass = getattr(args, "failure_class", None)
+
     def _mark(current_node: dict, _graph: dict) -> None:
         current_node["status"] = "discarded"
         current_node["discard_reason"] = args.reason
+        if fclass:
+            current_node["failure_class"] = fclass
 
     update_node(root, args.exp_id, _mark)
     preservation = _preserve_discard_artifacts(root, node)
     result_extra: dict[str, Any] = {"reason": args.reason}
+    if fclass:
+        result_extra["failure_class"] = fclass
     if preservation["artifacts"]:
         result_extra["preserved_artifacts"] = preservation["artifacts"]
         result_extra["artifact_manifest"] = "artifacts/discarded/manifest.json"
@@ -5925,6 +6067,17 @@ def build_parser() -> argparse.ArgumentParser:
         help="shorthand for remote backend selection. Examples: modal, "
              "ssh:user@host, my_pkg.providers:Provider.",
     )
+    new_p.add_argument(
+        "--from-artifact",
+        dest="from_artifact",
+        help="seed this experiment from a PRESERVED artifact of a prior "
+             "(usually discarded) experiment: `exp_0007` or `exp_0007:<label>`. "
+             "Resolves the artifact from that experiment's discard manifest and "
+             "exposes its absolute path to the recipe as EVO_SEED_ARTIFACT so it "
+             "can warm-start / eval-retest instead of rebuilding from scratch. "
+             "Category-agnostic: the artifact is whatever the recipe declared "
+             "(checkpoint, adapter, index, prompt, ...).",
+    )
     new_p.set_defaults(func=cmd_new)
 
     run_p = sub.add_parser("run")
@@ -6053,6 +6206,17 @@ def build_parser() -> argparse.ArgumentParser:
     discard_p = sub.add_parser("discard")
     discard_p.add_argument("exp_id")
     discard_p.add_argument("--reason", required=True)
+    discard_p.add_argument(
+        "--failure-class",
+        dest="failure_class",
+        choices=["build", "eval", "hypothesis"],
+        default=None,
+        help="classify the failure so reuse/branch routing is explicit: "
+             "build = the artifact-production step broke (fix + retry/resume); "
+             "eval = the artifact is good but scoring/serving config is wrong "
+             "(preserve + retest, no rebuild); hypothesis = it ran clean but "
+             "didn't help (branch a new direction). Recorded on the node.",
+    )
     discard_p.add_argument(
         "--force",
         action="store_true",

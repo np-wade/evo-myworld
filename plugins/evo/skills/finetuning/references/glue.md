@@ -8,27 +8,32 @@ You write this per task in the experiment worktree. evo provides inputs by conve
 
 - `EVO_DATASET` — path to the assembled scored-trajectory JSONL (train split only;
   selection already applied). See `trace-schema.md`.
-- `EVO_PARENT_POLICY` — for a root experiment, the base model id; for any
-  non-root experiment, the local path to the parent experiment's checkpoint.
-  The training script **must** warm-start from this when the value is a
-  checkpoint path. Re-training from base on every experiment burns the budget
-  on duplicated work and breaks capability accumulation across the tree.
-- `EVO_RUN_DIR` / `EVO_ARTIFACTS_DIR` — where to write the checkpoint + traces.
+- `EVO_SEED_ARTIFACT` — set only when the orchestrator branched this experiment
+  from a committed/preserved checkpoint via `evo new --from-artifact <exp[:label]>`;
+  the local path to that artifact (also mirrored as `EVO_PARENT_POLICY` for
+  back-compat with recipes that read that name). Warm-start from it when present;
+  if unset, load the base model. Re-training from base when a usable seed exists
+  burns the budget and breaks capability accumulation across the tree.
+- `EVO_CHECKPOINT_DIR` — durable output location for the checkpoint you produce
+  (lives under the experiment record, survives between-attempt cleanup and
+  discard). Write the reusable checkpoint here so it can be declared + later
+  seeded; the worktree itself is ephemeral.
 - Held-out data is **not** provided — evo scores on it independently.
 
 ### Warm-start pattern
 
 ```python
-parent_policy = os.environ.get("EVO_PARENT_POLICY")
-if parent_policy and os.path.exists(parent_policy):
-    model = AutoModelForCausalLM.from_pretrained(parent_policy, ...)
+seed = os.environ.get("EVO_SEED_ARTIFACT") or os.environ.get("EVO_PARENT_POLICY")
+if seed and os.path.exists(seed):
+    model = AutoModelForCausalLM.from_pretrained(seed, ...)
 else:
     model = AutoModelForCausalLM.from_pretrained(BASE_MODEL, ...)
 ```
 
-Branch on `os.path.exists` rather than presence-only — for the root
-experiment the value is a model id, not a path, so `from_pretrained` should
-treat it as the base.
+`EVO_SEED_ARTIFACT` is unset for a from-base experiment, so absence ⇒ load the
+base model. (Load onto the GPU directly — `device_map={"": 0}` / `.to("cuda")`;
+never `device_map="auto"` for training, which offloads to CPU or crashes the
+backward pass.)
 
 ## What you produce
 

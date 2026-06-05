@@ -22,7 +22,9 @@ If the training uses TRL (`SFTTrainer`, `DPOTrainer`, `GRPOTrainer`, etc.) just 
 from trl import SFTConfig, SFTTrainer
 
 config = SFTConfig(
-    output_dir="final_model",
+    # write the checkpoint to the durable, declarable location (not a hardcoded
+    # dir) so it survives discard and can be reused via --from-artifact:
+    output_dir=os.environ.get("EVO_CHECKPOINT_DIR", "out"),
     report_to="trackio",                       # or "wandb", "mlflow", "none"
     run_name=os.environ.get("EVO_EXPERIMENT_ID", "exp_unknown"),
     # ... other args
