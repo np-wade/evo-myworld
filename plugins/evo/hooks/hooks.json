@@ -20,6 +20,15 @@
             "command": "${CLAUDE_PLUGIN_ROOT}/bin/evo-hook-drain"
           }
         ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/wait_hint.sh"
+          }
+        ]
       }
     ],
     "UserPromptSubmit": [

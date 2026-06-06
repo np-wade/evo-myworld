@@ -25,6 +25,9 @@ from .. import __version__ as EVO_VERSION
 _RELEASE_URL_TEMPLATE = (
     "https://github.com/evo-hq/evo/releases/download/v{version}/{asset}"
 )
+_LATEST_RELEASE_URL_TEMPLATE = (
+    "https://github.com/evo-hq/evo/releases/latest/download/{asset}"
+)
 
 
 def _target_name() -> str | None:
@@ -144,14 +147,37 @@ def ensure_hook_drain_binary(plugin_root: Path, *, force: bool = False) -> bool:
                 )
 
     version_tag = _release_version_tag(EVO_VERSION)
-    url = _RELEASE_URL_TEMPLATE.format(version=version_tag, asset=asset)
+    versioned_url = _RELEASE_URL_TEMPLATE.format(version=version_tag, asset=asset)
+    latest_url = _LATEST_RELEASE_URL_TEMPLATE.format(asset=asset)
 
-    try:
-        print(f"$ fetching {asset} from {url}")
-        urllib.request.urlretrieve(url, str(dest))
-    except (urllib.error.URLError, OSError) as e:
+    # Try the exact-version release first. Pre-release / alpha versions often
+    # don't have a corresponding GitHub Release tagged yet (release builds
+    # are only cut at stable bumps), so a 404 here is expected during alpha
+    # cycles. Fall back to /releases/latest/, which GitHub redirects to the
+    # most recent stable release. The binary's wire protocol is stable
+    # across minor versions, so a slightly older binary still works.
+    last_err: Exception | None = None
+    for url in (versioned_url, latest_url):
+        try:
+            print(f"$ fetching {asset} from {url}")
+            urllib.request.urlretrieve(url, str(dest))
+            if url == latest_url and url != versioned_url:
+                print(
+                    f"NOTE: used /releases/latest/ fallback because the "
+                    f"version-tagged release v{version_tag} doesn't exist on "
+                    f"GitHub yet. Binary is wire-compatible across minor "
+                    f"versions; mid-run inject will work.",
+                )
+            break
+        except (urllib.error.URLError, OSError) as e:
+            last_err = e
+            # urlretrieve on 404 raises urllib.error.HTTPError (subclass of URLError).
+            # Continue to the next URL in the fallback chain.
+            continue
+    else:
         print(
-            f"WARN: failed to fetch evo-hook-drain binary from {url}: {e}\n"
+            f"WARN: failed to fetch evo-hook-drain binary "
+            f"(tried {versioned_url} and {latest_url}): {last_err}\n"
             f"      Mid-run inject (`evo direct`) will not work until the "
             f"binary is staged at {dest}. Re-run `evo install <host> --force` "
             f"with network access to retry.",

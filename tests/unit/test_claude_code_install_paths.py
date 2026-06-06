@@ -68,3 +68,32 @@ def test_latest_cache_dir_does_not_leak_to_home_when_env_set(env_with_config_dir
     # _latest_cache_dir must look at env_with_config_dir, not fake_home/.claude.
     # env_with_config_dir has no plugins/ tree -> returns None.
     assert claude_code._latest_cache_dir() is None
+
+
+# --------------------------------------------------------------------------- #
+# _hook_drain_staging_dir: --from-path must target the source tree, not cache
+# --------------------------------------------------------------------------- #
+def test_staging_dir_from_path_targets_source_plugin_dir(tmp_path):
+    """Regression: with --from-path, claude runs the plugin from the source
+    tree (${CLAUDE_PLUGIN_ROOT} = <from_path>/plugins/evo). Staging the
+    hook-drain binary into the version cache leaves the hook firing exit 127.
+    The staging dir must be the source plugin dir."""
+    repo = tmp_path / "evo"
+    plugin = repo / "plugins" / "evo"
+    plugin.mkdir(parents=True)
+    assert claude_code._hook_drain_staging_dir(str(repo)) == plugin
+
+
+def test_staging_dir_from_path_accepts_plugin_dir_directly(tmp_path):
+    """Tolerate being handed the plugin dir itself (has bin/ or .claude-plugin)."""
+    plugin = tmp_path / "evo-plugin"
+    (plugin / "bin").mkdir(parents=True)
+    assert claude_code._hook_drain_staging_dir(str(plugin)) == plugin
+
+
+def test_staging_dir_without_from_path_uses_cache(env_with_config_dir):
+    """A normal (no --from-path) install stages into the version cache."""
+    base = env_with_config_dir / "plugins" / "cache" / claude_code._MARKETPLACE_NAME / "evo"
+    versioned = base / "0.5.0-alpha.12"
+    versioned.mkdir(parents=True)
+    assert claude_code._hook_drain_staging_dir(None) == versioned

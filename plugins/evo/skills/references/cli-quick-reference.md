@@ -45,6 +45,7 @@ evo init \
   --benchmark "<command using {worktree} and/or {target}>" \
   --metric <max|min> \
   --host <claude-code|codex|opencode|openclaw|hermes|generic> \
+  --per-exp-timeout <seconds> \
   [--instrumentation-mode <sdk|inline>] \
   [--gate "<command>"] \
   [--commit-strategy <all|tracked-only>]
@@ -58,6 +59,10 @@ evo init \
   experiment branches.
 - `--host` records the orchestrator runtime; it controls whether `dispatch` is
   available.
+- `--per-exp-timeout` is the workspace default wall-clock cap for each `evo run`
+  (seconds). Override per-call with `evo run --timeout N`. Pick based on what
+  the benchmark actually costs; update later with
+  `evo config set per-exp-timeout <seconds>`.
 
 ## Configuration
 
@@ -71,7 +76,7 @@ Settable / gettable fields:
 
 ```
 project-name | target | benchmark | metric | commit-strategy
-max-attempts | gate | frontier-strategy
+max-attempts | gate | frontier-strategy | default-orchestrator | task-skills
 ```
 
 Examples:
@@ -102,6 +107,7 @@ exist for a reason and the dashboard may be writing concurrently).
 | `max_attempts`         | `evo config set max-attempts`       | `evo config get max-attempts`       | Per-experiment retry cap. Default 3.                   |
 | `gate`                 | `evo config set gate`               | `evo config get gate`               | Workspace-default gate. Per-node gates: `evo gate add`. |
 | `frontier_strategy`    | `evo config set frontier-strategy`  | `evo config get frontier-strategy`  | Kinds: `argmax`, `top_k`, `epsilon_greedy`, `softmax`, `pareto_per_task`. |
+| `task_skills`          | `evo config set task-skills`        | `evo config get task-skills`        | Comma-separated evo skill name(s) a builder loads for this task's category (e.g. `finetuning`). Set by `discover`; read by prose subagents + workflow lanes. Empty = subagent protocol suffices. |
 | `runtime` recipe       | `evo config runtime set`            | `evo config runtime show`           | `--prepare`, `--before-run`, `--prefix`.               |
 | `runtime_env`          | `evo env load/inherit-shell/clear`  | `evo env show`                      | Separate top-level command.                            |
 | `execution_backend`    | `evo config backend <name>`         | `evo config backend show`           | `worktree`, `pool`, `remote`.                          |
@@ -165,12 +171,12 @@ Provider auth and SDK packages are separate from benchmark runtime env.
 ## Experiment Lifecycle
 
 ```bash
-evo new --parent <parent_id> -m "<hypothesis>"
-evo run <exp_id> [--timeout <seconds>] [--force]
-evo run <exp_id> --check [--timeout <seconds>]
-evo abort <exp_id> [--timeout <seconds>] [--force]
+evo new --parent <parent_id> -m "<hypothesis>" [--from-artifact <exp[:label]>]
+evo run <exp_id> [--timeout <seconds>] [--force]    # --timeout overrides workspace per-exp-timeout
+evo run <exp_id> --check [--timeout <seconds>]      # same override semantics for check phase
+evo abort <exp_id> [--timeout <seconds>] [--force]  # stop a mid-run experiment (driver + subprocess tree)
 evo done <exp_id> --score <float> [--traces <dir>] [--no-compare]
-evo discard <exp_id> --reason "<why>" [--force]
+evo discard <exp_id> --reason "<why>" [--failure-class build|eval|hypothesis] [--force]
 evo prune <exp_id> [--reason "<why>"]
 evo restore <exp_id>
 evo gc
@@ -184,13 +190,22 @@ Lifecycle command rules:
   prior driver is gone but its state wasn't reclaimed (e.g. recycled
   PID). Remote backend skips the guard — its resume logic handles
   `status=active` natively.
-- `evo abort <exp_id>` SIGTERMs the driver process of the current
-  attempt; if it doesn't exit within `--timeout` seconds (default 5),
-  escalates to SIGKILL. `--force` skips the grace period. Aborts only
-  the driver — workers detached via setsid/nohup survive.
+- `evo abort <exp_id>` SIGTERMs the driver process AND its descendant
+  subprocess tree (the benchmark/training child and its children),
+  captured before the parent is signalled so nothing orphans. If the
+  driver doesn't exit within `--timeout` seconds (default 5), escalates
+  to SIGKILL on whatever's still alive. `--force` skips the grace period.
+  Workers fully detached into a new session (setsid/nohup) still escape —
+  for those the recipe must honour SIGTERM. Use it to stop an experiment
+  heading toward failure mid-run; a partial artifact written to
+  `EVO_CHECKPOINT_DIR` survives for reuse. `abort` does not mutate graph
+  state; classify + park the node afterward with `evo discard`.
 - `evo discard` is for non-committed nodes (active/evaluated/failed).
   Refuses `committed` (use `evo prune` instead). Refuses `active` without
-  `--force`. Refuses any node with non-discarded children.
+  `--force`. Refuses any node with non-discarded children. `--failure-class
+  build|eval|hypothesis` records why it failed (routes reuse vs branch —
+  see **Artifacts & reuse**); declared artifacts are preserved before the
+  worktree is deleted.
 - `evo prune` accepts `committed` or `evaluated` nodes. Marks the lineage
   exhausted; the result stays available for `evo restore` later.
   `--reason` is optional — omit it for routine round-N cleanups (a stderr
@@ -211,6 +226,32 @@ Outcomes:
 
 `evo done` is for externally scored runs only. Do not call it after a successful
 `evo run`.
+
+## Artifacts & reuse
+
+A benchmark/recipe can DECLARE reusable outputs so they survive a discard and
+can seed later experiments. Category-agnostic: the artifact is whatever the
+recipe produces (checkpoint, adapter, retrieval index, compiled prompt, …) —
+never assume a specific name like `final_model/`.
+
+- **Declare**: name the output in the benchmark result's `artifacts` field —
+  `{"score": 0.42, "artifacts": {"checkpoint": "<path>"}}` (a `label→path`
+  dict, or a list of `{name, path}`). Write durable outputs to
+  `EVO_CHECKPOINT_DIR` (it lives under the experiment record, outside the
+  worktree, so it survives between-attempt cleanup and discard).
+- **Preserve**: `evo discard` copies declared worktree artifacts out before
+  deleting the worktree, and records already-persistent ones (e.g. under
+  `EVO_CHECKPOINT_DIR`) — both land in the discard manifest as reusable.
+- **Classify**: `evo discard --failure-class build|eval|hypothesis` records
+  why it failed: `build` (artifact step broke → fix + retry/resume), `eval`
+  (artifact good, scoring/serving wrong → preserve + retest, no rebuild),
+  `hypothesis` (ran clean, didn't help → branch a new direction). Stored on
+  the node so the orchestrator can route reuse vs branch.
+- **Reuse**: `evo new --parent <id> --from-artifact <exp[:label]>` seeds a new
+  experiment from a preserved artifact. Its absolute path is exposed to the
+  recipe as `EVO_SEED_ARTIFACT` — warm-start / eval-retest instead of
+  rebuilding from scratch. Use `exp:label` when an experiment preserved more
+  than one artifact.
 
 ## Gates
 
@@ -274,13 +315,26 @@ evo infra log [--limit N]                          # read recorded events
 ## Loop control (for the /optimize orchestrator)
 
 ```bash
-evo wait [--timeout SEC]      # block until any experiment reaches a
-                              # terminal state (committed / evaluated /
-                              # failed / discarded). Per-task traces and
-                              # other in-flight writes are ignored.
-                              # default 3600, capped at 3600 (1h).
-                              # exit 0 with one-line summary on transition,
-                              # 124 on timeout.
+evo wait [--for <target>] ... [--count N] [--timeout DUR]
+         [--stall-threshold DUR] [--poll-interval DUR] [--json]
+                              # --for is repeatable. Targets:
+                              #   experiments       (workspace; new commit lands)
+                              #   ideators          (workspace; new proposal lands)
+                              #   process=<pid>     (PID exits)
+                              #   log-growth=<path> (file stalls for --stall-threshold)
+                              #   gpu-active        (GPU util rises above 0)
+                              #   gpu-idle          (GPU util drops to 0)
+                              # No --for = legacy default: watches BOTH experiments
+                              # and ideators; wakes on whichever first.
+                              # --count N (requires exactly one --for experiments|ideators)
+                              # blocks until N additional items of that kind land.
+                              # --timeout: duration string (60m, 2h) or int seconds;
+                              # default 1h, max 24h.
+                              # --stall-threshold default 2m. --poll-interval default 5s.
+                              # --json emits structured exit (exit_reason, triggered_by,
+                              # per-watch state) instead of the one-line summary.
+                              # Exit: 0 on match, 124 on timeout, 2 on usage error.
+                              # See `references/evo-wait.md` for full semantics + JSON shape.
 
 evo autonomous on|off         # arm/disarm the stop-nudge (keep-going
                               # loop). Off by default. Run `on` when

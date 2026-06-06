@@ -56,6 +56,31 @@ def _latest_cache_dir() -> Path | None:
     versions = sorted(p for p in root.iterdir() if p.is_dir())
     return versions[-1] if versions else None
 
+
+def _hook_drain_staging_dir(from_path: str | None) -> Path | None:
+    """Return the plugin dir whose `bin/evo-hook-drain` the runtime hook will
+    actually exercise, or None if it can't be located.
+
+    A `--from-path` install runs the plugin straight from the source tree:
+    `claude plugin marketplace add <from_path>` makes claude resolve
+    `${CLAUDE_PLUGIN_ROOT}` to `<from_path>/plugins/evo`, NOT to the version
+    cache. Staging into `_latest_cache_dir()` in that case drops the binary
+    where no hook ever looks, so every hook fire is `not found` (exit 127).
+    Target the source tree instead. A normal (cache-backed) install has no
+    `from_path`, so it falls through to the version cache.
+    """
+    if from_path:
+        src = Path(from_path)
+        # from_path is the marketplace root (repo dir); the plugin lives at
+        # plugins/evo within it. Tolerate being handed the plugin dir directly.
+        candidate = src / "plugins" / "evo"
+        if candidate.exists():
+            return candidate
+        if (src / "bin").exists() or (src / ".claude-plugin").exists():
+            return src
+        return candidate  # let ensure_* create bin/ under the expected path
+    return _latest_cache_dir()
+
 # Strict release-tag shape: 'X.Y.Z' optionally followed by a pre-release
 # suffix ('0.4.0-alpha.5', '0.4.0a5', '0.4.0rc1'). Only this shape gets
 # auto-prefixed with 'v' to match the repo's release-tag convention.
@@ -127,10 +152,10 @@ def install(args: argparse.Namespace) -> int:
     rc = _run(["claude", "plugin", "install", _PLUGIN, "--scope", scope])
     if rc != 0:
         return rc
-    # Stage the platform-native evo-hook-drain binary inside the cache.
-    # hooks.json points at ${CLAUDE_PLUGIN_ROOT}/bin/evo-hook-drain;
-    # without the binary every hook fire would be a no-op.
-    plugin_dir = _latest_cache_dir()
+    # Stage the platform-native evo-hook-drain binary where the runtime hook
+    # resolves it. hooks.json points at ${CLAUDE_PLUGIN_ROOT}/bin/evo-hook-drain;
+    # for a --from-path install that's the source tree, not the version cache.
+    plugin_dir = _hook_drain_staging_dir(getattr(args, "from_path", None))
     if plugin_dir is not None:
         ensure_hook_drain_binary(plugin_dir, force=bool(getattr(args, "force", False)))
     print(
@@ -185,9 +210,10 @@ def update(args: argparse.Namespace) -> int:
 
     if rc != 0:
         return rc
-    # Re-stage the hook-drain binary into the freshly-installed cache.
+    # Re-stage the hook-drain binary where the runtime hook resolves it
+    # (source tree for --from-path, version cache otherwise).
     # --force will re-download even if a binary's already there.
-    plugin_dir = _latest_cache_dir()
+    plugin_dir = _hook_drain_staging_dir(from_path)
     if plugin_dir is not None:
         ensure_hook_drain_binary(plugin_dir, force=force)
     print(

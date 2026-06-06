@@ -36,6 +36,10 @@ const state = {
   _scatterResizeBound: false,  // scatter overlay drag-resize handler
   _barHoverTipsBound: false,   // hover-tooltips on compact off-spine bars
   _scatterTipsBound: false,    // hover-tooltips on scatter dots
+  // Logs tab state (per-drawer; resets when the drawer or file changes).
+  logsSelected: null,    // currently-displayed log file name
+  logsOffset: 0,         // byte offset for incremental append polling
+  logsAutoRefresh: false, // whether the 2s poll timer is active
 };
 
 // ─── Helpers ─────────────────────────────────────────────
@@ -2066,11 +2070,17 @@ async function openDrawer(expId, opts) {
   const isStale = () => state.selectedNode !== requestedId;
   const ws = state.workspace || {};
 
+  // Pre-fetch annotations once per render so Summary (global) and Tasks
+  // (per-task) can both render synchronously below. Small payload; not
+  // worth caching across renders since they mutate on every commit.
+  const annotations = await getAnnotationsForExperiment(expId);
+  if (isStale()) return;
+
   const delta = scoreDelta(node);
   const deltaColor = deltaColorFor(delta);
   const statusColor = STATUS_COLORS[node.status] || '#52525b';
   const hasChildren = (node.children || []).length > 0;
-  const activeTab = ['summary', 'diff', 'tasks'].includes(state.sidebarTab)
+  const activeTab = ['summary', 'diff', 'tasks', 'logs'].includes(state.sidebarTab)
     ? state.sidebarTab
     : 'summary';
   // Drives the diff-tab fill layout in CSS (.sidebar[data-tab="diff"]).
@@ -2100,6 +2110,7 @@ async function openDrawer(expId, opts) {
       ${drawerTabButton('summary', 'Summary', activeTab)}
       ${drawerTabButton('diff', 'Diff', activeTab)}
       ${drawerTabButton('tasks', 'Tasks', activeTab)}
+      ${drawerTabButton('logs', 'Logs', activeTab)}
     </div>`;
 
   if (activeTab === 'summary') {
@@ -2114,6 +2125,8 @@ async function openDrawer(expId, opts) {
       detail = `<div class="drawer-summary-detail error">${esc(node.error)}</div>`;
     } else if (node.status === 'pruned' && node.pruned_reason) {
       detail = `<div class="drawer-summary-detail">${esc(node.pruned_reason)}</div>`;
+    } else if (node.status === 'discarded' && node.discard_reason) {
+      detail = `<div class="drawer-summary-detail">${esc(node.discard_reason)}</div>`;
     } else if (isFrontierCandidate(node)) {
       detail = `<div class="drawer-summary-detail accent">Frontier candidate — evo may branch from this node next.</div>`;
     }
@@ -2133,6 +2146,28 @@ async function openDrawer(expId, opts) {
       html += `<div class="drawer-section">
         <span class="drawer-section-title">Hypothesis</span>
         <div class="drawer-hyp">${esc(node.hypothesis)}</div>
+      </div>`;
+    }
+
+    // Diagnoses: global annotations written by benchmark-reviewer,
+    // verifier, ideator, or the orchestrator itself. Per-task ones live
+    // on the Tasks tab; here we surface global + a footnote count.
+    const perTaskCount = Object.keys(annotations.byTask).length;
+    if (annotations.global.length > 0 || perTaskCount > 0) {
+      let diagItems = '';
+      for (const a of annotations.global) {
+        const split = splitAnnotation(a.analysis);
+        const ts = relTime(a.timestamp);
+        diagItems += `<div class="drawer-diagnosis">
+          ${split.category ? `<span class="task-annotation-cat">${esc(split.category)}</span>` : ''}
+          ${esc(split.body)}
+          <div class="drawer-diagnosis-meta">${ts ? `${ts} ago` : ''}</div>
+        </div>`;
+      }
+      html += `<div class="drawer-section">
+        <span class="drawer-section-title">Diagnoses</span>
+        <div class="drawer-diagnoses">${diagItems || '<div class="sidebar-empty">No global diagnoses recorded.</div>'}</div>
+        ${perTaskCount > 0 ? `<div class="drawer-diagnoses-footnote">${perTaskCount} per-task diagnosis${perTaskCount === 1 ? '' : 'es'} on the Tasks tab</div>` : ''}
       </div>`;
     }
 
@@ -2159,6 +2194,11 @@ async function openDrawer(expId, opts) {
       <div class="drawer-meta-row"><span class="drawer-meta-key">Score</span><span class="drawer-meta-val mono">${check.score != null ? Number(check.score).toFixed(2) : '--'}</span></div>
       <div class="drawer-meta-row"><span class="drawer-meta-key">Traces</span><span class="drawer-meta-val mono">${check.trace_count || 0}</span></div>
       <div class="drawer-meta-row"><span class="drawer-meta-key">Artifacts</span><span class="drawer-meta-val mono">${esc(check.artifact_path || '--')}</span></div>
+      <div class="drawer-meta-row" id="drawer-trackio-row" style="display:none">
+        <span class="drawer-meta-key">Metrics</span>
+        <span class="drawer-meta-val" id="drawer-trackio-val"></span>
+      </div>
+      <div id="drawer-trackio-spark"></div>
       ${check.error ? `<div class="failure-box"><span class="failure-box-title">Failure: ${esc(check.error)}</span></div>` : ''}
     </div>` : ''}`;
   } else if (activeTab === 'diff') {
@@ -2230,6 +2270,19 @@ async function openDrawer(expId, opts) {
         ${summary ? `<div class="task-summary">${esc(summary)}</div>` : ''}
       </div>`;
 
+      // Per-task annotation (from benchmark-reviewer's review-experiment
+      // mode, or any agent that wrote `evo annotate <exp> --task K`).
+      // Sits right under the task row so the diagnosis is co-located
+      // with the failure it explains.
+      const ann = annotations.byTask[String(tid)];
+      if (ann) {
+        const split = splitAnnotation(ann.analysis);
+        tasksHtml += `<div class="task-annotation">
+          ${split.category ? `<span class="task-annotation-cat">${esc(split.category)}</span>` : ''}
+          ${esc(split.body)}
+        </div>`;
+      }
+
       // Trace detail (hidden by default, toggled by click)
       if (trace) {
         let traceHtml = '<div class="trace-detail hidden" data-task="' + esc(tid) + '">';
@@ -2242,6 +2295,21 @@ async function openDrawer(expId, opts) {
           if (end) traceHtml += `<span>Ended: ${end}</span>`;
           if (dur) traceHtml += `<span>Duration: ${dur}</span>`;
           traceHtml += `</div>`;
+        }
+        // Target + model output -- the most useful per-task surface for
+        // LLM benchmarks. Renders for any trace that has these fields,
+        // regardless of whether the benchmark also emitted `events`.
+        if (trace.target !== undefined && trace.target !== null) {
+          traceHtml += `<div class="trace-msg">
+            <div class="trace-role tool">target</div>
+            <div class="trace-content mono">${esc(String(trace.target))}</div>
+          </div>`;
+        }
+        if (trace.model_output) {
+          traceHtml += `<div class="trace-msg">
+            <div class="trace-role agent">model output</div>
+            <div class="trace-content mono">${esc(String(trace.model_output))}</div>
+          </div>`;
         }
         if (trace.failure_reason) {
           traceHtml += `<div class="failure-box">
@@ -2281,10 +2349,220 @@ async function openDrawer(expId, opts) {
     } else {
       html += `<div class="drawer-section"><div class="sidebar-empty">No benchmark task results recorded.</div></div>`;
     }
+  } else if (activeTab === 'logs') {
+    let payload = { attempt: null, files: [] };
+    try {
+      payload = await fetch(`/api/node/${expId}/logs`).then(r => r.json());
+      if (isStale()) return;
+    } catch (e) { /* empty list */ }
+    if (!payload.files.length) {
+      html += `<div class="drawer-section"><div class="sidebar-empty">No log files in latest attempt. Training scripts write to logs/*.log under the experiment worktree.</div></div>`;
+    } else {
+      // Default to the largest file (= most active). User can switch via tabs.
+      const sorted = [...payload.files].sort((a, b) => b.size - a.size);
+      const initial = state.logsSelected && payload.files.find(f => f.name === state.logsSelected)
+        ? state.logsSelected
+        : sorted[0].name;
+      const fileTabs = payload.files.map(f =>
+        `<button class="logs-file-tab ${f.name === initial ? 'active' : ''}" onclick="onLogsFileSelect('${esc(f.name)}')">${esc(f.name)} <span style="opacity:0.65">${formatBytes(f.size)}</span></button>`
+      ).join('');
+      html += `<div class="drawer-section">
+        <div class="logs-file-tabs">${fileTabs}</div>
+        <div class="logs-controls">
+          <label>
+            <input type="checkbox" id="logs-autorefresh" onchange="onLogsAutorefreshChange()" ${state.logsAutoRefresh ? 'checked' : ''}>
+            live tail
+          </label>
+          <button onclick="refreshLogsTail(true)">refresh</button>
+        </div>
+        <pre id="logs-tail" class="logs-pane">Loading...</pre>
+      </div>`;
+    }
   }
 
   if (isStale()) return;
   content.innerHTML = html;
+
+  // Post-render side effects: kick off async fetches that populate placeholders
+  // already in the DOM. Done after innerHTML so the main panel paints first.
+  if (activeTab === 'summary') {
+    loadTrackioPreview(expId);
+  } else if (activeTab === 'logs') {
+    // Inline file tabs (.logs-file-tab.active) replace the old dropdown.
+    // Read the initially-active one off the DOM so a re-render of the same
+    // file keeps showing its content (instead of resetting to the first).
+    const activeBtn = document.querySelector('.logs-file-tab.active');
+    if (activeBtn) {
+      // Filename is the part before the size span -- robust enough since
+      // log names don't contain spaces in practice.
+      state.logsSelected = (activeBtn.textContent || '').trim().split(/\s+/)[0];
+      state.logsOffset = 0;
+      refreshLogsTail(true);
+      if (state.logsAutoRefresh) startLogsAutorefresh(expId);
+    }
+  }
+}
+
+function formatBytes(n) {
+  if (n < 1024) return `${n}B`;
+  if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)}KB`;
+  return `${(n / 1024 / 1024).toFixed(1)}MB`;
+}
+
+// Strip ANSI escape codes from log output for readable rendering.
+// Handles both real ESC+CSI (logs from a TTY) and the bracket-only
+// leftover (some emitters drop ESC when writing through pipes).
+function stripAnsi(text) {
+  if (!text) return '';
+  return text
+    .replace(/\x1b\[[0-9;]*[A-Za-z]/g, '')
+    .replace(/\[[0-9;]+[A-Za-z]/g, '');
+}
+
+// Fetch all annotations and return {global: [...], byTask: {tid: ann}}
+// scoped to one experiment. Per-task annotations keyed by string task_id
+// so they join cleanly against the trace task_id field.
+// Recognizes the benchmark-reviewer convention: leading "category: " in
+// the analysis text -> renders as a colored tag.
+async function getAnnotationsForExperiment(expId) {
+  let all = [];
+  try {
+    const r = await fetch('/api/annotations');
+    if (r.ok) {
+      const data = await r.json();
+      all = data.annotations || [];
+    }
+  } catch (e) { /* empty */ }
+  const mine = all.filter(a => a.experiment_id === expId);
+  const global = mine.filter(a => a.task_id === null || a.task_id === undefined);
+  const byTask = {};
+  for (const a of mine) {
+    if (a.task_id !== null && a.task_id !== undefined) {
+      byTask[String(a.task_id)] = a;
+    }
+  }
+  return { global, byTask };
+}
+
+// Split a benchmark-reviewer annotation into {category, body}. If no
+// leading "<category>: ..." prefix is detected, returns category=null.
+function splitAnnotation(text) {
+  if (!text) return { category: null, body: '' };
+  const m = text.match(/^([a-z][a-z-]{2,30}):\s+(.+)$/s);
+  if (!m) return { category: null, body: text };
+  return { category: m[1], body: m[2] };
+}
+
+async function loadTrackioPreview(expId) {
+  try {
+    const r = await fetch(`/api/node/${expId}/trackio`);
+    if (!r.ok) return;
+    const data = await r.json();
+    if (!data.url) return;
+    const row = document.getElementById('drawer-trackio-row');
+    const val = document.getElementById('drawer-trackio-val');
+    const spark = document.getElementById('drawer-trackio-spark');
+    if (!row || !val) return;
+    const label = data.run_name ? `${data.project}: ${data.run_name}` : (data.project || 'trackio');
+    val.innerHTML = `<a href="${esc(data.url)}" target="_blank" rel="noopener" style="color:var(--indigo);text-decoration:none">${esc(label)} ↗</a>`;
+    row.style.display = '';
+    if (spark && data.scalars) {
+      spark.innerHTML = renderSparklines(data.scalars);
+    }
+  } catch (e) { /* silent */ }
+}
+
+function renderSparklines(scalars) {
+  // Render at most 3 series. Order: prefer loss, lr, then anything else.
+  const preferred = ['loss', 'learning_rate', 'lr', 'reward', 'kl', 'grad_norm'];
+  const keys = Object.keys(scalars).sort((a, b) => {
+    const ai = preferred.indexOf(a); const bi = preferred.indexOf(b);
+    return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
+  }).slice(0, 3);
+  return keys.map(k => {
+    const series = scalars[k];
+    if (!series || series.length < 2) return '';
+    const vals = series.map(p => p.value);
+    const min = Math.min(...vals); const max = Math.max(...vals);
+    const range = max - min || 1;
+    const W = 140, H = 24;
+    const pts = series.map((p, i) => {
+      const x = (i / (series.length - 1)) * W;
+      const y = H - ((p.value - min) / range) * H;
+      return `${x.toFixed(1)},${y.toFixed(1)}`;
+    }).join(' ');
+    const last = vals[vals.length - 1];
+    const lastStr = Math.abs(last) >= 100 ? last.toFixed(1) : Math.abs(last) >= 1 ? last.toFixed(3) : last.toExponential(2);
+    return `<div style="display:flex;align-items:center;gap:8px;margin-top:4px;font-size:11px">
+      <span class="mono" style="color:var(--text-1);min-width:80px">${esc(k)}</span>
+      <svg width="${W}" height="${H}" style="flex-shrink:0"><polyline points="${pts}" fill="none" stroke="var(--indigo)" stroke-width="1.2"/></svg>
+      <span class="mono" style="color:var(--text-0)">${lastStr}</span>
+    </div>`;
+  }).join('');
+}
+
+let _logsTimer = null;
+function startLogsAutorefresh(expId) {
+  stopLogsAutorefresh();
+  _logsTimer = setInterval(() => refreshLogsTail(false), 2000);
+}
+function stopLogsAutorefresh() {
+  if (_logsTimer) { clearInterval(_logsTimer); _logsTimer = null; }
+}
+function onLogsFileChange() {
+  const picker = document.getElementById('logs-file-picker');
+  if (!picker) return;
+  state.logsSelected = picker.value;
+  state.logsOffset = 0;
+  refreshLogsTail(true);
+}
+// New inline-tab handler -- toggles .active class on the clicked button,
+// updates the selected file, and reloads the pane.
+function onLogsFileSelect(name) {
+  if (!name) return;
+  state.logsSelected = name;
+  state.logsOffset = 0;
+  // Update the visual active state on the file tabs.
+  document.querySelectorAll('.logs-file-tab').forEach(btn => {
+    const isActive = btn.textContent.trim().startsWith(name);
+    btn.classList.toggle('active', isActive);
+  });
+  refreshLogsTail(true);
+}
+function onLogsAutorefreshChange() {
+  const cb = document.getElementById('logs-autorefresh');
+  state.logsAutoRefresh = !!cb?.checked;
+  if (state.logsAutoRefresh) {
+    const expId = state.selectedNode;
+    if (expId) startLogsAutorefresh(expId);
+  } else {
+    stopLogsAutorefresh();
+  }
+}
+async function refreshLogsTail(reset) {
+  const pre = document.getElementById('logs-tail');
+  if (!pre || !state.selectedNode || !state.logsSelected) return;
+  const params = new URLSearchParams();
+  if (reset) {
+    params.set('tail', '500');
+  } else {
+    params.set('offset', String(state.logsOffset || 0));
+  }
+  try {
+    const r = await fetch(`/api/node/${state.selectedNode}/log/${encodeURIComponent(state.logsSelected)}?${params}`);
+    if (!r.ok) return;
+    const text = await r.text();
+    const size = parseInt(r.headers.get('X-Log-Size') || '0', 10);
+    const clean = stripAnsi(text);
+    if (reset) {
+      pre.textContent = clean;
+    } else if (clean) {
+      pre.textContent += clean;
+    }
+    state.logsOffset = size;
+    // Stick to bottom on append
+    pre.scrollTop = pre.scrollHeight;
+  } catch (e) { /* network blip; next tick will retry */ }
 }
 
 function drawerTabButton(tab, label, activeTab) {
@@ -2292,8 +2570,10 @@ function drawerTabButton(tab, label, activeTab) {
 }
 
 function setSidebarTab(tab) {
-  if (!['summary', 'diff', 'tasks'].includes(tab)) return;
+  if (!['summary', 'diff', 'tasks', 'logs'].includes(tab)) return;
   state.sidebarTab = tab;
+  // Stop log-tail polling when navigating away from the Logs tab.
+  if (tab !== 'logs') stopLogsAutorefresh();
   if (state.selectedNode) openDrawer(state.selectedNode);
 }
 
@@ -2369,6 +2649,7 @@ function closeSidebar() {
   const backdrop = document.getElementById('sidebar-backdrop');
   if (backdrop) backdrop.classList.add('hidden');
   state.selectedNode = null;
+  stopLogsAutorefresh();
   // Reset history — the next open is a fresh navigation chain.
   state.drawerHistory.length = 0;
   state.drawerHistoryIndex = -1;
