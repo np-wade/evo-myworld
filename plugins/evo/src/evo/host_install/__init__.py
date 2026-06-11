@@ -66,10 +66,15 @@ def _mark_cli_synced() -> None:
 
 
 def install(host: str, args) -> int:
-    """Run the host's install + sync the global CLI to match."""
+    """Run the host's install + sync the global CLI to match, then run
+    the host's doctor. A non-zero doctor result is returned as the
+    install's result: an install that doctor can't verify is not a
+    success the user should have to discover at hook-fire time.
+    """
     rc = get(host).install(args)
     if rc == 0:
         _sync_cli_to_plugin_version(args)
+        rc = _verify_install(host)
     return rc
 
 
@@ -91,7 +96,17 @@ def update(host: str, args) -> int:
     rc = fn(args)
     if rc == 0:
         _sync_cli_to_plugin_version(args)
+        rc = _verify_install(host)
     return rc
+
+
+def _verify_install(host: str) -> int:
+    """Run the host's doctor after a successful install/update so a
+    broken result is visible immediately instead of at hook-fire time.
+    """
+    import argparse
+    print(f"\n=== verifying: evo doctor {host} ===")
+    return get(host).doctor(argparse.Namespace())
 
 
 def _is_editable_evo_install() -> bool:

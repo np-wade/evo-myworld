@@ -61,7 +61,7 @@ class _SandboxBase(unittest.TestCase):
         self._tmp.cleanup()
 
 
-class TestCodexRestageSurvival(_SandboxBase):
+class _CodexSandbox(_SandboxBase):
 
     def setUp(self):
         super().setUp()
@@ -87,6 +87,9 @@ class TestCodexRestageSurvival(_SandboxBase):
 
     def _cache_plugin_dir(self) -> Path:
         return self.codex_home / "plugins" / "cache" / "evo-hq" / "evo" / "9.9.9"
+
+
+class TestCodexRestageSurvival(_CodexSandbox):
 
     def test_install_stages_binary_into_cache_and_snapshot(self):
         rc = codex._install_via_filecopy(None)
@@ -131,6 +134,31 @@ class TestCodexRestageSurvival(_SandboxBase):
         # Latent issue only — doctor must still pass so `evo update`
         # (which skips unhealthy hosts) can re-mirror it.
         self.assertEqual(rc, 0)
+
+
+class TestInstallRunsDoctor(_CodexSandbox):
+    """`evo install <host>` finishes with the host's doctor so a broken
+    install is visible immediately instead of at hook-fire time."""
+
+    def test_install_runs_doctor_and_returns_its_rc(self):
+        import argparse
+        import contextlib
+        import io
+
+        from evo import host_install
+
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            rc = host_install.install(
+                "codex",
+                argparse.Namespace(
+                    from_path=str(self.snapshot), trust_hooks=True
+                ),
+            )
+        self.assertEqual(rc, 0)
+        text = out.getvalue()
+        self.assertIn("verifying: evo doctor codex", text)
+        self.assertIn("evo-hook-drain present + executable", text)
 
 
 class TestClaudeCodeCloneMirror(_SandboxBase):

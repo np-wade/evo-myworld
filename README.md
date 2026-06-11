@@ -76,8 +76,6 @@ npm install -g @anthropic-ai/claude-code     # or @openai/codex, openclaw, @eare
 evo install <host>     # claude-code | codex | cursor | hermes | opencode | openclaw | pi
 ```
 
-`evo install <host>` installs the plugin into the host's marketplace and stages the hooks evo needs to talk to in-flight subagents. Verify with `evo doctor <host>`.
-
 For remote backends, install with the matching provider extra: `uv tool install 'evo-hq-cli[modal]'` (or `[e2b]`, `[daytona]`, `[aws]`, `[azure]`, `[all]`).
 
 ### Codex hook trust
