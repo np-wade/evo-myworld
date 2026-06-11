@@ -76,13 +76,11 @@ npm install -g @anthropic-ai/claude-code     # or @openai/codex, openclaw, @eare
 evo install <host>     # claude-code | codex | cursor | hermes | opencode | openclaw | pi
 ```
 
-`evo install <host>` installs the plugin into the host's marketplace and stages the hooks evo needs to talk to in-flight subagents. Verify with `evo doctor <host>`.
-
 For remote backends, install with the matching provider extra: `uv tool install 'evo-hq-cli[modal]'` (or `[e2b]`, `[daytona]`, `[aws]`, `[azure]`, `[all]`).
 
 ### Codex hook trust
 
-Codex requires manual approval for plugin hooks. After install, run `/hooks` inside codex to trust evo's hooks — or pass `--trust-hooks` to `evo install codex` to skip the prompt.
+`evo install codex` trusts evo's hooks for you. To review them yourself first, pass `--no-trust-hooks`, then approve via `/hooks` inside codex.
 
 ## How it works
 
@@ -163,15 +161,15 @@ uv tool install --force evo-hq-cli && evo update --force
 
 `--force` wipes the host plugin cache and reinstalls, working around [anthropics/claude-code#14061](https://github.com/anthropics/claude-code/issues/14061): `/plugin update` returns success but does not replace cached plugin files.
 
-### Codex hooks failing with exit 127
+### Hooks failing with exit 127
 
-Fixed in 0.4.5. If Codex reports `SessionStart` / `UserPromptSubmit` / `PostToolUse` hooks failing with exit 127, the hook binary was staged under a marketplace name Codex does not load from. A plain `evo update` does not repair it — the broken install reports unhealthy and gets skipped — so reinstall the Codex host explicitly:
+The host lost evo's hook binary. Fixed in 0.5.1; reinstall the host to repair:
 
 ```bash
-uv tool install --force evo-hq-cli && evo install codex --force
+uv tool install --force evo-hq-cli && evo install codex --force   # or: evo install claude-code --force
 ```
 
-This stages `evo-hook-drain` into the cache directory Codex resolves and clears the stale registration. Verify with `evo doctor codex`, which now checks the binary directly.
+`evo doctor <host>` confirms the result.
 
 ### Testing a pre-release (alpha)
 
