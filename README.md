@@ -11,8 +11,12 @@
 [![Tests](https://github.com/evo-hq/evo/actions/workflows/ci.yml/badge.svg)](https://github.com/evo-hq/evo/actions/workflows/ci.yml)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20447923.svg)](https://doi.org/10.5281/zenodo.20447923)
 
-**Get started with autoresearch on any codebase — with two simple commands.**
+**Get started with autoresearch on any codebase - with two simple commands.**
 
+Do you want to do more with autoresearch or need a custom, hands-on deployment?
+[Request access to evo platform](https://evo-hq.com/beta) or email [hello@evo-hq.com](mailto:hello@evo-hq.com).
+
+---
 **[Try it](#try-it)** · **[Install](#install)** · **[How it works](#how-it-works)** · **[Dashboard](#dashboard)** · **[Upgrading](#upgrading)**
 
 </div>
