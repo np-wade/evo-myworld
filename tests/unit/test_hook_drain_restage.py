@@ -23,6 +23,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import time
 import unittest
 from pathlib import Path
 
@@ -258,6 +259,54 @@ class TestCodexRestageSurvival(_CodexSandbox):
         )
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(result.stdout.strip(), b"{}")
+
+    @unittest.skipIf(sys.platform == "win32", "shell-script smoke is posix-only")
+    def test_materialized_hook_fails_open_when_descendant_lingers_on_stdio(self):
+        """Regression: the helper hands off to a child that inherits its
+        stdout/stderr. If a descendant outlives the helper while holding those
+        fds, an unbounded `spawnSync` blocks until the descendant dies, so the
+        host shows the PostToolUse hook "running" indefinitely (loading-spinner
+        pile-up). The launcher's `spawnSync` timeout must bound this: the hook
+        returns and fails open even though the grandchild is still alive.
+        """
+        self.assertEqual(codex._install_via_filecopy(None), 0)
+        stable = self.root / ".evo" / "bin" / HOOK_NAME
+        # Emit the reply, then spawn a grandchild that inherits stdout/stderr
+        # and outlives us — exactly what `evo-hook-drain` -> `evo-drain` does.
+        stable.write_text(
+            "#!/bin/sh\n"
+            "cat >/dev/null\n"
+            "printf '{}'\n"
+            "sleep 30 &\n"
+            "exit 0\n"
+        )
+        stable.chmod(0o755)
+
+        hooks = json.loads(
+            (self._cache_plugin_dir() / "hooks" / "hooks.json").read_text()
+        )
+        command = hooks["hooks"]["SessionStart"][0]["hooks"][0]["command"]
+        start = time.monotonic()
+        # Host-side cap well above the launcher's internal 2s timeout but far
+        # below the grandchild's 30s lifetime. Pre-fix this `subprocess.run`
+        # raises TimeoutExpired (the hook never returns); post-fix it returns.
+        result = subprocess.run(
+            command,
+            input=b'{"hook_event_name":"SessionStart","session_id":"linger"}',
+            capture_output=True,
+            env=os.environ.copy(),
+            shell=True,
+            timeout=20,
+        )
+        elapsed = time.monotonic() - start
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(result.stdout.strip(), b"{}")
+        self.assertLess(
+            elapsed,
+            20,
+            "hook did not return before the lingering grandchild — spawnSync "
+            "is not bounded by a timeout",
+        )
 
     def test_binary_survives_codex_restage(self):
         """The regression: codex wipes the cache dir and re-copies the
