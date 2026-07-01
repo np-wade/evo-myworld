@@ -310,7 +310,7 @@ def _resolve_backend_cli_args(
             raise RuntimeError("backend is required")
         return None, None
 
-    if backend == "worktree":
+    if backend in ("worktree", "gitdir"):
         if workspaces:
             raise RuntimeError(
                 "--workspaces is only valid with --backend pool. "
@@ -324,7 +324,7 @@ def _resolve_backend_cli_args(
             raise RuntimeError(
                 "--provider-config is only valid with --backend remote."
             )
-        return "worktree", {}
+        return backend, {}
 
     if backend == "pool":
         if provider:
@@ -972,6 +972,8 @@ def cmd_config_backend(args: argparse.Namespace) -> int:
         summary = (
             f"backend set to remote (provider={backend_config['provider']})"
         )
+    elif backend_name == "gitdir":
+        summary = "backend set to gitdir"
     else:
         summary = "backend set to worktree"
     print(summary)
@@ -6264,7 +6266,7 @@ def build_parser() -> argparse.ArgumentParser:
         "backend",
         help="set the workspace default execution backend, or `show` to read it",
     )
-    config_backend_p.add_argument("backend", choices=["worktree", "pool", "remote", "show"])
+    config_backend_p.add_argument("backend", choices=["worktree", "gitdir", "pool", "remote", "show"])
     config_backend_p.add_argument(
         "--json", action="store_true",
         help="emit JSON (only meaningful with `show`)",
@@ -6333,7 +6335,7 @@ def build_parser() -> argparse.ArgumentParser:
     new_p.add_argument("-m", "--message", required=True)
     new_p.add_argument(
         "--backend",
-        choices=["worktree", "pool", "remote"],
+        choices=["worktree", "gitdir", "pool", "remote"],
         help="per-experiment backend override. Omit to use the workspace default.",
     )
     new_p.add_argument(
