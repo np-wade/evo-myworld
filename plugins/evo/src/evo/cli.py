@@ -310,7 +310,7 @@ def _resolve_backend_cli_args(
             raise RuntimeError("backend is required")
         return None, None
 
-    if backend == "worktree":
+    if backend in ("worktree", "gitdir"):
         if workspaces:
             raise RuntimeError(
                 "--workspaces is only valid with --backend pool. "
@@ -324,7 +324,7 @@ def _resolve_backend_cli_args(
             raise RuntimeError(
                 "--provider-config is only valid with --backend remote."
             )
-        return "worktree", {}
+        return backend, {}
 
     if backend == "pool":
         if provider:
@@ -358,7 +358,25 @@ def _resolve_backend_cli_args(
 
 
 def cmd_init(args: argparse.Namespace) -> int:
-    root = repo_root()
+    from .user_defaults import get_user_default_str
+
+    backend = getattr(args, "backend", None) or get_user_default_str("execution_backend")
+    if backend is None:
+        # claude-science can't use `.git`, so its local default is gitdir.
+        backend = "gitdir" if args.host == "claude-science" else "worktree"
+
+    # A relocated base repo has no `.git`, so don't require an existing git repo
+    # (that's the point in a sandbox). Relocation applies to claude-science
+    # workspaces and any explicit gitdir workspace, independent of where
+    # experiments later execute (local gitdir or a remote provider).
+    relocate = backend == "gitdir" or args.host == "claude-science"
+    if relocate:
+        from .backends.gitdir import base_git_env
+        root = Path.cwd().resolve()
+        os.environ.update(base_git_env(root))
+    else:
+        root = repo_root()
+
     if args.metric not in {"max", "min"}:
         raise RuntimeError("--metric must be `max` or `min`")
     if args.host not in SUPPORTED_HOSTS:
@@ -380,13 +398,21 @@ def cmd_init(args: argparse.Namespace) -> int:
         commit_strategy=commit_strategy,
         project_name=args.name,
         per_exp_timeout=args.per_exp_timeout,
+        backend=backend,
     )
     if args.instrumentation_mode:
         meta_file = evo_dir(root) / "meta.json"
         meta = json.loads(meta_file.read_text(encoding="utf-8"))
         meta["instrumentation_mode"] = args.instrumentation_mode
         atomic_write_json(meta_file, meta)
-    _start_dashboard_background(root, port=args.port)
+    # The dashboard binds a local TCP port. Relocated (gitdir / claude-science)
+    # workspaces run under a sandbox that forbids socket binds, so starting it
+    # only produces a crash-loop in the supervisor log. Skip it there; use
+    # `evo status` / `evo tree` for progress instead.
+    if relocate:
+        print("Dashboard disabled in sandbox mode; use `evo status` / `evo tree`.")
+    else:
+        _start_dashboard_background(root, port=args.port)
     print(
         f"Initialized evo workspace {run_id} at {workspace_path(root)} "
         f"(host={args.host}, commit_strategy={commit_strategy})"
@@ -972,6 +998,8 @@ def cmd_config_backend(args: argparse.Namespace) -> int:
         summary = (
             f"backend set to remote (provider={backend_config['provider']})"
         )
+    elif backend_name == "gitdir":
+        summary = "backend set to gitdir"
     else:
         summary = "backend set to worktree"
     print(summary)
@@ -6264,7 +6292,7 @@ def build_parser() -> argparse.ArgumentParser:
         "backend",
         help="set the workspace default execution backend, or `show` to read it",
     )
-    config_backend_p.add_argument("backend", choices=["worktree", "pool", "remote", "show"])
+    config_backend_p.add_argument("backend", choices=["worktree", "gitdir", "pool", "remote", "show"])
     config_backend_p.add_argument(
         "--json", action="store_true",
         help="emit JSON (only meaningful with `show`)",
@@ -6333,7 +6361,7 @@ def build_parser() -> argparse.ArgumentParser:
     new_p.add_argument("-m", "--message", required=True)
     new_p.add_argument(
         "--backend",
-        choices=["worktree", "pool", "remote"],
+        choices=["worktree", "gitdir", "pool", "remote"],
         help="per-experiment backend override. Omit to use the workspace default.",
     )
     new_p.add_argument(
@@ -7474,6 +7502,14 @@ def main(argv: list[str] | None = None) -> None:
             version_check.maybe_detect_legacy()
         except Exception:
             pass  # never let the version check break a user's command
+    # In a workspace whose base repo is relocated off `.git` (gitdir mode),
+    # export the base GIT_DIR/GIT_WORK_TREE so every command's git calls resolve
+    # without a `.git`. No-op for normal `.git` workspaces.
+    try:
+        from .core import maybe_apply_gitdir_env
+        maybe_apply_gitdir_env()
+    except Exception:
+        pass
     try:
         rc = args.func(args)
     except Exception as exc:  # noqa: BLE001

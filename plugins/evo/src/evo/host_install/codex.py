@@ -39,13 +39,21 @@ def _stable_hook_command() -> str:
     Codex hook execution does not depend on plugin-root expansion, cwd, or PATH.
     The Node wrapper deliberately fails open: hooks run in every Codex session,
     and a killed/corrupt helper binary must not break unrelated work.
+
+    Failing open requires a BOUND on every blocking call. The helper hands off
+    to the Python `evo-drain`, which inherits the helper's stdout/stderr; if any
+    descendant lingers on those fds, an unbounded `spawnSync` blocks forever and
+    the host shows the hook "running" indefinitely. So `spawnSync` gets a hard
+    `timeout`/`killSignal`, and stdin is only read when fd 0 is a real pipe
+    (never block on an interactive terminal).
     """
     stable_json = json.dumps(str(stable_binary_path().resolve()))
     script = (
-        "const fs=require('fs'),cp=require('child_process');"
-        "const input=fs.readFileSync(0);"
+        "const fs=require('fs'),cp=require('child_process'),tty=require('tty');"
+        "let input=Buffer.alloc(0);"
+        "try{if(!tty.isatty(0))input=fs.readFileSync(0)}catch(e){}"
         f"const bin={stable_json};"
-        "try{const r=cp.spawnSync(bin,[],{input});"
+        "try{const r=cp.spawnSync(bin,[],{input,timeout:2000,killSignal:'SIGKILL'});"
         "if(r.status===0&&r.stdout&&r.stdout.length){"
         "process.stdout.write(r.stdout);process.exit(0)}}catch(e){}"
         "process.stdout.write('{}\\n')"

@@ -28,6 +28,7 @@ PRUNE_KINDS = frozenset({PRUNE_KIND_EXHAUSTED, PRUNE_KIND_INVALID})
 
 SUPPORTED_HOSTS = frozenset({
     "claude-code",
+    "claude-science",
     "codex",
     "cursor",
     "opencode",
@@ -61,6 +62,70 @@ def repo_root(cwd: Path | None = None) -> Path:
 def evo_dir(root: Path) -> Path:
     """Top-level .evo/ container."""
     return root / WORKSPACE_NAME
+
+
+def find_workspace_root(start: Path | None = None) -> Path | None:
+    """Walk up from `start` (or cwd) to the directory containing a workspace
+    `.evo/`.
+
+    Git-independent, so it resolves the workspace even in gitdir-mode
+    workspaces that have no `.git`. The global evo home (``$EVO_HOME`` or
+    ``~/.evo``) shares the `.evo` name but is user-level state, not a workspace,
+    so it is never returned -- this matters when `start` sits under the home
+    dir, as temp dirs do on Windows. Returns None if no workspace is found.
+    """
+    cur = (start or Path.cwd()).resolve()
+    global_homes = _global_evo_home_paths()
+    for cand in (cur, *cur.parents):
+        evo = cand / WORKSPACE_NAME
+        if evo.is_dir() and evo.resolve() not in global_homes:
+            return cand
+    return None
+
+
+def _global_evo_home_paths() -> set[Path]:
+    """Resolved paths that are evo's *global* home (not a workspace `.evo`):
+    ``$EVO_HOME`` and ``~/.evo``. Kept dependency-free (no `global_evo_dir`
+    call) so `find_workspace_root` stays clear of an import cycle."""
+    homes: set[Path] = set()
+    env_home = os.environ.get("EVO_HOME")
+    if env_home:
+        try:
+            homes.add(Path(env_home).resolve())
+        except OSError:
+            pass
+    try:
+        homes.add((Path.home() / WORKSPACE_NAME).resolve())
+    except (RuntimeError, OSError):
+        pass
+    return homes
+
+
+def maybe_apply_gitdir_env(start: Path | None = None) -> bool:
+    """If cwd sits inside a workspace whose *base repo* is relocated off `.git`
+    (a `.evo/basegit` git dir exists), export that base repo's `GIT_DIR`/
+    `GIT_WORK_TREE` into the process environment so evo's `.git`-free base git
+    calls resolve. Returns True if applied.
+
+    Gated on the presence of the relocated base, NOT on `execution_backend`, so
+    it is correct whether experiments run locally (`gitdir` backend) or on a
+    remote provider (`remote` backend, which still bundles from the local base).
+    For a normal `.git` workspace there is no `basegit`, so this is a no-op and
+    worktree/pool workspaces are unaffected. `setdefault` lets a per-experiment
+    executor override still win.
+    """
+    try:
+        ws = find_workspace_root(start)
+        if ws is None:
+            return False
+        from .backends.gitdir import base_gitdir, base_git_env
+        if not base_gitdir(ws).exists():
+            return False
+        for key, value in base_git_env(ws).items():
+            os.environ.setdefault(key, value)
+        return True
+    except Exception:
+        return False
 
 
 def _meta_path(root: Path) -> Path:
@@ -501,6 +566,7 @@ def init_workspace(
     commit_strategy: str = "all",
     project_name: str | None = None,
     per_exp_timeout: int | None = None,
+    backend: str = "worktree",
 ) -> str:
     if commit_strategy not in ("all", "tracked-only"):
         raise RuntimeError(
@@ -512,8 +578,17 @@ def init_workspace(
         )
     run_id = _allocate_run(root)
     ensure_workspace_dirs(root)
+    if backend == "gitdir" or host == "claude-science":
+        # Relocate the base repo off `.git` and commit a baseline, so init
+        # works in a sandbox that forbids `.git` creation. This is independent
+        # of where experiments EXECUTE: a claude-science workspace relocates the
+        # base whether experiments run locally (gitdir) or on a remote provider
+        # (execution_backend=remote), because the local base git must survive
+        # the sandbox either way.
+        from .backends.gitdir import ensure_gitdir_base
+        ensure_gitdir_base(root)
     config = default_config(root, target, benchmark, metric, gate, project_name=project_name)
-    config["execution_backend"] = "worktree"
+    config["execution_backend"] = backend
     config["commit_strategy"] = commit_strategy
     if per_exp_timeout is not None:
         config["per_exp_timeout"] = per_exp_timeout

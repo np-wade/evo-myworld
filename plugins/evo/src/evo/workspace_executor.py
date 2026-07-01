@@ -613,6 +613,25 @@ class RemoteExecutor(WorkspaceExecutor):
         self.client.close()
 
 
+class GitDirExecutor(LocalExecutor):
+    """LocalExecutor that injects a relocated-``GIT_DIR`` environment into every
+    command, so git operations against a gitdir-backed experiment work without
+    any ``.git`` path in the working tree. Non-git commands are unaffected by
+    the extra env vars."""
+
+    def __init__(self, git_env_vars: dict[str, str]) -> None:
+        self._git_env = dict(git_env_vars)
+
+    def _merge(self, env: dict[str, str] | None) -> dict[str, str]:
+        return {**os.environ, **self._git_env, **(env or {})}
+
+    def run(self, cmd, *, cwd, env=None, timeout=None, check=False):
+        return super().run(cmd, cwd=cwd, env=self._merge(env), timeout=timeout, check=check)
+
+    def stream(self, cmd, *, cwd, env=None, **kwargs):
+        return super().stream(cmd, cwd=cwd, env=self._merge(env), **kwargs)
+
+
 # ---------------------------------------------------------------------------
 # Factory
 # ---------------------------------------------------------------------------
@@ -631,5 +650,8 @@ def workspace_executor_for(backend: Any, root: Path, node: dict[str, Any]) -> It
             yield executor
         finally:
             executor.close()
+    elif getattr(backend, "name", None) == "gitdir":
+        from .backends.gitdir import git_env, gitdir_for
+        yield GitDirExecutor(git_env(gitdir_for(root, node["id"]), Path(node["worktree"])))
     else:
         yield LocalExecutor()

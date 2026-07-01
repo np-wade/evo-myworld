@@ -2,6 +2,8 @@
 
 Backends abstract workspace allocation and lifecycle:
 - WorktreeBackend (default): fresh `git worktree` per experiment
+- GitDirBackend: `.git`-free experiment workspaces (relocated GIT_DIR +
+  shared object store) for sandboxes that forbid creating any `.git` path
 - PoolBackend (alpha.1+): leases user-provided pre-built directories
 - RemoteSandboxBackend (alpha.3+): provisions a remote container and runs
   experiments inside it via a provider-owned sandbox client
@@ -11,6 +13,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
+from .gitdir import GitDirBackend
 from .pool import PoolBackend
 from .protocol import (
     AllocateCtx,
@@ -38,6 +41,7 @@ __all__ = [
     "Backend",
     "BackendError",
     "DiscardCtx",
+    "GitDirBackend",
     "PoolBackend",
     "PoolExhausted",
     "PoolSlotDirty",
@@ -88,6 +92,8 @@ def backend_spec_for_node(
 def _construct_backend(name: str, config: dict[str, Any]) -> Backend:
     if name == "worktree":
         return WorktreeBackend()
+    if name == "gitdir":
+        return GitDirBackend()
     if name == "pool":
         return PoolBackend(slot_paths=list(config.get("slots", []) or []))
     if name == "remote":
