@@ -143,5 +143,41 @@ class TestClaudeScienceHostAdapter(_EnvIsolation):
             self.assertEqual(adapter.doctor(ns), 1)  # no longer configured
 
 
+class TestEvoHomeFallback(unittest.TestCase):
+    """`global_evo_dir` falls back to a workspace-local home when `~/.evo` is
+    unwritable (the CS sandbox blocks the home dir)."""
+
+    def test_env_override_wins(self):
+        from evo.user_defaults import _resolve_global_evo_dir
+        with tempfile.TemporaryDirectory() as d:
+            got = _resolve_global_evo_dir(f"{d}/custom", Path("/nope"), None)
+            self.assertEqual(got, Path(f"{d}/custom"))
+
+    def test_writable_home_used(self):
+        from evo.user_defaults import _resolve_global_evo_dir
+        with tempfile.TemporaryDirectory() as home:
+            got = _resolve_global_evo_dir(None, Path(home), None)
+            self.assertEqual(got, Path(home) / ".evo")
+
+    def test_falls_back_to_workspace_when_home_blocked(self):
+        from evo.user_defaults import _resolve_global_evo_dir
+        with tempfile.TemporaryDirectory() as d:
+            # home is a *file*, so `<home>/.evo` cannot be created -> unusable.
+            blocked_home = Path(d) / "not_a_dir"
+            blocked_home.write_text("x")
+            ws = Path(d) / "ws"
+            ws.mkdir()
+            got = _resolve_global_evo_dir(None, blocked_home, ws)
+            self.assertEqual(got, ws / ".evo" / "home")
+
+    def test_last_resort_home_when_no_workspace(self):
+        from evo.user_defaults import _resolve_global_evo_dir
+        with tempfile.TemporaryDirectory() as d:
+            blocked_home = Path(d) / "f"
+            blocked_home.write_text("x")
+            got = _resolve_global_evo_dir(None, blocked_home, None)
+            self.assertEqual(got, blocked_home / ".evo")
+
+
 if __name__ == "__main__":
     unittest.main()

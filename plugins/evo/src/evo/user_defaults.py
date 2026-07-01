@@ -17,7 +17,7 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
-from .core import atomic_write_json, load_json, lock_file_for
+from .core import WORKSPACE_NAME, atomic_write_json, load_json, lock_file_for
 from .locking import advisory_lock
 
 _VALID_KEYS = frozenset({"autonomous", "subagents_only"})
@@ -25,10 +25,40 @@ _VALID_KEYS = frozenset({"autonomous", "subagents_only"})
 _VALID_STR_KEYS = frozenset({"execution_backend"})
 
 
+def _dir_usable(path: Path) -> bool:
+    """True if `path` can be created and written. Sandboxes that block the home
+    directory make `~/.evo` unusable; this lets the caller fall back."""
+    try:
+        path.mkdir(parents=True, exist_ok=True)
+        return os.access(path, os.W_OK)
+    except OSError:
+        return False
+
+
+def _resolve_global_evo_dir(env_override: str | None, home: Path,
+                            workspace: Path | None) -> Path:
+    """Pure resolver for the user-level evo home (see `global_evo_dir`)."""
+    if env_override:
+        return Path(env_override)
+    home_evo = home / ".evo"
+    if _dir_usable(home_evo):
+        return home_evo
+    # `~/.evo` is blocked (e.g. the Claude Science kernel sandbox). Fall back to
+    # a workspace-local home so evo still works, and so delegated child kernels
+    # resolve a writable home on their own without inheriting `EVO_HOME`.
+    if workspace is not None:
+        return workspace / WORKSPACE_NAME / "home"
+    return home_evo
+
+
 def global_evo_dir() -> Path:
-    """User-level evo home: ``$EVO_HOME`` or ``~/.evo``."""
-    override = os.environ.get("EVO_HOME")
-    return Path(override) if override else Path.home() / ".evo"
+    """User-level evo home: ``$EVO_HOME`` if set, else ``~/.evo``, else (when the
+    home dir is not writable) a workspace-local ``.evo/home``."""
+    from .core import find_workspace_root
+
+    return _resolve_global_evo_dir(
+        os.environ.get("EVO_HOME"), Path.home(), find_workspace_root()
+    )
 
 
 def global_defaults_path() -> Path:
