@@ -181,11 +181,16 @@ class GitDirBackend:
 
         # 3. Point the experiment branch at the parent commit (reachable via
         #    the shared objects) and materialise it into the working tree.
-        if not self._commit_reachable(ctx.parent_commit, cwd=root, env=env):
+        probe = self._git(["cat-file", "-e", f"{ctx.parent_commit}^{{commit}}"],
+                          cwd=root, env=env, check=False)
+        if probe.returncode != 0:
             raise BackendError(
                 f"parent commit {ctx.parent_commit[:12]} not found in the shared "
                 f"object store for {ctx.exp_id}; is the base repo's git dir "
-                f"({self._base_git_dir(root)}) intact?"
+                f"({self._base_git_dir(root)}) intact? "
+                f"[alternates={alternates.read_text().strip()!r} "
+                f"base_objects_isdir={base_objects.is_dir()} "
+                f"git_stderr={probe.stderr.strip()!r}]"
             )
         self._git(["update-ref", f"refs/heads/{ctx.branch}", ctx.parent_commit],
                   cwd=root, env=env)
@@ -202,12 +207,6 @@ class GitDirBackend:
 
         head = self._git(["rev-parse", "HEAD"], cwd=root, env=env).stdout.strip()
         return AllocateResult(worktree=worktree, commit=head, branch=ctx.branch)
-
-    def _commit_reachable(self, commit: str, *, cwd: Path, env: dict[str, str]) -> bool:
-        return self._git(
-            ["cat-file", "-e", f"{commit}^{{commit}}"],
-            cwd=cwd, env=env, check=False,
-        ).returncode == 0
 
     # ---- teardown ------------------------------------------------------- #
 
