@@ -10,6 +10,8 @@ mocks.
 from __future__ import annotations
 
 import argparse
+import contextlib
+import io
 import json
 import os
 import subprocess
@@ -177,6 +179,49 @@ class TestEvoHomeFallback(unittest.TestCase):
             blocked_home.write_text("x")
             got = _resolve_global_evo_dir(None, blocked_home, None)
             self.assertEqual(got, blocked_home / ".evo")
+
+
+class TestDashboardDisabledInSandbox(_EnvIsolation):
+    """`evo init` in relocated (gitdir / claude-science) mode must NOT start the
+    dashboard: the sandbox forbids TCP binds, so a started supervisor only
+    crash-loops. Exercises the real `cmd_init` relocate branch (which never
+    spawns a subprocess); no mocks."""
+
+    def _init_args(self, **over):
+        ns = argparse.Namespace(
+            host="claude-science", target=".", benchmark="true", metric="max",
+            gate=None, commit_strategy=None, name=None, per_exp_timeout=None,
+            instrumentation_mode=None, port=8080, backend=None,
+        )
+        for k, v in over.items():
+            setattr(ns, k, v)
+        return ns
+
+    def test_relocated_init_skips_dashboard(self):
+        from evo.cli import cmd_init
+        from evo.core import evo_dir
+
+        with tempfile.TemporaryDirectory() as d, \
+                tempfile.TemporaryDirectory() as home:
+            root = Path(d).resolve()
+            (root / "code.py").write_text("x = 1\n")
+            os.environ["EVO_HOME"] = home
+            cwd = os.getcwd()
+            os.chdir(root)
+            try:
+                buf = io.StringIO()
+                with contextlib.redirect_stdout(buf):
+                    rc = cmd_init(self._init_args())
+            finally:
+                os.chdir(cwd)
+
+            self.assertEqual(rc, 0)
+            self.assertIn("Dashboard disabled", buf.getvalue())
+            edir = evo_dir(root)
+            for artifact in ("dashboard.port", "dashboard.pid", "supervisor.pid"):
+                self.assertFalse(
+                    (edir / artifact).exists(),
+                    f"{artifact} must not be created in sandbox mode")
 
 
 if __name__ == "__main__":

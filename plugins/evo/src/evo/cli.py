@@ -405,7 +405,14 @@ def cmd_init(args: argparse.Namespace) -> int:
         meta = json.loads(meta_file.read_text(encoding="utf-8"))
         meta["instrumentation_mode"] = args.instrumentation_mode
         atomic_write_json(meta_file, meta)
-    _start_dashboard_background(root, port=args.port)
+    # The dashboard binds a local TCP port. Relocated (gitdir / claude-science)
+    # workspaces run under a sandbox that forbids socket binds, so starting it
+    # only produces a crash-loop in the supervisor log. Skip it there; use
+    # `evo status` / `evo tree` for progress instead.
+    if relocate:
+        print("Dashboard disabled in sandbox mode; use `evo status` / `evo tree`.")
+    else:
+        _start_dashboard_background(root, port=args.port)
     print(
         f"Initialized evo workspace {run_id} at {workspace_path(root)} "
         f"(host={args.host}, commit_strategy={commit_strategy})"
