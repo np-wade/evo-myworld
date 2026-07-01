@@ -113,6 +113,9 @@ class TestGitDirAllocate(unittest.TestCase):
             alternates = gd / "objects" / "info" / "alternates"
             self.assertTrue(alternates.is_file())
             self.assertIn(".git/objects", alternates.read_text())
+            # git reads the alternate path literally and doesn't strip a trailing
+            # CR, so the file must never contain one (Windows text-mode writes do).
+            self.assertNotIn(b"\r", alternates.read_bytes())
             # The parent commit resolves in the exp repo purely via the shared
             # store -- the exp git dir did not duplicate the base pack.
             env = git_env(gd, root / ".evo" / "run_0000" / "worktrees" / "exp_0001")

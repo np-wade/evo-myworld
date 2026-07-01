@@ -174,10 +174,12 @@ class GitDirBackend:
         base_objects = self._base_git_dir(root) / "objects"
         alternates = git_dir / "objects" / "info" / "alternates"
         alternates.parent.mkdir(parents=True, exist_ok=True)
-        # Forward slashes: git's alternates parser resolves POSIX-style paths on
-        # every platform, but not Windows backslash paths -- with backslashes the
-        # base object store goes unlinked and the parent commit reads as missing.
-        alternates.write_text(base_objects.as_posix() + "\n", encoding="utf-8")
+        # git's alternates parser reads each line literally and does NOT strip a
+        # trailing CR (unlike its gitignore parser). Write bytes with a bare LF:
+        # Path.write_text() on Windows translates "\n" -> "\r\n", and the "\r"
+        # turns the path into "objects\r", which git can't find, silently
+        # unlinking the shared store. Forward slashes parse on every platform.
+        alternates.write_bytes((base_objects.as_posix() + "\n").encode("utf-8"))
 
         # 3. Point the experiment branch at the parent commit (reachable via
         #    the shared objects) and materialise it into the working tree.
@@ -187,10 +189,7 @@ class GitDirBackend:
             raise BackendError(
                 f"parent commit {ctx.parent_commit[:12]} not found in the shared "
                 f"object store for {ctx.exp_id}; is the base repo's git dir "
-                f"({self._base_git_dir(root)}) intact? "
-                f"[alternates={alternates.read_text().strip()!r} "
-                f"base_objects_isdir={base_objects.is_dir()} "
-                f"git_stderr={probe.stderr.strip()!r}]"
+                f"({self._base_git_dir(root)}) intact? git: {probe.stderr.strip()}"
             )
         self._git(["update-ref", f"refs/heads/{ctx.branch}", ctx.parent_commit],
                   cwd=root, env=env)
