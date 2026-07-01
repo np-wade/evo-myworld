@@ -28,6 +28,7 @@ PRUNE_KINDS = frozenset({PRUNE_KIND_EXHAUSTED, PRUNE_KIND_INVALID})
 
 SUPPORTED_HOSTS = frozenset({
     "claude-code",
+    "claude-science",
     "codex",
     "cursor",
     "opencode",
@@ -61,6 +62,46 @@ def repo_root(cwd: Path | None = None) -> Path:
 def evo_dir(root: Path) -> Path:
     """Top-level .evo/ container."""
     return root / WORKSPACE_NAME
+
+
+def find_workspace_root(start: Path | None = None) -> Path | None:
+    """Walk up from `start` (or cwd) to the directory containing `.evo/`.
+
+    Git-independent, so it resolves the workspace even in gitdir-mode
+    workspaces that have no `.git`. Returns None if none is found.
+    """
+    cur = (start or Path.cwd()).resolve()
+    for cand in (cur, *cur.parents):
+        if (cand / WORKSPACE_NAME).is_dir():
+            return cand
+    return None
+
+
+def maybe_apply_gitdir_env(start: Path | None = None) -> bool:
+    """If cwd sits inside a workspace whose *base repo* is relocated off `.git`
+    (a `.evo/basegit` git dir exists), export that base repo's `GIT_DIR`/
+    `GIT_WORK_TREE` into the process environment so evo's `.git`-free base git
+    calls resolve. Returns True if applied.
+
+    Gated on the presence of the relocated base, NOT on `execution_backend`, so
+    it is correct whether experiments run locally (`gitdir` backend) or on a
+    remote provider (`remote` backend, which still bundles from the local base).
+    For a normal `.git` workspace there is no `basegit`, so this is a no-op and
+    worktree/pool workspaces are unaffected. `setdefault` lets a per-experiment
+    executor override still win.
+    """
+    try:
+        ws = find_workspace_root(start)
+        if ws is None:
+            return False
+        from .backends.gitdir import base_gitdir, base_git_env
+        if not base_gitdir(ws).exists():
+            return False
+        for key, value in base_git_env(ws).items():
+            os.environ.setdefault(key, value)
+        return True
+    except Exception:
+        return False
 
 
 def _meta_path(root: Path) -> Path:
@@ -501,6 +542,7 @@ def init_workspace(
     commit_strategy: str = "all",
     project_name: str | None = None,
     per_exp_timeout: int | None = None,
+    backend: str = "worktree",
 ) -> str:
     if commit_strategy not in ("all", "tracked-only"):
         raise RuntimeError(
@@ -512,8 +554,17 @@ def init_workspace(
         )
     run_id = _allocate_run(root)
     ensure_workspace_dirs(root)
+    if backend == "gitdir" or host == "claude-science":
+        # Relocate the base repo off `.git` and commit a baseline, so init
+        # works in a sandbox that forbids `.git` creation. This is independent
+        # of where experiments EXECUTE: a claude-science workspace relocates the
+        # base whether experiments run locally (gitdir) or on a remote provider
+        # (execution_backend=remote), because the local base git must survive
+        # the sandbox either way.
+        from .backends.gitdir import ensure_gitdir_base
+        ensure_gitdir_base(root)
     config = default_config(root, target, benchmark, metric, gate, project_name=project_name)
-    config["execution_backend"] = "worktree"
+    config["execution_backend"] = backend
     config["commit_strategy"] = commit_strategy
     if per_exp_timeout is not None:
         config["per_exp_timeout"] = per_exp_timeout

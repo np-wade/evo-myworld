@@ -21,6 +21,8 @@ from .core import atomic_write_json, load_json, lock_file_for
 from .locking import advisory_lock
 
 _VALID_KEYS = frozenset({"autonomous", "subagents_only"})
+# String-valued defaults (as opposed to the boolean ones above).
+_VALID_STR_KEYS = frozenset({"execution_backend"})
 
 
 def global_evo_dir() -> Path:
@@ -55,3 +57,36 @@ def set_user_default(key: str, value: bool) -> None:
         data = load_user_defaults()
         data[key] = bool(value)
         atomic_write_json(path, data)
+
+
+def get_user_default_str(key: str) -> str | None:
+    """Return the stored string for a string-valued default, or None if unset."""
+    if key not in _VALID_STR_KEYS:
+        raise ValueError(f"unknown string default key: {key!r}")
+    value = load_user_defaults().get(key)
+    return value if isinstance(value, str) else None
+
+
+def set_user_default_str(key: str, value: str) -> None:
+    if key not in _VALID_STR_KEYS:
+        raise ValueError(f"unknown string default key: {key!r}")
+    path = global_defaults_path()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with advisory_lock(lock_file_for(path)):
+        data = load_user_defaults()
+        data[key] = str(value)
+        atomic_write_json(path, data)
+
+
+def unset_user_default(key: str) -> None:
+    """Remove a default (bool or string). No-op if unset."""
+    if key not in _VALID_KEYS and key not in _VALID_STR_KEYS:
+        raise ValueError(f"unknown user default key: {key!r}")
+    path = global_defaults_path()
+    if not path.exists():
+        return
+    with advisory_lock(lock_file_for(path)):
+        data = load_user_defaults()
+        if key in data:
+            del data[key]
+            atomic_write_json(path, data)

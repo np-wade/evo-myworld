@@ -67,6 +67,54 @@ def git_env(git_dir: Path, work_tree: Path) -> dict[str, str]:
     }
 
 
+def base_gitdir(root: Path) -> Path:
+    """Relocated git directory for the *base* repo of a gitdir-mode workspace
+    (the analogue of ``.git`` in a normal repo, under an allowed name)."""
+    from ..core import evo_dir
+
+    return evo_dir(root) / "basegit"
+
+
+def base_git_env(root: Path) -> dict[str, str]:
+    """Environment pointing git at the relocated base repo, working tree=root."""
+    return git_env(base_gitdir(root), root)
+
+
+def ensure_gitdir_base(root: Path) -> str:
+    """Create a ``.git``-free base repo (relocated ``GIT_DIR``) with a baseline
+    commit if none exists. Idempotent. Returns the baseline commit hash.
+
+    This is what lets ``evo init`` run where creating ``.git`` is forbidden:
+    the base repo's metadata lives at ``<root>/.evo/basegit`` and evo's own
+    state (``.evo/``) is excluded from the baseline so the git dir never tries
+    to track itself.
+    """
+    gd = base_gitdir(root)
+    env = {**os.environ, **base_git_env(root)}
+    gd.mkdir(parents=True, exist_ok=True)
+    if not (gd / "HEAD").exists():
+        subprocess.run(["git", "init", "-q"], cwd=str(root), env=env, check=True)
+        subprocess.run(["git", "config", "core.bare", "false"],
+                       cwd=str(root), env=env, check=True)
+    exclude = gd / "info" / "exclude"
+    exclude.parent.mkdir(parents=True, exist_ok=True)
+    exclude.write_text(".evo/\n", encoding="utf-8")
+    has_head = subprocess.run(
+        ["git", "rev-parse", "--verify", "HEAD"],
+        cwd=str(root), env=env, capture_output=True,
+    ).returncode == 0
+    if not has_head:
+        subprocess.run(["git", "add", "-A"], cwd=str(root), env=env, check=True)
+        subprocess.run(
+            ["git", "commit", "-q", "-m", "evo: baseline", "--allow-empty"],
+            cwd=str(root), env=env, check=True,
+        )
+    return subprocess.run(
+        ["git", "rev-parse", "HEAD"],
+        cwd=str(root), env=env, capture_output=True, text=True,
+    ).stdout.strip()
+
+
 class GitDirBackend:
     """Workspace allocator that isolates experiments with a relocated GIT_DIR
     plus a shared object store, creating no ``.git`` path anywhere."""

@@ -28,10 +28,11 @@ import subprocess
 import sys
 from pathlib import Path
 
-from . import claude_code, codex, cursor, hermes, opencode, openclaw, pi
+from . import claude_code, claude_science, codex, cursor, hermes, opencode, openclaw, pi
 
 ADAPTERS = {
     "claude-code": claude_code,
+    "claude-science": claude_science,
     "codex": codex,
     "cursor": cursor,
     "hermes": hermes,

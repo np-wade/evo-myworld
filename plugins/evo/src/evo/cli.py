@@ -358,7 +358,25 @@ def _resolve_backend_cli_args(
 
 
 def cmd_init(args: argparse.Namespace) -> int:
-    root = repo_root()
+    from .user_defaults import get_user_default_str
+
+    backend = getattr(args, "backend", None) or get_user_default_str("execution_backend")
+    if backend is None:
+        # claude-science can't use `.git`, so its local default is gitdir.
+        backend = "gitdir" if args.host == "claude-science" else "worktree"
+
+    # A relocated base repo has no `.git`, so don't require an existing git repo
+    # (that's the point in a sandbox). Relocation applies to claude-science
+    # workspaces and any explicit gitdir workspace, independent of where
+    # experiments later execute (local gitdir or a remote provider).
+    relocate = backend == "gitdir" or args.host == "claude-science"
+    if relocate:
+        from .backends.gitdir import base_git_env
+        root = Path.cwd().resolve()
+        os.environ.update(base_git_env(root))
+    else:
+        root = repo_root()
+
     if args.metric not in {"max", "min"}:
         raise RuntimeError("--metric must be `max` or `min`")
     if args.host not in SUPPORTED_HOSTS:
@@ -380,6 +398,7 @@ def cmd_init(args: argparse.Namespace) -> int:
         commit_strategy=commit_strategy,
         project_name=args.name,
         per_exp_timeout=args.per_exp_timeout,
+        backend=backend,
     )
     if args.instrumentation_mode:
         meta_file = evo_dir(root) / "meta.json"
@@ -7476,6 +7495,14 @@ def main(argv: list[str] | None = None) -> None:
             version_check.maybe_detect_legacy()
         except Exception:
             pass  # never let the version check break a user's command
+    # In a workspace whose base repo is relocated off `.git` (gitdir mode),
+    # export the base GIT_DIR/GIT_WORK_TREE so every command's git calls resolve
+    # without a `.git`. No-op for normal `.git` workspaces.
+    try:
+        from .core import maybe_apply_gitdir_env
+        maybe_apply_gitdir_env()
+    except Exception:
+        pass
     try:
         rc = args.func(args)
     except Exception as exc:  # noqa: BLE001
