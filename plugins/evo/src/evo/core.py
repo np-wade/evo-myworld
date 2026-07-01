@@ -65,16 +65,40 @@ def evo_dir(root: Path) -> Path:
 
 
 def find_workspace_root(start: Path | None = None) -> Path | None:
-    """Walk up from `start` (or cwd) to the directory containing `.evo/`.
+    """Walk up from `start` (or cwd) to the directory containing a workspace
+    `.evo/`.
 
     Git-independent, so it resolves the workspace even in gitdir-mode
-    workspaces that have no `.git`. Returns None if none is found.
+    workspaces that have no `.git`. The global evo home (``$EVO_HOME`` or
+    ``~/.evo``) shares the `.evo` name but is user-level state, not a workspace,
+    so it is never returned -- this matters when `start` sits under the home
+    dir, as temp dirs do on Windows. Returns None if no workspace is found.
     """
     cur = (start or Path.cwd()).resolve()
+    global_homes = _global_evo_home_paths()
     for cand in (cur, *cur.parents):
-        if (cand / WORKSPACE_NAME).is_dir():
+        evo = cand / WORKSPACE_NAME
+        if evo.is_dir() and evo.resolve() not in global_homes:
             return cand
     return None
+
+
+def _global_evo_home_paths() -> set[Path]:
+    """Resolved paths that are evo's *global* home (not a workspace `.evo`):
+    ``$EVO_HOME`` and ``~/.evo``. Kept dependency-free (no `global_evo_dir`
+    call) so `find_workspace_root` stays clear of an import cycle."""
+    homes: set[Path] = set()
+    env_home = os.environ.get("EVO_HOME")
+    if env_home:
+        try:
+            homes.add(Path(env_home).resolve())
+        except OSError:
+            pass
+    try:
+        homes.add((Path.home() / WORKSPACE_NAME).resolve())
+    except (RuntimeError, OSError):
+        pass
+    return homes
 
 
 def maybe_apply_gitdir_env(start: Path | None = None) -> bool:

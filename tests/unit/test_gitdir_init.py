@@ -52,6 +52,25 @@ class TestFindWorkspaceRoot(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             self.assertIsNone(find_workspace_root(Path(d)))
 
+    def test_skips_global_evo_home(self):
+        # A `.evo` that IS the global home ($EVO_HOME / ~/.evo) is user-level
+        # state, not a workspace, so the walk-up must not return it. (On Windows
+        # temp dirs live under ~, so an ambient ~/.evo would otherwise match.)
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d).resolve()
+            (root / ".evo").mkdir()
+            nested = root / "sub"
+            nested.mkdir()
+            old = os.environ.get("EVO_HOME")
+            os.environ["EVO_HOME"] = str(root / ".evo")
+            try:
+                self.assertIsNone(find_workspace_root(nested))
+            finally:
+                if old is None:
+                    os.environ.pop("EVO_HOME", None)
+                else:
+                    os.environ["EVO_HOME"] = old
+
 
 class TestGitDirInit(_EnvIsolation):
     def test_init_backend_gitdir_is_git_free_with_baseline(self):
