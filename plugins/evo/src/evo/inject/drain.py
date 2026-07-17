@@ -149,12 +149,16 @@ def _resolve_root_from_payload(payload: dict) -> Path | None:
     hook command runs from outside the project. Cursor's user-level
     `~/.cursor/hooks.json` runs from `~/.cursor/`, not the repo, so cwd is
     useless — the project path arrives in the payload's `workspace_roots`.
+    Kimi supplies the path in `cwd`, which is tried after `workspace_roots`.
     Falls back to walking up from cwd. Returns None if no `.evo/` is found.
     """
     candidates: list[Path] = []
     roots = payload.get("workspace_roots")
     if isinstance(roots, list):
         candidates.extend(Path(r) for r in roots if isinstance(r, str) and r)
+    cwd = payload.get("cwd")
+    if isinstance(cwd, str) and cwd:
+        candidates.append(Path(cwd))
     candidates.append(Path.cwd())
     for start in candidates:
         cur = start
@@ -226,6 +230,8 @@ _OPTIMIZE_INVOCATION_PATTERNS: dict[str, list[_re.Pattern[str]]] = {
     ],
     # Cursor: `/cmd` only, no plugin namespacing. Bare /optimize covers it.
     "cursor": [_re.compile(r"(?:^|[^A-Za-z0-9_/:-])/optimize\b", _re.IGNORECASE)],
+    # Kimi: accepts both the canonical /evo:optimize and the bare /optimize.
+    "kimi": [_re.compile(r"(?:^|[^A-Za-z0-9_/:-])/(?:evo:)?optimize\b", _re.IGNORECASE)],
     # Hermes: bundled plugins can namespace their skills as `/plugin:skill`
     # (verified against hermes-agent/agent/skill_commands.py). evo's
     # current install lays bare skills into ~/.agents/skills/optimize/,
@@ -321,15 +327,15 @@ def _maybe_mark_engaged_from_shell(
     hook_event: str | None,
     payload: dict | None,
 ) -> None:
-    """For self-contained hosts (currently Cursor): if the agent's about
+    """For self-contained hosts (Cursor, Kimi): if the agent's about
     to run an `evo` shell command, mark the session as evo-engaged and
     seed the workspace offset to the queue tail. Mirrors what
     `auto_register_from_env` does for hosts that route engagement
     through the Python CLI path.
     """
-    if host != "cursor":
+    if host not in ("cursor", "kimi"):
         return
-    if hook_event != "preToolUse":
+    if hook_event not in ("preToolUse", "PreToolUse"):
         return
     if _cursor_tool_class((payload or {}).get("tool_name")) != "shell":
         return
@@ -364,7 +370,7 @@ def _maybe_mark_autonomous_from_shell(
     commands and arm/disarm the matching hook session in-process. This is
     idempotent and covers hosts whose shell subprocess lacks the same session
     env var the hook payload carries."""
-    if host not in ("cursor", "codex", "claude-code"):
+    if host not in ("cursor", "codex", "claude-code", "kimi"):
         return
     if hook_event not in ("preToolUse", "PreToolUse"):
         return
@@ -419,6 +425,14 @@ def _self_contained_gate(
     if hook_event not in _DELIVER_EVENTS:
         return False  # register-only (sessionStart, beforeSubmitPrompt, …)
 
+    # Kimi delivers only by blocking a hook, and only Stop's block reaches the
+    # model (it's appended to the context, and the loop continues).
+    # SubagentStop is fire-and-forget — kimi discards its result entirely — so
+    # draining there would consume a directive that can never arrive. The
+    # PreToolUse policy deny below is exempt: it intends to deny.
+    if host == "kimi" and hook_event in ("subagentStop", "SubagentStop"):
+        return False
+
     # Steering bypass for orchestrator-class sessions in optimize_mode:
     #   - stop/subagentStop: always-fire stop nudge needs drain to run.
     #   - preToolUse: only when the tool is on the deny list. Letting
@@ -427,22 +441,26 @@ def _self_contained_gate(
     #     IDE drops — silently losing the directive.
     sess = get_session(root, session_id)
     if sess and sess.get("optimize_mode") and not sess.get("exp_id"):
-        if hook_event in ("stop", "subagentStop"):
+        if hook_event in ("stop", "subagentStop", "Stop", "SubagentStop"):
             return True
         # Only treat a denied tool as drain-worthy when subagents_only is
         # armed — otherwise there's no policy deny to emit (default allows
         # orchestrator edits).
-        if (hook_event == "preToolUse" and sess.get("subagents_only")
+        if (hook_event in ("preToolUse", "PreToolUse") and sess.get("subagents_only")
                 and _is_denied_in_optimize_mode(tool_name, tool_input)):
             return True
 
-    if hook_event == "preToolUse" and _cursor_tool_class(tool_name) != "shell":
-        # Only shell delivers mid-turn (updated_input echo into stdout, which
-        # the model reliably reads). For every other tool, deny+agent_message
-        # CONSUMES the directive without actually delivering it (verified: a
-        # Read deny clears the marker but the agent never gets the message).
-        # So defer (no consume) — the directive waits for the next shell call
-        # or the turn-end `stop`, both of which deliver reliably.
+    if hook_event in ("preToolUse", "PreToolUse") and (
+        host == "kimi" or _cursor_tool_class(tool_name) != "shell"
+    ):
+        # Only shell delivers mid-turn, and only on Cursor, which echoes the
+        # directive into the command's stdout via updated_input. Kimi has no
+        # equivalent — its only channel is a block, which here would deny the
+        # tool the agent asked for — so Kimi defers EVERY preToolUse and lets
+        # the turn-end Stop deliver. For every other tool, emitting a
+        # directive CONSUMES it without guaranteed delivery, so defer (no
+        # consume) — the directive waits for the next shell call or the
+        # turn-end stop, both of which deliver reliably.
         return False
     if fresh:
         return False  # just registered on this event; nothing marked yet
@@ -587,6 +605,25 @@ def emit_for_host(host: str, hook_event: str | None, text: str, payload: dict | 
             out = {"additional_context": text}
         sys.stdout.write(json.dumps(out, separators=(",", ":")))
         return
+    if host == "kimi":
+        # Kimi has no passive context-injection channel. The ONLY way to get
+        # text in front of the model is to BLOCK the hook: on Stop it runs
+        # `triggerBlock`, appends the block's permissionDecisionReason to the
+        # context as a user message, and returns continue:true — which
+        # delivers the directive and keeps the loop alive in one move.
+        # Anything that isn't a block collapses to {action:"allow"} and its
+        # `message` is dropped on the floor, so a claude-code-style
+        # additionalContext (or a bare `message`) parses fine and reaches
+        # nobody. Verified against kimi-code 0.26.0.
+        out = {
+            "hookSpecificOutput": {
+                "hookEventName": hook_event or "Stop",
+                "permissionDecision": "deny",
+                "permissionDecisionReason": text,
+            }
+        }
+        sys.stdout.write(json.dumps(out, separators=(",", ":")))
+        return
     # opencode and other in-process hosts: this entry point shouldn't
     # normally be invoked there. Fall through to a generic envelope.
     sys.stdout.write(json.dumps({"text": text}, separators=(",", ":")))
@@ -692,16 +729,22 @@ def drain_session(root: Path, session_id: str, host: str | None = None, hook_eve
         # state so the next non-violating tool call can drain it.
         return 0
 
-    # Cursor non-shell preToolUse: the IDE drops `additional_context`,
-    # so we'd consume queued directives without delivering them. This
-    # path is only reachable in optimize_mode (the gate normally defers
-    # non-shell preToolUse). The policy block didn't fire (even-numbered
-    # violation under the alternating cadence), so we let the tool
-    # through but must NOT consume directives.
-    if (
-        host == "cursor"
-        and hook_event in ("preToolUse", "PreToolUse")
-        and _cursor_tool_class(payload.get("tool_name") if payload else None) != "shell"
+    # preToolUse with no mid-turn delivery channel: let the tool through and
+    # do NOT consume directives. Reachable only in optimize_mode after the
+    # policy block didn't fire (even-numbered violation under the alternating
+    # cadence). Emitting here would both refuse the tool the cadence meant to
+    # allow and consume the directive on a pre-tool event.
+    #   - cursor: the IDE drops `additional_context` on non-shell tools (shell
+    #     delivers via updated_input, so it's allowed to drain).
+    #   - kimi: the only channel is a Stop-hook block, which would deny the
+    #     tool; every preToolUse defers to the turn-end Stop.
+    _pre = hook_event in ("preToolUse", "PreToolUse")
+    if _pre and (
+        host == "kimi"
+        or (
+            host == "cursor"
+            and _cursor_tool_class(payload.get("tool_name") if payload else None) != "shell"
+        )
     ):
         sys.stdout.write("{}")
         return 0
@@ -1377,8 +1420,9 @@ def _maybe_stop_nudge_text(
         would double-drive (re-prompt after the workflow already finished).
       - host must have a working stop-continuation envelope:
         claude-code/codex use `{decision: "block", reason: …}`; cursor
-        uses `{followup_message: …}` (auto-submitted at turn end).
-        emit_for_host dispatches the right shape per host.
+        uses `{followup_message: …}` (auto-submitted at turn end); kimi
+        uses a Stop-hook block, whose reason it appends to the context
+        before continuing. emit_for_host dispatches the right shape per host.
     """
     if hook_event not in _STOP_EVENTS:
         return None
@@ -1390,7 +1434,7 @@ def _maybe_stop_nudge_text(
         return None
     if not sess.get("autonomous"):
         return None  # opt-in only; default /optimize stops naturally
-    if host not in ("claude-code", "codex", "cursor"):
+    if host not in ("claude-code", "codex", "cursor", "kimi"):
         return None  # no known stop-continuation envelope on this host
     # Workflow driver self-drives: the dynamic workflow runs the whole round loop in-process
     # (one long Workflow tool call) until its own stall limit. The always-fire stop nudge is the
@@ -1413,15 +1457,15 @@ def main(argv: list[str] | None = None) -> int:
     1. Front-ended by the `evo-hook-drain` Rust binary (claude-code/codex):
        it passes `--run-dir` and `--session` and has already done the marker
        gate, so this just drains.
-    2. Self-contained (cursor): the host's hooks.json calls `evo-drain
-       --host cursor` directly with no Rust binary in front. `--run-dir` and
+    2. Self-contained (cursor/kimi): the host's hooks.json calls `evo-drain
+       --host <host>` directly with no Rust binary in front. `--run-dir` and
        `--session` are omitted; they're resolved from the hook stdin payload
-       (`workspace_roots`, `conversation_id`) and the marker gate runs here.
+       (`workspace_roots`, `conversation_id`/`session_id`) and the marker gate runs here.
     """
     parser = argparse.ArgumentParser(prog="evo.drain")
     parser.add_argument("--run-dir", default=None, help="Path to .evo/run_*/ directory (omit for self-contained hosts)")
     parser.add_argument("--session", default=None, help="session_id to drain (omit to read from stdin payload)")
-    parser.add_argument("--host", default=None, help="host name (claude-code/codex/hermes/opencode/cursor); auto-detected if omitted")
+    parser.add_argument("--host", default=None, help="host name (claude-code/codex/hermes/opencode/cursor/kimi); auto-detected if omitted")
     args = parser.parse_args(argv)
 
     payload = _read_stdin_payload()
@@ -1458,13 +1502,20 @@ def main(argv: list[str] | None = None) -> int:
         )
 
     # Mode 2: self-contained — resolve everything from args + stdin payload.
-    # Key on conversation_id: it's present in EVERY Cursor hook event, whereas
-    # session_id only appears in sessionStart. Keying on session_id would
-    # register the session under one id at sessionStart and then look up a
-    # different id at postToolUse (where session_id is absent), so mid-run
+    # Cursor: key on conversation_id. It's present in EVERY Cursor hook event,
+    # whereas session_id only appears in sessionStart. Keying on session_id
+    # would register the session under one id at sessionStart and then look up
+    # a different id at postToolUse (where session_id is absent), so mid-run
     # directives would never be delivered.
+    # Kimi: session_id is present on every event (the hook engine stamps it on
+    # each trigger and snake-cases the payload keys), and there is no
+    # conversation_id — so session_id is the stable key. Verified against
+    # kimi-code 0.26.0.
     host = args.host or "cursor"
-    session = args.session or payload.get("conversation_id") or payload.get("session_id")
+    if host == "kimi":
+        session = args.session or payload.get("session_id")
+    else:
+        session = args.session or payload.get("conversation_id") or payload.get("session_id")
     root = _resolve_root_from_payload(payload)
     if not session or root is None or not inject_root(root).parent.exists():
         _drain_debug(stage="resolve", host=host, hook_event=hook_event,
@@ -1476,23 +1527,25 @@ def main(argv: list[str] | None = None) -> int:
     tool_input = payload.get("tool_input") or {}
     registered = session_file(root, session).exists()
     has_marker = marker.exists(root, session)
-    # Cursor has no session-id env var that Python `auto_register_from_env`
-    # can detect, so the engagement signal can't be set via the CLI path
-    # used by other hosts. Detect it here instead: if the agent runs any
-    # `evo …` shell command, flip engagement on this session's record.
+    # Cursor and Kimi have no session-id env var that Python
+    # `auto_register_from_env` can detect, so the engagement signal can't be
+    # set via the CLI path used by other hosts. Detect it here instead: if the
+    # agent runs any `evo …` shell command, flip engagement on this session's
+    # record.
     _maybe_mark_engaged_from_shell(root, session, host, hook_event, payload)
-    # Same rationale for autonomous: cursor arms via observing the command.
+    # Same rationale for autonomous: cursor/kimi arm via observing the command.
     _maybe_mark_autonomous_from_shell(root, session, host, hook_event, payload)
     gate = _self_contained_gate(root, session, host, hook_event, tool_name, tool_input)
-    # Detect /optimize invocation from the prompt payload for cursor's
+    # Detect /optimize invocation from the prompt payload for the
     # self-contained path. Must run AFTER the gate because the gate is
-    # what lazily registers the cursor session on first event (without
+    # what lazily registers the session on first event (without
     # registration, mark_optimize_mode finds no session file). The
     # mark_optimize_mode helper is idempotent + refuses to flag subagents.
     _maybe_mark_optimize_from_prompt(root, session, host, hook_event, payload)
     _drain_debug(stage="gate", host=host, hook_event=hook_event, session=session,
                  root=str(root), tool_name=tool_name,
-                 tool_class=_cursor_tool_class(tool_name) if hook_event == "preToolUse" else None,
+                 tool_class=_cursor_tool_class(tool_name)
+                 if hook_event in ("preToolUse", "PreToolUse") else None,
                  registered_before=registered, marker=has_marker, gate=gate)
     if not gate:
         sys.stdout.write("{}")
