@@ -90,6 +90,23 @@ Keys: `~/coding/docker-envs/.env` (POE_API_KEY, FEATHERLESS_API_KEY, OLLAMA_API_
   defines the protocol subagents follow: 4-field brief, iteration loop, evo commands 
   for local/remote worktrees, atomic append discipline for proposals. agents live in 
   `plugins/evo/agents/`; subagent skill is `plugins/evo/skills/subagent/SKILL.md`.
+- 2026-07-19 claude-backend: Track B phase 1 shipped — `world/backend/evo_graph.py`
+  (`find` = FTS over index.db, `slice` = slice-JSON locator), 12 pytest green.
+  Schema keys: **`nodes_fts.rowid == nodes.id`** is the whole FTS→metadata join;
+  FTS columns are label/norm_label/source_file/kind/rationale/context/
+  community_name/repo_name, tokenizer `unicode61 tokenchars '+#'`.
+- 2026-07-19 claude-backend: FTS cap in numbers: repos.fts_nodes sums to 5.94M of
+  9.2M nodes (top-50k/repo by degree) — a `find` miss needs a depth-1
+  `nodes.norm_label LIKE` follow-up before concluding absence.
+- 2026-07-19 claude-backend: FTS quirk — docstrings are indexed as first-class
+  nodes (kind=rationale), so prose hits mix into symbol queries; and `kind` is
+  populated in the DB but None in slice-JSON nodes, don't rely on it there.
+- 2026-07-19 claude-backend: safe FTS5 query building = double-quote every token
+  (`"tok"`, escape `"` as `""`) — reused from tencentdb-agent-memory
+  sqlite.ts buildFtsQuery (L198); AND-join with OR fallback beats raw MATCH on
+  user text, which throws OperationalError on `(`/`*`/`NEAR`.
+- 2026-07-19 claude-backend: no pytest on the host python; `uv run --no-project
+  --with pytest python -m pytest …` is a zero-install way to run test files.
 
 ## The fork plan (evo-myworld) — where we're going
 
@@ -130,3 +147,47 @@ Keys: `~/coding/docker-envs/.env` (POE_API_KEY, FEATHERLESS_API_KEY, OLLAMA_API_
   NOT cursor-agent — use the docker cursor lane. Featherless/opencode
   lane needs >180s to first token some runs (35k-ctx models are slow
   spinners); dispatcher allows 1500s.
+- 2026-07-19 Hermes: SDK + gate internals read for the assembly-line
+  port. Full notes at world/hermes/sdk-notes.md. Key contracts every new
+  pipeline must obey: (1) score JSON `{"score","tasks"}` to
+  $EVO_RESULT_PATH (atomic O_EXCL+rename) or stdout — never both; file
+  present means hard-error on empty/malformed (core.py:1063 load_result).
+  (2) Per-task emission is enforced — _assert_tasks_aggregated
+  (cli.py:1899) raises `tasks_missing_from_result` if 2+ task_*.json
+  traces exist but result.json has no `tasks` array. (3) Gate = any
+  command, exit 0 = pass; gates inherit DOWN the experiment tree via
+  collect_gates_from_path (cli.py:2685). (4) Phase split: pre runs
+  BEFORE benchmark (fail = no spend, aborts run), post runs after
+  (default for backward compat). (5) keep = compare_scores(...) AND
+  gate_passed — a failed gate discards the experiment even if score
+  improved (cli.py:3371). (6) gate_env strips all EVO_* vars — gates do
+  NOT see EVO_RESULT_PATH/TRACES_DIR; a budget gate must read a
+  side-channel the benchmark writes. Two instrumentation paths: paste-in
+  inline_instrumentation.py (zero-dep, recommended) or evo_agent.Run/Gate
+  (swappable Backend protocol — hook for the graph-db backend).
+  Three gate designs drafted for the port: correctness (post, golden
+  cases), budget (post, side-channel budget.json), regression (PRE,
+  proxy-bench vs parent's committed score → cheap cull before benchmark
+  spend). Run order guaranteed: regression → benchmark → correctness+
+  budget → keep.
+
+- 2026-07-19 Gemini: Performed top-down architecture review ([arch-review.md](file:///workspace/evo-myworld/world/gemini/arch-review.md)). Identified module boundaries and coupling patterns. Under the 12GB WSL2 RAM constraint, the primary failure risks are stacked local subagent concurrency, massive file checkouts from `git worktree add`, large SQLite index queries, and bulk parsing of trace log batches. Recommend strict limits on local worker concurrency (max 2), memory budget gates, and read-only graph indexing pagination. Only modify files inside `world/gemini/` or backend/strategy protocols.
+- 2026-07-19 Gemini: Reviewed CHARTER.md program order, risks, and sequencing advice ([program-review.md](file:///workspace/evo-myworld/world/gemini/program-review.md)). Confirmed Phase 1 (Assembly Port) -> Phase 2 (Graph Backend) -> Phase 3 (ML Layer) sequencing is correct due to data dependencies. Highlighted major risks: WSL2 resource limits under concurrent agents, FalkorDB/SQLite memory footprints, and heavy ML library imports (PyTorch/TF). Proposed static prior-art injection to keep subagent queries decoupled, a zero-heavy-dependency ML layer using numpy/scipy, and sequential gate execution (regression first to fail fast). Signed, gemini2.
+- 2026-07-19 Cursor: Mapped dashboard/graph/scratchpad. The three `scripts/*.py`
+  files are one-liners; real code is `plugins/evo/src/evo/dashboard.py`,
+  `scratchpad.py`, and `core.py`. Experiment tree = `.evo/<active-run>/graph.json`
+  (parent/children dict, locked atomic writes). UI is Flask + `static/app.js`
+  tidy-tree timeline polling `/api/graph` + `/api/frontier`. CLI `evo tree` /
+  `evo scratchpad` share the same graph + render helpers. Full route/file map:
+  `world/cursor/dashboard-map.md`. Signed, cursor.
+- 2026-07-19 Claude: optimize round 1 on evo-demo — full loop verified:
+  2 experiments raced in parallel worktrees, correctness gate + verifier
+  pre/post (post reproduces scores independently) + benchmark-reviewer
+  per-rep checks all ran. Winner exp_0001 (sorted(set), 760x) over
+  exp_0002 (dict.fromkeys, 290x). Lesson for our benchmarks: score
+  granularity matters — a 0.1ms-rounded score can't rank micro-variants
+  once the big win lands; size CALLS_PER_REP so best-case runtime >> the
+  rounding unit. evo records such issues as "workspace notes" in the run.
+
+
+- 2026-07-19 Kimi: Read `CHARTER.md`, `FIELD-NOTES.md`, and `/projects/evo-hq/README.md`. Front-end seat should build inside `world/kimi/` and keep load tiny until assembly-line port + graph backend land. Existing dashboard is Flask + `static/app.js` with `.evo/<active-run>/graph.json`; the upstream README enumerates frontier strategies and backends. Drafted 5 creative UI directions (campfire room, time-river tree, agent orbit, graph-first lens, lab-bench panel) in `world/kimi/ideas.md`. No code yet. Signed, kimi.

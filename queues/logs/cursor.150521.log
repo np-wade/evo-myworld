@@ -1,0 +1,63 @@
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 1.59kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/node:22-bookworm-slim
+#2 DONE 0.2s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [1/8] FROM docker.io/library/node:22-bookworm-slim@sha256:6c74791e557ce11fc957704f6d4fe134a7bc8d6f5ca4403205b2966bd488f6b3
+#4 resolve docker.io/library/node:22-bookworm-slim@sha256:6c74791e557ce11fc957704f6d4fe134a7bc8d6f5ca4403205b2966bd488f6b3 0.0s done
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 51B done
+#5 DONE 0.0s
+
+#6 [3/8] RUN install -m 0755 -d /etc/apt/keyrings     && curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc     && chmod a+r /etc/apt/keyrings/docker.asc     && . /etc/os-release     && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian ${VERSION_CODENAME} stable"        > /etc/apt/sources.list.d/docker.list     && apt-get update     && apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin     && rm -rf /var/lib/apt/lists/*
+#6 CACHED
+
+#7 [7/8] RUN chmod +x /dockerd-entrypoint-wrapper.sh
+#7 CACHED
+
+#8 [6/8] COPY dockerd-entrypoint-wrapper.sh /dockerd-entrypoint-wrapper.sh
+#8 CACHED
+
+#9 [4/8] RUN npm install -g bun
+#9 CACHED
+
+#10 [5/8] RUN npm install -g playwright     && playwright install --with-deps chromium
+#10 CACHED
+
+#11 [2/8] RUN apt-get update && apt-get install -y     git     ripgrep     curl     jq     vim     && rm -rf /var/lib/apt/lists/*
+#11 CACHED
+
+#12 [8/8] WORKDIR /workspace
+#12 CACHED
+
+#13 exporting to image
+#13 exporting layers done
+#13 exporting manifest sha256:614ec1c694a754aef904f9634b06d4ab62013dee460537f2c84febbc3898e084 done
+#13 exporting config sha256:89ea76f9a58095bdbd5f7e3a6b67bac8dcfc1e0fe808e5d2771e31543f453c73 done
+#13 exporting attestation manifest sha256:3123efa8a543ebfe127791e0a16e02d3b710e752f8520cca02cc416736f55a6e 0.0s done
+#13 exporting manifest list sha256:471c2b8c9a2a20c865a7e2734599f94de4ec7cc28bc90e130b9ca72e7bd8da87
+#13 exporting manifest list sha256:471c2b8c9a2a20c865a7e2734599f94de4ec7cc28bc90e130b9ca72e7bd8da87 0.0s done
+#13 naming to docker.io/library/coding-base:latest done
+#13 unpacking to docker.io/library/coding-base:latest 0.0s done
+#13 DONE 0.1s
+ Container docker-envs-cursor-cli-run-6b6390e37edb Creating 
+ Container docker-envs-cursor-cli-run-6b6390e37edb Created 
+Done. Queue item 1 is checked off.
+
+**Finding:** `scripts/dashboard.py`, `graph.py`, and `scratchpad.py` are thin wrappers. The real map is in `plugins/evo/src/evo/`.
+
+- **Tree storage:** `.evo/<active-run>/graph.json` — parent/children node dict, atomic lock writes via `core.py`
+- **Dashboard:** Flask routes in `dashboard.py`; `static/app.js` polls `/api/graph` + `/api/frontier` and draws a tidy-tree timeline
+- **CLI twins:** `evo tree` → `ascii_tree`; `evo scratchpad` → `build_scratchpad` (same helpers as `/api/tree` and `/api/scratchpad`)
+
+Wrote `world/cursor/dashboard-map.md` (routes, data files, render paths). Appended a dated FIELD-NOTES entry. Next queue item is how a graph backend could feed the dashboard.

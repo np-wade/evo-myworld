@@ -34,7 +34,8 @@ for AI in "$@"; do
     cursor)
       (cd "$ENVROOT" && timeout 1500 ./scripts/launch.sh ask cursor "$(prompt_for cursor cursor /workspace/evo-myworld)") >"$LOG" 2>&1 ;;
     codex)
-      (cd "$REPO_HOST" && timeout 1500 codex exec --skip-git-repo-check --sandbox workspace-write "$(prompt_for codex codex "$REPO_HOST")") >"$LOG" 2>&1 ;;
+      # host codex has no auth (401) — the docker codex lane holds the login
+      (cd "$ENVROOT" && timeout 1500 ./scripts/launch.sh ask codex "$(prompt_for codex codex /workspace/evo-myworld)") >"$LOG" 2>&1 ;;
     kimi)
       timeout 1500 docker exec kimi-cli kimi --print -p "$(prompt_for kimi kimi /projects/evo-myworld)" >"$LOG" 2>&1 ;;
     *) echo "unknown ai: $AI" | tee "$LOG"; continue ;;

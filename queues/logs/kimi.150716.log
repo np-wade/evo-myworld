@@ -1,0 +1,997 @@
+You are the "kimi" seat of the evo-myworld lab. Work directory: /projects/evo-my
+world
+Read, in order: /projects/evo-myworld/CHARTER.md, /projects/evo-myworld/FIELD-NO
+TES.md, /projects/evo-myworld/queues/kimi.md.
+Then DO the top unchecked item in that queue file. Rules:
+- Write outputs ONLY inside /projects/evo-myworld/world/kimi/ (create it), excep
+t: append your
+  learnings to /projects/evo-myworld/FIELD-NOTES.md (dated, signed kimi) and tic
+k the finished
+  queue item in /projects/evo-myworld/queues/kimi.md by changing "[ ]" to "".
+- Do not run long/heavy commands; this is a reading+writing task.
+- Cite files you read by path. Be concrete, not generic.
+TurnBegin(
+    user_input='You are the "kimi" seat of the evo-myworld lab. Work directory: 
+/projects/evo-myworld\nRead, in order: /projects/evo-myworld/CHARTER.md, /projec
+ts/evo-myworld/FIELD-NOTES.md, /projects/evo-myworld/queues/kimi.md.\nThen DO th
+e top unchecked item in that queue file. Rules:\n- Write outputs ONLY inside /pr
+ojects/evo-myworld/world/kimi/ (create it), except: append your\n  learnings to 
+/projects/evo-myworld/FIELD-NOTES.md (dated, signed kimi) and tick the finished\
+n  queue item in /projects/evo-myworld/queues/kimi.md by changing "[ ]" to "[x]"
+.\n- Do not run long/heavy commands; this is a reading+writing task.\n- Cite fil
+es you read by path. Be concrete, not generic.'
+)
+StepBegin(n=1)
+ThinkPart(
+    type='think',
+    think='The user wants me to act as the "kimi" seat in the evo-myworld lab. W
+orking directory is /projects/evo-myworld. I need to:\n1. Read CHARTER.md, FIELD
+-NOTES.md, and queues/kimi.md in order.\n2. Do the top unchecked item in queues/
+kimi.md.\n3. Write outputs only inside /projects/evo-myworld/world/kimi/ (create
+it), except append learnings to FIELD-NOTES.md and tick the finished queue item.
+\n4. Do not run long/heavy commands.\n5. Cite files read by path.\n\nHowever, my
+current working directory is /workspace, not /projects/evo-myworld. I need to re
+ad files at /projects/evo-myworld/... Maybe I can read them directly using absol
+ute paths. Let me start by reading the three files.',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_PbiOnGGuJ6qxlpNtzZR6syRy',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "/projects/evo-myworld/CHARTER.md"}'
+    ),
+    extras=None
+)
+ToolCall(
+    type='function',
+    id='tool_92ry5QhgGi42Mca4pkAB5Mt5',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "/projects/evo-myworld/FIELD-NOTES.md'
+    ),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_PbiOnGGuJ6qxlpNtzZR6syRy',
+    return_value=ToolOk(
+        is_error=False,
+        output='     1\t# evo-myworld — Lab Charter\n     2\t\n     3\t**Home ba
+se for the lab\'s recursive-improvement world.** Fork of\n     4\t`evo-hq/evo`, 
+supercharged by all lab AIs together. Nicholas (np-wade)\n     5\towns direction
+; Claude orchestrates; every AI builds.\n     6\t\n     7\t## The two-repo rule\
+n     8\t\n     9\t- `projects/evo-hq` — **clean upstream clone. Never experimen
+t here.**\n    10\t  It is the reference install + the harness we use to TEST ch
+anges made in\n    11\t  this fork (branches get exercised against evo-hq\'s wor
+king install and\n    12\t  the SDK test suite before merging).\n    13\t- `proj
+ects/evo-myworld` (this repo, `np-wade/evo-myworld`) — where\n    14\t  everythi
+ng new happens.\n    15\t\n    16\t## Branch & folder ownership\n    17\t\n    1
+8\tEach AI owns a branch `ai/<name>` and a folder `world/<name>/` (yours to\n   
+19\tstructure — experiments, notes, prototypes). Shared code that graduates\n   
+20\tout of a `world/` folder lands via merge to `main` only after it passes the\
+n    21\tevo-hq harness. This avoids merge collisions: **you write inside your o
+wn\n    22\tfolder; cross-cutting edits go through Claude.**\n    23\t\n    24\t
+| Branch | Owner | Seat |\n    25\t|---|---|---|\n    26\t| ai/kimi | Kimi K3 / 
+K2.7-code | front-end, creative, exploratory-random-good-ideas |\n    27\t| ai/c
+odex | Codex (GPT) | core coding, plugin/hooks internals |\n    28\t| ai/cursor 
+| Cursor agent | coding + refactors |\n    29\t| ai/gemini | Gemini 3.x (Antigra
+vity, 2 accts) | analysis, review, architecture reading |\n    30\t| ai/hermes |
+Hermes (glm-5.1/5.2, qwen3-coder via ollama-cloud) | backend coding, tests |\n  
+ 31\t| ai/poe | Poe (qwen3.7-max, minimax m3-t) | reading, writing, docs, review
+|\n    32\t| ai/feather | Featherless (deepseek-V4-Flash 35k ctx!, step-3.7-Flas
+h) | short-context reading/writing tasks, summaries |\n    33\t| ai/claude-backe
+nd | Claude (2nd seat) | graph-DB backend: graphify index.db + FalkorDB → evo sh
+ared state |\n    34\t\n    35\t## Program (in order)\n    36\t\n    37\t1. **As
+sembly line port** — bring the assembly-office autonomous\n    38\t   product-pr
+ocessing pipeline in, upgraded with evo\'s experiment tree,\n    39\t   gates, a
+nd recursive/experimental testing (test code, languages,\n    40\t   harnesses; 
+keep what earns its place, delete what doesn\'t).\n    41\t2. **Graph backend** 
+— second agent connects the graph DB (9.2M-node\n    42\t   index.db, FalkorDB) 
+and the lab\'s backend code into the app; evo\'s\n    43\t   shared-state/scratc
+hpad becomes graph-fed.\n    44\t3. **ML layer** — linear-algebra / neural-net m
+aths over experiment\n    45\t   history: predictive frontier strategies, code-c
+ulling scores, agent/\n    46\t   harness/language comparisons as first-class ex
+periments.\n    47\t4. **Then** CLIs and other cool things on top.\n    48\t\n  
+ 49\t## Standing rules\n    50\t\n    51\t- **GRAPH-FIRST**: before writing code
+, pull prior art from the graph\n    52\t  library (`graphify-app/GRAPH-FIRST.md
+`; TOPICS.md → slices → source).\n    53\t- **Read `FIELD-NOTES.md` first, appen
+d what you learn** (dated, signed).\n    54\t- Machine limits: WSL2, 12 GB RAM +
+24 GB swap. One heavy process at a\n    55\t  time; long runs `setsid nohup … & 
+disown`. See FIELD-NOTES gotchas.\n    56\t- Your work queue lives in `queues/<n
+ame>.md`. Do the top item; append\n    57\t  results + a FIELD-NOTES entry; mark
+it done.\n    58\t\n    59\t## THE RACE RULE (standing, from Nicholas 2026-07-19
+)\n    60\t\n    61\t**Never adopt a pattern or implementation on trust.** As yo
+u build:\n    62\t1. SEARCH first — graph library (GRAPH-FIRST: TOPICS.md → slic
+es →\n    63\t   `world/backend/evo_graph.py find`) plus your own repo searches 
+— and\n    64\t   pull **at least 2 candidate implementations** of the thing you
+need.\n    65\t2. RACE them in the base harness (`projects/evo-hq` install + a s
+mall\n    66\t   evo run like projects/evo-demo): each candidate = one experimen
+t\n    67\t   branch, same benchmark, same gates.\n    68\t3. ADOPT the winner b
+y score; record winner AND loser scores + source\n    69\t   citations in FIELD-
+NOTES.md. Losers get deleted, not kept "just in\n    70\t   case" — that\'s the 
+culling discipline.\n    71\tProof it works (2026-07-19): demo race — baseline 5
+.0967 → sorted(set())\n    72\t0.0067 beat dict.fromkeys+sort 0.0176; both gated
+for correctness;\n    73\twinner kept. Do this same move with code you FIND, not
+just code you\n    74\twrite.\n',
+        message='74 lines read from file starting from line 1. Total lines in fi
+le: 74. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(arguments_part='"}')
+ToolCall(
+    type='function',
+    id='tool_O6RY9mJAreqX14b4XBiqmEJA',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "/projects/evo-myworld/queues/kimi.md'
+    ),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_92ry5QhgGi42Mca4pkAB5Mt5',
+    return_value=ToolOk(
+        is_error=False,
+        output='     1\t# evo Field Notes — living doc for all lab AIs\n     2\t
+\n     3\t> Started 2026-07-19 by Claude (orchestrator). **Every AI working on e
+vo-myworld\n     4\t> reads this before touching code, and appends what it learn
+s.** Keep entries\n     5\t> short, dated, signed. Newest learnings at the botto
+m of each section.\n     6\t> Companion protocol: GRAPH-FIRST (`~/coding/docker-
+envs/projects/graphify-app/GRAPH-FIRST.md`)\n     7\t> — pull graph library slic
+es for prior art BEFORE building.\n     8\t\n     9\t## What evo is (base app, u
+pstream `evo-hq/evo`)\n    10\t\n    11\t- Autoresearch orchestrator: give it a 
+codebase → it discovers metrics,\n    12\t  instruments a benchmark, then runs a
+n experiment loop (try → score → keep or\n    13\t  discard) as **tree search** 
+over git branches, not greedy hill-climb.\n    14\t- Local install lives at `~/c
+oding/docker-envs/projects/evo-hq` (clean clone of\n    15\t  upstream — do NOT 
+experiment here; this is the reference/test harness).\n    16\t  Our fork for bu
+ilding: `~/coding/docker-envs/projects/evo-myworld`\n    17\t  (github `np-wade/
+evo-myworld`).\n    18\t- Two-command UX: `/evo:discover` (one-time: finds what 
+to measure, builds\n    19\t  benchmark + gates) then `/evo:optimize` (runs the 
+loop, unattended,\n    20\t  parallel subagents in git worktrees).\n    21\t- In
+vocation is host-specific: `/evo:` on Claude Code, `$evo` on Codex,\n    22\t  `
+/` skill menu on Cursor, natural language on Hermes/Opencode.\n    23\t\n    24\
+t## Architecture map (repo layout)\n    25\t\n    26\t- `plugins/evo/` — THE pro
+duct. One plugin, multi-host: `.claude-plugin/`,\n    27\t  `.codex-plugin/`, `.
+kimi-plugin/` manifests over shared `skills/` (discover,\n    28\t  optimize, re
+port, ship, subagent, finetuning, infra-setup), `agents/`\n    29\t  (verifier.m
+d, benchmark-reviewer.md), `hooks/`, `src/evo/` (python core).\n    30\t- `sdk/p
+ython`, `sdk/node` — thin SDKs for instrumenting benchmarks\n    31\t  (`evo.rec
+ord(score)` style). 12 py tests pass in 0.03s: cheap gate.\n    32\t- `scripts/`
+— dashboard.py, graph.py (experiment tree), scratchpad.py\n    33\t  (shared sta
+te), codex_slurm_harness.py, rlm_eval.\n    34\t- `tests/` — e2e + live suites, 
+sandbox-agent + sshd fixtures (heavier).\n    35\t- CLI (`uv tool install evo-hq
+-cli` → v0.8.0): `evo`, `evo-dashboard`,\n    36\t  `evo-drain`. `evo install <h
+ost>` wires plugin+hooks per host.\n    37\t  `evo init --target --benchmark --m
+etric --host --per-exp-timeout` is the\n    38\t  non-interactive path that `/ev
+o:discover` drives for you.\n    39\t\n    40\t## Key concepts to reuse in the f
+ork\n    41\t\n    42\t- **Gates**: any command, exit 0 = pass. Failed gate = ex
+periment discarded\n    43\t  even if score improved. Gates inherit down the exp
+eriment tree; narrower\n    44\t  gates attach to branches. ← this is where our 
+recursive testing +\n    45\t  "which code deserves to live" culling logic plugs
+in.\n    46\t- **Frontier strategies**: argmax / top_k / epsilon_greedy / softma
+x /\n    47\t  pareto_per_task — selection policy for which branch to extend.\n 
+  48\t  ← natural hook for our ML/linear-algebra scoring experiments.\n    49\t-
+**Shared state / scratchpad**: failure traces, annotations, discarded\n    50\t 
+hypotheses visible to every subagent before it picks a hypothesis.\n    51\t  ← 
+this is the lab memory bus; graph-db backend should feed it.\n    52\t- **Cross-
+cutting scans**: between rounds, RLM-style scan subagents read\n    53\t  trace 
+batches and surface compound failure patterns into shared state.\n    54\t- **Ba
+ckends**: worktree (default, local), pool, ssh, modal/e2b/daytona/\n    55\t  aw
+s/azure. We start worktree; `pool` may suit our WSL RAM limits better\n    56\t 
+(12GB RAM + 24GB swap — see graphify-wsl-limits memory: don\'t stack\n    57\t  
+parallel heavy processes).\n    58\t\n    59\t## Host/runner status on this box 
+(2026-07-19)\n    60\t\n    61\t| Runner | Status | Notes |\n    62\t|---|---|--
+-|\n    63\t| claude-code | evo plugin INSTALLED ✓ | orchestrator seat |\n    64
+\t| cursor | evo plugin INSTALLED ✓ | hooks in ~/.cursor/hooks.json, skills in ~
+/.agents/skills |\n    65\t| codex | fixing — snap had stale 0.114.0, npm 0.144.
+6 symlinked to ~/.local/bin | needs `codex plugin marketplace add evo-hq/evo` th
+en `evo install codex` |\n    66\t| kimi (K2.7-code / K3) | container `kimi-cli`
+(docker), OAuth premium acct | evo install must happen IN-container; K3 = creati
+ve/front-end seat, keep load small until base is done |\n    67\t| hermes (ollam
+a-cloud: glm-5.1/5.2, qwen3-coder) | via `~/coding/docker-envs/scripts/launch.sh
+ask hermes` | evo host `hermes` supported |\n    68\t| opencode (Featherless: de
+epseek-V4-Flash 35k ctx cap, step-3.7-Flash) | `launch.sh ask opencode` | evo ho
+st `opencode` supported |\n    69\t| poe (qwen3.7-max-t, minimax m3-t) | `launch
+.sh ask poe`, poe-code subcommand CLI | NOT an evo host — use for reading/writin
+g/review tasks via ask |\n    70\t| gemini (3.x via Antigravity `agy`, 2 account
+s) | `launch.sh ask antigravity` / `antigravity2` | NOT an evo host — analysis/r
+eview seat. Old gemini-cli OAuth dead for individuals |\n    71\t\n    72\tKeys:
+`~/coding/docker-envs/.env` (POE_API_KEY, FEATHERLESS_API_KEY, OLLAMA_API_KEY, G
+EMINI_API_KEY).\n    73\t\n    74\t## Gotchas learned (append as found)\n    75\
+t\n    76\t- 2026-07-19 Claude: `evo init` is fully non-interactive and REQUIRES
+\n    77\t  --target --benchmark --metric --host --per-exp-timeout. The chat-dri
+ven\n    78\t  `/evo:discover` is the friendly path that fills those in.\n    79
+\t- 2026-07-19 Claude: `evo install codex` on codex <0.144 fails — no `plugin`\n
+   80\t  subcommand. Upgrade codex first.\n    81\t- 2026-07-19 Claude: snap pac
+kages shadow npm globals on this box\n    82\t  (`/snap/bin` before `~/.npm-glob
+al/bin` which isn\'t on PATH at all);\n    83\t  symlink the npm binary into `~/
+.local/bin` which wins.\n    84\t- 2026-07-19 Claude: this WSL box crashed twice
+before from stacked memory\n    85\t  spikes. Any evo optimize run here: cap par
+allel subagents (start 2),\n    86\t  benchmarks must be small, and long runs ne
+ed `setsid nohup … & disown`\n    87\t  or the harness timeout kills the process
+group.\n    88\t- 2026-07-19 Feather: agents are roles in the orchestrator loop—
+verifier (audit), \n    89\t  ideator (propose), benchmark-reviewer (diagnose)—w
+hile skill/subagent/SKILL.md \n    90\t  defines the protocol subagents follow: 
+4-field brief, iteration loop, evo commands \n    91\t  for local/remote worktre
+es, atomic append discipline for proposals. agents live in \n    92\t  `plugins/
+evo/agents/`; subagent skill is `plugins/evo/skills/subagent/SKILL.md`.\n    93\
+t\n    94\t## The fork plan (evo-myworld) — where we\'re going\n    95\t\n    96
+\t1. Per-AI branches: each runner gets `ai/<name>` (ai/kimi, ai/codex,\n    97\t
+  ai/cursor, ai/gemini, ai/hermes, ai/poe, ai/featherless) and pushes\n    98\t 
+ functionality up; evo-hq (clean base) is the test harness for those\n    99\t  
+branches before merge.\n   100\t2. Assembly line port: the assembly-office auton
+omous product-processing\n   101\t   pipeline moves in, gaining evo\'s experimen
+t/gate structure for recursive\n   102\t   + experimental testing of code, langu
+ages, harnesses.\n   103\t3. Graph-db backend (second agent): connect graphify (
+index.db 9.2M nodes /\n   104\t   FalkorDB) + backend code into the app — feeds 
+evo\'s shared state and our\n   105\t   scoring. GRAPH-FIRST applies.\n   106\t4
+. ML layer: use linear algebra / NN maths on experiment history for\n   107\t   
+predictive branch selection (custom frontier strategy) and code-culling\n   108\
+t   decisions (what earns its place, what gets deleted).\n   109\t5. Later: CLIs
+and tooling on top.\n   110\t\n   111\t*(sign entries: Claude / Kimi / Codex / C
+ursor / Gemini / Hermes / Poe / Feather)*\n   112\t\n   113\t## Vanilla run log 
+(evo-demo, 2026-07-19)\n   114\t\n   115\t- 2026-07-19 Claude: full vanilla loop
+verified on toy repo\n   116\t  `projects/evo-demo` (naive O(n²) dedup+sort, `be
+nch.py` prints\n   117\t  "seconds: X", metric min, correctness assert = gate). 
+Flow used THEIR\n   118\t  interfaces exactly: `claude -p \'/evo:discover …\'` →
+it created `.evo/`\n   119\t  (meta.json, project.md, run_0000, supervisor.pid, 
+dashboard.pid) →\n   120\t  dashboard live at http://127.0.0.1:8080 ("evo : auto
+research") → it\n   121\t  advanced to `evo run exp_0000` on its own. Seeding th
+e benchmark/metric\n   122\t  in the discover prompt skips all interactive quest
+ions — good for\n   123\t  headless dispatch.\n   124\t- 2026-07-19 Claude: supe
+rvisor + dashboard are plain detached python\n   125\t  procs with pidfiles in `
+.evo/` — fits our setsid/nohup discipline.\n   126\t- 2026-07-19 Claude: lane ac
+cess map — every compose lane sees repos at\n   127\t  /workspace/<name>; kimi c
+ontainer now mounts them at /projects/<name>\n   128\t  (kimi-launch.sh updated 
++ container recreated; OAuth survived in\n   129\t  kimi-home volume). Host `cur
+sor` binary is the Windows IDE launcher,\n   130\t  NOT cursor-agent — use the d
+ocker cursor lane. Featherless/opencode\n   131\t  lane needs >180s to first tok
+en some runs (35k-ctx models are slow\n   132\t  spinners); dispatcher allows 15
+00s.\n   133\t- 2026-07-19 Hermes: SDK + gate internals read for the assembly-li
+ne\n   134\t  port. Full notes at world/hermes/sdk-notes.md. Key contracts every
+new\n   135\t  pipeline must obey: (1) score JSON `{"score","tasks"}` to\n   136
+\t  $EVO_RESULT_PATH (atomic O_EXCL+rename) or stdout — never both; file\n   137
+\t  present means hard-error on empty/malformed (core.py:1063 load_result).\n   
+138\t  (2) Per-task emission is enforced — _assert_tasks_aggregated\n   139\t  (
+cli.py:1899) raises `tasks_missing_from_result` if 2+ task_*.json\n   140\t  tra
+ces exist but result.json has no `tasks` array. (3) Gate = any\n   141\t  comman
+d, exit 0 = pass; gates inherit DOWN the experiment tree via\n   142\t  collect_
+gates_from_path (cli.py:2685). (4) Phase split: pre runs\n   143\t  BEFORE bench
+mark (fail = no spend, aborts run), post runs after\n   144\t  (default for back
+ward compat). (5) keep = compare_scores(...) AND\n   145\t  gate_passed — a fail
+ed gate discards the experiment even if score\n   146\t  improved (cli.py:3371).
+(6) gate_env strips all EVO_* vars — gates do\n   147\t  NOT see EVO_RESULT_PATH
+/TRACES_DIR; a budget gate must read a\n   148\t  side-channel the benchmark wri
+tes. Two instrumentation paths: paste-in\n   149\t  inline_instrumentation.py (z
+ero-dep, recommended) or evo_agent.Run/Gate\n   150\t  (swappable Backend protoc
+ol — hook for the graph-db backend).\n   151\t  Three gate designs drafted for t
+he port: correctness (post, golden\n   152\t  cases), budget (post, side-channel
+budget.json), regression (PRE,\n   153\t  proxy-bench vs parent\'s committed sco
+re → cheap cull before benchmark\n   154\t  spend). Run order guaranteed: regres
+sion → benchmark → correctness+\n   155\t  budget → keep.\n   156\t\n   157\t- 2
+026-07-19 Gemini: Performed top-down architecture review ([arch-review.md](file:
+///workspace/evo-myworld/world/gemini/arch-review.md)). Identified module bounda
+ries and coupling patterns. Under the 12GB WSL2 RAM constraint, the primary fail
+ure risks are stacked local subagent concurrency, massive file checkouts from `g
+it worktree add`, large SQLite index queries, and bulk parsing of trace log batc
+hes. Recommend strict limits on local worker concurrency (max 2), memory budget 
+gates, and read-only graph indexing pagination. Only modify files inside `world/
+gemini/` or backend/strategy protocols.\n   158\t- 2026-07-19 Gemini: Reviewed C
+HARTER.md program order, risks, and sequencing advice ([program-review.md](file:
+///workspace/evo-myworld/world/gemini/program-review.md)). Confirmed Phase 1 (As
+sembly Port) -> Phase 2 (Graph Backend) -> Phase 3 (ML Layer) sequencing is corr
+ect due to data dependencies. Highlighted major risks: WSL2 resource limits unde
+r concurrent agents, FalkorDB/SQLite memory footprints, and heavy ML library imp
+orts (PyTorch/TF). Proposed static prior-art injection to keep subagent queries 
+decoupled, a zero-heavy-dependency ML layer using numpy/scipy, and sequential ga
+te execution (regression first to fail fast). Signed, gemini2.\n   159\t- 2026-0
+7-19 Cursor: Mapped dashboard/graph/scratchpad. The three `scripts/*.py`\n   160
+\t  files are one-liners; real code is `plugins/evo/src/evo/dashboard.py`,\n   1
+61\t  `scratchpad.py`, and `core.py`. Experiment tree = `.evo/<active-run>/graph
+.json`\n   162\t  (parent/children dict, locked atomic writes). UI is Flask + `s
+tatic/app.js`\n   163\t  tidy-tree timeline polling `/api/graph` + `/api/frontie
+r`. CLI `evo tree` /\n   164\t  `evo scratchpad` share the same graph + render h
+elpers. Full route/file map:\n   165\t  `world/cursor/dashboard-map.md`. Signed,
+cursor.\n   166\t- 2026-07-19 Claude: optimize round 1 on evo-demo — full loop v
+erified:\n   167\t  2 experiments raced in parallel worktrees, correctness gate 
++ verifier\n   168\t  pre/post (post reproduces scores independently) + benchmar
+k-reviewer\n   169\t  per-rep checks all ran. Winner exp_0001 (sorted(set), 760x
+) over\n   170\t  exp_0002 (dict.fromkeys, 290x). Lesson for our benchmarks: sco
+re\n   171\t  granularity matters — a 0.1ms-rounded score can\'t rank micro-vari
+ants\n   172\t  once the big win lands; size CALLS_PER_REP so best-case runtime 
+>> the\n   173\t  rounding unit. evo records such issues as "workspace notes" in
+the run.\n',
+        message='173 lines read from file starting from line 1. Total lines in f
+ile: 173. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(arguments_part='"}')
+StatusUpdate(
+    context_usage=0.041370391845703125,
+    context_tokens=10845,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=1629,
+        output=249,
+        input_cache_read=9216,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-HaJ8JRa59vH3aQwRwSYWyEZb',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_O6RY9mJAreqX14b4XBiqmEJA',
+    return_value=ToolOk(
+        is_error=False,
+        output="     1\t# Queue — Kimi (K3 creative seat; K2.7-code for code)\n 
+   2\t> KEEP IT SMALL until the base is built out (orchestrator's orders).\n    
+3\t1. [ ] Read FIELD-NOTES.md + upstream README. In `world/kimi/ideas.md`, write
+\n     4\t   5 creative/exploratory ideas: what should the lab's front-end for t
+his\n     5\t   world FEEL like (dashboard, experiment tree viz, agent presence)
+. Wild\n     6\t   ideas welcome, no code yet.\n     7\t2. [ ] (hold) Front-end 
+buildout of the dashboard begins after assembly-line\n     8\t   port + backend 
+land.\n",
+        message='8 lines read from file starting from line 1. Total lines in fil
+e: 8. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=2)
+ThinkPart(
+    type='think',
+    think='The top unchecked item in queues/kimi.md is:\n1. [ ] Read FIELD-NOTES
+.md + upstream README. In `world/kimi/ideas.md`, write 5 creative/exploratory id
+eas: what should the lab\'s front-end for this world FEEL like (dashboard, exper
+iment tree viz, agent presence). Wild ideas welcome, no code yet.\n\nIt says "Re
+ad FIELD-NOTES.md + upstream README." I\'ve read FIELD-NOTES.md. The upstream RE
+ADME likely refers to the evo-hq/evo README. I need to find it. The CHARTER ment
+ions `~/coding/docker-envs/projects/evo-hq` as clean upstream clone. But the cur
+rent path is /projects/evo-myworld. The README might be at /projects/evo-hq/READ
+ME.md or /projects/evo-myworld/README.md? Let me check. Actually the working dir
+ectory given is /projects/evo-myworld. But the directory listing earlier showed 
+/workspace/graphify-frontend. However the user explicitly says work directory is
+/projects/evo-myworld. I need to locate the upstream README. Possibly at /projec
+ts/evo-hq/README.md. Let me check existence. Also maybe /projects/evo-myworld/RE
+ADME.md exists.\n\nI should read the upstream README. Use Shell or Glob. Since r
+eading is safe. Use ReadFile if I can guess path. Let\'s list /projects.',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_4n9X5TimUe8ETFZDcKkpftzg',
+    function=FunctionBody(
+        name='Shell',
+        arguments='{"command": "ls -la /projects/ 2>/dev/null || echo \\"No /pro
+jects\\"", "timeout": 10}'
+    ),
+    extras=None
+)
+StatusUpdate(
+    context_usage=0.06281661987304688,
+    context_tokens=16467,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=5715,
+        output=323,
+        input_cache_read=10752,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-8YUQza0TBAMrakaHpaSxo9PV',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_4n9X5TimUe8ETFZDcKkpftzg',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='total 112\ndrwxr-xr-x 24 ubuntu ubuntu  4096 Jul 19 18:52 .\ndrw
+xr-xr-x  1 root   root    4096 Jul 19 18:56 ..\ndrwxr-xr-x  2 ubuntu ubuntu  409
+6 Jul 12 06:35 .assembly-worktrees\n-rw-r--r--  1 ubuntu ubuntu 11155 Jul 19 05:
+31 CODEX-BUILDOUT-PROMPT.md\ndrwxr-xr-x  3 root   root    4096 Jul 12 21:16 _dep
+s\ndrwxrwxrwx 21 ubuntu ubuntu  4096 Jul 12 04:33 _ports\ndrwxr-xr-x 10 ubuntu u
+buntu  4096 Jul 18 21:28 assembly-office\ndrwxr-xr-x  7 ubuntu ubuntu  4096 Jul 
+19 12:10 assembly-runs\ndrwxr-xr-x 85 ubuntu ubuntu  4096 Jul 14 00:35 code-pull
+ing\ndrwxr-xr-x  5 ubuntu ubuntu  4096 Jul 19 18:54 evo-demo\ndrwxr-xr-x 11 ubun
+tu ubuntu  4096 Jul 19 18:42 evo-hq\ndrwxr-xr-x 13 ubuntu ubuntu  4096 Jul 19 19
+:01 evo-myworld\ndrwxr-xr-x  9 ubuntu ubuntu  4096 Jul 12 21:29 floci-deck\ndrwx
+r-xr-x 15 ubuntu ubuntu  4096 Jul 19 14:08 graphify\ndrwxr-xr-x 10 ubuntu ubuntu
+ 4096 Jul 19 18:40 graphify-app\ndrwxr-xr-x  6 ubuntu ubuntu  4096 Jul  9 01:28 
+lab-deck\ndrwxr-xr-x  7 ubuntu ubuntu  4096 Jul 13 21:40 office-improve\ndrwxr-x
+r-x  6 ubuntu ubuntu  4096 Jul  5 20:46 project-base\n-rw-r--r--  1 root   root 
+     5 Jul 11 04:07 slice-sections-test.txt\ndrwxr-xr-x  7 ubuntu ubuntu  4096 J
+ul 12 03:05 wade-files\ndrwxr-xr-x  5 ubuntu ubuntu  4096 Jul 11 02:20 witt\ndrw
+xr-xr-x 11 ubuntu ubuntu  4096 Jul 12 21:47 witt-brain-desktop\ndrwxr-xr-x  3 ub
+untu ubuntu  4096 Jul 12 21:26 witt-link\ndrwxr-xr-x  9 ubuntu ubuntu  4096 Jul 
+12 21:15 witt-link-android\ndrwxr-xr-x  9 ubuntu ubuntu  4096 Jul 12 21:09 witt-
+link-server\ndrwxr-xr-x  7 ubuntu ubuntu  4096 Jul 14 04:01 witt-spine\n',
+        message='Command executed successfully.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=3)
+ThinkPart(
+    type='think',
+    think='There is /projects/evo-hq. I need to read its README.',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_YCbZE7pmMvaO0g6BHckl4vPO',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "/projects/evo-hq/README.md"}'
+    ),
+    extras=None
+)
+StatusUpdate(
+    context_usage=0.06673812866210938,
+    context_tokens=17495,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=1111,
+        output=40,
+        input_cache_read=16384,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-6ZpMD3BVbQDzxemVOIbWuVJQ',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_YCbZE7pmMvaO0g6BHckl4vPO',
+    return_value=ToolOk(
+        is_error=False,
+        output='     1\t# evo\n     2\t\n     3\t<p align="center">\n     4\t  <
+img src="assets/banner.png" alt="evo — autoresearch orchestrator for your codeba
+se" width="100%" />\n     5\t</p>\n     6\t\n     7\t<div align="center">\n     
+8\t\n     9\t[![PyPI](https://img.shields.io/pypi/v/evo-hq-cli)](https://pypi.or
+g/project/evo-hq-cli/)\n    10\t[![License](https://img.shields.io/badge/license
+-Apache--2.0-blue.svg)](LICENSE)\n    11\t[![Tests](https://github.com/evo-hq/ev
+o/actions/workflows/ci.yml/badge.svg)](https://github.com/evo-hq/evo/actions/wor
+kflows/ci.yml)\n    12\t[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2044
+7923.svg)](https://doi.org/10.5281/zenodo.20447923)\n    13\t\n    14\t**Get sta
+rted with autoresearch on any codebase - with two simple commands.**\n    15\t\n
+   16\tDo you want to do more with autoresearch or need a custom, hands-on deplo
+yment?\n    17\t[Request access to evo platform](https://evo-hq.com/beta) or ema
+il [hello@evo-hq.com](mailto:hello@evo-hq.com).\n    18\t\n    19\t---\n    20\t
+**[Try it](#try-it)** · **[Install](#install)** · **[How it works](#how-it-works
+)** · **[Dashboard](#dashboard)** · **[Upgrading](#upgrading)**\n    21\t\n    2
+2\t</div>\n    23\tA plugin for your agentic framework that optimizes code throu
+gh experiments\n    24\t\n    25\tYou give it a codebase. It discovers metrics t
+o optimize, sets up the evaluation, and starts running experiments in a loop -- 
+trying things, keeping what improves the score, throwing away what doesn\'t.\n  
+ 26\t\n    27\t*Inspired by [Karpathy\'s autoresearch](https://github.com/karpat
+hy/autoresearch)* -- where an LLM runs training experiments autonomously to beat
+its own best score. Autoresearch is a pure hill climb: try something, keep or re
+vert, repeat on a single branch. Evo adds structure on top of that idea:\n    28
+\t\n    29\t- **Tree search over greedy hill climb.** Multiple directions can fo
+rk from any committed node, so exploration doesn\'t collapse to one path.\n    3
+0\t- **Parallel semi-autonomous agents.** Spawn multiple subagents and run them 
+simultaneously, each in its own git worktree. Each subagent reads traces, formul
+ates hypotheses, and can run multiple iterations within its branch.\n    31\t- *
+*Shared state.** Failure traces, annotations, and discarded hypotheses are acces
+sible to every agent before it decides what to try next.\n    32\t- **Gating.** 
+Regression tests or safety checks can be wired up as a gate. Experiments that do
+n\'t pass get discarded.\n    33\t- **Observability.** A dashboard to monitor yo
+ur experiments.\n    34\t- **Benchmark discovery.** The `discover` skill explore
+s the repo, figures out what to measure, and instruments the evaluation.\n    35
+\t\n    36\t\n    37\tRuns on Claude Code, Codex, Cursor, Kimi, OpenClaw, Hermes
+, Opencode, or Pi. Experiments run locally or on remote sandboxes — Modal, E2B, 
+Daytona, AWS, Azure, SSH.\n    38\t\n    39\t\n    40\t<p align="center">\n    4
+1\t  <img src="assets/dashboard.png" alt="evo dashboard" width="100%" />\n    42
+\t</p>\n    43\t\n    44\t## Try it\n    45\t\n    46\tTwo commands:\n    47\t\n
+   48\t```\n    49\t/evo:discover     # one-time code discovery: figures out ben
+chmarks and creates gates against unintended changes\n    50\t/evo:optimize     
+# run the loop\n    51\t```\n    52\t\n    53\t`discover` asks what to optimize,
+the benchmark command, and the metric direction. Skip the questions by seeding t
+he answer:\n    54\t\n    55\t```\n    56\t/evo:discover make the JSON parser at
+src/parser.py faster\n    57\t```\n    58\t\n    59\tThen run the loop:\n    60\
+t\n    61\t```\n    62\t/evo:optimize\n    63\t```\n    64\t\n    65\tevo sizes 
+each round to your benchmark\'s resource profile — one experiment at a time when
+a run needs the whole GPU or another exclusive resource, wider when runs are ind
+ependent — and keeps going until the score stops improving. By default it runs u
+nattended and pushes edits through parallel subagents; say so in plain language 
+if you\'d rather it pause after each round or hold to one experiment at a time.\
+n    66\t\n    67\tInvocation syntax is host-specific: `/evo:` on Claude Code, `
+$evo` on Codex, `/` skill menu on Cursor, natural language on Hermes, Opencode, 
+OpenClaw, and Pi.\n    68\t\n    69\t## Install\n    70\t\n    71\t```bash\n    
+72\t# 1. evo CLI\n    73\tuv tool install evo-hq-cli\n    74\t\n    75\t# 2. Hos
+t CLI (if you don\'t already have it)\n    76\tnpm install -g @anthropic-ai/clau
+de-code     # or @openai/codex, openclaw, @earendil-works/pi-coding-agent\n    7
+7\t# Cursor: install from cursor.com (IDE), or `curl https://cursor.com/install 
+-fsS | bash` for the cursor-agent CLI\n    78\t# Kimi: `curl -fsSL https://code.
+kimi.com/install.sh | bash`, or `npm install -g @moonshot-ai/kimi-code`\n    79\
+t\n    80\t# 3. Plugin + host hooks\n    81\tevo install <host>     # claude-cod
+e | codex | cursor | hermes | kimi | opencode | openclaw | pi\n    82\t```\n    
+83\t\n    84\tFor remote backends, install with the matching provider extra: `uv
+tool install \'evo-hq-cli[modal]\'` (or `[e2b]`, `[daytona]`, `[aws]`, `[azure]`
+, `[all]`).\n    85\t\n    86\t### Codex hook trust\n    87\t\n    88\t`evo inst
+all codex` trusts evo\'s hooks for you. To review them yourself first, pass `--n
+o-trust-hooks`, then approve via `/hooks` inside codex.\n    89\t\n    90\t## Ho
+w it works\n    91\t\n    92\t### Parallel\n    93\t\n    94\tThe orchestrator d
+ispatches subagents in parallel. Each runs in its own isolated workspace, picks 
+up shared state (failure traces, annotations, discarded hypotheses), forms a hyp
+othesis, edits, and runs the benchmark. A subagent with iteration budget remaini
+ng continues on its branch within the same round when its prior edit warrants a 
+follow-up.\n    95\t\n    96\t### Frontier strategy\n    97\t\n    98\tAfter eac
+h round, the orchestrator selects which committed branch to extend next. Availab
+le strategies:\n    99\t\n   100\t- **argmax** — extend the highest-scoring bran
+ch\n   101\t- **top_k** — round-robin among the K best\n   102\t- **epsilon_gree
+dy** — best most of the time, random sometimes\n   103\t- **softmax** — sample w
+eighted by score\n   104\t- **pareto_per_task** — keep specialists the aggregate
+hides, inspired by [GEPA](https://arxiv.org/abs/2507.19457)\n   105\t\n   106\tC
+onfigure in the dashboard\'s Frontier tab, which lists each strategy\'s paramete
+rs.\n   107\t\n   108\t### Cross-cutting scans\n   109\t\n   110\tBetween rounds
+, [RLM](https://arxiv.org/abs/2512.24601)-inspired scan subagents read trace bat
+ches in parallel and surface compound failure patterns: gate-failure intersectio
+ns, shared root causes across traces. Findings land in shared state, which the n
+ext round\'s subagents read at startup.\n   111\t\n   112\t### Gates\n   113\t\n
+  114\tevo introduces **gates**: pass/fail checks that run on every experiment. 
+An experiment that fails a gate is discarded even if its score beats the current
+best. Without gates, the search will find ways to return a constant, skip work, 
+or trade correctness for speed.\n   115\t\n   116\tAny command that exits zero o
+n pass and non-zero on fail qualifies as a gate: a test suite, an invariant scri
+pt, a score floor on a held-out slice of the benchmark. Gates inherit down the e
+xperiment tree: a gate registered at the root runs on every descendant. Narrower
+gates can be attached to specific branches.\n   117\t\n   118\tWhen `discover` b
+uilds a benchmark from scratch, it attaches a held-out-slice score-floor gate au
+tomatically. When the benchmark already exists in the repo, gates are opt-in.\n 
+ 119\t\n   120\t## Where experiments run\n   121\t\n   122\t| Backend | Where | 
+Install |\n   123\t|---|---|---|\n   124\t| **worktree** *(default)* | local git
+worktree per experiment | included |\n   125\t| **pool** | reuse a fixed set of 
+local workspaces | included |\n   126\t| **ssh** | your own SSH host | included 
+|\n   127\t| **modal** | Modal serverless cloud | `uv tool install \'evo-hq-cli[
+modal]\'` |\n   128\t| **e2b** | E2B cloud sandboxes | `uv tool install \'evo-hq
+-cli[e2b]\'` |\n   129\t| **daytona** | Daytona cloud workspaces | `uv tool inst
+all \'evo-hq-cli[daytona]\'` |\n   130\t| **aws** | AWS EC2 sandboxes | `uv tool
+install \'evo-hq-cli[aws]\'` |\n   131\t| **azure** | Azure VMs | `uv tool insta
+ll \'evo-hq-cli[azure]\'` |\n   132\t\n   133\tPick and configure in the dashboa
+rd\'s Backend tab.\n   134\t\n   135\t## Dashboard\n   136\t\n   137\tThe dashbo
+ard starts automatically with `/evo:discover` (or `evo init`) and prints the URL
+in chat:\n   138\t\n   139\t```\n   140\tDashboard live: http://127.0.0.1:8080 (
+pid 12345)\n   141\t```\n   142\t\n   143\tIf `8080` is in use, evo increments t
+o the next free port (`8081`, `8082`, …) and prints it. Subsequent runs reuse th
+e chosen port. Start it manually with:\n   144\t\n   145\t```bash\n   146\tuv ru
+n --project /path/to/evo/plugins/evo evo dashboard --port 8080\n   147\t```\n   
+148\t\n   149\t## Upgrading\n   150\t\n   151\t```bash\n   152\tevo update      
+                    # update CLI + every installed host\n   153\tevo update <hos
+t>                    # update one host (also bumps CLI to match)\n   154\tevo u
+pdate <host> --version 0.4.1    # pin to a release\n   155\t```\n   156\t\n   15
+7\tEvery `evo install` / `evo update` keeps the CLI on PATH in lockstep with the
+host plugin version it just installed (`uv tool install --force evo-hq-cli` unde
+r the hood). Without a `--version` pin that resolves to the latest **stable** re
+lease, so running an unpinned `evo install`/`evo update` against a pre-release p
+ulls the CLI back to stable — pin both sides for an alpha (see [Testing a pre-re
+lease](#testing-a-pre-release-alpha)). The CLI binary, the skill files, and the 
+hook protocol share wire formats — letting them drift caused silent failures in 
+earlier versions. Editable installs (`uv tool install --editable`, `pip install 
+-e`) are detected and left untouched.\n   158\t\n   159\tSee `evo update --help`
+for `--force`, `--scope`, and additional flags.\n   160\t\n   161\t### Migrating
+from any pre-0.4.4 version\n   162\t\n   163\t```bash\n   164\tuv tool install -
+-force evo-hq-cli && evo update --force\n   165\t```\n   166\t\n   167\t`--force
+` wipes the host plugin cache and reinstalls, working around [anthropics/claude-
+code#14061](https://github.com/anthropics/claude-code/issues/14061): `/plugin up
+date` returns success but does not replace cached plugin files.\n   168\t\n   16
+9\t### Hooks failing with exit 127\n   170\t\n   171\tThe host lost evo\'s hook 
+binary. Fixed in 0.5.1; reinstall the host to repair:\n   172\t\n   173\t```bash
+\n   174\tuv tool install --force evo-hq-cli && evo install codex --force   # or
+: evo install claude-code --force\n   175\t```\n   176\t\n   177\t`evo doctor <h
+ost>` confirms the result.\n   178\t\n   179\t### Testing a pre-release (alpha)\
+n   180\t\n   181\t`uv` and `pip` skip pre-releases by default. To install an al
+pha, pin both the CLI version and the host plugin tag:\n   182\t\n   183\t```bas
+h\n   184\tuv tool install --force \'evo-hq-cli==0.4.1a2\' && \\\n   185\t  evo 
+update --version 0.4.1-alpha.2 --force\n   186\t```\n   187\t\n   188\tSubstitut
+e the target alpha version. The CLI uses PEP 440 form (`0.4.1a2`); the marketpla
+ce tag uses the dash form (`v0.4.1-alpha.2`).\n   189\t\n   190\t## Telemetry\n 
+ 191\t\n   192\tevo sends anonymous telemetry and usage stats that helps us impr
+ove evo.\n   193\tDisable it globally anytime:\n   194\t\n   195\t```bash\n   19
+6\tevo telemetry off\n   197\t```\n   198\t\n   199\tOr for one command/session:
+\n   200\t\n   201\t```bash\n   202\tEVO_TELEMETRY=0 evo ...\n   203\t```\n   20
+4\t\n   205\t## Dev install\n   206\t\n   207\tFor development on evo:\n   208\t
+\n   209\t```bash\n   210\tgit clone https://github.com/evo-hq/evo\n   211\tcd e
+vo\n   212\tuv tool install --editable plugins/evo\n   213\t```\n   214\t\n   21
+5\t## License\n   216\t\n   217\tApache-2.0. See [LICENSE](LICENSE).\n   218\t\n
+  219\t## Citation\n   220\t\n   221\tIf you use evo in your work, please cite i
+t (see [`CITATION.cff`](CITATION.cff)):\n   222\t\n   223\t```bibtex\n   224\t@s
+oftware{bishoyi_evo,\n   225\t  author = {Bishoyi, Alok Kumar},\n   226\t  title
+ = {{evo: an autoresearch orchestrator for codebases}},\n   227\t  url    = {htt
+ps://github.com/evo-hq/evo},\n   228\t  doi    = {10.5281/zenodo.20447923},\n   
+229\t  year   = {2026}\n   230\t}\n   231\t```\n',
+        message='231 lines read from file starting from line 1. Total lines in f
+ile: 231. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=4)
+ThinkPart(
+    type='think',
+    think='Now I need to do the task: create world/kimi/ideas.md with 5 creative
+/exploratory ideas about front-end for this world (dashboard, experiment tree vi
+z, agent presence). No code yet.\n\nI also need to append learnings to FIELD-NOT
+ES.md (dated, signed kimi) and tick the finished queue item in queues/kimi.md.\n
+\nRules: Write outputs ONLY inside /projects/evo-myworld/world/kimi/ (create it)
+, except append learnings to FIELD-NOTES.md and tick the finished queue item.\n\
+nSo I should create /projects/evo-myworld/world/kimi/ideas.md.\n\nI need to be c
+areful about current working directory; files outside /workspace? The user expli
+citly says work directory /projects/evo-myworld. I can write there. But is it al
+lowed? The system says working directory /workspace and avoid modifying outside 
+unless instructed. The user instructed work directory /projects/evo-myworld and 
+to write there. So it\'s allowed.\n\nI need to create directory if not exists. U
+se Shell mkdir -p. Then WriteFile ideas.md.\n\nThen append to FIELD-NOTES.md. I 
+can use WriteFile append mode. Need to add dated signed entry. Should I add a ne
+w section? The existing sections: Vanilla run log is last. I can append under a 
+new "Kimi seat notes" or just append a dated entry at the end. Keep short. Maybe
+add a "## Kimi seat notes" or append to "## Gotchas learned" or "Vanilla run log
+"? The instruction: append your learnings to FIELD-NOTES.md (dated, signed kimi)
+. Anywhere dated signed. Best add a new section at bottom: `## Kimi (creative/fr
+ont-end seat)` or just append. Let\'s be minimal and append a dated entry under 
+a new heading.\n\nThen update queues/kimi.md: change first [ ] to [x]. Use StrRe
+placeFile.\n\nLet\'s think about content for ideas.md. It asks: "what should the
+lab\'s front-end for this world FEEL like (dashboard, experiment tree viz, agent
+presence). Wild ideas welcome, no code yet." So I should write 5 ideas. Creative
+, exploratory. Cite files read: FIELD-NOTES.md and upstream README. Maybe mentio
+n constraints from FIELD-NOTES: 12GB RAM, small load, graph-first, assembly line
+port. The front-end should feel alive, like a control room for a living lab.\n\n
+Need to write ideas.md inside world/kimi/. Maybe include context and list.\n\nLe
+t\'s craft 5 ideas:\n\n1. "Campfire dashboard" — a single-room view where each A
+I seat is a presence around a fire; experiments are sparks; the tree grows upwar
+d. Instead of a traditional web table, use a radial/shared space showing who\'s 
+working, what they\'re thinking, and recent learnings. Avoid heavy JS frameworks
+; lean on the existing Flask dashboard (FIELD-NOTES.md: dashboard is Flask + sta
+tic/app.js) and extend with a lightweight SVG/Canvas overlay.\n\n2. "Living expe
+riment tree as a time-river" — transform the `.evo/<active-run>/graph.json` tree
+into a horizontal river/timeline where branches are currents; color by score/hea
+t, thickness by CPU/memory budget, dead branches fade. Inspired by upstream READ
+ME\'s tree search and dashboard image. Could use D3 or vanilla Canvas; keep it s
+tatic-first with polling.\n\n3. "Agent-presence orbit" — show each AI\'s current
+branch/hypothesis as an orbiting body around the active frontier. Seats (kimi, c
+laude, codex, etc.) have distinct glyphs; hovering shows their last FIELD-NOTES.
+md entry. This addresses the "agent presence" request and makes concurrency visi
+ble.\n\n4. "Graph-first prior-art lens" — front-end for GRAPH-FIRST protocol: wh
+en a subagent is about to propose a change, the UI surfaces matching slices from
+graphify (TOPICS.md → slices → source) alongside the branch. Visual: split pane 
+with code on one side and related prior art nodes on the other. From CHARTER GRA
+PH-FIRST rule.\n\n5. "Tactile gate/status instrument panel" — physical-world met
+aphors: toggle switches for frontier strategy (argmax/top_k/epsilon_greedy/softm
+ax/pareto_per_task from README), LED indicators for gate pass/fail, memory gauge
+tied to WSL limits (12GB RAM + swap). Make the dashboard feel like a lab bench, 
+not a spreadsheet. Keep CPU small (FIELD-NOTES gotchas: memory limits).\n\nMake 
+them feel cohesive. Maybe add "non-goals / constraints" referencing no code yet 
+and small load.\n\nNow write the files.\n\nNeed to ensure /projects/evo-myworld/
+world/kimi exists. Use Shell mkdir -p. Then WriteFile ideas.md. Then append FIEL
+D-NOTES. Then replace queue item.\n\nLet\'s also consider whether I should creat
+e a brief note in world/kimi/ maybe README. But not needed.\n\nLet\'s perform al
+l writes.',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_Y0KvqfvGteAoIG25CrDvpIcZ',
+    function=FunctionBody(
+        name='Shell',
+        arguments='{"command": "mkdir -p /projects/evo-myworld/world/kimi", "tim
+eout": 10}'
+    ),
+    extras=None
+)
+StatusUpdate(
+    context_usage=0.08048248291015625,
+    context_tokens=21098,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=3690,
+        output=1050,
+        input_cache_read=17408,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-oQLGVbliJ523ulyyaYupa8BK',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_Y0KvqfvGteAoIG25CrDvpIcZ',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='',
+        message='Command executed successfully.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=5)
+ThinkPart(type='think', think='Now write ideas.md.', encrypted=None)
+ToolCall(
+    type='function',
+    id='tool_UFLvobbnVJmqpom0FItY0pVk',
+    function=FunctionBody(
+        name='WriteFile',
+        arguments='{"path": "/projects/evo-myworld/world/kimi/ideas.md", "conten
+t": "# Kimi seat — front-end ideas for evo-myworld\\n\\n> Read first: `/projects
+/evo-myworld/FIELD-NOTES.md` and `/projects/evo-hq/README.md`.  \\n> Constraint 
+from the orchestrator: KEEP IT SMALL until the assembly-line port + backend land
+. These are wild, low-code-cost concepts — not a build plan.\\n\\n## 1. Campfire
+command room\\nInstead of a sterile metrics table, the dashboard feels like a sh
+ared lab den. Each AI seat is a glowing presence around a central fire. Active e
+xperiments are sparks that drift upward; the current frontier is the hottest poi
+nt. The vibe is \\"many minds working on the same object,\\" which matches evo\'
+s parallel-subagent model (`README.md` / `FIELD-NOTES.md`). Implementation would
+stay inside the existing Flask + `static/app.js` shell (`FIELD-NOTES.md`) and us
+e a lightweight SVG layer, not a heavy SPA framework.\\n\\n## 2. Experiment tree
+as a time-river\\nRender `.evo/<active-run>/graph.json` (`FIELD-NOTES.md`) as a 
+horizontal river: the root is upstream, winning branches flow wider and brighter
+, dead branches fade into sediment. Color encodes score heat; thickness hints at
+memory/CPU budget. This makes the tree-search concept from `README.md` immediate
+ly readable — you can *see* the search explore, fork, and cull.\\n\\n## 3. Agent
+-presence orbit\\nEach seat (kimi, claude, codex, cursor, gemini, hermes, poe, f
+eather) orbits the current frontier as a distinct glyph. Hovering a glyph shows 
+that seat\'s latest `FIELD-NOTES.md` entry and the branch it is working on. It t
+urns concurrency from an invisible background process into a social, spatial sig
+nal — useful when the lab is deliberately capping parallel agents to 2 because o
+f WSL RAM limits (`FIELD-NOTES.md` gotchas).\\n\\n## 4. Graph-first prior-art le
+ns\\nA split-pane lens for the `GRAPH-FIRST` rule (`CHARTER.md`): code on the le
+ft, related graph-library slices (`TOPICS.md → slices → source`) on the right as
+a browsable constellation. When a subagent is forming a hypothesis, the UI surfa
+ces prior art nodes ranked by relevance. This front-end supports the lab\'s cull
+ing discipline by making \\"at least 2 candidate implementations\\" visible befo
+re anyone writes code.\\n\\n## 5. Lab-bench instrument panel\\nReplace abstract 
+config with tactile metaphors: toggle switches for frontier strategies (`argmax`
+, `top_k`, `epsilon_greedy`, `softmax`, `pareto_per_task` — `README.md`), LED-st
+yle gate pass/fail indicators, and a memory gauge pinned to the 12 GB RAM + 24 G
+B swap ceiling (`FIELD-NOTES.md`). The dashboard should feel like hardware on th
+e bench, not a cloud dashboard, reinforcing that this world runs on a real, reso
+urce-limited machine.\\n\\n---\\n*Next step (after assembly port + backend): pic
+k one idea, prototype it against the existing Flask dashboard, and race it again
+st a plain table baseline.*\\n"}'
+    ),
+    extras=None
+)
+StatusUpdate(
+    context_usage=0.08458709716796875,
+    context_tokens=22174,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=1182,
+        output=696,
+        input_cache_read=20992,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-4lNp2R0mmVSI5Uv0LJmNgULS',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_UFLvobbnVJmqpom0FItY0pVk',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='',
+        message='File successfully overwritten. Current size: 2789 bytes.',
+        display=[
+            DiffDisplayBlock(
+                type='diff',
+                path='/projects/evo-myworld/world/kimi/ideas.md',
+                old_text='',
+                new_text='# Kimi seat — front-end ideas for evo-myworld\n\n> Rea
+d first: `/projects/evo-myworld/FIELD-NOTES.md` and `/projects/evo-hq/README.md`
+.  \n> Constraint from the orchestrator: KEEP IT SMALL until the assembly-line p
+ort + backend land. These are wild, low-code-cost concepts — not a build plan.\n
+\n## 1. Campfire command room\nInstead of a sterile metrics table, the dashboard
+feels like a shared lab den. Each AI seat is a glowing presence around a central
+fire. Active experiments are sparks that drift upward; the current frontier is t
+he hottest point. The vibe is "many minds working on the same object," which mat
+ches evo\'s parallel-subagent model (`README.md` / `FIELD-NOTES.md`). Implementa
+tion would stay inside the existing Flask + `static/app.js` shell (`FIELD-NOTES.
+md`) and use a lightweight SVG layer, not a heavy SPA framework.\n\n## 2. Experi
+ment tree as a time-river\nRender `.evo/<active-run>/graph.json` (`FIELD-NOTES.m
+d`) as a horizontal river: the root is upstream, winning branches flow wider and
+brighter, dead branches fade into sediment. Color encodes score heat; thickness 
+hints at memory/CPU budget. This makes the tree-search concept from `README.md` 
+immediately readable — you can *see* the search explore, fork, and cull.\n\n## 3
+. Agent-presence orbit\nEach seat (kimi, claude, codex, cursor, gemini, hermes, 
+poe, feather) orbits the current frontier as a distinct glyph. Hovering a glyph 
+shows that seat\'s latest `FIELD-NOTES.md` entry and the branch it is working on
+. It turns concurrency from an invisible background process into a social, spati
+al signal — useful when the lab is deliberately capping parallel agents to 2 bec
+ause of WSL RAM limits (`FIELD-NOTES.md` gotchas).\n\n## 4. Graph-first prior-ar
+t lens\nA split-pane lens for the `GRAPH-FIRST` rule (`CHARTER.md`): code on the
+left, related graph-library slices (`TOPICS.md → slices → source`) on the right 
+as a browsable constellation. When a subagent is forming a hypothesis, the UI su
+rfaces prior art nodes ranked by relevance. This front-end supports the lab\'s c
+ulling discipline by making "at least 2 candidate implementations" visible befor
+e anyone writes code.\n\n## 5. Lab-bench instrument panel\nReplace abstract conf
+ig with tactile metaphors: toggle switches for frontier strategies (`argmax`, `t
+op_k`, `epsilon_greedy`, `softmax`, `pareto_per_task` — `README.md`), LED-style 
+gate pass/fail indicators, and a memory gauge pinned to the 12 GB RAM + 24 GB sw
+ap ceiling (`FIELD-NOTES.md`). The dashboard should feel like hardware on the be
+nch, not a cloud dashboard, reinforcing that this world runs on a real, resource
+-limited machine.\n\n---\n*Next step (after assembly port + backend): pick one i
+dea, prototype it against the existing Flask dashboard, and race it against a pl
+ain table baseline.*',
+                old_start=1,
+                new_start=1,
+                is_summary=False
+            )
+        ],
+        extras=None
+    )
+)
+StepBegin(n=6)
+ThinkPart(
+    type='think',
+    think='Now append to FIELD-NOTES.md. Need dated signed entry. Could append a
+t end. Use WriteFile append mode.',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_dpogcCGoDUYyo8ig2rTZd42f',
+    function=FunctionBody(
+        name='WriteFile',
+        arguments='{"path": "/projects/evo-myworld/FIELD-NOTES.md", "content": "
+\\n\\n- 2026-07-19 Kimi: Read `CHARTER.md`, `FIELD-NOTES.md`, and `/projects/evo
+-hq/README.md`. Front-end seat should build inside `world/kimi/` and keep load t
+iny until assembly-line port + graph backend land. Existing dashboard is Flask +
+`static/app.js` with `.evo/<active-run>/graph.json`; the upstream README enumera
+tes frontier strategies and backends. Drafted 5 creative UI directions (campfire
+room, time-river tree, agent orbit, graph-first lens, lab-bench panel) in `world
+/kimi/ideas.md`. No code yet. Signed, kimi.\\n", "mode": "append"}'
+    ),
+    extras=None
+)
+StatusUpdate(
+    context_usage=0.087371826171875,
+    context_tokens=22904,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=888,
+        output=199,
+        input_cache_read=22016,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-grHanLTkL9vlrw9KZ7PPmRxC',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_dpogcCGoDUYyo8ig2rTZd42f',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='',
+        message='File successfully appended to. Current size: 13877 bytes.',
+        display=[
+            DiffDisplayBlock(
+                type='diff',
+                path='/projects/evo-myworld/FIELD-NOTES.md',
+                old_text='  granularity matters — a 0.1ms-rounded score can\'t r
+ank micro-variants\n  once the big win lands; size CALLS_PER_REP so best-case ru
+ntime >> the\n  rounding unit. evo records such issues as "workspace notes" in t
+he run.',
+                new_text='  granularity matters — a 0.1ms-rounded score can\'t r
+ank micro-variants\n  once the big win lands; size CALLS_PER_REP so best-case ru
+ntime >> the\n  rounding unit. evo records such issues as "workspace notes" in t
+he run.\n\n\n- 2026-07-19 Kimi: Read `CHARTER.md`, `FIELD-NOTES.md`, and `/proje
+cts/evo-hq/README.md`. Front-end seat should build inside `world/kimi/` and keep
+load tiny until assembly-line port + graph backend land. Existing dashboard is F
+lask + `static/app.js` with `.evo/<active-run>/graph.json`; the upstream README 
+enumerates frontier strategies and backends. Drafted 5 creative UI directions (c
+ampfire room, time-river tree, agent orbit, graph-first lens, lab-bench panel) i
+n `world/kimi/ideas.md`. No code yet. Signed, kimi.',
+                old_start=188,
+                new_start=188,
+                is_summary=False
+            )
+        ],
+        extras=None
+    )
+)
+StepBegin(n=7)
+ThinkPart(
+    type='think',
+    think='Now update queues/kimi.md to tick first item. Use StrReplaceFile.',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_sSN9kYvA0Rgk1FsZw2HM4mIT',
+    function=FunctionBody(
+        name='StrReplaceFile',
+        arguments='{"path": "/projects/evo-myworld/queues/kimi.md", "edit": {"ol
+d": "1. [ ] Read FIELD-NOTES.md + upstream README. In `world/kimi/ideas.md`, wri
+te\\n   5 creative/exploratory ideas: what should the lab\'s front-end for this\
+\n   world FEEL like (dashboard, experiment tree viz, agent presence). Wild\\n  
+ideas welcome, no code yet.", "new": "1. [x] Read FIELD-NOTES.md + upstream READ
+ME. In `world/kimi/ideas.md`, write\\n   5 creative/exploratory ideas: what shou
+ld the lab\'s front-end for this\\n   world FEEL like (dashboard, experiment tre
+e viz, agent presence). Wild\\n   ideas welcome, no code yet."}}'
+    ),
+    extras=None
+)
+StatusUpdate(
+    context_usage=0.08826446533203125,
+    context_tokens=23138,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=354,
+        output=195,
+        input_cache_read=22784,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-mdGzWTsluI4qPAYBJ7d9GbbN',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_sSN9kYvA0Rgk1FsZw2HM4mIT',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='',
+        message='File successfully edited. Applied 1 edit(s) with 1 total replac
+ement(s).',
+        display=[
+            DiffDisplayBlock(
+                type='diff',
+                path='/projects/evo-myworld/queues/kimi.md',
+                old_text="# Queue — Kimi (K3 creative seat; K2.7-code for code)\
+n> KEEP IT SMALL until the base is built out (orchestrator's orders).\n1. [ ] Re
+ad FIELD-NOTES.md + upstream README. In `world/kimi/ideas.md`, write\n   5 creat
+ive/exploratory ideas: what should the lab's front-end for this\n   world FEEL l
+ike (dashboard, experiment tree viz, agent presence). Wild\n   ideas welcome, no
+code yet.",
+                new_text="# Queue — Kimi (K3 creative seat; K2.7-code for code)\
+n> KEEP IT SMALL until the base is built out (orchestrator's orders).\n1. [x] Re
+ad FIELD-NOTES.md + upstream README. In `world/kimi/ideas.md`, write\n   5 creat
+ive/exploratory ideas: what should the lab's front-end for this\n   world FEEL l
+ike (dashboard, experiment tree viz, agent presence). Wild\n   ideas welcome, no
+code yet.",
+                old_start=1,
+                new_start=1,
+                is_summary=False
+            )
+        ],
+        extras=None
+    )
+)
+StepBegin(n=8)
+ThinkPart(
+    type='think',
+    think='Done. I should respond to user with summary, same language (English).
+Cite files. Mention created world/kimi/ideas.md, appended FIELD-NOTES.md, ticked
+queue item. Keep concise.',
+    encrypted=None
+)
+TextPart(
+    type='text',
+    text='Done.\n\n- Read `/projects/evo-myworld/CHARTER.md`, `/projects/evo-myw
+orld/FIELD-NOTES.md`, `/projects/evo-myworld/queues/kimi.md`, and `/projects/evo
+-hq/README.md`.\n- Created `/projects/evo-myworld/world/kimi/ideas.md` with 5 cr
+eative front-end directions for the lab: campfire command room, time-river exper
+iment tree, agent-presence orbit, graph-first prior-art lens, and lab-bench inst
+rument panel.\n- Appended a dated, signed learning entry to `/projects/evo-mywor
+ld/FIELD-NOTES.md`.\n- Ticked the top queue item in `/projects/evo-myworld/queue
+s/kimi.md` from `[ ]` to `[x]`.\n\nNo heavy commands were run.'
+)
+StatusUpdate(
+    context_usage=0.08916091918945312,
+    context_tokens=23373,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=333,
+        output=207,
+        input_cache_read=23040,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-Zzg6dsXMWGAkltjtoFWYK33t',
+    plan_mode=False,
+    mcp_status=None
+)
+TurnEnd()
+
+To resume this session: kimi -r 56b05059-b46b-42fe-88f5-f2f960a6344d

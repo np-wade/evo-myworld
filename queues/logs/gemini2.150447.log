@@ -1,0 +1,80 @@
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 1.59kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/node:22-bookworm-slim
+#2 DONE 0.2s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [1/8] FROM docker.io/library/node:22-bookworm-slim@sha256:6c74791e557ce11fc957704f6d4fe134a7bc8d6f5ca4403205b2966bd488f6b3
+#4 resolve docker.io/library/node:22-bookworm-slim@sha256:6c74791e557ce11fc957704f6d4fe134a7bc8d6f5ca4403205b2966bd488f6b3 0.0s done
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 51B done
+#5 DONE 0.0s
+
+#6 [4/8] RUN npm install -g bun
+#6 CACHED
+
+#7 [5/8] RUN npm install -g playwright     && playwright install --with-deps chromium
+#7 CACHED
+
+#8 [6/8] COPY dockerd-entrypoint-wrapper.sh /dockerd-entrypoint-wrapper.sh
+#8 CACHED
+
+#9 [2/8] RUN apt-get update && apt-get install -y     git     ripgrep     curl     jq     vim     && rm -rf /var/lib/apt/lists/*
+#9 CACHED
+
+#10 [3/8] RUN install -m 0755 -d /etc/apt/keyrings     && curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc     && chmod a+r /etc/apt/keyrings/docker.asc     && . /etc/os-release     && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian ${VERSION_CODENAME} stable"        > /etc/apt/sources.list.d/docker.list     && apt-get update     && apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin     && rm -rf /var/lib/apt/lists/*
+#10 CACHED
+
+#11 [7/8] RUN chmod +x /dockerd-entrypoint-wrapper.sh
+#11 CACHED
+
+#12 [8/8] WORKDIR /workspace
+#12 CACHED
+
+#13 exporting to image
+#13 exporting layers done
+#13 exporting manifest sha256:614ec1c694a754aef904f9634b06d4ab62013dee460537f2c84febbc3898e084 done
+#13 exporting config sha256:89ea76f9a58095bdbd5f7e3a6b67bac8dcfc1e0fe808e5d2771e31543f453c73 done
+#13 exporting attestation manifest sha256:956c707caf0b3ebd0e9517435909189c851cf86be0c374de867f6da86609f69a 0.0s done
+#13 exporting manifest list sha256:b417be194916f283c34acd88ec1d1c944e2240652515d9beb2e50834b91dc14d
+#13 exporting manifest list sha256:b417be194916f283c34acd88ec1d1c944e2240652515d9beb2e50834b91dc14d 0.0s done
+#13 naming to docker.io/library/coding-base:latest done
+#13 unpacking to docker.io/library/coding-base:latest 0.0s done
+#13 DONE 0.1s
+ Container docker-envs-gemini-cli-2-run-dafeb83607b0 Creating 
+ Container docker-envs-gemini-cli-2-run-dafeb83607b0 Created 
+I have completed the review of the program order in [CHARTER.md](file:///workspace/evo-myworld/CHARTER.md) and checked off the task from the queue. Here is a summary of the steps completed and files processed:
+
+### 1. Files Read & Processed (in order)
+*   **[CHARTER.md](file:///workspace/evo-myworld/CHARTER.md):** Analyzed the roadmap sequence of `evo-myworld` (Assembly Line Port $\rightarrow$ Graph Backend $\rightarrow$ ML Layer $\rightarrow$ CLIs/Tooling).
+*   **[FIELD-NOTES.md](file:///workspace/evo-myworld/FIELD-NOTES.md):** Reviewed prior architectural findings and constraints (specifically the 12GB WSL2 RAM and swap constraints).
+*   **[queues/gemini.md](file:///workspace/evo-myworld/queues/gemini.md):** Retrieved the top unchecked item: *"Review CHARTER.md program order — risks & sequencing advice, append to FIELD-NOTES.md."*
+*   **[PORT-PLAN.md](file:///workspace/evo-myworld/PORT-PLAN.md):** Consulted for deeper context on the implementation deliverables for Tracks A and B.
+
+---
+
+### 2. Output Generated
+I created the detailed review document at:
+*   **[world/gemini/program-review.md](file:///workspace/evo-myworld/world/gemini/program-review.md)**
+
+Key findings in the program review include:
+*   **Sequence Validation:** The current Phase 1 $\rightarrow$ Phase 2 $\rightarrow$ Phase 3 order is correct due to strict data dependencies. You cannot train an ML model (Phase 3) without historical run trees indexed in a graph (Phase 2), and you cannot populate the graph without the active loop running (Phase 1).
+*   **WSL2 Constraints & Mitigation:**
+    *   *Phase 1:* Limit worker concurrency strictly to 2 to avoid container crashes during agent/test execution.
+    *   *Phase 2:* Query SQLite FTS `/index.db` instead of spinning up the memory-heavy FalkorDB container immediately. Implement **static prior-art injection** in subagent briefs during execution planning, avoiding dynamic runtime DB queries.
+    *   *Phase 3:* Mandate a **Zero-Heavy-Dependency** policy (using lightweight math like numpy/scipy or pure-Python heuristics) to prevent imports from PyTorch or TensorFlow from hogging WSL2 memory.
+
+---
+
+### 3. Updates to Repo Files
+*   **[FIELD-NOTES.md](file:///workspace/evo-myworld/FIELD-NOTES.md):** Appended a summary entry detailing the sequencing risks and optimization advice, dated and signed `gemini2`.
+*   **[queues/gemini.md](file:///workspace/evo-myworld/queues/gemini.md):** Ticked off the second queue item by replacing `[ ]` with `[x]`.

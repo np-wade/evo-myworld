@@ -1,0 +1,1622 @@
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 1.59kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/node:22-bookworm-slim
+#2 DONE 0.3s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [1/8] FROM docker.io/library/node:22-bookworm-slim@sha256:6c74791e557ce11fc957704f6d4fe134a7bc8d6f5ca4403205b2966bd488f6b3
+#4 resolve docker.io/library/node:22-bookworm-slim@sha256:6c74791e557ce11fc957704f6d4fe134a7bc8d6f5ca4403205b2966bd488f6b3 0.0s done
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 51B done
+#5 DONE 0.0s
+
+#6 [3/8] RUN install -m 0755 -d /etc/apt/keyrings     && curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc     && chmod a+r /etc/apt/keyrings/docker.asc     && . /etc/os-release     && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian ${VERSION_CODENAME} stable"        > /etc/apt/sources.list.d/docker.list     && apt-get update     && apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin     && rm -rf /var/lib/apt/lists/*
+#6 CACHED
+
+#7 [4/8] RUN npm install -g bun
+#7 CACHED
+
+#8 [7/8] RUN chmod +x /dockerd-entrypoint-wrapper.sh
+#8 CACHED
+
+#9 [6/8] COPY dockerd-entrypoint-wrapper.sh /dockerd-entrypoint-wrapper.sh
+#9 CACHED
+
+#10 [2/8] RUN apt-get update && apt-get install -y     git     ripgrep     curl     jq     vim     && rm -rf /var/lib/apt/lists/*
+#10 CACHED
+
+#11 [5/8] RUN npm install -g playwright     && playwright install --with-deps chromium
+#11 CACHED
+
+#12 [8/8] WORKDIR /workspace
+#12 CACHED
+
+#13 exporting to image
+#13 exporting layers done
+#13 exporting manifest sha256:614ec1c694a754aef904f9634b06d4ab62013dee460537f2c84febbc3898e084 done
+#13 exporting config sha256:89ea76f9a58095bdbd5f7e3a6b67bac8dcfc1e0fe808e5d2771e31543f453c73 done
+#13 exporting attestation manifest sha256:ff75d1c3551d6437aa8f03202da3aa5f3069706b8fc35b9e87a0d33f63789497
+#13 exporting attestation manifest sha256:ff75d1c3551d6437aa8f03202da3aa5f3069706b8fc35b9e87a0d33f63789497 0.0s done
+#13 exporting manifest list sha256:1a9f71a54af01c14e3fcd94282a163417094dcf61b2ff68015fa8342a52716f0 0.0s done
+#13 naming to docker.io/library/coding-base:latest done
+#13 unpacking to docker.io/library/coding-base:latest 0.0s done
+#13 DONE 0.1s
+ Container docker-envs-codex-cli-run-73d2fb083845 Creating 
+ Container docker-envs-codex-cli-run-73d2fb083845 Created 
+Reading additional input from stdin...
+OpenAI Codex v0.144.1
+--------
+workdir: /workspace
+model: gpt-5.6-sol
+provider: openai
+approval: never
+sandbox: danger-full-access
+reasoning effort: none
+reasoning summaries: none
+session id: 019f7bc7-712e-7553-8ad8-71eee0928b4f
+--------
+user
+You are the "codex" seat of the evo-myworld lab. Work directory: /workspace/evo-myworld
+Read, in order: /workspace/evo-myworld/CHARTER.md, /workspace/evo-myworld/FIELD-NOTES.md, /workspace/evo-myworld/queues/codex.md.
+Then DO the top unchecked item in that queue file. Rules:
+- Write outputs ONLY inside /workspace/evo-myworld/world/codex/ (create it), except: append your
+  learnings to /workspace/evo-myworld/FIELD-NOTES.md (dated, signed codex) and tick the finished
+  queue item in /workspace/evo-myworld/queues/codex.md by changing "[ ]" to "[x]".
+- Do not run long/heavy commands; this is a reading+writing task.
+- Cite files you read by path. Be concrete, not generic.
+codex
+I’ll read the three lab files in the specified order, then complete only the first unchecked queue task and record the required notes/status changes.
+exec
+/bin/bash -lc "sed -n '1,240p' CHARTER.md && sed -n '1,280p' FIELD-NOTES.md && sed -n '1,200p' queues/codex.md" in /workspace/evo-myworld
+ succeeded in 0ms:
+# evo-myworld — Lab Charter
+
+**Home base for the lab's recursive-improvement world.** Fork of
+`evo-hq/evo`, supercharged by all lab AIs together. Nicholas (np-wade)
+owns direction; Claude orchestrates; every AI builds.
+
+## The two-repo rule
+
+- `projects/evo-hq` — **clean upstream clone. Never experiment here.**
+  It is the reference install + the harness we use to TEST changes made in
+  this fork (branches get exercised against evo-hq's working install and
+  the SDK test suite before merging).
+- `projects/evo-myworld` (this repo, `np-wade/evo-myworld`) — where
+  everything new happens.
+
+## Branch & folder ownership
+
+Each AI owns a branch `ai/<name>` and a folder `world/<name>/` (yours to
+structure — experiments, notes, prototypes). Shared code that graduates
+out of a `world/` folder lands via merge to `main` only after it passes the
+evo-hq harness. This avoids merge collisions: **you write inside your own
+folder; cross-cutting edits go through Claude.**
+
+| Branch | Owner | Seat |
+|---|---|---|
+| ai/kimi | Kimi K3 / K2.7-code | front-end, creative, exploratory-random-good-ideas |
+| ai/codex | Codex (GPT) | core coding, plugin/hooks internals |
+| ai/cursor | Cursor agent | coding + refactors |
+| ai/gemini | Gemini 3.x (Antigravity, 2 accts) | analysis, review, architecture reading |
+| ai/hermes | Hermes (glm-5.1/5.2, qwen3-coder via ollama-cloud) | backend coding, tests |
+| ai/poe | Poe (qwen3.7-max, minimax m3-t) | reading, writing, docs, review |
+| ai/feather | Featherless (deepseek-V4-Flash 35k ctx!, step-3.7-Flash) | short-context reading/writing tasks, summaries |
+| ai/claude-backend | Claude (2nd seat) | graph-DB backend: graphify index.db + FalkorDB → evo shared state |
+
+## Program (in order)
+
+1. **Assembly line port** — bring the assembly-office autonomous
+   product-processing pipeline in, upgraded with evo's experiment tree,
+   gates, and recursive/experimental testing (test code, languages,
+   harnesses; keep what earns its place, delete what doesn't).
+2. **Graph backend** — second agent connects the graph DB (9.2M-node
+   index.db, FalkorDB) and the lab's backend code into the app; evo's
+   shared-state/scratchpad becomes graph-fed.
+3. **ML layer** — linear-algebra / neural-net maths over experiment
+   history: predictive frontier strategies, code-culling scores, agent/
+   harness/language comparisons as first-class experiments.
+4. **Then** CLIs and other cool things on top.
+
+## Standing rules
+
+- **GRAPH-FIRST**: before writing code, pull prior art from the graph
+  library (`graphify-app/GRAPH-FIRST.md`; TOPICS.md → slices → source).
+- **Read `FIELD-NOTES.md` first, append what you learn** (dated, signed).
+- Machine limits: WSL2, 12 GB RAM + 24 GB swap. One heavy process at a
+  time; long runs `setsid nohup … & disown`. See FIELD-NOTES gotchas.
+- Your work queue lives in `queues/<name>.md`. Do the top item; append
+  results + a FIELD-NOTES entry; mark it done.
+
+## THE RACE RULE (standing, from Nicholas 2026-07-19)
+
+**Never adopt a pattern or implementation on trust.** As you build:
+1. SEARCH first — graph library (GRAPH-FIRST: TOPICS.md → slices →
+   `world/backend/evo_graph.py find`) plus your own repo searches — and
+   pull **at least 2 candidate implementations** of the thing you need.
+2. RACE them in the base harness (`projects/evo-hq` install + a small
+   evo run like projects/evo-demo): each candidate = one experiment
+   branch, same benchmark, same gates.
+3. ADOPT the winner by score; record winner AND loser scores + source
+   citations in FIELD-NOTES.md. Losers get deleted, not kept "just in
+   case" — that's the culling discipline.
+Proof it works (2026-07-19): demo race — baseline 5.0967 → sorted(set())
+0.0067 beat dict.fromkeys+sort 0.0176; both gated for correctness;
+winner kept. Do this same move with code you FIND, not just code you
+write.
+# evo Field Notes — living doc for all lab AIs
+
+> Started 2026-07-19 by Claude (orchestrator). **Every AI working on evo-myworld
+> reads this before touching code, and appends what it learns.** Keep entries
+> short, dated, signed. Newest learnings at the bottom of each section.
+> Companion protocol: GRAPH-FIRST (`~/coding/docker-envs/projects/graphify-app/GRAPH-FIRST.md`)
+> — pull graph library slices for prior art BEFORE building.
+
+## What evo is (base app, upstream `evo-hq/evo`)
+
+- Autoresearch orchestrator: give it a codebase → it discovers metrics,
+  instruments a benchmark, then runs an experiment loop (try → score → keep or
+  discard) as **tree search** over git branches, not greedy hill-climb.
+- Local install lives at `~/coding/docker-envs/projects/evo-hq` (clean clone of
+  upstream — do NOT experiment here; this is the reference/test harness).
+  Our fork for building: `~/coding/docker-envs/projects/evo-myworld`
+  (github `np-wade/evo-myworld`).
+- Two-command UX: `/evo:discover` (one-time: finds what to measure, builds
+  benchmark + gates) then `/evo:optimize` (runs the loop, unattended,
+  parallel subagents in git worktrees).
+- Invocation is host-specific: `/evo:` on Claude Code, `$evo` on Codex,
+  `/` skill menu on Cursor, natural language on Hermes/Opencode.
+
+## Architecture map (repo layout)
+
+- `plugins/evo/` — THE product. One plugin, multi-host: `.claude-plugin/`,
+  `.codex-plugin/`, `.kimi-plugin/` manifests over shared `skills/` (discover,
+  optimize, report, ship, subagent, finetuning, infra-setup), `agents/`
+  (verifier.md, benchmark-reviewer.md), `hooks/`, `src/evo/` (python core).
+- `sdk/python`, `sdk/node` — thin SDKs for instrumenting benchmarks
+  (`evo.record(score)` style). 12 py tests pass in 0.03s: cheap gate.
+- `scripts/` — dashboard.py, graph.py (experiment tree), scratchpad.py
+  (shared state), codex_slurm_harness.py, rlm_eval.
+- `tests/` — e2e + live suites, sandbox-agent + sshd fixtures (heavier).
+- CLI (`uv tool install evo-hq-cli` → v0.8.0): `evo`, `evo-dashboard`,
+  `evo-drain`. `evo install <host>` wires plugin+hooks per host.
+  `evo init --target --benchmark --metric --host --per-exp-timeout` is the
+  non-interactive path that `/evo:discover` drives for you.
+
+## Key concepts to reuse in the fork
+
+- **Gates**: any command, exit 0 = pass. Failed gate = experiment discarded
+  even if score improved. Gates inherit down the experiment tree; narrower
+  gates attach to branches. ← this is where our recursive testing +
+  "which code deserves to live" culling logic plugs in.
+- **Frontier strategies**: argmax / top_k / epsilon_greedy / softmax /
+  pareto_per_task — selection policy for which branch to extend.
+  ← natural hook for our ML/linear-algebra scoring experiments.
+- **Shared state / scratchpad**: failure traces, annotations, discarded
+  hypotheses visible to every subagent before it picks a hypothesis.
+  ← this is the lab memory bus; graph-db backend should feed it.
+- **Cross-cutting scans**: between rounds, RLM-style scan subagents read
+  trace batches and surface compound failure patterns into shared state.
+- **Backends**: worktree (default, local), pool, ssh, modal/e2b/daytona/
+  aws/azure. We start worktree; `pool` may suit our WSL RAM limits better
+  (12GB RAM + 24GB swap — see graphify-wsl-limits memory: don't stack
+  parallel heavy processes).
+
+## Host/runner status on this box (2026-07-19)
+
+| Runner | Status | Notes |
+|---|---|---|
+| claude-code | evo plugin INSTALLED ✓ | orchestrator seat |
+| cursor | evo plugin INSTALLED ✓ | hooks in ~/.cursor/hooks.json, skills in ~/.agents/skills |
+| codex | fixing — snap had stale 0.114.0, npm 0.144.6 symlinked to ~/.local/bin | needs `codex plugin marketplace add evo-hq/evo` then `evo install codex` |
+| kimi (K2.7-code / K3) | container `kimi-cli` (docker), OAuth premium acct | evo install must happen IN-container; K3 = creative/front-end seat, keep load small until base is done |
+| hermes (ollama-cloud: glm-5.1/5.2, qwen3-coder) | via `~/coding/docker-envs/scripts/launch.sh ask hermes` | evo host `hermes` supported |
+| opencode (Featherless: deepseek-V4-Flash 35k ctx cap, step-3.7-Flash) | `launch.sh ask opencode` | evo host `opencode` supported |
+| poe (qwen3.7-max-t, minimax m3-t) | `launch.sh ask poe`, poe-code subcommand CLI | NOT an evo host — use for reading/writing/review tasks via ask |
+| gemini (3.x via Antigravity `agy`, 2 accounts) | `launch.sh ask antigravity` / `antigravity2` | NOT an evo host — analysis/review seat. Old gemini-cli OAuth dead for individuals |
+
+Keys: `~/coding/docker-envs/.env` (POE_API_KEY, FEATHERLESS_API_KEY, OLLAMA_API_KEY, GEMINI_API_KEY).
+
+## Gotchas learned (append as found)
+
+- 2026-07-19 Claude: `evo init` is fully non-interactive and REQUIRES
+  --target --benchmark --metric --host --per-exp-timeout. The chat-driven
+  `/evo:discover` is the friendly path that fills those in.
+- 2026-07-19 Claude: `evo install codex` on codex <0.144 fails — no `plugin`
+  subcommand. Upgrade codex first.
+- 2026-07-19 Claude: snap packages shadow npm globals on this box
+  (`/snap/bin` before `~/.npm-global/bin` which isn't on PATH at all);
+  symlink the npm binary into `~/.local/bin` which wins.
+- 2026-07-19 Claude: this WSL box crashed twice before from stacked memory
+  spikes. Any evo optimize run here: cap parallel subagents (start 2),
+  benchmarks must be small, and long runs need `setsid nohup … & disown`
+  or the harness timeout kills the process group.
+- 2026-07-19 Feather: agents are roles in the orchestrator loop—verifier (audit), 
+  ideator (propose), benchmark-reviewer (diagnose)—while skill/subagent/SKILL.md 
+  defines the protocol subagents follow: 4-field brief, iteration loop, evo commands 
+  for local/remote worktrees, atomic append discipline for proposals. agents live in 
+  `plugins/evo/agents/`; subagent skill is `plugins/evo/skills/subagent/SKILL.md`.
+- 2026-07-19 claude-backend: Track B phase 1 shipped — `world/backend/evo_graph.py`
+  (`find` = FTS over index.db, `slice` = slice-JSON locator), 12 pytest green.
+  Schema keys: **`nodes_fts.rowid == nodes.id`** is the whole FTS→metadata join;
+  FTS columns are label/norm_label/source_file/kind/rationale/context/
+  community_name/repo_name, tokenizer `unicode61 tokenchars '+#'`.
+- 2026-07-19 claude-backend: FTS cap in numbers: repos.fts_nodes sums to 5.94M of
+  9.2M nodes (top-50k/repo by degree) — a `find` miss needs a depth-1
+  `nodes.norm_label LIKE` follow-up before concluding absence.
+- 2026-07-19 claude-backend: FTS quirk — docstrings are indexed as first-class
+  nodes (kind=rationale), so prose hits mix into symbol queries; and `kind` is
+  populated in the DB but None in slice-JSON nodes, don't rely on it there.
+- 2026-07-19 claude-backend: safe FTS5 query building = double-quote every token
+  (`"tok"`, escape `"` as `""`) — reused from tencentdb-agent-memory
+  sqlite.ts buildFtsQuery (L198); AND-join with OR fallback beats raw MATCH on
+  user text, which throws OperationalError on `(`/`*`/`NEAR`.
+- 2026-07-19 claude-backend: no pytest on the host python; `uv run --no-project
+  --with pytest python -m pytest …` is a zero-install way to run test files.
+
+## The fork plan (evo-myworld) — where we're going
+
+1. Per-AI branches: each runner gets `ai/<name>` (ai/kimi, ai/codex,
+   ai/cursor, ai/gemini, ai/hermes, ai/poe, ai/featherless) and pushes
+   functionality up; evo-hq (clean base) is the test harness for those
+   branches before merge.
+2. Assembly line port: the assembly-office autonomous product-processing
+   pipeline moves in, gaining evo's experiment/gate structure for recursive
+   + experimental testing of code, languages, harnesses.
+3. Graph-db backend (second agent): connect graphify (index.db 9.2M nodes /
+   FalkorDB) + backend code into the app — feeds evo's shared state and our
+   scoring. GRAPH-FIRST applies.
+4. ML layer: use linear algebra / NN maths on experiment history for
+   predictive branch selection (custom frontier strategy) and code-culling
+   decisions (what earns its place, what gets deleted).
+5. Later: CLIs and tooling on top.
+
+*(sign entries: Claude / Kimi / Codex / Cursor / Gemini / Hermes / Poe / Feather)*
+
+## Vanilla run log (evo-demo, 2026-07-19)
+
+- 2026-07-19 Claude: full vanilla loop verified on toy repo
+  `projects/evo-demo` (naive O(n²) dedup+sort, `bench.py` prints
+  "seconds: X", metric min, correctness assert = gate). Flow used THEIR
+  interfaces exactly: `claude -p '/evo:discover …'` → it created `.evo/`
+  (meta.json, project.md, run_0000, supervisor.pid, dashboard.pid) →
+  dashboard live at http://127.0.0.1:8080 ("evo : autoresearch") → it
+  advanced to `evo run exp_0000` on its own. Seeding the benchmark/metric
+  in the discover prompt skips all interactive questions — good for
+  headless dispatch.
+- 2026-07-19 Claude: supervisor + dashboard are plain detached python
+  procs with pidfiles in `.evo/` — fits our setsid/nohup discipline.
+- 2026-07-19 Claude: lane access map — every compose lane sees repos at
+  /workspace/<name>; kimi container now mounts them at /projects/<name>
+  (kimi-launch.sh updated + container recreated; OAuth survived in
+  kimi-home volume). Host `cursor` binary is the Windows IDE launcher,
+  NOT cursor-agent — use the docker cursor lane. Featherless/opencode
+  lane needs >180s to first token some runs (35k-ctx models are slow
+  spinners); dispatcher allows 1500s.
+- 2026-07-19 Hermes: SDK + gate internals read for the assembly-line
+  port. Full notes at world/hermes/sdk-notes.md. Key contracts every new
+  pipeline must obey: (1) score JSON `{"score","tasks"}` to
+  $EVO_RESULT_PATH (atomic O_EXCL+rename) or stdout — never both; file
+  present means hard-error on empty/malformed (core.py:1063 load_result).
+  (2) Per-task emission is enforced — _assert_tasks_aggregated
+  (cli.py:1899) raises `tasks_missing_from_result` if 2+ task_*.json
+  traces exist but result.json has no `tasks` array. (3) Gate = any
+  command, exit 0 = pass; gates inherit DOWN the experiment tree via
+  collect_gates_from_path (cli.py:2685). (4) Phase split: pre runs
+  BEFORE benchmark (fail = no spend, aborts run), post runs after
+  (default for backward compat). (5) keep = compare_scores(...) AND
+  gate_passed — a failed gate discards the experiment even if score
+  improved (cli.py:3371). (6) gate_env strips all EVO_* vars — gates do
+  NOT see EVO_RESULT_PATH/TRACES_DIR; a budget gate must read a
+  side-channel the benchmark writes. Two instrumentation paths: paste-in
+  inline_instrumentation.py (zero-dep, recommended) or evo_agent.Run/Gate
+  (swappable Backend protocol — hook for the graph-db backend).
+  Three gate designs drafted for the port: correctness (post, golden
+  cases), budget (post, side-channel budget.json), regression (PRE,
+  proxy-bench vs parent's committed score → cheap cull before benchmark
+  spend). Run order guaranteed: regression → benchmark → correctness+
+  budget → keep.
+
+- 2026-07-19 Gemini: Performed top-down architecture review ([arch-review.md](file:///workspace/evo-myworld/world/gemini/arch-review.md)). Identified module boundaries and coupling patterns. Under the 12GB WSL2 RAM constraint, the primary failure risks are stacked local subagent concurrency, massive file checkouts from `git worktree add`, large SQLite index queries, and bulk parsing of trace log batches. Recommend strict limits on local worker concurrency (max 2), memory budget gates, and read-only graph indexing pagination. Only modify files inside `world/gemini/` or backend/strategy protocols.
+- 2026-07-19 Gemini: Reviewed CHARTER.md program order, risks, and sequencing advice ([program-review.md](file:///workspace/evo-myworld/world/gemini/program-review.md)). Confirmed Phase 1 (Assembly Port) -> Phase 2 (Graph Backend) -> Phase 3 (ML Layer) sequencing is correct due to data dependencies. Highlighted major risks: WSL2 resource limits under concurrent agents, FalkorDB/SQLite memory footprints, and heavy ML library imports (PyTorch/TF). Proposed static prior-art injection to keep subagent queries decoupled, a zero-heavy-dependency ML layer using numpy/scipy, and sequential gate execution (regression first to fail fast). Signed, gemini2.
+- 2026-07-19 Cursor: Mapped dashboard/graph/scratchpad. The three `scripts/*.py`
+  files are one-liners; real code is `plugins/evo/src/evo/dashboard.py`,
+  `scratchpad.py`, and `core.py`. Experiment tree = `.evo/<active-run>/graph.json`
+  (parent/children dict, locked atomic writes). UI is Flask + `static/app.js`
+  tidy-tree timeline polling `/api/graph` + `/api/frontier`. CLI `evo tree` /
+  `evo scratchpad` share the same graph + render helpers. Full route/file map:
+  `world/cursor/dashboard-map.md`. Signed, cursor.
+- 2026-07-19 Claude: optimize round 1 on evo-demo — full loop verified:
+  2 experiments raced in parallel worktrees, correctness gate + verifier
+  pre/post (post reproduces scores independently) + benchmark-reviewer
+  per-rep checks all ran. Winner exp_0001 (sorted(set), 760x) over
+  exp_0002 (dict.fromkeys, 290x). Lesson for our benchmarks: score
+  granularity matters — a 0.1ms-rounded score can't rank micro-variants
+  once the big win lands; size CALLS_PER_REP so best-case runtime >> the
+  rounding unit. evo records such issues as "workspace notes" in the run.
+
+
+- 2026-07-19 Kimi: Read `CHARTER.md`, `FIELD-NOTES.md`, and `/projects/evo-hq/README.md`. Front-end seat should build inside `world/kimi/` and keep load tiny until assembly-line port + graph backend land. Existing dashboard is Flask + `static/app.js` with `.evo/<active-run>/graph.json`; the upstream README enumerates frontier strategies and backends. Drafted 5 creative UI directions (campfire room, time-river tree, agent orbit, graph-first lens, lab-bench panel) in `world/kimi/ideas.md`. No code yet. Signed, kimi.
+# Queue — Codex
+1. [ ] Map the plugin internals: plugins/evo/hooks/, bin/, src/evo/, and how
+   evo-drain / evo direct deliver messages. Write world/codex/internals-map.md
+   (what fires when, host differences claude-code vs codex vs cursor).
+2. [ ] Identify the 3 cheapest extension points for adding a custom frontier
+   strategy. Append findings to FIELD-NOTES.md.
+3. [ ] PORT-PLAN.md Track A, deliverable A2 — RACE RULE applies (≥2 candidate schemas/patterns from searches, raced in the evo-hq harness before adoption): world/codex/assigner-bridge/ —
+   Planner-JSON → evo run config + subagent briefs. Read
+   /home/npwad/coding/docker-envs/projects/assembly-office/docs/HOW-ASSEMBLY-OFFICE-BUILDS-APPS.md first.
+
+codex
+The top task is the plugin internals map. I’m tracing the hook entrypoints, launcher scripts, Python delivery path, and host-specific manifests/config before writing the map.
+exec
+/bin/bash -lc "find plugins/evo/hooks plugins/evo/bin plugins/evo/src/evo -maxdepth 3 -type f -print | sort
+rg -n \"evo-drain|drain|deliver|message|hook|codex|cursor|claude-code\" plugins/evo/hooks plugins/evo/bin plugins/evo/src/evo plugins/evo/.claude-plugin plugins/evo/.codex-plugin plugins/evo/.kimi-plugin -g '"'!**/__pycache__/**'"'" in /workspace/evo-myworld
+ succeeded in 0ms:
+plugins/evo/bin/evo
+plugins/evo/bin/evo-hook-drain
+plugins/evo/bin/evo-hook-drain-rs/Cargo.lock
+plugins/evo/bin/evo-hook-drain-rs/Cargo.toml
+plugins/evo/bin/evo-hook-drain-rs/src/main.rs
+plugins/evo/hooks/hooks.json
+plugins/evo/hooks/wait_hint.sh
+plugins/evo/src/evo/__init__.py
+plugins/evo/src/evo/backends/__init__.py
+plugins/evo/src/evo/backends/gitdir.py
+plugins/evo/src/evo/backends/pool.py
+plugins/evo/src/evo/backends/pool_state.py
+plugins/evo/src/evo/backends/protocol.py
+plugins/evo/src/evo/backends/remote.py
+plugins/evo/src/evo/backends/remote_state.py
+plugins/evo/src/evo/backends/sandbox_providers/__init__.py
+plugins/evo/src/evo/backends/sandbox_providers/_common.py
+plugins/evo/src/evo/backends/sandbox_providers/aws.py
+plugins/evo/src/evo/backends/sandbox_providers/azure.py
+plugins/evo/src/evo/backends/sandbox_providers/daytona.py
+plugins/evo/src/evo/backends/sandbox_providers/e2b.py
+plugins/evo/src/evo/backends/sandbox_providers/manual.py
+plugins/evo/src/evo/backends/sandbox_providers/modal.py
+plugins/evo/src/evo/backends/sandbox_providers/ssh.py
+plugins/evo/src/evo/backends/state_keys.py
+plugins/evo/src/evo/backends/worktree.py
+plugins/evo/src/evo/cli.py
+plugins/evo/src/evo/core.py
+plugins/evo/src/evo/dashboard.py
+plugins/evo/src/evo/dashboard_supervisor.py
+plugins/evo/src/evo/dispatch.py
+plugins/evo/src/evo/frontier_strategies.py
+plugins/evo/src/evo/git_bundle.py
+plugins/evo/src/evo/hermes_plugin/__init__.py
+plugins/evo/src/evo/host_install/__init__.py
+plugins/evo/src/evo/host_install/_hook_drain.py
+plugins/evo/src/evo/host_install/claude_code.py
+plugins/evo/src/evo/host_install/claude_science.py
+plugins/evo/src/evo/host_install/codex.py
+plugins/evo/src/evo/host_install/cursor.py
+plugins/evo/src/evo/host_install/hermes.py
+plugins/evo/src/evo/host_install/kimi.py
+plugins/evo/src/evo/host_install/openclaw.py
+plugins/evo/src/evo/host_install/opencode.py
+plugins/evo/src/evo/host_install/pi.py
+plugins/evo/src/evo/hosts/__init__.py
+plugins/evo/src/evo/hosts/claude_fork.py
+plugins/evo/src/evo/inject/__init__.py
+plugins/evo/src/evo/inject/drain.py
+plugins/evo/src/evo/inject/marker.py
+plugins/evo/src/evo/inject/paths.py
+plugins/evo/src/evo/inject/queue.py
+plugins/evo/src/evo/inject/registry.py
+plugins/evo/src/evo/locking.py
+plugins/evo/src/evo/openclaw_plugin/evo.bundle.js
+plugins/evo/src/evo/openclaw_plugin/factory.ts
+plugins/evo/src/evo/openclaw_plugin/index.ts
+plugins/evo/src/evo/openclaw_plugin/native/HOOK.md
+plugins/evo/src/evo/openclaw_plugin/native/index.js
+plugins/evo/src/evo/openclaw_plugin/native/index.ts
+plugins/evo/src/evo/openclaw_plugin/native/openclaw.plugin.json
+plugins/evo/src/evo/openclaw_plugin/pi-entry.ts
+plugins/evo/src/evo/openclaw_plugin/pi.bundle.js
+plugins/evo/src/evo/opencode_plugin/drain.ts
+plugins/evo/src/evo/opencode_plugin/evo.bundle.js
+plugins/evo/src/evo/opencode_plugin/index.ts
+plugins/evo/src/evo/providers.py
+plugins/evo/src/evo/report.py
+plugins/evo/src/evo/sandbox_client.py
+plugins/evo/src/evo/scratchpad.py
+plugins/evo/src/evo/static/app.js
+plugins/evo/src/evo/static/favicon.svg
+plugins/evo/src/evo/static/highlight-langs-extra.min.js
+plugins/evo/src/evo/static/highlight.min.js
+plugins/evo/src/evo/static/hljs-theme.css
+plugins/evo/src/evo/static/index.html
+plugins/evo/src/evo/static/logos/aws.svg
+plugins/evo/src/evo/static/logos/azure.svg
+plugins/evo/src/evo/static/logos/daytona.svg
+plugins/evo/src/evo/static/logos/e2b.png
+plugins/evo/src/evo/static/logos/modal.svg
+plugins/evo/src/evo/static/style.css
+plugins/evo/src/evo/telemetry.py
+plugins/evo/src/evo/user_defaults.py
+plugins/evo/src/evo/version_check.py
+plugins/evo/src/evo/workspace_executor.py
+plugins/evo/.kimi-plugin/plugin.json:17:  "hooks": [
+plugins/evo/.kimi-plugin/plugin.json:20:      "command": "evo-drain --host kimi"
+plugins/evo/.kimi-plugin/plugin.json:24:      "command": "evo-drain --host kimi"
+plugins/evo/.kimi-plugin/plugin.json:28:      "command": "evo-drain --host kimi"
+plugins/evo/.kimi-plugin/plugin.json:32:      "command": "evo-drain --host kimi"
+plugins/evo/.kimi-plugin/plugin.json:36:      "command": "evo-drain --host kimi"
+plugins/evo/hooks/wait_hint.sh:2:# wait_hint.sh — PostToolUse hook that emits a one-shot reminder to use
+plugins/evo/hooks/wait_hint.sh:103:# Touch BEFORE printing so concurrent hook fires don't double-emit.
+plugins/evo/hooks/hooks.json:2:  "hooks": {
+plugins/evo/hooks/hooks.json:6:        "hooks": [
+plugins/evo/hooks/hooks.json:17:        "hooks": [
+plugins/evo/hooks/hooks.json:26:        "hooks": [
+plugins/evo/hooks/hooks.json:36:        "hooks": [
+plugins/evo/hooks/hooks.json:46:        "hooks": [
+plugins/evo/hooks/hooks.json:56:        "hooks": [
+plugins/evo/hooks/hooks.json:66:        "hooks": [
+plugins/evo/bin/evo-hook-drain:2:# Fallback entry point for the hooks.json command `bin/evo-hook-drain`.
+plugins/evo/bin/evo-hook-drain:5:# $EVO_HOME/bin/evo-hook-drain (default ~/.evo/bin) and replaces this
+plugins/evo/bin/evo-hook-drain:7:# the plugin from a fresh git snapshot (codex re-clones its marketplace
+plugins/evo/bin/evo-hook-drain:8:# snapshot at session start; claude-code on `claude plugin update`),
+plugins/evo/bin/evo-hook-drain:10:# copy so hooks keep firing across those re-stages.
+plugins/evo/bin/evo-hook-drain:11:stable="${EVO_HOME:-$HOME/.evo}/bin/evo-hook-drain"
+plugins/evo/bin/evo-hook-drain:15:# No staged binary anywhere: degrade to a no-op so the host's hooks
+plugins/evo/bin/evo-hook-drain:18:echo "evo-hook-drain: binary not staged at $stable; run \`evo install <host> --force\` to enable mid-run inject" >&2
+plugins/evo/src/evo/dispatch.py:10:* the EXPLORE-phase user-message template the explorer subprocess sees
+plugins/evo/src/evo/dispatch.py:198:# EXPLORE-phase user message
+plugins/evo/src/evo/dispatch.py:201:#: Template for the explorer subprocess's first user message. The literal
+plugins/evo/src/evo/dispatch.py:223:The actual hypothesis to attempt arrives in your next user message.
+plugins/evo/src/evo/dispatch.py:234:    """Concrete EXPLORE-phase user message for a given parent + worktree.
+plugins/evo/src/evo/dispatch.py:255:# EXECUTE-phase user message
+plugins/evo/src/evo/dispatch.py:258:#: Template for the child fork's first user message. The child inherits
+plugins/evo/src/evo/dispatch.py:260:#: this prompt only needs to deliver the per-child handle: the experiment
+plugins/evo/src/evo/dispatch.py:305:    """Concrete EXECUTE-phase user message for one child fork.
+plugins/evo/src/evo/dispatch.py:370:            "Run `evo host set <claude-code|codex|opencode|...>` first."
+plugins/evo/src/evo/dispatch.py:571:HOST_NAME_CLAUDE_CODE = "claude-code"
+plugins/evo/src/evo/frontier_strategies.py:450:        "message": f"frontier({strategy.get('kind', '?')}) -> {len(returned_ids)} id(s){seed_str}",
+plugins/evo/src/evo/inject/paths.py:57:    session_id. The Rust hook (and other hot-path readers) check
+plugins/evo/src/evo/inject/paths.py:69:def delivered_dir(root: Path) -> Path:
+plugins/evo/src/evo/inject/paths.py:70:    """L1 ACK: where drain writes a record per directive emitted."""
+plugins/evo/src/evo/inject/paths.py:71:    return inject_root(root) / "delivered"
+plugins/evo/src/evo/inject/paths.py:74:def delivered_file(root: Path, event_id: str) -> Path:
+plugins/evo/src/evo/inject/paths.py:75:    return delivered_dir(root) / f"{event_id}.json"
+plugins/evo/src/evo/inject/paths.py:96:        delivered_dir(root),
+plugins/evo/src/evo/inject/__init__.py:1:"""Cross-host directive delivery — auto-register, queues, marker, drain.
+plugins/evo/src/evo/inject/__init__.py:11:    - drain.drain_session(root, session_id, host): the actual hook payload generator
+plugins/evo/src/evo/scratchpad.py:454:            # 0.3.0 frontier events shipped with key "at" and no "message"
+plugins/evo/src/evo/scratchpad.py:458:            msg = event.get("message") or f"{event.get('kind', '?')} event"
+plugins/evo/src/evo/inject/marker.py:3:Empty file on disk. Hot-path bash hook does a single `[ -f ... ]` test;
+plugins/evo/src/evo/inject/marker.py:4:present means drain. Hook unlinks after consumption.
+plugins/evo/src/evo/dashboard_supervisor.py:104:    fmt = "%(asctime)s %(levelname)s %(message)s" if with_timestamp else "%(message)s"
+plugins/evo/src/evo/inject/drain.py:4:Invoked by the bash hot-path script via `python3 -m evo.drain` only
+plugins/evo/src/evo/inject/drain.py:5:after the marker file confirmed there's something to deliver.
+plugins/evo/src/evo/inject/drain.py:8:    Claude Code / Codex: {"hookSpecificOutput": {"hookEventName": "...", "additionalContext": "..."}}
+plugins/evo/src/evo/inject/drain.py:11:                         interprets it and applies to the right hook input.
+plugins/evo/src/evo/inject/drain.py:14:hook which exec's `python3 -m evo.drain`. hermes and opencode plugins
+plugins/evo/src/evo/inject/drain.py:41:# Hook event names that signal a fresh session — drain unconditionally on
+plugins/evo/src/evo/inject/drain.py:47:def _drain_debug(**fields) -> None:
+plugins/evo/src/evo/inject/drain.py:48:    """Append a diagnostic JSON line tracing this drain invocation's decisions.
+plugins/evo/src/evo/inject/drain.py:51:    sentinel ~/.cursor/.evo-drain-debug exists. Log path is EVO_DRAIN_DEBUG_LOG
+plugins/evo/src/evo/inject/drain.py:52:    or, by default, $HOME/.evo-drain.log — the SAME file the Rust evo-hook-drain
+plugins/evo/src/evo/inject/drain.py:53:    binary writes to, so a single tail shows the full per-hook trace across both
+plugins/evo/src/evo/inject/drain.py:55:    the drain decided to bail and which envelope it emitted. Never logs in
+plugins/evo/src/evo/inject/drain.py:58:        sentinel = Path.home() / ".cursor" / ".evo-drain-debug"
+plugins/evo/src/evo/inject/drain.py:62:        log = Path(log_env) if log_env else (Path.home() / ".evo-drain.log")
+plugins/evo/src/evo/inject/drain.py:68:    except Exception:  # noqa: BLE001 — diagnostics must never break the hook
+plugins/evo/src/evo/inject/drain.py:74:    # hookSpecificOutput.additionalContext envelope; Stop / SubagentStop use
+plugins/evo/src/evo/inject/drain.py:77:    # the ralph-loop plugin's stop-hook.sh).
+plugins/evo/src/evo/inject/drain.py:78:    "claude-code": ("PreToolUse", "PostToolUse", "UserPromptSubmit", "SessionStart", "Stop", "SubagentStop"),
+plugins/evo/src/evo/inject/drain.py:79:    "codex": ("PreToolUse", "PostToolUse", "UserPromptSubmit", "SessionStart", "Stop", "SubagentStop"),
+plugins/evo/src/evo/inject/drain.py:81:    # delivers mid-turn for SHELL tools only (updated_input echo into stdout);
+plugins/evo/src/evo/inject/drain.py:82:    # every non-shell tool defers (no consume) and is delivered at turn end via
+plugins/evo/src/evo/inject/drain.py:83:    # stop -> followup_message. subagentStop fires at Task-subagent turn-end
+plugins/evo/src/evo/inject/drain.py:85:    # the IDE, and agent_message-on-deny consumes without the agent acting —
+plugins/evo/src/evo/inject/drain.py:87:    "cursor": ("sessionStart", "beforeSubmitPrompt", "preToolUse", "stop", "subagentStop"),
+plugins/evo/src/evo/inject/drain.py:92:    """Best-effort host detection from env. Default 'claude-code'.
+plugins/evo/src/evo/inject/drain.py:95:    on codex-cli 0.130. Keep this in sync with
+plugins/evo/src/evo/inject/drain.py:99:        return "codex"
+plugins/evo/src/evo/inject/drain.py:101:        return "claude-code"
+plugins/evo/src/evo/inject/drain.py:106:    return "claude-code"
+plugins/evo/src/evo/inject/drain.py:110:    """Read the host's hook stdin payload as a dict. Returns {} when stdin
+plugins/evo/src/evo/inject/drain.py:112:    is the single read point — all fields (hook event, session id,
+plugins/evo/src/evo/inject/drain.py:129:def _hook_event_from_payload(payload: dict) -> str | None:
+plugins/evo/src/evo/inject/drain.py:130:    return payload.get("hook_event_name") or payload.get("hookEventName")
+plugins/evo/src/evo/inject/drain.py:134:    """Mirror the Rust binary's `is_subagent_context`: claude-code (and
+plugins/evo/src/evo/inject/drain.py:135:    codex) include a non-empty `agent_id` in hook payloads triggered by
+plugins/evo/src/evo/inject/drain.py:140:    Python drain may run SessionStart registration directly."""
+plugins/evo/src/evo/inject/drain.py:149:    hook command runs from outside the project. Cursor's user-level
+plugins/evo/src/evo/inject/drain.py:150:    `~/.cursor/hooks.json` runs from `~/.cursor/`, not the repo, so cwd is
+plugins/evo/src/evo/inject/drain.py:177:def _cursor_tool_class(tool_name: str | None) -> str:
+plugins/evo/src/evo/inject/drain.py:179:    mid-turn delivery channel — rewrite the command via updated_input so the
+plugins/evo/src/evo/inject/drain.py:181:    still runs. Every other tool DEFERS (no consume) and is delivered at the
+plugins/evo/src/evo/inject/drain.py:182:    turn-end stop: deny+agent_message was tried and consumes the directive
+plugins/evo/src/evo/inject/drain.py:215:#   - claude-code: `/optimize` (bare alias) and `/evo:optimize`
+plugins/evo/src/evo/inject/drain.py:217:#   - codex: `$optimize` (bare) and `$<ns>:optimize` (namespaced).
+plugins/evo/src/evo/inject/drain.py:218:#     codex-rs/core-skills/src/injection.rs scans for the `$` sigil
+plugins/evo/src/evo/inject/drain.py:222:#   - cursor / hermes / opencode / openclaw / pi: just `/optimize`.
+plugins/evo/src/evo/inject/drain.py:224:    "claude-code": [
+plugins/evo/src/evo/inject/drain.py:227:    "codex": [
+plugins/evo/src/evo/inject/drain.py:232:    "cursor": [_re.compile(r"(?:^|[^A-Za-z0-9_/:-])/optimize\b", _re.IGNORECASE)],
+plugins/evo/src/evo/inject/drain.py:267:    """Pull the user's prompt text out of a hook payload. Different hosts
+plugins/evo/src/evo/inject/drain.py:271:      - `prompt` (claude-code / codex stdin payloads)
+plugins/evo/src/evo/inject/drain.py:272:      - `user_message` (hermes pre_llm_call kwargs — invokes via the
+plugins/evo/src/evo/inject/drain.py:273:        invoke_hook(..., user_message=...) call in run_agent.py)
+plugins/evo/src/evo/inject/drain.py:274:      - `message`, `userPrompt`, `input` (various other shapes).
+plugins/evo/src/evo/inject/drain.py:278:    for key in ("prompt", "user_prompt", "userPrompt", "user_message",
+plugins/evo/src/evo/inject/drain.py:279:                "message", "input"):
+plugins/evo/src/evo/inject/drain.py:290:    hook_event: str | None,
+plugins/evo/src/evo/inject/drain.py:293:    """If the host hook payload looks like a /evo:optimize invocation,
+plugins/evo/src/evo/inject/drain.py:308:    if hook_event not in prompt_events:
+plugins/evo/src/evo/inject/drain.py:327:    hook_event: str | None,
+plugins/evo/src/evo/inject/drain.py:336:    if host not in ("cursor", "kimi"):
+plugins/evo/src/evo/inject/drain.py:338:    if hook_event not in ("preToolUse", "PreToolUse"):
+plugins/evo/src/evo/inject/drain.py:340:    if _cursor_tool_class((payload or {}).get("tool_name")) != "shell":
+plugins/evo/src/evo/inject/drain.py:353:# `evo subagents-only on` may not self-detect the same session the hook is
+plugins/evo/src/evo/inject/drain.py:354:# handling. Observe the command here and arm/disarm the hook session directly.
+plugins/evo/src/evo/inject/drain.py:366:    hook_event: str | None,
+plugins/evo/src/evo/inject/drain.py:370:    commands and arm/disarm the matching hook session in-process. This is
+plugins/evo/src/evo/inject/drain.py:372:    env var the hook payload carries."""
+plugins/evo/src/evo/inject/drain.py:373:    if host not in ("cursor", "codex", "claude-code", "kimi"):
+plugins/evo/src/evo/inject/drain.py:375:    if hook_event not in ("preToolUse", "PreToolUse"):
+plugins/evo/src/evo/inject/drain.py:398:    root: Path, session_id: str, host: str, hook_event: str | None,
+plugins/evo/src/evo/inject/drain.py:402:    """Gate for hosts wired directly to `evo-drain` (no `evo-hook-drain`
+plugins/evo/src/evo/inject/drain.py:403:    binary in front). Returns True when the caller should proceed to drain.
+plugins/evo/src/evo/inject/drain.py:414:    IDE drops additional_context so there's nothing to deliver, and draining
+plugins/evo/src/evo/inject/drain.py:416:    delivers (updated_input echo); every non-shell tool is DEFERRED (return
+plugins/evo/src/evo/inject/drain.py:418:    shell call or the turn-end stop — deny+agent_message consumes without
+plugins/evo/src/evo/inject/drain.py:419:    delivering on non-shell tools.
+plugins/evo/src/evo/inject/drain.py:425:    if hook_event not in _DELIVER_EVENTS:
+plugins/evo/src/evo/inject/drain.py:428:    # Kimi delivers only by blocking a hook, and only Stop's block reaches the
+plugins/evo/src/evo/inject/drain.py:431:    # draining there would consume a directive that can never arrive. The
+plugins/evo/src/evo/inject/drain.py:433:    if host == "kimi" and hook_event in ("subagentStop", "SubagentStop"):
+plugins/evo/src/evo/inject/drain.py:437:    #   - stop/subagentStop: always-fire stop nudge needs drain to run.
+plugins/evo/src/evo/inject/drain.py:439:    #     drain_session run on a non-denied tool would consume queued
+plugins/evo/src/evo/inject/drain.py:444:        if hook_event in ("stop", "subagentStop", "Stop", "SubagentStop"):
+plugins/evo/src/evo/inject/drain.py:446:        # Only treat a denied tool as drain-worthy when subagents_only is
+plugins/evo/src/evo/inject/drain.py:449:        if (hook_event in ("preToolUse", "PreToolUse") and sess.get("subagents_only")
+plugins/evo/src/evo/inject/drain.py:453:    if hook_event in ("preToolUse", "PreToolUse") and (
+plugins/evo/src/evo/inject/drain.py:454:        host == "kimi" or _cursor_tool_class(tool_name) != "shell"
+plugins/evo/src/evo/inject/drain.py:456:        # Only shell delivers mid-turn, and only on Cursor, which echoes the
+plugins/evo/src/evo/inject/drain.py:460:        # the turn-end Stop deliver. For every other tool, emitting a
+plugins/evo/src/evo/inject/drain.py:461:        # directive CONSUMES it without guaranteed delivery, so defer (no
+plugins/evo/src/evo/inject/drain.py:463:        # turn-end stop, both of which deliver reliably.
+plugins/evo/src/evo/inject/drain.py:483:    Ack-on-receipt (not ack-when-done) makes the ack a reliable delivery
+plugins/evo/src/evo/inject/drain.py:501:                f"you have received this message, then proceed]"
+plugins/evo/src/evo/inject/drain.py:512:def _write_delivery_records(
+plugins/evo/src/evo/inject/drain.py:517:    hook_event: str | None,
+plugins/evo/src/evo/inject/drain.py:519:    """L1 ACK: record per-event delivery. Best-effort; never raises.
+plugins/evo/src/evo/inject/drain.py:521:    Writes one file per event delivered, keyed by event id. Multiple
+plugins/evo/src/evo/inject/drain.py:522:    sessions delivering the same event each leave their own record
+plugins/evo/src/evo/inject/drain.py:526:    event was delivered to at least one session," not exhaustive routing.
+plugins/evo/src/evo/inject/drain.py:529:    from .paths import delivered_file, delivered_dir
+plugins/evo/src/evo/inject/drain.py:531:        delivered_dir(root).mkdir(parents=True, exist_ok=True)
+plugins/evo/src/evo/inject/drain.py:541:                "hook_event": hook_event,
+plugins/evo/src/evo/inject/drain.py:542:                "delivered_at": now,
+plugins/evo/src/evo/inject/drain.py:544:            delivered_file(root, ev_id).write_text(json.dumps(rec))
+plugins/evo/src/evo/inject/drain.py:549:def emit_for_host(host: str, hook_event: str | None, text: str, payload: dict | None = None) -> None:
+plugins/evo/src/evo/inject/drain.py:551:    hook stdin (needed by the cursor preToolUse branch for tool_name/command)."""
+plugins/evo/src/evo/inject/drain.py:555:    if host in ("claude-code", "codex"):
+plugins/evo/src/evo/inject/drain.py:559:        # plugin's stop-hook.sh on Claude Code; documented for Codex).
+plugins/evo/src/evo/inject/drain.py:560:        if hook_event in ("Stop", "SubagentStop"):
+plugins/evo/src/evo/inject/drain.py:565:        # SessionStart) carry the directive via hookSpecificOutput.additionalContext.
+plugins/evo/src/evo/inject/drain.py:567:        evt = hook_event or "PreToolUse"
+plugins/evo/src/evo/inject/drain.py:568:        hook_out = {"hookEventName": evt, "additionalContext": text}
+plugins/evo/src/evo/inject/drain.py:570:        # hook also returns a concrete permissionDecision. Verified on CLI
+plugins/evo/src/evo/inject/drain.py:573:        # delivers it as a system-reminder next to the tool result. "allow"
+plugins/evo/src/evo/inject/drain.py:577:        # additionalContext (gpt-5 acted on it), so we leave codex untouched to
+plugins/evo/src/evo/inject/drain.py:579:        if host == "claude-code" and evt == "PreToolUse":
+plugins/evo/src/evo/inject/drain.py:580:            hook_out["permissionDecision"] = "allow"
+plugins/evo/src/evo/inject/drain.py:581:        payload = {"hookSpecificOutput": hook_out}
+plugins/evo/src/evo/inject/drain.py:588:    if host == "cursor":
+plugins/evo/src/evo/inject/drain.py:589:        # Cursor delivery, routed around the IDE's broken additional_context:
+plugins/evo/src/evo/inject/drain.py:590:        #   stop/subagentStop -> followup_message (auto-submitted at turn end)
+plugins/evo/src/evo/inject/drain.py:595:        # agent_message consumes without delivering, so we let stop deliver).
+plugins/evo/src/evo/inject/drain.py:597:        if hook_event in ("stop", "subagentStop"):
+plugins/evo/src/evo/inject/drain.py:598:            out: dict = {"followup_message": text}
+plugins/evo/src/evo/inject/drain.py:599:        elif hook_event == "preToolUse" and _cursor_tool_class(p.get("tool_name")) == "shell":
+plugins/evo/src/evo/inject/drain.py:610:        # text in front of the model is to BLOCK the hook: on Stop it runs
+plugins/evo/src/evo/inject/drain.py:612:        # context as a user message, and returns continue:true — which
+plugins/evo/src/evo/inject/drain.py:613:        # delivers the directive and keeps the loop alive in one move.
+plugins/evo/src/evo/inject/drain.py:615:        # `message` is dropped on the floor, so a claude-code-style
+plugins/evo/src/evo/inject/drain.py:616:        # additionalContext (or a bare `message`) parses fine and reaches
+plugins/evo/src/evo/inject/drain.py:619:            "hookSpecificOutput": {
+plugins/evo/src/evo/inject/drain.py:620:                "hookEventName": hook_event or "Stop",
+plugins/evo/src/evo/inject/drain.py:632:def drain_session(root: Path, session_id: str, host: str | None = None, hook_event: str | None = None, payload: dict | None = None) -> int:
+plugins/evo/src/evo/inject/drain.py:634:    unlink marker. Returns 0 on success. `payload` is the raw hook stdin,
+plugins/evo/src/evo/inject/drain.py:635:    passed through to emit_for_host (cursor preToolUse needs tool_name/command)."""
+plugins/evo/src/evo/inject/drain.py:659:    # Codex and Claude Code use the same hookSpecificOutput envelope.
+plugins/evo/src/evo/inject/drain.py:661:    # envelope since it's the more common case for shell-hook hosts.
+plugins/evo/src/evo/inject/drain.py:663:        host = "claude-code"
+plugins/evo/src/evo/inject/drain.py:666:    # Orchestrator engagement on SessionStart. For hook hosts
+plugins/evo/src/evo/inject/drain.py:667:    # (claude-code/codex) the host process that fired SessionStart IS the
+plugins/evo/src/evo/inject/drain.py:678:        hook_event in _SESSION_START_EVENTS
+plugins/evo/src/evo/inject/drain.py:688:    # have an offset file. Closes the SessionStart-unconditional-drain
+plugins/evo/src/evo/inject/drain.py:690:    # hands off to this drain regardless, so without seeding, a fresh
+plugins/evo/src/evo/inject/drain.py:702:        # Subagent: drain its scoped queue only
+plugins/evo/src/evo/inject/drain.py:709:        # Orchestrator-class session: drain workspace queue
+plugins/evo/src/evo/inject/drain.py:721:    if _should_policy_block(root, session_id, sess, host, hook_event, payload):
+plugins/evo/src/evo/inject/drain.py:722:        _drain_debug(stage="policy_block", host=host, hook_event=hook_event,
+plugins/evo/src/evo/inject/drain.py:724:                     note="deny emitted; marker+offset preserved (directive NOT delivered)")
+plugins/evo/src/evo/inject/drain.py:727:        # inject directive (if any) hasn't actually been delivered to
+plugins/evo/src/evo/inject/drain.py:729:        # state so the next non-violating tool call can drain it.
+plugins/evo/src/evo/inject/drain.py:732:    # preToolUse with no mid-turn delivery channel: let the tool through and
+plugins/evo/src/evo/inject/drain.py:737:    #   - cursor: the IDE drops `additional_context` on non-shell tools (shell
+plugins/evo/src/evo/inject/drain.py:738:    #     delivers via updated_input, so it's allowed to drain).
+plugins/evo/src/evo/inject/drain.py:739:    #   - kimi: the only channel is a Stop-hook block, which would deny the
+plugins/evo/src/evo/inject/drain.py:741:    _pre = hook_event in ("preToolUse", "PreToolUse")
+plugins/evo/src/evo/inject/drain.py:745:            host == "cursor"
+plugins/evo/src/evo/inject/drain.py:746:            and _cursor_tool_class(payload.get("tool_name") if payload else None) != "shell"
+plugins/evo/src/evo/inject/drain.py:756:    nudge_text = _maybe_stop_nudge_text(root, session_id, sess, host, hook_event)
+plugins/evo/src/evo/inject/drain.py:759:        # `evo direct` injections aren't dropped when the stop hook
+plugins/evo/src/evo/inject/drain.py:762:        _drain_debug(stage="emit", host=host, hook_event=hook_event,
+plugins/evo/src/evo/inject/drain.py:765:        emit_for_host(host, hook_event, combined, payload)
+plugins/evo/src/evo/inject/drain.py:767:        _drain_debug(stage="emit", host=host, hook_event=hook_event,
+plugins/evo/src/evo/inject/drain.py:770:        emit_for_host(host, hook_event, text, payload)
+plugins/evo/src/evo/inject/drain.py:772:    # L1 ACK: record delivery for each event so `evo direct status <id>`
+plugins/evo/src/evo/inject/drain.py:773:    # can show whether the drain emitted the directive to a session.
+plugins/evo/src/evo/inject/drain.py:775:        _write_delivery_records(root, events, session_id, host, hook_event)
+plugins/evo/src/evo/inject/drain.py:785:        _drain_debug(stage="offset_advanced", host=host, hook_event=hook_event,
+plugins/evo/src/evo/inject/drain.py:801:    # claude-code / codex
+plugins/evo/src/evo/inject/drain.py:804:    # cursor
+plugins/evo/src/evo/inject/drain.py:898:        r"|codex(?:\s|$)"
+plugins/evo/src/evo/inject/drain.py:899:        r"|cursor-agent(?:\s|$)"
+plugins/evo/src/evo/inject/drain.py:1175:      - Host-spawn prefixes (`claude`, `codex`, …) exempt the redirect
+plugins/evo/src/evo/inject/drain.py:1286:    hook_event: str | None, payload: dict | None,
+plugins/evo/src/evo/inject/drain.py:1293:      - hook_event is the host's pre-tool event name. claude-code /
+plugins/evo/src/evo/inject/drain.py:1294:        codex send `PreToolUse`; cursor sends `preToolUse` (camelCase).
+plugins/evo/src/evo/inject/drain.py:1304:    if hook_event not in _PRE_TOOL_EVENTS:
+plugins/evo/src/evo/inject/drain.py:1339:    - claude-code / codex: the documented PreToolUse shape is the
+plugins/evo/src/evo/inject/drain.py:1340:      hookSpecificOutput envelope with `permissionDecision` and
+plugins/evo/src/evo/inject/drain.py:1343:      `{permission: deny, reason: …}` form (cursor-style) is silently
+plugins/evo/src/evo/inject/drain.py:1344:      ignored by claude-code — verified empirically: the model got
+plugins/evo/src/evo/inject/drain.py:1346:    - cursor: `{permission: deny, agent_message: …}` — preToolUse output
+plugins/evo/src/evo/inject/drain.py:1347:      fields per ~/.cursor/skills-cursor/create-hook/SKILL.md are
+plugins/evo/src/evo/inject/drain.py:1348:      `permission`, `user_message`, `agent_message`, `updated_input`.
+plugins/evo/src/evo/inject/drain.py:1350:    if host == "cursor":
+plugins/evo/src/evo/inject/drain.py:1351:        return {"permission": "deny", "agent_message": _POLICY_NUDGE_TEMPLATE}
+plugins/evo/src/evo/inject/drain.py:1352:    # claude-code / codex / default
+plugins/evo/src/evo/inject/drain.py:1354:        "hookSpecificOutput": {
+plugins/evo/src/evo/inject/drain.py:1355:            "hookEventName": "PreToolUse",
+plugins/evo/src/evo/inject/drain.py:1363:# Stop-hook self-continuation nudge for /optimize orchestrators
+plugins/evo/src/evo/inject/drain.py:1398:    hook_event: str | None,
+plugins/evo/src/evo/inject/drain.py:1412:      - hook event must be Stop or SubagentStop (case-insensitive
+plugins/evo/src/evo/inject/drain.py:1413:        across hosts — claude-code/codex use PascalCase, cursor uses
+plugins/evo/src/evo/inject/drain.py:1422:        claude-code/codex use `{decision: "block", reason: …}`; cursor
+plugins/evo/src/evo/inject/drain.py:1423:        uses `{followup_message: …}` (auto-submitted at turn end); kimi
+plugins/evo/src/evo/inject/drain.py:1424:        uses a Stop-hook block, whose reason it appends to the context
+plugins/evo/src/evo/inject/drain.py:1427:    if hook_event not in _STOP_EVENTS:
+plugins/evo/src/evo/inject/drain.py:1437:    if host not in ("claude-code", "codex", "cursor", "kimi"):
+plugins/evo/src/evo/inject/drain.py:1457:    1. Front-ended by the `evo-hook-drain` Rust binary (claude-code/codex):
+plugins/evo/src/evo/inject/drain.py:1459:       gate, so this just drains.
+plugins/evo/src/evo/inject/drain.py:1460:    2. Self-contained (cursor/kimi): the host's hooks.json calls `evo-drain
+plugins/evo/src/evo/inject/drain.py:1462:       `--session` are omitted; they're resolved from the hook stdin payload
+plugins/evo/src/evo/inject/drain.py:1465:    parser = argparse.ArgumentParser(prog="evo.drain")
+plugins/evo/src/evo/inject/drain.py:1467:    parser.add_argument("--session", default=None, help="session_id to drain (omit to read from stdin payload)")
+plugins/evo/src/evo/inject/drain.py:1468:    parser.add_argument("--host", default=None, help="host name (claude-code/codex/hermes/opencode/cursor/kimi); auto-detected if omitted")
+plugins/evo/src/evo/inject/drain.py:1472:    hook_event = _hook_event_from_payload(payload)
+plugins/evo/src/evo/inject/drain.py:1490:        # we drain. Idempotent + subagent-safe inside mark_optimize_mode.
+plugins/evo/src/evo/inject/drain.py:1493:                root, args.session, args.host, hook_event, payload,
+plugins/evo/src/evo/inject/drain.py:1496:        # `tool_input` from it. Without this, PreToolUse drain runs with
+plugins/evo/src/evo/inject/drain.py:1499:        return drain_session(
+plugins/evo/src/evo/inject/drain.py:1501:            hook_event=hook_event, payload=payload,
+plugins/evo/src/evo/inject/drain.py:1505:    # Cursor: key on conversation_id. It's present in EVERY Cursor hook event,
+plugins/evo/src/evo/inject/drain.py:1509:    # directives would never be delivered.
+plugins/evo/src/evo/inject/drain.py:1510:    # Kimi: session_id is present on every event (the hook engine stamps it on
+plugins/evo/src/evo/inject/drain.py:1514:    host = args.host or "cursor"
+plugins/evo/src/evo/inject/drain.py:1521:        _drain_debug(stage="resolve", host=host, hook_event=hook_event,
+plugins/evo/src/evo/inject/drain.py:1535:    _maybe_mark_engaged_from_shell(root, session, host, hook_event, payload)
+plugins/evo/src/evo/inject/drain.py:1536:    # Same rationale for autonomous: cursor/kimi arm via observing the command.
+plugins/evo/src/evo/inject/drain.py:1537:    _maybe_mark_autonomous_from_shell(root, session, host, hook_event, payload)
+plugins/evo/src/evo/inject/drain.py:1538:    gate = _self_contained_gate(root, session, host, hook_event, tool_name, tool_input)
+plugins/evo/src/evo/inject/drain.py:1544:    _maybe_mark_optimize_from_prompt(root, session, host, hook_event, payload)
+plugins/evo/src/evo/inject/drain.py:1545:    _drain_debug(stage="gate", host=host, hook_event=hook_event, session=session,
+plugins/evo/src/evo/inject/drain.py:1547:                 tool_class=_cursor_tool_class(tool_name)
+plugins/evo/src/evo/inject/drain.py:1548:                 if hook_event in ("preToolUse", "PreToolUse") else None,
+plugins/evo/src/evo/inject/drain.py:1553:    return drain_session(root, session, host=host, hook_event=hook_event, payload=payload)
+plugins/evo/src/evo/openclaw_plugin/evo.bundle.js:1:// ../opencode_plugin/drain.ts
+plugins/evo/src/evo/openclaw_plugin/evo.bundle.js:125:      lines.push(`[END EVO DIRECTIVE — run \`evo ack ${id}\` to confirm you have received this message, then proceed]`);
+plugins/evo/src/evo/openclaw_plugin/evo.bundle.js:258:function drainSession(runDir, sessionId) {
+plugins/evo/src/evo/openclaw_plugin/evo.bundle.js:348:var HOST_SPAWN_PREFIX_RE = /^\s*(?:nohup\s+)?(?:claude(?:\s|$)|codex(?:\s|$)|cursor-agent(?:\s|$)|opencode(?:\s|$)|hermes(?:\s|$)|openclaw(?:\s|$)|pi(?:\s|$)|pi-coding-agent(?:\s|$))/;
+plugins/evo/src/evo/openclaw_plugin/evo.bundle.js:740:    const drainedItems = [];
+plugins/evo/src/evo/openclaw_plugin/evo.bundle.js:758:      } else if (Array.isArray(event.payload?.messages)) {
+plugins/evo/src/evo/openclaw_plugin/evo.bundle.js:759:        event.payload.messages.push({
+plugins/evo/src/evo/openclaw_plugin/evo.bundle.js:786:        const msgs = Array.isArray(payload?.messages) ? payload.messages : [];
+plugins/evo/src/evo/openclaw_plugin/evo.bundle.js:816:        const msgs = Array.isArray(payload?.messages) ? payload.messages : [];
+plugins/evo/src/evo/openclaw_plugin/evo.bundle.js:840:      const result = drainSession(ctx.runDir, ctx.sid);
+plugins/evo/src/evo/openclaw_plugin/evo.bundle.js:842:        drainedItems.push({ ids: parseDirectiveIds(result.text), text: result.text });
+plugins/evo/src/evo/openclaw_plugin/evo.bundle.js:844:      for (let i = drainedItems.length - 1;i >= 0; i--) {
+plugins/evo/src/evo/openclaw_plugin/evo.bundle.js:845:        const it = drainedItems[i];
+plugins/evo/src/evo/openclaw_plugin/evo.bundle.js:847:          drainedItems.splice(i, 1);
+plugins/evo/src/evo/openclaw_plugin/evo.bundle.js:850:      if (drainedItems.length === 0)
+plugins/evo/src/evo/openclaw_plugin/evo.bundle.js:852:      const combined = drainedItems.map((it) => it.text).join(`
+plugins/evo/src/evo/openclaw_plugin/evo.bundle.js:913:        api.sendUserMessage(text, { deliverAs: "followUp" });
+plugins/evo/src/evo/inject/registry.py:37:# codex-cli 0.130 — it shows "session id: <uuid>" at startup and exports
+plugins/evo/src/evo/inject/registry.py:40:# so both resolve the session from the hook stdin payload instead (Kimi
+plugins/evo/src/evo/inject/registry.py:41:# sends `session_id` on every event; see drain's self-contained path).
+plugins/evo/src/evo/inject/registry.py:43:    ("codex", "CODEX_THREAD_ID"),
+plugins/evo/src/evo/inject/registry.py:44:    ("claude-code", "CLAUDE_CODE_SESSION_ID"),
+plugins/evo/src/evo/inject/registry.py:81:    onto a record that is NOT an engaged orchestrator. claude-code and
+plugins/evo/src/evo/inject/registry.py:82:    codex inherit the parent's CLAUDE_CODE_SESSION_ID / CODEX_THREAD_ID
+plugins/evo/src/evo/inject/registry.py:173:        # drain.py). Drives the policy nudge.
+plugins/evo/src/evo/inject/registry.py:176:        # v0.4.5+: autonomous gates the stop-hook continuation (the
+plugins/evo/src/evo/inject/registry.py:195:    # SessionStart-unconditional-drain in the Rust binary would backfill
+plugins/evo/src/evo/inject/registry.py:241:    The Rust hook checks this via stat() to decide whether to hand off
+plugins/evo/src/evo/inject/registry.py:244:    via the drain's consistency check."""
+plugins/evo/src/evo/inject/registry.py:271:    as a fast-path side channel for the Rust hook.
+plugins/evo/src/evo/inject/registry.py:293:    # hook entirely.
+plugins/evo/src/evo/inject/registry.py:346:    the Python drain (`_maybe_stop_nudge_text`) reads this field to decide
+plugins/evo/src/evo/inject/registry.py:539:    session does engage, only post-engagement directives can deliver.
+plugins/evo/src/evo/static/highlight-langs-extra.min.js:264:keyword:"break cmake_host_system_information cmake_minimum_required cmake_parse_arguments cmake_policy configure_file continue elseif else endforeach endfunction endif endmacro endwhile execute_process file find_file find_library find_package find_path find_program foreach function get_cmake_property get_directory_property get_filename_component get_property if include include_guard list macro mark_as_advanced math message option return separate_arguments set_directory_properties set_property set site_name string unset variable_watch while add_compile_definitions add_compile_options add_custom_command add_custom_target add_definitions add_dependencies add_executable add_library add_link_options add_subdirectory add_test aux_source_directory build_command create_test_sourcelist define_property enable_language enable_testing export fltk_wrap_ui get_source_file_property get_target_property get_test_property include_directories include_external_msproject include_regular_expression install link_directories link_libraries load_cache project qt_wrap_cpp qt_wrap_ui remove_definitions set_source_files_properties set_target_properties set_tests_properties source_group target_compile_definitions target_compile_features target_compile_options target_include_directories target_link_directories target_link_libraries target_link_options target_sources try_compile try_run ctest_build ctest_configure ctest_coverage ctest_empty_binary_directory ctest_memcheck ctest_read_custom_files ctest_run_script ctest_sleep ctest_start ctest_submit ctest_test ctest_update ctest_upload build_name exec_program export_library_dependencies install_files install_programs install_targets load_command make_directory output_required_files remove subdir_depends subdirs use_mangled_mesa utility_source variable_requires write_file qt5_use_modules qt5_use_package qt5_wrap_cpp on off true false and or not command policy target test exists is_newer_than is_directory is_symlink is_absolute matches less greater equal less_equal greater_equal strless strgreater strequal strless_equal strgreater_equal version_less version_greater version_equal version_less_equal version_greater_equal in_list defined"
+plugins/evo/src/evo/static/highlight-langs-extra.min.js:270:match:[/(message|enum|service)\s+/,e.IDENT_RE],scope:{1:"keyword",
+plugins/evo/src/evo/static/highlight.min.js:247:if(n.message&&n.message.includes("Illegal"))return{language:e,value:J(t),
+plugins/evo/src/evo/static/highlight.min.js:248:illegal:!0,relevance:0,_illegalBy:{message:n.message,index:T,
+plugins/evo/src/evo/static/highlight.min.js:317:}),re=["a","abbr","address","article","aside","audio","b","blockquote","body","button","canvas","caption","cite","code","dd","del","details","dfn","div","dl","dt","em","fieldset","figcaption","figure","footer","form","h1","h2","h3","h4","h5","h6","header","hgroup","html","i","iframe","img","input","ins","kbd","label","legend","li","main","mark","menu","nav","object","ol","p","q","quote","samp","section","span","strong","summary","sup","table","tbody","td","textarea","tfoot","th","thead","time","tr","ul","var","video"],se=["any-hover","any-pointer","aspect-ratio","color","color-gamut","color-index","device-aspect-ratio","device-height","device-width","display-mode","forced-colors","grid","height","hover","inverted-colors","monochrome","orientation","overflow-block","overflow-inline","pointer","prefers-color-scheme","prefers-contrast","prefers-reduced-motion","prefers-reduced-transparency","resolution","scan","scripting","update","width","min-width","max-width","min-height","max-height"],oe=["active","any-link","blank","checked","current","default","defined","dir","disabled","drop","empty","enabled","first","first-child","first-of-type","fullscreen","future","focus","focus-visible","focus-within","has","host","host-context","hover","indeterminate","in-range","invalid","is","lang","last-child","last-of-type","left","link","local-link","not","nth-child","nth-col","nth-last-child","nth-last-col","nth-last-of-type","nth-of-type","only-child","only-of-type","optional","out-of-range","past","placeholder-shown","read-only","read-write","required","right","root","scope","target","target-within","user-invalid","valid","visited","where"],le=["after","backdrop","before","cue","cue-region","first-letter","first-line","grammar-error","marker","part","placeholder","selection","slotted","spelling-error"],ce=["align-content","align-items","align-self","all","animation","animation-delay","animation-direction","animation-duration","animation-fill-mode","animation-iteration-count","animation-name","animation-play-state","animation-timing-function","backface-visibility","background","background-attachment","background-blend-mode","background-clip","background-color","background-image","background-origin","background-position","background-repeat","background-size","block-size","border","border-block","border-block-color","border-block-end","border-block-end-color","border-block-end-style","border-block-end-width","border-block-start","border-block-start-color","border-block-start-style","border-block-start-width","border-block-style","border-block-width","border-bottom","border-bottom-color","border-bottom-left-radius","border-bottom-right-radius","border-bottom-style","border-bottom-width","border-collapse","border-color","border-image","border-image-outset","border-image-repeat","border-image-slice","border-image-source","border-image-width","border-inline","border-inline-color","border-inline-end","border-inline-end-color","border-inline-end-style","border-inline-end-width","border-inline-start","border-inline-start-color","border-inline-start-style","border-inline-start-width","border-inline-style","border-inline-width","border-left","border-left-color","border-left-style","border-left-width","border-radius","border-right","border-right-color","border-right-style","border-right-width","border-spacing","border-style","border-top","border-top-color","border-top-left-radius","border-top-right-radius","border-top-style","border-top-width","border-width","bottom","box-decoration-break","box-shadow","box-sizing","break-after","break-before","break-inside","caption-side","caret-color","clear","clip","clip-path","clip-rule","color","column-count","column-fill","column-gap","column-rule","column-rule-color","column-rule-style","column-rule-width","column-span","column-width","columns","contain","content","content-visibility","counter-increment","counter-reset","cue","cue-after","cue-before","cursor","direction","display","empty-cells","filter","flex","flex-basis","flex-direction","flex-flow","flex-grow","flex-shrink","flex-wrap","float","flow","font","font-display","font-family","font-feature-settings","font-kerning","font-language-override","font-size","font-size-adjust","font-smoothing","font-stretch","font-style","font-synthesis","font-variant","font-variant-caps","font-variant-east-asian","font-variant-ligatures","font-variant-numeric","font-variant-position","font-variation-settings","font-weight","gap","glyph-orientation-vertical","grid","grid-area","grid-auto-columns","grid-auto-flow","grid-auto-rows","grid-column","grid-column-end","grid-column-start","grid-gap","grid-row","grid-row-end","grid-row-start","grid-template","grid-template-areas","grid-template-columns","grid-template-rows","hanging-punctuation","height","hyphens","icon","image-orientation","image-rendering","image-resolution","ime-mode","inline-size","isolation","justify-content","left","letter-spacing","line-break","line-height","list-style","list-style-image","list-style-position","list-style-type","margin","margin-block","margin-block-end","margin-block-start","margin-bottom","margin-inline","margin-inline-end","margin-inline-start","margin-left","margin-right","margin-top","marks","mask","mask-border","mask-border-mode","mask-border-outset","mask-border-repeat","mask-border-slice","mask-border-source","mask-border-width","mask-clip","mask-composite","mask-image","mask-mode","mask-origin","mask-position","mask-repeat","mask-size","mask-type","max-block-size","max-height","max-inline-size","max-width","min-block-size","min-height","min-inline-size","min-width","mix-blend-mode","nav-down","nav-index","nav-left","nav-right","nav-up","none","normal","object-fit","object-position","opacity","order","orphans","outline","outline-color","outline-offset","outline-style","outline-width","overflow","overflow-wrap","overflow-x","overflow-y","padding","padding-block","padding-block-end","padding-block-start","padding-bottom","padding-inline","padding-inline-end","padding-inline-start","padding-left","padding-right","padding-top","page-break-after","page-break-before","page-break-inside","pause","pause-after","pause-before","perspective","perspective-origin","pointer-events","position","quotes","resize","rest","rest-after","rest-before","right","row-gap","scroll-margin","scroll-margin-block","scroll-margin-block-end","scroll-margin-block-start","scroll-margin-bottom","scroll-margin-inline","scroll-margin-inline-end","scroll-margin-inline-start","scroll-margin-left","scroll-margin-right","scroll-margin-top","scroll-padding","scroll-padding-block","scroll-padding-block-end","scroll-padding-block-start","scroll-padding-bottom","scroll-padding-inline","scroll-padding-inline-end","scroll-padding-inline-start","scroll-padding-left","scroll-padding-right","scroll-padding-top","scroll-snap-align","scroll-snap-stop","scroll-snap-type","scrollbar-color","scrollbar-gutter","scrollbar-width","shape-image-threshold","shape-margin","shape-outside","speak","speak-as","src","tab-size","table-layout","text-align","text-align-all","text-align-last","text-combine-upright","text-decoration","text-decoration-color","text-decoration-line","text-decoration-style","text-emphasis","text-emphasis-color","text-emphasis-position","text-emphasis-style","text-indent","text-justify","text-orientation","text-overflow","text-rendering","text-shadow","text-transform","text-underline-position","top","transform","transform-box","transform-origin","transform-style","transition","transition-delay","transition-duration","transition-property","transition-timing-function","unicode-bidi","vertical-align","visibility","voice-balance","voice-duration","voice-family","voice-pitch","voice-range","voice-rate","voice-stress","voice-volume","white-space","widows","width","will-change","word-break","word-spacing","word-wrap","writing-mode","z-index"].reverse(),de=oe.concat(le)
+plugins/evo/src/evo/static/highlight.min.js:713:built_in:"_G _ENV _VERSION __index __newindex __mode __call __metatable __tostring __len __gc __add __sub __mul __div __mod __pow __concat __unm __eq __lt __le assert collectgarbage dofile error getfenv getmetatable ipairs load loadfile loadstring module next pairs pcall print rawequal rawget rawset require select setfenv setmetatable tonumber tostring type unpack xpcall arg self coroutine resume yield status wrap create running debug getupvalue debug sethook getmetatable gethook setmetatable setlocal traceback setfenv getinfo setupvalue getlocal getregistry getfenv io lines write close flush open output type read stderr stdin input stdout popen tmpfile math log max acos huge ldexp pi cos tanh pow deg tan cosh sinh random randomseed frexp ceil floor rad abs sqrt modf asin min mod fmod log10 atan2 exp sin atan os exit setlocale date getenv difftime remove time clock tmpname rename execute package preload loadlib loaded loaders cpath config path seeall string sub upper len gfind rep find match char dump gmatch reverse byte format gsub lower table setn insert getn foreachi maxn foreach concat sort remove"
+plugins/evo/src/evo/static/highlight.min.js:1041:const n=e.regex,t=e.COMMENT("--","$"),a=["true","false","unknown"],i=["bigint","binary","blob","boolean","char","character","clob","date","dec","decfloat","decimal","float","int","integer","interval","nchar","nclob","national","numeric","real","row","smallint","time","timestamp","varchar","varying","varbinary"],r=["abs","acos","array_agg","asin","atan","avg","cast","ceil","ceiling","coalesce","corr","cos","cosh","count","covar_pop","covar_samp","cume_dist","dense_rank","deref","element","exp","extract","first_value","floor","json_array","json_arrayagg","json_exists","json_object","json_objectagg","json_query","json_table","json_table_primitive","json_value","lag","last_value","lead","listagg","ln","log","log10","lower","max","min","mod","nth_value","ntile","nullif","percent_rank","percentile_cont","percentile_disc","position","position_regex","power","rank","regr_avgx","regr_avgy","regr_count","regr_intercept","regr_r2","regr_slope","regr_sxx","regr_sxy","regr_syy","row_number","sin","sinh","sqrt","stddev_pop","stddev_samp","substring","substring_regex","sum","tan","tanh","translate","translate_regex","treat","trim","trim_array","unnest","upper","value_of","var_pop","var_samp","width_bucket"],s=["create table","insert into","primary key","foreign key","not null","alter table","add constraint","grouping sets","on overflow","character set","respect nulls","ignore nulls","nulls first","nulls last","depth first","breadth first"],o=r,l=["abs","acos","all","allocate","alter","and","any","are","array","array_agg","array_max_cardinality","as","asensitive","asin","asymmetric","at","atan","atomic","authorization","avg","begin","begin_frame","begin_partition","between","bigint","binary","blob","boolean","both","by","call","called","cardinality","cascaded","case","cast","ceil","ceiling","char","char_length","character","character_length","check","classifier","clob","close","coalesce","collate","collect","column","commit","condition","connect","constraint","contains","convert","copy","corr","corresponding","cos","cosh","count","covar_pop","covar_samp","create","cross","cube","cume_dist","current","current_catalog","current_date","current_default_transform_group","current_path","current_role","current_row","current_schema","current_time","current_timestamp","current_path","current_role","current_transform_group_for_type","current_user","cursor","cycle","date","day","deallocate","dec","decimal","decfloat","declare","default","define","delete","dense_rank","deref","describe","deterministic","disconnect","distinct","double","drop","dynamic","each","element","else","empty","end","end_frame","end_partition","end-exec","equals","escape","every","except","exec","execute","exists","exp","external","extract","false","fetch","filter","first_value","float","floor","for","foreign","frame_row","free","from","full","function","fusion","get","global","grant","group","grouping","groups","having","hold","hour","identity","in","indicator","initial","inner","inout","insensitive","insert","int","integer","intersect","intersection","interval","into","is","join","json_array","json_arrayagg","json_exists","json_object","json_objectagg","json_query","json_table","json_table_primitive","json_value","lag","language","large","last_value","lateral","lead","leading","left","like","like_regex","listagg","ln","local","localtime","localtimestamp","log","log10","lower","match","match_number","match_recognize","matches","max","member","merge","method","min","minute","mod","modifies","module","month","multiset","national","natural","nchar","nclob","new","no","none","normalize","not","nth_value","ntile","null","nullif","numeric","octet_length","occurrences_regex","of","offset","old","omit","on","one","only","open","or","order","out","outer","over","overlaps","overlay","parameter","partition","pattern","per","percent","percent_rank","percentile_cont","percentile_disc","period","portion","position","position_regex","power","precedes","precision","prepare","primary","procedure","ptf","range","rank","reads","real","recursive","ref","references","referencing","regr_avgx","regr_avgy","regr_count","regr_intercept","regr_r2","regr_slope","regr_sxx","regr_sxy","regr_syy","release","result","return","returns","revoke","right","rollback","rollup","row","row_number","rows","running","savepoint","scope","scroll","search","second","seek","select","sensitive","session_user","set","show","similar","sin","sinh","skip","smallint","some","specific","specifictype","sql","sqlexception","sqlstate","sqlwarning","sqrt","start","static","stddev_pop","stddev_samp","submultiset","subset","substring","substring_regex","succeeds","sum","symmetric","system","system_time","system_user","table","tablesample","tan","tanh","then","time","timestamp","timezone_hour","timezone_minute","to","trailing","translate","translate_regex","translation","treat","trigger","trim","trim_array","true","truncate","uescape","union","unique","unknown","unnest","update","upper","user","using","value","values","value_of","var_pop","var_samp","varbinary","varchar","varying","versioning","when","whenever","where","width_bucket","window","with","within","without","year","add","asc","collation","desc","final","first","last","view"].filter((e=>!r.includes(e))),c={
+plugins/evo/src/evo/static/app.js:1378:    // area is continuous bar → chips (no flicker as the cursor crosses).
+plugins/evo/src/evo/static/app.js:1497:    // mouseout fires when leaving for a child; only hide when the cursor
+plugins/evo/src/evo/static/app.js:1593:    // Math: cursor sees rendered coord (scroll + c). That same content
+plugins/evo/src/evo/static/app.js:1649:      rowsHost.style.cursor = 'grabbing';
+plugins/evo/src/evo/static/app.js:1662:    rowsHost.style.cursor = '';
+plugins/evo/src/evo/static/app.js:1668:// We anchor the snap at the cursor so the content under the pointer stays
+plugins/evo/src/evo/static/app.js:1767:    document.body.style.cursor = 'row-resize';
+plugins/evo/src/evo/static/app.js:1784:    document.body.style.cursor = '';
+plugins/evo/src/evo/static/app.js:2256:      <div class="drawer-meta-row"><span class="drawer-meta-key">Parent</span><span class="drawer-meta-val mono" style="color:var(--indigo);cursor:pointer" onclick="openDrawer('${esc(node.parent)}')">${esc(node.parent)}</span></div>
+plugins/evo/src/evo/static/app.js:2830:      errEl.textContent = `Network error: ${e.message || e}`;
+plugins/evo/src/evo/static/app.js:2930:      errEl.textContent = `Network error: ${e.message || e}`;
+plugins/evo/src/evo/openclaw_plugin/factory.ts:17://     directives + the policy banner as user messages.
+plugins/evo/src/evo/openclaw_plugin/factory.ts:21://     `pi.sendUserMessage(text, { deliverAs: "followUp" })` from inside
+plugins/evo/src/evo/openclaw_plugin/factory.ts:22://     it to queue an autonomous-continuation message. That message
+plugins/evo/src/evo/openclaw_plugin/factory.ts:34:  drainSession,
+plugins/evo/src/evo/openclaw_plugin/factory.ts:55:} from "../opencode_plugin/drain.js"
+plugins/evo/src/evo/openclaw_plugin/factory.ts:62:    options?: { deliverAs?: "steer" | "followUp" | "nextTurn"; triggerTurn?: boolean },
+plugins/evo/src/evo/openclaw_plugin/factory.ts:81:    // In-memory cache of directive text already drained from disk. We keep
+plugins/evo/src/evo/openclaw_plugin/factory.ts:85:    // Each drained directive tracked by its event ids so the replay below
+plugins/evo/src/evo/openclaw_plugin/factory.ts:89:    const drainedItems: { ids: string[]; text: string }[] = []
+plugins/evo/src/evo/openclaw_plugin/factory.ts:112:      } else if (Array.isArray(event.payload?.messages)) {
+plugins/evo/src/evo/openclaw_plugin/factory.ts:113:        event.payload.messages.push({
+plugins/evo/src/evo/openclaw_plugin/factory.ts:140:    // recent messages for tool calls that ran `evo …`. Both OpenAI
+plugins/evo/src/evo/openclaw_plugin/factory.ts:142:    // (payload.messages tool_use blocks) expose recent tool calls in
+plugins/evo/src/evo/openclaw_plugin/factory.ts:159:        // Anthropic Messages-style: payload.messages with tool_use blocks
+plugins/evo/src/evo/openclaw_plugin/factory.ts:160:        const msgs = Array.isArray(payload?.messages) ? payload.messages : []
+plugins/evo/src/evo/openclaw_plugin/factory.ts:176:    // Extract the most recent user-message text from the outbound LLM
+plugins/evo/src/evo/openclaw_plugin/factory.ts:178:    // Anthropic Messages-style (payload.messages), with `content` as
+plugins/evo/src/evo/openclaw_plugin/factory.ts:193:        const msgs = Array.isArray(payload?.messages) ? payload.messages : []
+plugins/evo/src/evo/openclaw_plugin/factory.ts:214:      // Auto-arm optimize_mode if the most recent user message looks like
+plugins/evo/src/evo/openclaw_plugin/factory.ts:226:      const result = drainSession(ctx.runDir, ctx.sid)
+plugins/evo/src/evo/openclaw_plugin/factory.ts:228:        drainedItems.push({ ids: parseDirectiveIds(result.text), text: result.text })
+plugins/evo/src/evo/openclaw_plugin/factory.ts:231:      // Replay previously drained directives so subagents that share sid
+plugins/evo/src/evo/openclaw_plugin/factory.ts:233:      // agent has already acked, so a delivered+acknowledged directive
+plugins/evo/src/evo/openclaw_plugin/factory.ts:236:      for (let i = drainedItems.length - 1; i >= 0; i--) {
+plugins/evo/src/evo/openclaw_plugin/factory.ts:237:        const it = drainedItems[i]
+plugins/evo/src/evo/openclaw_plugin/factory.ts:239:          drainedItems.splice(i, 1)
+plugins/evo/src/evo/openclaw_plugin/factory.ts:242:      if (drainedItems.length === 0) return
+plugins/evo/src/evo/openclaw_plugin/factory.ts:243:      const combined = drainedItems.map((it) => it.text).join("\n")
+plugins/evo/src/evo/openclaw_plugin/factory.ts:248:    // Policy gate via the tool_call hook. Verified against
+plugins/evo/src/evo/openclaw_plugin/factory.ts:288:    // `pi.sendUserMessage(text, { deliverAs: "followUp" })`. Per upstream
+plugins/evo/src/evo/openclaw_plugin/factory.ts:289:    // docs the followUp message waits for the agent to finish current
+plugins/evo/src/evo/openclaw_plugin/factory.ts:290:    // tool execution, then delivers AND triggers another turn — the
+plugins/evo/src/evo/openclaw_plugin/factory.ts:310:        api.sendUserMessage(text, { deliverAs: "followUp" })
+plugins/evo/src/evo/openclaw_plugin/native/index.ts:3:// Four hook subscriptions, each verified against openclaw's
+plugins/evo/src/evo/openclaw_plugin/native/index.ts:4:// `src/plugins/hook-types.ts` and `src/plugins/hooks.ts`:
+plugins/evo/src/evo/openclaw_plugin/native/index.ts:6://   - `tool_result_persist` — mid-run directive delivery. Appends the
+plugins/evo/src/evo/openclaw_plugin/native/index.ts:8://     message so the LLM sees it on its next reasoning step.
+plugins/evo/src/evo/openclaw_plugin/native/index.ts:10://   - `before_prompt_build` — `/optimize` auto-arm. The hook receives
+plugins/evo/src/evo/openclaw_plugin/native/index.ts:19://     hooks.ts:569 (`shouldStop: result.block === true`, terminal).
+plugins/evo/src/evo/openclaw_plugin/native/index.ts:24://     keeps driving /optimize autonomously. Merger at hooks.ts:166
+plugins/evo/src/evo/openclaw_plugin/native/index.ts:35:  drainSession,
+plugins/evo/src/evo/openclaw_plugin/native/index.ts:50:} from "../../opencode_plugin/drain.js"
+plugins/evo/src/evo/openclaw_plugin/native/index.ts:57:// Detect re-entry on the same message by checking for the banner's
+plugins/evo/src/evo/openclaw_plugin/native/index.ts:98:// the parent's drain advances the on-disk offset the subagent's drain
+plugins/evo/src/evo/openclaw_plugin/native/index.ts:99:// returns null. Cache the drained text so the directive re-appends
+plugins/evo/src/evo/openclaw_plugin/native/index.ts:100:// to every subsequent tool-result message until session end.
+plugins/evo/src/evo/openclaw_plugin/native/index.ts:101:// Track each drained directive by its event ids so directiveBanner can
+plugins/evo/src/evo/openclaw_plugin/native/index.ts:103:// re-appends to every tool-result message until session end → repeated
+plugins/evo/src/evo/openclaw_plugin/native/index.ts:105:const drainedItems: { ids: string[]; text: string }[] = []
+plugins/evo/src/evo/openclaw_plugin/native/index.ts:108:  // Drop directives the agent has already acked, so a delivered+acked
+plugins/evo/src/evo/openclaw_plugin/native/index.ts:111:  for (let i = drainedItems.length - 1; i >= 0; i--) {
+plugins/evo/src/evo/openclaw_plugin/native/index.ts:112:    const it = drainedItems[i]
+plugins/evo/src/evo/openclaw_plugin/native/index.ts:114:      drainedItems.splice(i, 1)
+plugins/evo/src/evo/openclaw_plugin/native/index.ts:117:  if (drainedItems.length === 0) return ""
+plugins/evo/src/evo/openclaw_plugin/native/index.ts:119:  // by formatDirectiveText() inside drainSession() — don't double-wrap.
+plugins/evo/src/evo/openclaw_plugin/native/index.ts:120:  return "\n" + drainedItems.map((it) => it.text).join("\n\n")
+plugins/evo/src/evo/openclaw_plugin/native/index.ts:127:    "Delivers `evo direct` directives mid-conversation by appending them to the most recent tool-result message via tool_result_persist.",
+plugins/evo/src/evo/openclaw_plugin/native/index.ts:161:      const result = drainSession(runDir, sid)
+plugins/evo/src/evo/openclaw_plugin/native/index.ts:163:        drainedItems.push({ ids: parseDirectiveIds(result.text), text: result.text })
+plugins/evo/src/evo/openclaw_plugin/native/index.ts:164:        log(`drained ${result.text.length} bytes`)
+plugins/evo/src/evo/openclaw_plugin/native/index.ts:173:    // auto-arm); listing it here would register twice on the same hook.
+plugins/evo/src/evo/openclaw_plugin/native/index.ts:196:    // fully documented; sniff both `messages[]` (anthropic style) and
+plugins/evo/src/evo/openclaw_plugin/native/index.ts:197:    // `input[]` (openai style) and pick the trailing user message.
+plugins/evo/src/evo/openclaw_plugin/native/index.ts:200:        const sources = [event?.messages, event?.payload?.messages,
+plugins/evo/src/evo/openclaw_plugin/native/index.ts:234:    // Deny gate. Failure policy is "fail-closed" (hooks.ts:842), so a
+plugins/evo/src/evo/openclaw_plugin/native/index.ts:266:        log(`before_tool_call error (fail-open): ${err?.message ?? err}`)
+plugins/evo/src/evo/openclaw_plugin/native/index.ts:290:        log(`before_agent_finalize error: ${err?.message ?? err}`)
+plugins/evo/src/evo/openclaw_plugin/native/index.ts:295:    // Synchronous in openclaw (hooks.ts:42) — async handler returns a
+plugins/evo/src/evo/openclaw_plugin/native/index.ts:303:      if (drainedItems.length === 0) return undefined
+plugins/evo/src/evo/openclaw_plugin/native/index.ts:305:      // Per docs: handler returns the modified message (rewrites
+plugins/evo/src/evo/openclaw_plugin/native/index.ts:307:      // verbatim — sniff the message and append to whichever text
+plugins/evo/src/evo/openclaw_plugin/native/index.ts:309:      const msg = event?.message ?? event?.assistantMessage ?? event
+plugins/evo/src/evo/openclaw_plugin/native/index.ts:315:        // Re-entry guard: skip if this message already contains the
+plugins/evo/src/evo/openclaw_plugin/native/index.ts:336:        // shove the banner into every text-shaped field on the message.
+plugins/evo/src/evo/openclaw_plugin/native/index.js:1:// ../../opencode_plugin/drain.ts
+plugins/evo/src/evo/openclaw_plugin/native/index.js:125:      lines.push(`[END EVO DIRECTIVE — run \`evo ack ${id}\` to confirm you have received this message, then proceed]`);
+plugins/evo/src/evo/openclaw_plugin/native/index.js:218:function drainSession(runDir, sessionId) {
+plugins/evo/src/evo/openclaw_plugin/native/index.js:308:var HOST_SPAWN_PREFIX_RE = /^\s*(?:nohup\s+)?(?:claude(?:\s|$)|codex(?:\s|$)|cursor-agent(?:\s|$)|opencode(?:\s|$)|hermes(?:\s|$)|openclaw(?:\s|$)|pi(?:\s|$)|pi-coding-agent(?:\s|$))/;
+plugins/evo/src/evo/openclaw_plugin/native/index.js:751:var drainedItems = [];
+plugins/evo/src/evo/openclaw_plugin/native/index.js:753:  for (let i = drainedItems.length - 1;i >= 0; i--) {
+plugins/evo/src/evo/openclaw_plugin/native/index.js:754:    const it = drainedItems[i];
+plugins/evo/src/evo/openclaw_plugin/native/index.js:756:      drainedItems.splice(i, 1);
+plugins/evo/src/evo/openclaw_plugin/native/index.js:759:  if (drainedItems.length === 0)
+plugins/evo/src/evo/openclaw_plugin/native/index.js:762:` + drainedItems.map((it) => it.text).join(`
+plugins/evo/src/evo/openclaw_plugin/native/index.js:769:  description: "Delivers `evo direct` directives mid-conversation by appending them to the most recent tool-result message via tool_result_persist.",
+plugins/evo/src/evo/openclaw_plugin/native/index.js:788:      const result = drainSession(runDir, sid);
+plugins/evo/src/evo/openclaw_plugin/native/index.js:790:        drainedItems.push({ ids: parseDirectiveIds(result.text), text: result.text });
+plugins/evo/src/evo/openclaw_plugin/native/index.js:791:        log(`drained ${result.text.length} bytes`);
+plugins/evo/src/evo/openclaw_plugin/native/index.js:814:          event?.messages,
+plugins/evo/src/evo/openclaw_plugin/native/index.js:815:          event?.payload?.messages,
+plugins/evo/src/evo/openclaw_plugin/native/index.js:882:        log(`before_tool_call error (fail-open): ${err?.message ?? err}`);
+plugins/evo/src/evo/openclaw_plugin/native/index.js:904:        log(`before_agent_finalize error: ${err?.message ?? err}`);
+plugins/evo/src/evo/openclaw_plugin/native/index.js:913:      if (drainedItems.length === 0)
+plugins/evo/src/evo/openclaw_plugin/native/index.js:915:      const msg = event?.message ?? event?.assistantMessage ?? event;
+plugins/evo/src/evo/openclaw_plugin/pi.bundle.js:1:// ../opencode_plugin/drain.ts
+plugins/evo/src/evo/openclaw_plugin/pi.bundle.js:125:      lines.push(`[END EVO DIRECTIVE — run \`evo ack ${id}\` to confirm you have received this message, then proceed]`);
+plugins/evo/src/evo/openclaw_plugin/pi.bundle.js:258:function drainSession(runDir, sessionId) {
+plugins/evo/src/evo/openclaw_plugin/pi.bundle.js:348:var HOST_SPAWN_PREFIX_RE = /^\s*(?:nohup\s+)?(?:claude(?:\s|$)|codex(?:\s|$)|cursor-agent(?:\s|$)|opencode(?:\s|$)|hermes(?:\s|$)|openclaw(?:\s|$)|pi(?:\s|$)|pi-coding-agent(?:\s|$))/;
+plugins/evo/src/evo/openclaw_plugin/pi.bundle.js:740:    const drainedItems = [];
+plugins/evo/src/evo/openclaw_plugin/pi.bundle.js:758:      } else if (Array.isArray(event.payload?.messages)) {
+plugins/evo/src/evo/openclaw_plugin/pi.bundle.js:759:        event.payload.messages.push({
+plugins/evo/src/evo/openclaw_plugin/pi.bundle.js:786:        const msgs = Array.isArray(payload?.messages) ? payload.messages : [];
+plugins/evo/src/evo/openclaw_plugin/pi.bundle.js:816:        const msgs = Array.isArray(payload?.messages) ? payload.messages : [];
+plugins/evo/src/evo/openclaw_plugin/pi.bundle.js:840:      const result = drainSession(ctx.runDir, ctx.sid);
+plugins/evo/src/evo/openclaw_plugin/pi.bundle.js:842:        drainedItems.push({ ids: parseDirectiveIds(result.text), text: result.text });
+plugins/evo/src/evo/openclaw_plugin/pi.bundle.js:844:      for (let i = drainedItems.length - 1;i >= 0; i--) {
+plugins/evo/src/evo/openclaw_plugin/pi.bundle.js:845:        const it = drainedItems[i];
+plugins/evo/src/evo/openclaw_plugin/pi.bundle.js:847:          drainedItems.splice(i, 1);
+plugins/evo/src/evo/openclaw_plugin/pi.bundle.js:850:      if (drainedItems.length === 0)
+plugins/evo/src/evo/openclaw_plugin/pi.bundle.js:852:      const combined = drainedItems.map((it) => it.text).join(`
+plugins/evo/src/evo/openclaw_plugin/pi.bundle.js:913:        api.sendUserMessage(text, { deliverAs: "followUp" });
+plugins/evo/src/evo/host_install/openclaw.py:3:directive delivery) and trust grants in plugins.allow."""
+plugins/evo/src/evo/host_install/openclaw.py:21:     what delivers `evo direct` directives mid-conversation.
+plugins/evo/src/evo/host_install/openclaw.py:60:    hook_md = native_dir / "HOOK.md"
+plugins/evo/src/evo/host_install/openclaw.py:61:    if not all(p.exists() for p in (manifest, index_js, hook_md)):
+plugins/evo/src/evo/host_install/openclaw.py:63:    return manifest, index_js, hook_md
+plugins/evo/src/evo/host_install/openclaw.py:158:    # Install the openclaw-native plugin that delivers mid-run inject
+plugins/evo/src/evo/host_install/openclaw.py:159:    # via the `tool_result_persist` hook. Codex bundle (extensions/evo/)
+plugins/evo/src/evo/host_install/openclaw.py:172:        manifest_src, index_src, hook_md_src = native_sources
+plugins/evo/src/evo/host_install/openclaw.py:178:        _sh.copyfile(hook_md_src, native_dir / "HOOK.md")
+plugins/evo/src/evo/host_install/_hook_drain.py:1:"""Stage the platform-native evo-hook-drain binary where hooks resolve it.
+plugins/evo/src/evo/host_install/_hook_drain.py:3:The hook script is a small Rust binary (~330 KB) built natively for each
+plugins/evo/src/evo/host_install/_hook_drain.py:7:`ensure_hook_drain_binary(plugin_root)`, which:
+plugins/evo/src/evo/host_install/_hook_drain.py:12:  2. copies it to `<plugin_root>/bin/evo-hook-drain`, the path
+plugins/evo/src/evo/host_install/_hook_drain.py:13:     hooks.json commands resolve.
+plugins/evo/src/evo/host_install/_hook_drain.py:15:The plugin tree commits a shell-script fallback at `bin/evo-hook-drain`
+plugins/evo/src/evo/host_install/_hook_drain.py:17:fresh git snapshot whenever they decide to (codex re-clones its
+plugins/evo/src/evo/host_install/_hook_drain.py:20:keeps hooks firing via the stable copy.
+plugins/evo/src/evo/host_install/_hook_drain.py:93:def hook_drain_binary_name() -> str:
+plugins/evo/src/evo/host_install/_hook_drain.py:95:    return "evo-hook-drain.exe" if platform.system().lower() == "windows" else "evo-hook-drain"
+plugins/evo/src/evo/host_install/_hook_drain.py:101:    `bin/evo-hook-drain` wrapper in the plugin tree execs this copy.
+plugins/evo/src/evo/host_install/_hook_drain.py:105:    return base / "bin" / hook_drain_binary_name()
+plugins/evo/src/evo/host_install/_hook_drain.py:118:def mirror_hook_drain_binary(src_plugin_root: Path, dst_plugin_root: Path) -> bool:
+plugins/evo/src/evo/host_install/_hook_drain.py:119:    """Copy `bin/evo-hook-drain` from one plugin root to another, so a
+plugins/evo/src/evo/host_install/_hook_drain.py:120:    host re-stage from the destination (codex: marketplace snapshot;
+plugins/evo/src/evo/host_install/_hook_drain.py:121:    claude-code: marketplace clone) carries the native binary instead of
+plugins/evo/src/evo/host_install/_hook_drain.py:132:    name = hook_drain_binary_name()
+plugins/evo/src/evo/host_install/_hook_drain.py:149:            f"WARN: failed to mirror evo-hook-drain into {dst.parent}: {e}",
+plugins/evo/src/evo/host_install/_hook_drain.py:172:    sidecar = stable.parent / "evo-hook-drain.version"
+plugins/evo/src/evo/host_install/_hook_drain.py:197:                print(f"installed evo-hook-drain binary from EVO_HOOK_DRAIN_BINARY: {stable}")
+plugins/evo/src/evo/host_install/_hook_drain.py:236:                f"WARN: could not refresh evo-hook-drain "
+plugins/evo/src/evo/host_install/_hook_drain.py:244:            f"WARN: failed to fetch evo-hook-drain binary "
+plugins/evo/src/evo/host_install/_hook_drain.py:259:    print(f"installed evo-hook-drain binary: {stable}")
+plugins/evo/src/evo/host_install/_hook_drain.py:263:def ensure_hook_drain_binary(plugin_root: Path, *, force: bool = False,
+plugins/evo/src/evo/host_install/_hook_drain.py:266:    `<plugin_root>/bin/evo-hook-drain` a working hook entry point.
+plugins/evo/src/evo/host_install/_hook_drain.py:267:    Returns True when hooks at `plugin_root` will fire.
+plugins/evo/src/evo/host_install/_hook_drain.py:273:    the stable copy, so hooks still work.
+plugins/evo/src/evo/host_install/_hook_drain.py:281:            f"WARN: evo-hook-drain binary not available for "
+plugins/evo/src/evo/host_install/_hook_drain.py:290:    asset = f"evo-hook-drain-{target}{ext}"
+plugins/evo/src/evo/host_install/_hook_drain.py:294:    dest = plugin_root / "bin" / hook_drain_binary_name()
+plugins/evo/src/evo/host_install/_hook_drain.py:310:            print(f"staged evo-hook-drain binary: {dest}")
+plugins/evo/src/evo/host_install/_hook_drain.py:313:                f"WARN: failed to stage evo-hook-drain at {dest}: {e}",
+plugins/evo/src/evo/host_install/_hook_drain.py:322:            f"at {stable}, so hooks will no-op. Re-run "
+plugins/evo/src/evo/host_install/claude_code.py:6:claude-code`, `evo update claude-code`, and `evo uninstall claude-code` can
+plugins/evo/src/evo/host_install/claude_code.py:12:(anthropics/claude-code#14061) that leaves the cache stale after a normal
+plugins/evo/src/evo/host_install/claude_code.py:27:from ._hook_drain import (
+plugins/evo/src/evo/host_install/claude_code.py:28:    ensure_hook_drain_binary,
+plugins/evo/src/evo/host_install/claude_code.py:29:    hook_drain_binary_name,
+plugins/evo/src/evo/host_install/claude_code.py:30:    mirror_hook_drain_binary,
+plugins/evo/src/evo/host_install/claude_code.py:47:    skipping `ensure_hook_drain_binary` and breaking `evo direct` delivery.
+plugins/evo/src/evo/host_install/claude_code.py:64:def _hook_drain_staging_dir(from_path: str | None) -> Path | None:
+plugins/evo/src/evo/host_install/claude_code.py:65:    """Return the plugin dir whose `bin/evo-hook-drain` the runtime hook will
+plugins/evo/src/evo/host_install/claude_code.py:72:    where no hook ever looks, so every hook fire is `not found` (exit 127).
+plugins/evo/src/evo/host_install/claude_code.py:89:def _stage_hook_drain(from_path: str | None, *, force: bool = False) -> None:
+plugins/evo/src/evo/host_install/claude_code.py:90:    """Fetch the binary into the plugin dir the hooks resolve, then mirror
+plugins/evo/src/evo/host_install/claude_code.py:95:    outside `evo update` would otherwise drop it and hooks exit 127.
+plugins/evo/src/evo/host_install/claude_code.py:97:    plugin_dir = _hook_drain_staging_dir(from_path)
+plugins/evo/src/evo/host_install/claude_code.py:103:    ensure_hook_drain_binary(
+plugins/evo/src/evo/host_install/claude_code.py:112:            mirror_hook_drain_binary(plugin_dir, clone_dir)
+plugins/evo/src/evo/host_install/claude_code.py:152:            "  npm install -g @anthropic-ai/claude-code",
+plugins/evo/src/evo/host_install/claude_code.py:185:    # Stage the platform-native evo-hook-drain binary where the runtime hook
+plugins/evo/src/evo/host_install/claude_code.py:186:    # resolves it. hooks.json points at ${CLAUDE_PLUGIN_ROOT}/bin/evo-hook-drain;
+plugins/evo/src/evo/host_install/claude_code.py:188:    _stage_hook_drain(
+plugins/evo/src/evo/host_install/claude_code.py:193:        f"\n✓ evo installed for claude-code at scope={scope}.\n"
+plugins/evo/src/evo/host_install/claude_code.py:204:    (workaround for anthropics/claude-code#14061, the upstream cache
+plugins/evo/src/evo/host_install/claude_code.py:244:    # Re-stage the hook-drain binary where the runtime hook resolves it
+plugins/evo/src/evo/host_install/claude_code.py:247:    _stage_hook_drain(from_path, force=force)
+plugins/evo/src/evo/host_install/claude_code.py:249:        "\n✓ evo updated for claude-code.\n"
+plugins/evo/src/evo/host_install/claude_code.py:284:        print("  Run: evo install claude-code")
+plugins/evo/src/evo/host_install/claude_code.py:296:                cache / "plugins" / "evo" / "bin" / hook_drain_binary_name()
+plugins/evo/src/evo/host_install/claude_code.py:300:                    f"! evo-hook-drain not mirrored in the marketplace clone "
+plugins/evo/src/evo/host_install/claude_code.py:302:                    f"  `claude plugin update` would drop the hook binary "
+plugins/evo/src/evo/host_install/claude_code.py:303:                    f"(hooks exit 127). Run: evo update claude-code"
+plugins/evo/src/evo/host_install/claude_code.py:338:                    f"  Run: evo update claude-code --force"
+plugins/evo/src/evo/version_check.py:133:    # cache has unpatched evo-hook-drain (no SessionStart drift block).
+plugins/evo/src/evo/version_check.py:136:    Path.home() / ".codex" / "plugins" / "cache" / "evo-hq-evo",
+plugins/evo/src/evo/version_check.py:140:def _has_unpatched_hook(plugin_root: Path) -> bool:
+plugins/evo/src/evo/version_check.py:141:    """Return True if the cached evo-hook-drain at this plugin_root is
+plugins/evo/src/evo/version_check.py:142:    affected by #36 (bare `exec evo-drain` with no SessionStart drift
+plugins/evo/src/evo/version_check.py:145:    hook = plugin_root / "bin" / "evo-hook-drain"
+plugins/evo/src/evo/version_check.py:146:    if not hook.exists():
+plugins/evo/src/evo/version_check.py:149:        text = hook.read_text()
+plugins/evo/src/evo/version_check.py:152:    # Post-0.4.1 hooks always contain the SessionStart drift block; if
+plugins/evo/src/evo/version_check.py:170:    # Special-case Claude Code cache: only flag versions whose bin/evo-hook-drain
+plugins/evo/src/evo/version_check.py:175:            if version_dir.is_dir() and _has_unpatched_hook(version_dir):
+plugins/evo/src/evo/version_check.py:179:    codex_legacy = Path.home() / ".codex" / "plugins" / "cache" / "evo-hq-evo"
+plugins/evo/src/evo/version_check.py:180:    if codex_legacy.exists():
+plugins/evo/src/evo/version_check.py:181:        found.append(codex_legacy)
+plugins/evo/src/evo/host_install/__init__.py:14:plugin's version. The CLI and the host's skills/hooks share a wire
+plugins/evo/src/evo/host_install/__init__.py:16:the hook event names — so drift breaks the loop silently. The
+plugins/evo/src/evo/host_install/__init__.py:31:from . import claude_code, claude_science, codex, cursor, hermes, kimi, opencode, openclaw, pi
+plugins/evo/src/evo/host_install/__init__.py:34:    "claude-code": claude_code,
+plugins/evo/src/evo/host_install/__init__.py:36:    "codex": codex,
+plugins/evo/src/evo/host_install/__init__.py:37:    "cursor": cursor,
+plugins/evo/src/evo/host_install/__init__.py:74:    success the user should have to discover at hook-fire time.
+plugins/evo/src/evo/host_install/__init__.py:85:    to `install(args)`. Most file-copy hosts (codex/openclaw/opencode)
+plugins/evo/src/evo/host_install/__init__.py:107:    broken result is visible immediately instead of at hook-fire time.
+plugins/evo/bin/evo-hook-drain-rs/src/main.rs:1:// evo-hook-drain — hot-path hook invoked by host plugins (Claude Code, Codex).
+plugins/evo/bin/evo-hook-drain-rs/src/main.rs:3:// Reads session_id from stdin's JSON payload (host hook contract), then does
+plugins/evo/bin/evo-hook-drain-rs/src/main.rs:4:// two stat checks; exits in ~1-3ms when there's nothing to deliver. Hands off
+plugins/evo/bin/evo-hook-drain-rs/src/main.rs:5:// to `evo-drain` (Python console_script) only when the marker says there's
+plugins/evo/bin/evo-hook-drain-rs/src/main.rs:6:// something to drain.
+plugins/evo/bin/evo-hook-drain-rs/src/main.rs:28:/// Append a diagnostic JSON line tracing this hook invocation's decisions.
+plugins/evo/bin/evo-hook-drain-rs/src/main.rs:30:/// EVO_DRAIN_DEBUG_LOG or, by default, $HOME/.evo-drain.log. `fields` is a
+plugins/evo/bin/evo-hook-drain-rs/src/main.rs:42:            format!("{}/.evo-drain.log", home)
+plugins/evo/bin/evo-hook-drain-rs/src/main.rs:87:    ("CLAUDE_CODE_SESSION_ID", "claude-code"),
+plugins/evo/bin/evo-hook-drain-rs/src/main.rs:88:    ("CODEX_THREAD_ID", "codex"),
+plugins/evo/bin/evo-hook-drain-rs/src/main.rs:94:    if buf.contains(".codex/") || buf.contains("\\.codex\\") {
+plugins/evo/bin/evo-hook-drain-rs/src/main.rs:95:        "codex"
+plugins/evo/bin/evo-hook-drain-rs/src/main.rs:101:        "claude-code"
+plugins/evo/bin/evo-hook-drain-rs/src/main.rs:135:    (String::new(), "claude-code")
+plugins/evo/bin/evo-hook-drain-rs/src/main.rs:211:    // SessionStart drain correctly routes to the exp queue (drain.py
+plugins/evo/bin/evo-hook-drain-rs/src/main.rs:223:    // Engage the orchestrator at SessionStart. The hook-host process that
+plugins/evo/bin/evo-hook-drain-rs/src/main.rs:320:        } else if plugin_root_str.contains("/.codex/plugins/cache/") {
+plugins/evo/bin/evo-hook-drain-rs/src/main.rs:322:                h.join(".codex")
+plugins/evo/bin/evo-hook-drain-rs/src/main.rs:350:    if which("evo-drain").is_none() {
+plugins/evo/bin/evo-hook-drain-rs/src/main.rs:358:fn handoff_to_drain(run_dir: &Path, sid: &str, host: &str, stdin_buf: &str) -> ! {
+plugins/evo/bin/evo-hook-drain-rs/src/main.rs:359:    let drain = match which("evo-drain") {
+plugins/evo/bin/evo-hook-drain-rs/src/main.rs:364:                "evo-hook-drain: install evo-hq-cli to enable drain — 'uv tool install evo-hq-cli' or 'pipx install evo-hq-cli'"
+plugins/evo/bin/evo-hook-drain-rs/src/main.rs:371:    let mut child = match Command::new(&drain)
+plugins/evo/bin/evo-hook-drain-rs/src/main.rs:410:/// need drain to run on tool/stop events.
+plugins/evo/bin/evo-hook-drain-rs/src/main.rs:419:/// Decide whether to hand off to the Python drain. Inputs are the three
+plugins/evo/bin/evo-hook-drain-rs/src/main.rs:424:///   - marker exists                       → hand off (deliver directive)
+plugins/evo/bin/evo-hook-drain-rs/src/main.rs:428:fn should_handoff(hook_event: &str, marker: bool, opt_flag: bool) -> bool {
+plugins/evo/bin/evo-hook-drain-rs/src/main.rs:433:        return matches!(hook_event, "PreToolUse" | "Stop" | "SubagentStop");
+plugins/evo/bin/evo-hook-drain-rs/src/main.rs:435:    matches!(hook_event, "UserPromptSubmit")
+plugins/evo/bin/evo-hook-drain-rs/src/main.rs:442:    // payload sid is what makes nested envs (codex spawned from claude
+plugins/evo/bin/evo-hook-drain-rs/src/main.rs:454:    let hook_event = find_json_string(&stdin_buf, "hook_event_name").unwrap_or_default();
+plugins/evo/bin/evo-hook-drain-rs/src/main.rs:461:        sid, host, hook_event, subagent, sessions_file.is_file()
+plugins/evo/bin/evo-hook-drain-rs/src/main.rs:464:    if hook_event == "SessionStart" {
+plugins/evo/bin/evo-hook-drain-rs/src/main.rs:466:            // engage=true: SessionStart on the hook host IS the orchestrator
+plugins/evo/bin/evo-hook-drain-rs/src/main.rs:481:        // Fall through to handoff: drain seeds offsets + emits empty
+plugins/evo/bin/evo-hook-drain-rs/src/main.rs:484:        handoff_to_drain(&run_dir, &sid, host, &stdin_buf);
+plugins/evo/bin/evo-hook-drain-rs/src/main.rs:487:    // Resume support: claude-code resumes (and `evo init` mid-session)
+plugins/evo/bin/evo-hook-drain-rs/src/main.rs:506:        if hook_event == "UserPromptSubmit" {
+plugins/evo/bin/evo-hook-drain-rs/src/main.rs:513:        } else if hook_event == "PostToolUse" {
+plugins/evo/bin/evo-hook-drain-rs/src/main.rs:524:        && hook_event == "PostToolUse"
+plugins/evo/bin/evo-hook-drain-rs/src/main.rs:536:    let handoff = should_handoff(&hook_event, marker, opt_flag);
+plugins/evo/bin/evo-hook-drain-rs/src/main.rs:539:        hook_event, marker, opt_flag, handoff
+plugins/evo/bin/evo-hook-drain-rs/src/main.rs:546:    // Subagent fence: claude-code (and codex) inherit the parent's
+plugins/evo/bin/evo-hook-drain-rs/src/main.rs:549:    // fires, this hook resolves to the parent's session_id — same as
+plugins/evo/bin/evo-hook-drain-rs/src/main.rs:550:    // the orchestrator. If we drain here, the directive's
+plugins/evo/bin/evo-hook-drain-rs/src/main.rs:555:    // Discriminator: the hook payload's `agent_id` field. Claude-code
+plugins/evo/bin/evo-hook-drain-rs/src/main.rs:561:    // main-session hook (typically the orchestrator's next Stop or a
+plugins/evo/bin/evo-hook-drain-rs/src/main.rs:562:    // top-level Bash/Read call) consumes it and delivers as a new
+plugins/evo/bin/evo-hook-drain-rs/src/main.rs:571:        hook_event, marker
+plugins/evo/bin/evo-hook-drain-rs/src/main.rs:573:    handoff_to_drain(&run_dir, &sid, host, &stdin_buf);
+plugins/evo/bin/evo-hook-drain-rs/src/main.rs:591:///     emitted by claude-code's bash-snapshot mechanism)
+plugins/evo/bin/evo-hook-drain-rs/src/main.rs:646:    // Claude-code includes `agent_id` (and `agent_type`) fields in hook
+plugins/evo/bin/evo-hook-drain-rs/src/main.rs:650:    // every hook payload across a release-smoke run:
+plugins/evo/bin/evo-hook-drain-rs/src/main.rs:658:    // Earlier `transcript_path` check was wrong — claude-code passes
+plugins/evo/bin/evo-hook-drain-rs/src/main.rs:685:        // Real claude-code shell-snapshot pattern:
+plugins/evo/bin/evo-hook-drain-rs/src/main.rs:741:        let payload = r#"{"hook_event_name":"PostToolUse","tool_name":"Bash","tool_input":{"command":"evo init --name foo","description":"init evo"}}"#;
+plugins/evo/bin/evo-hook-drain-rs/src/main.rs:747:        // The actual claude-code Bash invocation shape.
+plugins/evo/bin/evo-hook-drain-rs/src/main.rs:748:        let payload = r#"{"hook_event_name":"PostToolUse","tool_name":"Bash","tool_input":{"command":"source /tmp/snapshot.sh && shopt -u extglob 2>/dev/null || true && eval 'evo new --parent root'","description":"create exp"}}"#;
+plugins/evo/bin/evo-hook-drain-rs/src/main.rs:754:        let read_payload = r#"{"hook_event_name":"PostToolUse","tool_name":"Read","tool_input":{"file_path":"/tmp/evo init.txt"}}"#;
+plugins/evo/bin/evo-hook-drain-rs/src/main.rs:757:        let write_payload = r#"{"hook_event_name":"PostToolUse","tool_name":"Write","tool_input":{"file_path":"/tmp/evo init.py","content":"evo run"}}"#;
+plugins/evo/bin/evo-hook-drain-rs/src/main.rs:763:        let payload = r#"{"hook_event_name":"PostToolUse","tool_name":"Bash","tool_input":{}}"#;
+plugins/evo/bin/evo-hook-drain-rs/src/main.rs:769:        let payload = r#"{"hook_event_name":"PostToolUse","tool_name":"Bash","tool_input":{"command":"ls -la /home/user"}}"#;
+plugins/evo/bin/evo-hook-drain-rs/src/main.rs:772:        let with_substring = r#"{"hook_event_name":"PostToolUse","tool_name":"Bash","tool_input":{"command":"cargo install evo-hq-cli"}}"#;
+plugins/evo/bin/evo-hook-drain-rs/src/main.rs:775:        let revolution = r#"{"hook_event_name":"PostToolUse","tool_name":"Bash","tool_input":{"command":"python evolution.py --steps 1000"}}"#;
+plugins/evo/bin/evo-hook-drain-rs/src/main.rs:786:        let payload = r#"{"hook_event_name":"PostToolUse","tool_name":"Bash","tool_input":{"command":"ls /home/user/.evo/"}}"#;
+plugins/evo/src/evo/static/style.css:95:  cursor: pointer;
+plugins/evo/src/evo/static/style.css:256:  cursor: pointer;
+plugins/evo/src/evo/static/style.css:313:  cursor: pointer;
+plugins/evo/src/evo/static/style.css:363:  cursor: pointer;
+plugins/evo/src/evo/static/style.css:392:  cursor: pointer;
+plugins/evo/src/evo/static/style.css:418:  cursor: pointer;
+plugins/evo/src/evo/static/style.css:430:  cursor: pointer;
+plugins/evo/src/evo/static/style.css:501:  cursor: help;
+plugins/evo/src/evo/static/style.css:519:  cursor: pointer;
+plugins/evo/src/evo/static/style.css:601:  cursor: default;
+plugins/evo/src/evo/static/style.css:655:  cursor: pointer;
+plugins/evo/src/evo/static/style.css:675:  cursor: row-resize;
+plugins/evo/src/evo/static/style.css:723:  cursor: pointer;
+plugins/evo/src/evo/static/style.css:809:  cursor: grab;
+plugins/evo/src/evo/static/style.css:869:  cursor: pointer;
+plugins/evo/src/evo/static/style.css:892:   Hidden by default; appear when the cursor is over the owning bar or the
+plugins/evo/src/evo/static/style.css:901:     contiguous with the bar's bottom edge — no flicker on cursor cross. */
+plugins/evo/src/evo/static/style.css:926:  cursor: pointer;
+plugins/evo/src/evo/static/style.css:955:  cursor: pointer;
+plugins/evo/src/evo/static/style.css:1151:  cursor: pointer;
+plugins/evo/src/evo/static/style.css:1199:  cursor: ew-resize;
+plugins/evo/src/evo/static/style.css:1272:  cursor: pointer;
+plugins/evo/src/evo/static/style.css:1288:  cursor: pointer;
+plugins/evo/src/evo/static/style.css:1306:  cursor: pointer;
+plugins/evo/src/evo/static/style.css:1336:  cursor: pointer;
+plugins/evo/src/evo/static/style.css:1351:  cursor: default;
+plugins/evo/src/evo/static/style.css:1371:  cursor: pointer;
+plugins/evo/src/evo/static/style.css:1456:  cursor: pointer;
+plugins/evo/src/evo/static/style.css:1500:  cursor: pointer;
+plugins/evo/src/evo/static/style.css:1510:  cursor: pointer;
+plugins/evo/src/evo/static/style.css:1519:  cursor: pointer;
+plugins/evo/src/evo/static/style.css:1530:  cursor: pointer;
+plugins/evo/src/evo/static/style.css:1555:  cursor: pointer;
+plugins/evo/src/evo/static/style.css:1662:  cursor: pointer;
+plugins/evo/src/evo/static/style.css:1738:  cursor: pointer;
+plugins/evo/src/evo/static/style.css:1795:  cursor: pointer;
+plugins/evo/src/evo/static/style.css:1883:  cursor: pointer;
+plugins/evo/src/evo/static/style.css:2096:  cursor: pointer;
+plugins/evo/src/evo/static/style.css:2104:.btn-prune:disabled { opacity: 0.45; cursor: default; }
+plugins/evo/src/evo/static/style.css:2116:  cursor: pointer;
+plugins/evo/src/evo/static/style.css:2124:.btn-spawn:disabled { opacity: 0.45; cursor: default; }
+plugins/evo/src/evo/static/style.css:2144:  cursor: pointer;
+plugins/evo/src/evo/static/style.css:2273:  cursor: pointer;
+plugins/evo/src/evo/static/style.css:2331:  cursor: pointer;
+plugins/evo/src/evo/static/style.css:2437:  cursor: pointer;
+plugins/evo/src/evo/static/style.css:2478:  cursor: pointer;
+plugins/evo/src/evo/static/style.css:2486:  cursor: default;
+plugins/evo/src/evo/static/style.css:2495:  cursor: pointer;
+plugins/evo/src/evo/static/style.css:2575:  cursor: help;
+plugins/evo/src/evo/static/style.css:2920:  cursor: pointer;
+plugins/evo/src/evo/static/style.css:2949:  cursor: pointer;
+plugins/evo/src/evo/static/style.css:3034:  cursor: pointer;
+plugins/evo/src/evo/static/style.css:3093:  cursor: pointer;
+plugins/evo/bin/evo-hook-drain-rs/Cargo.toml:2:name = "evo-hook-drain"
+plugins/evo/src/evo/openclaw_plugin/native/HOOK.md:3:OpenClaw plugin that delivers `evo direct` directives mid-conversation by appending them to the most recent tool-result message via the `tool_result_persist` hook.
+plugins/evo/src/evo/openclaw_plugin/native/HOOK.md:5:## How it delivers
+plugins/evo/src/evo/openclaw_plugin/native/HOOK.md:8:2. On every tool result, drain the evo workspace inject queue.
+plugins/evo/src/evo/openclaw_plugin/native/HOOK.md:9:3. If a directive is queued, return the tool-result message with the directive appended.
+plugins/evo/src/evo/openclaw_plugin/native/HOOK.md:10:4. The LLM sees the directive as part of the tool-result message in its next reasoning step.
+plugins/evo/src/evo/host_install/kimi.py:11:nothing: no skills, no commands, no hooks. Verified against kimi-code 0.26.0.
+plugins/evo/src/evo/host_install/kimi.py:15:Hooks come from the plugin manifest's ``hooks`` array, so there is no
+plugins/evo/src/evo/host_install/kimi.py:16:separate hook-wiring step and no ``evo-hook-drain`` binary in front —
+plugins/evo/src/evo/host_install/kimi.py:17:``evo-drain --host kimi`` resolves the run dir and session from the hook
+plugins/evo/src/evo/host_install/kimi.py:278:    # the codex, cursor, and hermes adapters.
+plugins/evo/src/evo/sandbox_client.py:66:    def __init__(self, status: int, message: str, body: str = "") -> None:
+plugins/evo/src/evo/sandbox_client.py:67:        super().__init__(f"[{status}] {message}")
+plugins/evo/src/evo/openclaw_plugin/native/openclaw.plugin.json:4:  "description": "Delivers `evo direct` directives mid-run by rewriting the next Bash tool call to prepend the directive text. Embedded openclaw agent runs do not fire per-turn hooks (agent_turn_prepare/before_prompt_build fire only at session start) so before_tool_call is the only per-cycle mutation surface that works.",
+plugins/evo/src/evo/host_install/codex.py:1:"""Codex install — enables `plugin_hooks` and the evo plugin in
+plugins/evo/src/evo/host_install/codex.py:14:from ._hook_drain import (
+plugins/evo/src/evo/host_install/codex.py:15:    ensure_hook_drain_binary,
+plugins/evo/src/evo/host_install/codex.py:16:    hook_drain_binary_name,
+plugins/evo/src/evo/host_install/codex.py:18:    mirror_hook_drain_binary,
+plugins/evo/src/evo/host_install/codex.py:26:Codex install (run `codex plugin marketplace add evo-hq/evo` first if
+plugins/evo/src/evo/host_install/codex.py:28:  - sets [features] plugin_hooks = true  (required for `evo direct`)
+plugins/evo/src/evo/host_install/codex.py:30:in ~/.codex/config.toml.
+plugins/evo/src/evo/host_install/codex.py:34:def _stable_hook_command() -> str:
+plugins/evo/src/evo/host_install/codex.py:35:    """Codex-safe hook command.
+plugins/evo/src/evo/host_install/codex.py:38:    Materialize the user's stable evo hook binary path at install time so
+plugins/evo/src/evo/host_install/codex.py:39:    Codex hook execution does not depend on plugin-root expansion, cwd, or PATH.
+plugins/evo/src/evo/host_install/codex.py:40:    The Node wrapper deliberately fails open: hooks run in every Codex session,
+plugins/evo/src/evo/host_install/codex.py:44:    to the Python `evo-drain`, which inherits the helper's stdout/stderr; if any
+plugins/evo/src/evo/host_install/codex.py:46:    the host shows the hook "running" indefinitely. So `spawnSync` gets a hard
+plugins/evo/src/evo/host_install/codex.py:65:def _materialize_codex_hooks(hooks_json_path: Path) -> bool:
+plugins/evo/src/evo/host_install/codex.py:66:    """Rewrite an installed Codex hooks.json to use machine-local commands.
+plugins/evo/src/evo/host_install/codex.py:68:    The source plugin's hooks.json is shared with Claude Code and intentionally
+plugins/evo/src/evo/host_install/codex.py:70:    recent Codex versions may run plugin hooks without that variable, turning
+plugins/evo/src/evo/host_install/codex.py:71:    `${CLAUDE_PLUGIN_ROOT}/bin/evo-hook-drain` into `/bin/evo-hook-drain`
+plugins/evo/src/evo/host_install/codex.py:75:        data = json.loads(hooks_json_path.read_text())
+plugins/evo/src/evo/host_install/codex.py:80:    drain_cmd = _stable_hook_command()
+plugins/evo/src/evo/host_install/codex.py:81:    hooks = data.get("hooks") or {}
+plugins/evo/src/evo/host_install/codex.py:82:    for event_name, groups in list(hooks.items()):
+plugins/evo/src/evo/host_install/codex.py:86:            for handler in group.get("hooks", []) or []:
+plugins/evo/src/evo/host_install/codex.py:91:                if "evo-hook-drain" in cmd:
+plugins/evo/src/evo/host_install/codex.py:92:                    if cmd != drain_cmd:
+plugins/evo/src/evo/host_install/codex.py:93:                        handler = {**handler, "command": drain_cmd}
+plugins/evo/src/evo/host_install/codex.py:98:                    # Codex emit hook failures, which is worse than omitting it.
+plugins/evo/src/evo/host_install/codex.py:103:            group["hooks"] = handlers
+plugins/evo/src/evo/host_install/codex.py:108:        hooks[event_name] = updated_groups
+plugins/evo/src/evo/host_install/codex.py:111:        hooks_json_path.write_text(json.dumps(data, indent=2) + "\n")
+plugins/evo/src/evo/host_install/codex.py:115:def _codex_base() -> Path:
+plugins/evo/src/evo/host_install/codex.py:117:    return Path(home_override) if home_override else Path.home() / ".codex"
+plugins/evo/src/evo/host_install/codex.py:121:    return _codex_base() / ".tmp" / "marketplaces" / "evo-hq"
+plugins/evo/src/evo/host_install/codex.py:125:    manifest = mkt_root / "plugins" / "evo" / ".codex-plugin" / "plugin.json"
+plugins/evo/src/evo/host_install/codex.py:134:def _toggle_plugin_hooks(enable: bool) -> tuple[bool, Path]:
+plugins/evo/src/evo/host_install/codex.py:135:    cfg = _codex_base() / "config.toml"
+plugins/evo/src/evo/host_install/codex.py:140:    has_pluginhooks_true = "plugin_hooks = true" in text
+plugins/evo/src/evo/host_install/codex.py:141:    has_pluginhooks_false = "plugin_hooks = false" in text
+plugins/evo/src/evo/host_install/codex.py:144:        if has_pluginhooks_true:
+plugins/evo/src/evo/host_install/codex.py:146:        if has_pluginhooks_false:
+plugins/evo/src/evo/host_install/codex.py:147:            text = text.replace("plugin_hooks = false", "plugin_hooks = true")
+plugins/evo/src/evo/host_install/codex.py:149:            text = text.replace("[features]", "[features]\nplugin_hooks = true", 1)
+plugins/evo/src/evo/host_install/codex.py:151:            text = text.rstrip() + "\n\n[features]\nplugin_hooks = true\n"
+plugins/evo/src/evo/host_install/codex.py:153:        if not has_pluginhooks_true:
+plugins/evo/src/evo/host_install/codex.py:155:        text = text.replace("plugin_hooks = true", "plugin_hooks = false")
+plugins/evo/src/evo/host_install/codex.py:187:    cfg = _codex_base() / "config.toml"
+plugins/evo/src/evo/host_install/codex.py:211:    if _shutil.which("codex") is None:
+plugins/evo/src/evo/host_install/codex.py:213:            "ERROR: `codex` binary not on PATH. Install Codex first:\n"
+plugins/evo/src/evo/host_install/codex.py:214:            "  npm install -g @openai/codex",
+plugins/evo/src/evo/host_install/codex.py:220:    trust_hooks = bool(getattr(args, "trust_hooks", True))
+plugins/evo/src/evo/host_install/codex.py:223:    # Drive `codex plugin marketplace add` automatically. Skip if:
+plugins/evo/src/evo/host_install/codex.py:234:            f"codex marketplace cache already at {mkt_cache}; "
+plugins/evo/src/evo/host_install/codex.py:235:            "skipping `codex plugin marketplace add` prereq (use --force to refresh)"
+plugins/evo/src/evo/host_install/codex.py:246:        mkt_cmd = ["codex", "plugin", "marketplace", "add", source]
+plugins/evo/src/evo/host_install/codex.py:250:            rm_cmd = ["codex", "plugin", "marketplace", "remove", "evo-hq"]
+plugins/evo/src/evo/host_install/codex.py:271:    # Ensure config.toml exists. On freshly-npm-installed codex (never run
+plugins/evo/src/evo/host_install/codex.py:272:    # interactively), the marketplace add above creates ~/.codex/ but may
+plugins/evo/src/evo/host_install/codex.py:273:    # not create config.toml until the first `codex` invocation. Write a
+plugins/evo/src/evo/host_install/codex.py:275:    cfg = _codex_base() / "config.toml"
+plugins/evo/src/evo/host_install/codex.py:278:        cfg.write_text("# created by `evo install codex`\n")
+plugins/evo/src/evo/host_install/codex.py:281:    # Replicate what codex's TUI `plugin/install` RPC does: copy the plugin
+plugins/evo/src/evo/host_install/codex.py:282:    # contents into `~/.codex/plugins/cache/<marketplace>/<plugin>/<ver>/`
+plugins/evo/src/evo/host_install/codex.py:284:    # config.toml. Without this, `codex plugin marketplace add` alone
+plugins/evo/src/evo/host_install/codex.py:285:    # leaves the plugin discoverable but inert — skills aren't in codex's
+plugins/evo/src/evo/host_install/codex.py:286:    # tool list, the hooks/hooks.json drain script never fires, and
+plugins/evo/src/evo/host_install/codex.py:287:    # `evo direct` directives go undelivered.
+plugins/evo/src/evo/host_install/codex.py:290:    # `codex app-server generate-json-schema`). We do not drive that RPC
+plugins/evo/src/evo/host_install/codex.py:291:    # because `codex app-server` exits early on missing bubblewrap inside
+plugins/evo/src/evo/host_install/codex.py:294:    return _install_via_filecopy(from_path, trust_hooks=trust_hooks)
+plugins/evo/src/evo/host_install/codex.py:315:def _install_via_filecopy(from_path: str | None, *, trust_hooks: bool = True) -> int:
+plugins/evo/src/evo/host_install/codex.py:316:    """Mirror what codex's `plugin/install` RPC writes to disk:
+plugins/evo/src/evo/host_install/codex.py:318:      2. read plugin version from `<plugin-root>/.codex-plugin/plugin.json`
+plugins/evo/src/evo/host_install/codex.py:320:         `~/.codex/plugins/cache/<marketplace>/<plugin>/<version>/`
+plugins/evo/src/evo/host_install/codex.py:324:    If `trust_hooks` is True, additionally write
+plugins/evo/src/evo/host_install/codex.py:325:    `[hooks.state."<key>"] trusted_hash = "..."` entries that match what
+plugins/evo/src/evo/host_install/codex.py:326:    codex's TUI writes when the user trusts each hook via `/hooks`.
+plugins/evo/src/evo/host_install/codex.py:327:    Without trust, hooks remain in `untrusted` state and never fire —
+plugins/evo/src/evo/host_install/codex.py:346:    codex_manifest = plugin_root / ".codex-plugin" / "plugin.json"
+plugins/evo/src/evo/host_install/codex.py:350:        (codex_manifest, ".codex-plugin/plugin.json"),
+plugins/evo/src/evo/host_install/codex.py:355:                "  PyPI/GitHub: run `codex plugin marketplace add evo-hq/evo`\n"
+plugins/evo/src/evo/host_install/codex.py:363:    # OWNER, so `codex plugin marketplace add evo-hq/evo` registers
+plugins/evo/src/evo/host_install/codex.py:366:    # registration here MUST land under that same name, or codex fires
+plugins/evo/src/evo/host_install/codex.py:367:    # hooks against a cache dir we never populated → exit 127 on every
+plugins/evo/src/evo/host_install/codex.py:368:    # hook event. (Using the top-level `"name"` field — `evo-hq-evo` —
+plugins/evo/src/evo/host_install/codex.py:369:    # staged the binary into a sibling cache dir codex never reads, which
+plugins/evo/src/evo/host_install/codex.py:378:        manifest = _json.loads(codex_manifest.read_text())
+plugins/evo/src/evo/host_install/codex.py:381:        print(f"✗ could not parse {codex_manifest}: {exc}", file=_sys.stderr)
+plugins/evo/src/evo/host_install/codex.py:384:    cache_dst = (_codex_base() / "plugins" / "cache" / mkt_name / "evo" / version)
+plugins/evo/src/evo/host_install/codex.py:395:    # Stage the platform-native evo-hook-drain binary. Codex hook commands
+plugins/evo/src/evo/host_install/codex.py:398:    ensure_hook_drain_binary(cache_dst)
+plugins/evo/src/evo/host_install/codex.py:400:    # Mirror the binary into the marketplace snapshot so codex's next
+plugins/evo/src/evo/host_install/codex.py:402:    # wrapper. Best-effort: codex re-clones the snapshot from git at
+plugins/evo/src/evo/host_install/codex.py:408:        mirror_hook_drain_binary(cache_dst, plugin_root)
+plugins/evo/src/evo/host_install/codex.py:410:    nested_hooks = cache_dst / "hooks" / "hooks.json"
+plugins/evo/src/evo/host_install/codex.py:411:    if nested_hooks.exists() and _materialize_codex_hooks(nested_hooks):
+plugins/evo/src/evo/host_install/codex.py:412:        print(f"updated {nested_hooks}: materialized Codex hook commands")
+plugins/evo/src/evo/host_install/codex.py:414:        snapshot_hooks = plugin_root / "hooks" / "hooks.json"
+plugins/evo/src/evo/host_install/codex.py:415:        if snapshot_hooks.exists() and _materialize_codex_hooks(snapshot_hooks):
+plugins/evo/src/evo/host_install/codex.py:416:            print(f"updated {snapshot_hooks}: materialized Codex hook commands")
+plugins/evo/src/evo/host_install/codex.py:418:    # Update config.toml: ensure `[features] plugin_hooks = true`
+plugins/evo/src/evo/host_install/codex.py:419:    # (gates whether codex fires plugin hooks at all) AND
+plugins/evo/src/evo/host_install/codex.py:421:    # Without plugin_hooks=true the hooks.json declaration is ignored
+plugins/evo/src/evo/host_install/codex.py:422:    # and `evo direct` directives never get drained.
+plugins/evo/src/evo/host_install/codex.py:423:    changed_h, cfg = _toggle_plugin_hooks(enable=True)
+plugins/evo/src/evo/host_install/codex.py:425:        print(f"updated {cfg}: enabled plugin_hooks")
+plugins/evo/src/evo/host_install/codex.py:427:        print(f"plugin_hooks already enabled in {cfg}")
+plugins/evo/src/evo/host_install/codex.py:435:    # Hooks are codex's most security-sensitive surface (run on every
+plugins/evo/src/evo/host_install/codex.py:438:    #   - Interactive: user opens `codex` → `/hooks` → trusts each
+plugins/evo/src/evo/host_install/codex.py:439:    #   - Headless:    pass `--trust-hooks` to this command
+plugins/evo/src/evo/host_install/codex.py:440:    if not nested_hooks.exists():
+plugins/evo/src/evo/host_install/codex.py:442:            "\n(no hooks/hooks.json in plugin — skill-only install complete)"
+plugins/evo/src/evo/host_install/codex.py:445:    if trust_hooks:
+plugins/evo/src/evo/host_install/codex.py:446:        _trust_plugin_hooks(nested_hooks, plugin_id=f"evo@{mkt_name}", cfg=cfg)
+plugins/evo/src/evo/host_install/codex.py:448:        if _strip_plugin_hook_state(cfg, f"evo@{mkt_name}"):
+plugins/evo/src/evo/host_install/codex.py:449:            print(f"updated {cfg}: removed stale hook trust for evo@{mkt_name}")
+plugins/evo/src/evo/host_install/codex.py:451:            "\nPlugin hooks installed UNTRUSTED (--no-trust-hooks). They "
+plugins/evo/src/evo/host_install/codex.py:453:            "won't be delivered. To enable:\n"
+plugins/evo/src/evo/host_install/codex.py:454:            "  - Start `codex`, then `/hooks`, trust each evo hook, OR\n"
+plugins/evo/src/evo/host_install/codex.py:455:            "  - Re-run: evo install codex"
+plugins/evo/src/evo/host_install/codex.py:458:    _cleanup_legacy_codex_registrations(target_mkt=mkt_name)
+plugins/evo/src/evo/host_install/codex.py:462:def _cleanup_legacy_codex_registrations(target_mkt: str) -> None:
+plugins/evo/src/evo/host_install/codex.py:463:    """Remove leftover `evo@<other-mkt>` entries from codex's config.toml
+plugins/evo/src/evo/host_install/codex.py:468:    (marketplace.json's top-level `name`), while codex itself loads it
+plugins/evo/src/evo/host_install/codex.py:474:    This cleanup runs at the end of every codex install and removes:
+plugins/evo/src/evo/host_install/codex.py:476:      - `[hooks.state."evo@<other>:..."]` trust entries
+plugins/evo/src/evo/host_install/codex.py:480:      - `~/.codex/plugins/cache/<other>/` cache directories
+plugins/evo/src/evo/host_install/codex.py:484:    cfg_path = _codex_base() / "config.toml"
+plugins/evo/src/evo/host_install/codex.py:490:    hooks_header = re.compile(r'^\[hooks\.state\."evo@([^:]+):[^"]+"\]\s*$')
+plugins/evo/src/evo/host_install/codex.py:510:            mh = hooks_header.match(stripped)
+plugins/evo/src/evo/host_install/codex.py:531:        stale_cache = _codex_base() / "plugins" / "cache" / mkt
+plugins/evo/src/evo/host_install/codex.py:537:def _hook_event_label(event_name: str) -> str | None:
+plugins/evo/src/evo/host_install/codex.py:538:    """Map hooks.json camel-case event name → codex's snake-case label.
+plugins/evo/src/evo/host_install/codex.py:554:    """Recursively sort dict keys (mirrors codex's `canonical_json`)."""
+plugins/evo/src/evo/host_install/codex.py:562:def _command_hook_hash(event_label: str, matcher: str | None,
+plugins/evo/src/evo/host_install/codex.py:565:    """Reimplement codex's `command_hook_hash` so we can compute the
+plugins/evo/src/evo/host_install/codex.py:566:    `trusted_hash` value codex's TUI writes. Algorithm (from
+plugins/evo/src/evo/host_install/codex.py:567:    codex-rs/config/src/fingerprint.rs::version_for_toml):
+plugins/evo/src/evo/host_install/codex.py:573:    Verified empirically against codex's `hooks/list` output across the
+plugins/evo/src/evo/host_install/codex.py:574:    initial 3 hook events (pre_tool_use, session_start, user_prompt_submit);
+plugins/evo/src/evo/host_install/codex.py:587:    identity["hooks"] = [handler]
+plugins/evo/src/evo/host_install/codex.py:593:def _expected_hook_state(hooks_json_path: Path, plugin_id: str) -> dict[str, str] | None:
+plugins/evo/src/evo/host_install/codex.py:594:    """Compute the `{state_key: trusted_hash}` entries codex's TUI would
+plugins/evo/src/evo/host_install/codex.py:595:    write on user approval of every command hook in hooks.json. Returns
+plugins/evo/src/evo/host_install/codex.py:596:    None when hooks.json can't be parsed.
+plugins/evo/src/evo/host_install/codex.py:598:    The key shape codex uses (verified via `hooks/list` RPC):
+plugins/evo/src/evo/host_install/codex.py:599:        <plugin_id>:hooks/hooks.json:<event_label>:<group_idx>:<handler_idx>
+plugins/evo/src/evo/host_install/codex.py:604:        hooks_file = _json.loads(hooks_json_path.read_text())
+plugins/evo/src/evo/host_install/codex.py:606:        print(f"✗ could not parse {hooks_json_path}: {exc}", file=_sys.stderr)
+plugins/evo/src/evo/host_install/codex.py:610:    for event_name, groups in hooks_file.get("hooks", {}).items():
+plugins/evo/src/evo/host_install/codex.py:611:        event_label = _hook_event_label(event_name)
+plugins/evo/src/evo/host_install/codex.py:616:            for handler_idx, handler in enumerate(group.get("hooks", []) or []):
+plugins/evo/src/evo/host_install/codex.py:624:                    timeout = 600  # codex's default after normalization
+plugins/evo/src/evo/host_install/codex.py:625:                key = (f'{plugin_id}:hooks/hooks.json:'
+plugins/evo/src/evo/host_install/codex.py:627:                expected[key] = _command_hook_hash(
+plugins/evo/src/evo/host_install/codex.py:636:def _strip_plugin_hook_state(cfg: Path, plugin_id: str) -> bool:
+plugins/evo/src/evo/host_install/codex.py:640:        lambda header: header.startswith(f'[hooks.state."{plugin_id}:'),
+plugins/evo/src/evo/host_install/codex.py:649:def _trust_plugin_hooks(hooks_json_path: Path, plugin_id: str, cfg: Path) -> None:
+plugins/evo/src/evo/host_install/codex.py:650:    """Write `[hooks.state."<key>"] trusted_hash = "..."` entries to
+plugins/evo/src/evo/host_install/codex.py:651:    config.toml, same effect as `codex` → `/hooks` → Trust each.
+plugins/evo/src/evo/host_install/codex.py:653:    expected = _expected_hook_state(hooks_json_path, plugin_id)
+plugins/evo/src/evo/host_install/codex.py:657:        print("(no command hooks to trust)")
+plugins/evo/src/evo/host_install/codex.py:660:        f'[hooks.state."{key}"]\ntrusted_hash = "{trusted_hash}"'
+plugins/evo/src/evo/host_install/codex.py:666:    # Replace whole existing [hooks.state."..."] blocks for this plugin so
+plugins/evo/src/evo/host_install/codex.py:667:    # repeated --trust-hooks calls don't accumulate stale or disabled entries.
+plugins/evo/src/evo/host_install/codex.py:672:        lambda header: header.startswith(f'[hooks.state."{plugin_id}:'),
+plugins/evo/src/evo/host_install/codex.py:677:        f"updated {cfg}: trusted {len(lines)} hooks for {plugin_id} "
+plugins/evo/src/evo/host_install/codex.py:683:    """Send `initialize` + `plugin/install` to `codex app-server` via
+plugins/evo/src/evo/host_install/codex.py:701:                "`codex plugin marketplace add evo-hq/evo` first, or pass "
+plugins/evo/src/evo/host_install/codex.py:717:    print(f"calling codex plugin/install with marketplacePath={mj}")
+plugins/evo/src/evo/host_install/codex.py:720:            ["codex", "app-server"],
+plugins/evo/src/evo/host_install/codex.py:727:        print(f"✗ codex app-server invocation failed: {e}", file=_sys.stderr)
+plugins/evo/src/evo/host_install/codex.py:731:    print(f"codex app-server exit={proc.returncode}")
+plugins/evo/src/evo/host_install/codex.py:759:            "✗ plugin/install RPC: no response with id=2 — codex app-server "
+plugins/evo/src/evo/host_install/codex.py:770:    changed_h, cfg = _toggle_plugin_hooks(enable=False)
+plugins/evo/src/evo/host_install/codex.py:772:        print(f"updated {cfg}: disabled plugin_hooks")
+plugins/evo/src/evo/host_install/codex.py:776:    print("To remove the marketplace itself: `codex plugin marketplace remove evo-hq`")
+plugins/evo/src/evo/host_install/codex.py:781:    cfg = _codex_base() / "config.toml"
+plugins/evo/src/evo/host_install/codex.py:787:    if "plugin_hooks = true" in cfg_text:
+plugins/evo/src/evo/host_install/codex.py:788:        print(f"✓ plugin_hooks = true in {cfg}")
+plugins/evo/src/evo/host_install/codex.py:790:        print(f"✗ plugin_hooks not enabled in {cfg}")
+plugins/evo/src/evo/host_install/codex.py:791:        print("  Run: evo install codex")
+plugins/evo/src/evo/host_install/codex.py:798:        print("  Run: evo install codex")
+plugins/evo/src/evo/host_install/codex.py:806:        snapshot_binary = cache / "plugins" / "evo" / "bin" / hook_drain_binary_name()
+plugins/evo/src/evo/host_install/codex.py:809:                f"! evo-hook-drain not mirrored in the marketplace snapshot "
+plugins/evo/src/evo/host_install/codex.py:811:                f"  A codex plugin re-stage would drop the hook binary "
+plugins/evo/src/evo/host_install/codex.py:812:                f"(hooks exit 127). Run: evo install codex"
+plugins/evo/src/evo/host_install/codex.py:816:        print("  Run: codex plugin marketplace add evo-hq/evo")
+plugins/evo/src/evo/host_install/codex.py:819:    # The hook drain binary is what every hooks.json command resolves to.
+plugins/evo/src/evo/host_install/codex.py:820:    # config.toml can have plugin_hooks=true and the plugin enabled while
+plugins/evo/src/evo/host_install/codex.py:821:    # the binary is missing from the cache dir codex actually loads — then
+plugins/evo/src/evo/host_install/codex.py:822:    # every hook fires exit 127. Verify it exists + is executable at the
+plugins/evo/src/evo/host_install/codex.py:823:    # plugin root codex resolves for the active `evo@<owner>` selector.
+plugins/evo/src/evo/host_install/codex.py:825:    plugin_cache_root = _codex_base() / "plugins" / "cache"
+plugins/evo/src/evo/host_install/codex.py:854:            print("  Run: evo install codex --force")
+plugins/evo/src/evo/host_install/codex.py:857:        binary = versions[-1] / "bin" / hook_drain_binary_name()
+plugins/evo/src/evo/host_install/codex.py:860:            print(f"✗ evo-hook-drain missing at {binary} (hooks fire exit 127)")
+plugins/evo/src/evo/host_install/codex.py:861:            print("  Run: evo install codex --force")
+plugins/evo/src/evo/host_install/codex.py:864:            print(f"✗ evo-hook-drain at {binary} is not executable")
+plugins/evo/src/evo/host_install/codex.py:865:            print("  Run: evo install codex --force")
+plugins/evo/src/evo/host_install/codex.py:868:            print(f"✓ evo-hook-drain present + executable at {binary}")
+plugins/evo/src/evo/host_install/codex.py:871:                f"✓ evo-hook-drain fallback wrapper at {binary} "
+plugins/evo/src/evo/host_install/codex.py:876:                f"✗ evo-hook-drain at {binary} is the fallback wrapper and "
+plugins/evo/src/evo/host_install/codex.py:877:                f"no stable binary exists at {stable} (hooks no-op)"
+plugins/evo/src/evo/host_install/codex.py:879:            print("  Run: evo install codex --force")
+plugins/evo/src/evo/host_install/codex.py:882:        # Trust state. Untrusted hooks register but never fire, so `evo
+plugins/evo/src/evo/host_install/codex.py:886:        #     --no-trust-hooks installs await the user's /hooks review)
+plugins/evo/src/evo/host_install/codex.py:887:        #   - some entries missing or hash-mismatched → ✗ (hooks.json
+plugins/evo/src/evo/host_install/codex.py:890:        hooks_json = versions[-1] / "hooks" / "hooks.json"
+plugins/evo/src/evo/host_install/codex.py:891:        if not hooks_json.exists():
+plugins/evo/src/evo/host_install/codex.py:894:            hooks_text = hooks_json.read_text()
+plugins/evo/src/evo/host_install/codex.py:896:            hooks_text = ""
+plugins/evo/src/evo/host_install/codex.py:897:        if "CLAUDE_PLUGIN_ROOT" in hooks_text:
+plugins/evo/src/evo/host_install/codex.py:899:                f"✗ Codex hooks still reference CLAUDE_PLUGIN_ROOT in {hooks_json}; "
+plugins/evo/src/evo/host_install/codex.py:900:                f"recent Codex versions may run them as /bin/evo-hook-drain "
+plugins/evo/src/evo/host_install/codex.py:902:                f"  Run: evo install codex --force"
+plugins/evo/src/evo/host_install/codex.py:905:        expected = _expected_hook_state(hooks_json, f"evo@{mkt_name}")
+plugins/evo/src/evo/host_install/codex.py:909:            r'\[hooks\.state\."([^"]+)"\]\s*\ntrusted_hash = "([^"]+)"',
+plugins/evo/src/evo/host_install/codex.py:918:            print(f"✓ {len(expected)} hooks trusted for evo@{mkt_name}")
+plugins/evo/src/evo/host_install/codex.py:921:                f"! hooks installed but untrusted for evo@{mkt_name}: "
+plugins/evo/src/evo/host_install/codex.py:922:                f"they never fire, so `evo direct` won't be delivered\n"
+plugins/evo/src/evo/host_install/codex.py:923:                f"  Trust via `/hooks` inside codex, or run: evo install codex"
+plugins/evo/src/evo/host_install/codex.py:927:                f"✗ hook trust is stale for evo@{mkt_name} "
+plugins/evo/src/evo/host_install/codex.py:929:                f"hooks.json changed since trust was written; those hooks "
+plugins/evo/src/evo/host_install/codex.py:931:                f"  Run: evo install codex"
+plugins/evo/src/evo/dashboard.py:1168:            # touching markers/<exp_id>.flag alone wakes zero drains.
+plugins/evo/src/evo/dashboard.py:1201:        delivered = 0
+plugins/evo/src/evo/dashboard.py:1222:            delivered += 1
+plugins/evo/src/evo/dashboard.py:1226:            "fanout": delivered,
+plugins/evo/src/evo/host_install/cursor.py:4:     cross-host ``npx skills add ... --agent cursor``. Cursor auto-discovers
+plugins/evo/src/evo/host_install/cursor.py:7:  2. Mid-run inject (``evo direct``) via Cursor-native hooks. We write
+plugins/evo/src/evo/host_install/cursor.py:8:     ``~/.cursor/hooks.json`` entries that run ``evo-drain --host cursor`` on
+plugins/evo/src/evo/host_install/cursor.py:9:     ``sessionStart`` (registers the session) and ``stop`` (delivers the
+plugins/evo/src/evo/host_install/cursor.py:10:     directive as a ``followup_message`` that the IDE auto-submits as a
+plugins/evo/src/evo/host_install/cursor.py:11:     visible message). The IDE silently drops ``additional_context``, so
+plugins/evo/src/evo/host_install/cursor.py:13:     Code / Codex, Cursor needs no ``evo-hook-drain`` binary in front: its
+plugins/evo/src/evo/host_install/cursor.py:14:     hooks.json command talks to ``evo-drain`` directly, which resolves the
+plugins/evo/src/evo/host_install/cursor.py:15:     run dir and session from the hook stdin payload.
+plugins/evo/src/evo/host_install/cursor.py:18:Cursor can load Claude Code hooks, but ``UserPromptSubmit`` maps to
+plugins/evo/src/evo/host_install/cursor.py:20:hook path depends on ``CLAUDE_PLUGIN_ROOT`` which Cursor doesn't set. Native
+plugins/evo/src/evo/host_install/cursor.py:21:``~/.cursor/hooks.json`` keeps Cursor config in Cursor's namespace and uses
+plugins/evo/src/evo/host_install/cursor.py:22:the events that actually deliver context.
+plugins/evo/src/evo/host_install/cursor.py:41:#   - sessionStart / beforeSubmitPrompt: REGISTER the session (no delivery).
+plugins/evo/src/evo/host_install/cursor.py:47:#     claude-code's PreToolUse inject. Delivers tool-aware: shell via
+plugins/evo/src/evo/host_install/cursor.py:49:#     deny+agent_message; edits are deferred (never denied). The drain decides
+plugins/evo/src/evo/host_install/cursor.py:51:#   - stop: end of each agent turn -> followup_message; turn-end fallback for
+plugins/evo/src/evo/host_install/cursor.py:52:#     turns with no deliverable tool call.
+plugins/evo/src/evo/host_install/cursor.py:54:#     Same followup_message envelope as stop, scoped to the subagent. Without
+plugins/evo/src/evo/host_install/cursor.py:55:#     this, directives queued during a long Task subagent run can't deliver at
+plugins/evo/src/evo/host_install/cursor.py:61:def _cursor_base() -> Path:
+plugins/evo/src/evo/host_install/cursor.py:63:    return Path(home_override) if home_override else Path.home() / ".cursor"
+plugins/evo/src/evo/host_install/cursor.py:66:def _cursor_hooks_file() -> Path:
+plugins/evo/src/evo/host_install/cursor.py:67:    return _cursor_base() / "hooks.json"
+plugins/evo/src/evo/host_install/cursor.py:82:    """Run ``npx -y skills add <source> --agent cursor -g -y``.
+plugins/evo/src/evo/host_install/cursor.py:92:            "`evo install cursor`.",
+plugins/evo/src/evo/host_install/cursor.py:96:    cmd = [npx, "-y", "skills", "add", source, "--agent", "cursor", "-g", "-y"]
+plugins/evo/src/evo/host_install/cursor.py:101:def _drain_command() -> str:
+plugins/evo/src/evo/host_install/cursor.py:103:    absolute ``evo-drain`` path so the hook works regardless of the shell's
+plugins/evo/src/evo/host_install/cursor.py:105:    drain = shutil.which("evo-drain") or "evo-drain"
+plugins/evo/src/evo/host_install/cursor.py:106:    return f"{drain} --host cursor"
+plugins/evo/src/evo/host_install/cursor.py:110:    return isinstance(entry, dict) and "evo-drain" in str(entry.get("command", ""))
+plugins/evo/src/evo/host_install/cursor.py:113:def _write_inject_hooks() -> Path:
+plugins/evo/src/evo/host_install/cursor.py:114:    """Merge evo's inject hooks into ``~/.cursor/hooks.json`` without
+plugins/evo/src/evo/host_install/cursor.py:115:    clobbering the user's existing hooks. Idempotent: re-running refreshes
+plugins/evo/src/evo/host_install/cursor.py:116:    the evo entries (e.g. an updated evo-drain path) in place."""
+plugins/evo/src/evo/host_install/cursor.py:117:    hooks_file = _cursor_hooks_file()
+plugins/evo/src/evo/host_install/cursor.py:118:    hooks_file.parent.mkdir(parents=True, exist_ok=True)
+plugins/evo/src/evo/host_install/cursor.py:121:    if hooks_file.exists():
+plugins/evo/src/evo/host_install/cursor.py:123:            data = json.loads(hooks_file.read_text())
+plugins/evo/src/evo/host_install/cursor.py:126:                f"WARNING: could not parse {hooks_file}; leaving it untouched. "
+plugins/evo/src/evo/host_install/cursor.py:130:            return hooks_file
+plugins/evo/src/evo/host_install/cursor.py:135:    hooks = data.setdefault("hooks", {})
+plugins/evo/src/evo/host_install/cursor.py:136:    if not isinstance(hooks, dict):
+plugins/evo/src/evo/host_install/cursor.py:137:        hooks = {}
+plugins/evo/src/evo/host_install/cursor.py:138:        data["hooks"] = hooks
+plugins/evo/src/evo/host_install/cursor.py:140:    command = _drain_command()
+plugins/evo/src/evo/host_install/cursor.py:142:        arr = hooks.setdefault(event, [])
+plugins/evo/src/evo/host_install/cursor.py:145:            hooks[event] = arr
+plugins/evo/src/evo/host_install/cursor.py:147:        # command (absolute drain path) fresh across reinstalls.
+plugins/evo/src/evo/host_install/cursor.py:151:    hooks_file.write_text(json.dumps(data, indent=2) + "\n")
+plugins/evo/src/evo/host_install/cursor.py:152:    print(f"wired inject hooks in {hooks_file} ({', '.join(_INJECT_EVENTS)} -> {command})")
+plugins/evo/src/evo/host_install/cursor.py:153:    return hooks_file
+plugins/evo/src/evo/host_install/cursor.py:164:    print("\nWiring mid-run inject hooks ...")
+plugins/evo/src/evo/host_install/cursor.py:165:    _write_inject_hooks()
+plugins/evo/src/evo/host_install/cursor.py:167:    if shutil.which("evo-drain") is None:
+plugins/evo/src/evo/host_install/cursor.py:169:            "\nNOTE: `evo-drain` is not on PATH yet. Install the CLI so the "
+plugins/evo/src/evo/host_install/cursor.py:170:            "inject hook can fire:\n  uv tool install evo-hq-cli",
+plugins/evo/src/evo/host_install/cursor.py:175:        "\n✓ evo installed for cursor.\n"
+plugins/evo/src/evo/host_install/cursor.py:177:        "(IDE Agent or `cursor-agent`) to load the hooks."
+plugins/evo/src/evo/host_install/cursor.py:183:    """``npx skills add`` is idempotent and the hook writer refreshes in
+plugins/evo/src/evo/host_install/cursor.py:189:    hooks_file = _cursor_hooks_file()
+plugins/evo/src/evo/host_install/cursor.py:190:    if hooks_file.exists():
+plugins/evo/src/evo/host_install/cursor.py:192:            data = json.loads(hooks_file.read_text())
+plugins/evo/src/evo/host_install/cursor.py:195:        if isinstance(data, dict) and isinstance(data.get("hooks"), dict):
+plugins/evo/src/evo/host_install/cursor.py:199:            for event in list(data["hooks"].keys()):
+plugins/evo/src/evo/host_install/cursor.py:200:                arr = data["hooks"].get(event)
+plugins/evo/src/evo/host_install/cursor.py:206:                        data["hooks"][event] = kept
+plugins/evo/src/evo/host_install/cursor.py:208:                        del data["hooks"][event]
+plugins/evo/src/evo/host_install/cursor.py:210:                hooks_file.write_text(json.dumps(data, indent=2) + "\n")
+plugins/evo/src/evo/host_install/cursor.py:211:                print(f"removed evo inject hooks from {hooks_file}")
+plugins/evo/src/evo/host_install/cursor.py:213:                print(f"no evo inject hooks found in {hooks_file}")
+plugins/evo/src/evo/host_install/cursor.py:215:        print(f"no {hooks_file} (nothing to remove)")
+plugins/evo/src/evo/host_install/cursor.py:216:    print("To remove the skills: `npx skills remove evo-hq/evo --agent cursor` "
+plugins/evo/src/evo/host_install/cursor.py:223:    cursor` may target any of these depending on CLI version, so doctor
+plugins/evo/src/evo/host_install/cursor.py:227:        _cursor_base() / "skills",
+plugins/evo/src/evo/host_install/cursor.py:229:        Path.cwd() / ".cursor" / "skills",
+plugins/evo/src/evo/host_install/cursor.py:237:    # 1. evo-drain reachable — without it the hook fires into the void.
+plugins/evo/src/evo/host_install/cursor.py:238:    if shutil.which("evo-drain"):
+plugins/evo/src/evo/host_install/cursor.py:239:        print(f"✓ evo-drain on PATH: {shutil.which('evo-drain')}")
+plugins/evo/src/evo/host_install/cursor.py:241:        print("✗ evo-drain not on PATH (inject hook cannot fire)")
+plugins/evo/src/evo/host_install/cursor.py:245:    # 2. inject hooks wired in ~/.cursor/hooks.json.
+plugins/evo/src/evo/host_install/cursor.py:246:    hooks_file = _cursor_hooks_file()
+plugins/evo/src/evo/host_install/cursor.py:247:    if hooks_file.exists():
+plugins/evo/src/evo/host_install/cursor.py:249:            data = json.loads(hooks_file.read_text())
+plugins/evo/src/evo/host_install/cursor.py:250:            hooks = data.get("hooks", {}) if isinstance(data, dict) else {}
+plugins/evo/src/evo/host_install/cursor.py:253:                if any(_is_evo_entry(e) for e in hooks.get(ev, []) or [])
+plugins/evo/src/evo/host_install/cursor.py:256:                print(f"✓ inject hooks wired in {hooks_file} ({', '.join(_INJECT_EVENTS)})")
+plugins/evo/src/evo/host_install/cursor.py:259:                print(f"✗ inject hooks missing in {hooks_file}: {', '.join(missing)}")
+plugins/evo/src/evo/host_install/cursor.py:260:                print("  Run: evo install cursor")
+plugins/evo/src/evo/host_install/cursor.py:263:            print(f"✗ could not parse {hooks_file}")
+plugins/evo/src/evo/host_install/cursor.py:266:        print(f"✗ no {hooks_file}")
+plugins/evo/src/evo/host_install/cursor.py:267:        print("  Run: evo install cursor")
+plugins/evo/src/evo/host_install/cursor.py:284:        print("  Run: evo install cursor  (needs `npx` / Node on PATH)")
+plugins/evo/src/evo/hosts/__init__.py:11:Only hosts with a usable fork primitive get a handler. ``codex``,
+plugins/evo/src/evo/hosts/__init__.py:22:    "claude-code": claude_fork,
+plugins/evo/src/evo/hosts/claude_fork.py:36:HOST_NAME = "claude-code"
+plugins/evo/src/evo/core.py:30:    "claude-code",
+plugins/evo/src/evo/core.py:32:    "codex",
+plugins/evo/src/evo/core.py:33:    "cursor",
+plugins/evo/src/evo/core.py:44:DISPATCH_HOSTS = frozenset({"claude-code"})
+plugins/evo/src/evo/core.py:730:def append_infra_event(root: Path, message: str, breaking: bool) -> dict[str, Any]:
+plugins/evo/src/evo/core.py:735:            "message": message,
+plugins/evo/src/evo/backends/sandbox_providers/modal.py:15:# `_load_modal` translates this into a user-facing actionable message.
+plugins/evo/src/evo/cli.py:1165:# evo dispatch — fork-cache child spawning (claude-code only)
+plugins/evo/src/evo/cli.py:1350:            node["session_runtime"] = "claude-code"
+plugins/evo/src/evo/cli.py:1383:            brief=args.message,
+plugins/evo/src/evo/cli.py:1404:        "host": "claude-code",
+plugins/evo/src/evo/cli.py:1409:        "brief": args.message,
+plugins/evo/src/evo/cli.py:1784:        hypothesis=args.message,
+plugins/evo/src/evo/cli.py:2637:def _runtime_hook_command(config: dict, name: str) -> str | None:
+plugins/evo/src/evo/cli.py:2646:def _run_runtime_hook(
+plugins/evo/src/evo/cli.py:2658:    command = _runtime_hook_command(config, name)
+plugins/evo/src/evo/cli.py:2662:    hook_env = {k: v for k, v in env.items() if not k.startswith("EVO_")}
+plugins/evo/src/evo/cli.py:2666:        env=hook_env,
+plugins/evo/src/evo/cli.py:2830:        for hook_name, log_name in (
+plugins/evo/src/evo/cli.py:2834:            record = _run_runtime_hook(
+plugins/evo/src/evo/cli.py:2837:                hook_name,
+plugins/evo/src/evo/cli.py:3194:        for hook_name, log_name in (
+plugins/evo/src/evo/cli.py:3198:            phase_name = f"runtime_{hook_name}"
+plugins/evo/src/evo/cli.py:3208:            record = _run_runtime_hook(
+plugins/evo/src/evo/cli.py:3211:                hook_name,
+plugins/evo/src/evo/cli.py:4312:    # Hide the cursor during refresh so the user doesn't see it skipping
+plugins/evo/src/evo/cli.py:4391:    cursor = node
+plugins/evo/src/evo/cli.py:4392:    while cursor.get("parent") not in (None, "root"):
+plugins/evo/src/evo/cli.py:4393:        branch_root = cursor["parent"]
+plugins/evo/src/evo/cli.py:4394:        cursor = graph["nodes"][cursor["parent"]]
+plugins/evo/src/evo/cli.py:4641:    event = append_infra_event(root, args.message, args.breaking)
+plugins/evo/src/evo/cli.py:4727:        for hook_name, log_name in (
+plugins/evo/src/evo/cli.py:4731:            record = _run_runtime_hook(
+plugins/evo/src/evo/cli.py:4734:                hook_name,
+plugins/evo/src/evo/cli.py:4839:    keeping skill content + hook protocol + CLI behavior in lockstep.
+plugins/evo/src/evo/cli.py:4891:                                   invalidation, anthropics/claude-code#14061)
+plugins/evo/src/evo/cli.py:4935:#   - claude-code / codex / hermes: Python `auto_register_from_env`
+plugins/evo/src/evo/cli.py:4939:#   - cursor: the self-contained Python drain detects `evo …` shell
+plugins/evo/src/evo/cli.py:4942:#     `tool.execute.before` hook (opencode doesn't export
+plugins/evo/src/evo/cli.py:4951:    "claude-code", "codex", "cursor", "hermes",
+plugins/evo/src/evo/cli.py:4994:        # whose `exp_id` matches. The Rust hook + self-contained gates
+plugins/evo/src/evo/cli.py:4998:        # drains in current hosts. Without this, exp-targeted directives
+plugins/evo/src/evo/cli.py:5000:        # something else triggers a drain.
+plugins/evo/src/evo/cli.py:5004:        # the subagent's SessionStart unconditionally drains the exp
+plugins/evo/src/evo/cli.py:5024:    delivered = 0
+plugins/evo/src/evo/cli.py:5048:        delivered += 1
+plugins/evo/src/evo/cli.py:5050:        f"directive queued (id={event_id}, fanout={delivered} sessions, "
+plugins/evo/src/evo/cli.py:5516:    print("   (claude-code: TaskStop on the agentId; codex: equivalent).")
+plugins/evo/src/evo/cli.py:5557:            # Hosts without a session env var (cursor / openclaw / pi) arm
+plugins/evo/src/evo/cli.py:5563:                "cursor/openclaw/pi the plugin arms autonomous by observing "
+plugins/evo/src/evo/cli.py:5615:            # cursor/openclaw/pi have no session env var — their plugin arms
+plugins/evo/src/evo/cli.py:5618:                "note: no host session env var detected; on cursor/openclaw/pi "
+plugins/evo/src/evo/cli.py:6042:    """Show queue/delivery/ack state for a directive id.
+plugins/evo/src/evo/cli.py:6046:      - was it delivered to at least one session (drain wrote
+plugins/evo/src/evo/cli.py:6047:        inject/delivered/<id>.json)?
+plugins/evo/src/evo/cli.py:6051:    from .inject.paths import ack_file, delivered_file, workspace_events_path
+plugins/evo/src/evo/cli.py:6076:    d = delivered_file(root, event_id)
+plugins/evo/src/evo/cli.py:6081:                f"delivered to: {drec.get('session_id', '?')} "
+plugins/evo/src/evo/cli.py:6082:                f"(host={drec.get('host', '?')}) at {drec.get('delivered_at', '?')}"
+plugins/evo/src/evo/cli.py:6085:            print("delivered:    (record unreadable)")
+plugins/evo/src/evo/cli.py:6087:        print("delivered:    (no record)")
+plugins/evo/src/evo/cli.py:6127:        help="orchestrator runtime (claude-code/codex/opencode/openclaw/hermes/generic). "
+plugins/evo/src/evo/cli.py:6361:    new_p.add_argument("-m", "--message", required=True)
+plugins/evo/src/evo/cli.py:6774:    infra_event_p.add_argument("-m", "--message", required=True)
+plugins/evo/src/evo/cli.py:6825:        help="spawn a child fork from a parent's cached explorer session (claude-code only)",
+plugins/evo/src/evo/cli.py:6828:            "inheriting the parent's explorer KV cache. Available on host=claude-code "
+plugins/evo/src/evo/cli.py:6839:    dispatch_run_p.add_argument("-m", "--message", required=True, help="brief / hypothesis (free-form text)")
+plugins/evo/src/evo/cli.py:6905:        "--trust-hooks",
+plugins/evo/src/evo/cli.py:6908:        help="Trust the plugin's hooks non-interactively (codex only; "
+plugins/evo/src/evo/cli.py:6909:             "default: on). Writes the trusted_hash entries codex's "
+plugins/evo/src/evo/cli.py:6910:             "`/hooks` review would write on approval; without them the "
+plugins/evo/src/evo/cli.py:6911:             "hooks register but never fire and `evo direct` is not "
+plugins/evo/src/evo/cli.py:6912:             "delivered. Pass --no-trust-hooks to review and trust the "
+plugins/evo/src/evo/cli.py:6913:             "hooks inside codex via `/hooks` instead.",
+plugins/evo/src/evo/cli.py:6949:            "evo config, hooks, helper binaries, and cached plugin files. Use "
+plugins/evo/src/evo/cli.py:6971:        help="Plugin scope for hosts that support it (claude-code). Default: user.",
+plugins/evo/src/evo/cli.py:6991:        "--trust-hooks",
+plugins/evo/src/evo/cli.py:6994:        help="Trust the plugin's hooks non-interactively (codex only; "
+plugins/evo/src/evo/cli.py:6995:             "default: on). Pass --no-trust-hooks to review via `/hooks` "
+plugins/evo/src/evo/cli.py:6996:             "inside codex instead.",
+plugins/evo/src/evo/cli.py:7004:            "Without exp_id: directive is delivered to every registered "
+plugins/evo/src/evo/cli.py:7006:            "With exp_id: delivered only to that subagent's session. "
+plugins/evo/src/evo/cli.py:7045:        help="Show queue / delivery / ack state for a directive id",
+plugins/evo/src/evo/cli.py:7052:        help="Clear the optimize_mode flag on this session (turn off safety nudges + stop-hook continuation)",
+plugins/evo/src/evo/cli.py:7283:    if "runtime" in lowered or "hook" in lowered:
+plugins/evo/src/evo/opencode_plugin/evo.bundle.js:1:// drain.ts
+plugins/evo/src/evo/opencode_plugin/evo.bundle.js:107:      lines.push(`[END EVO DIRECTIVE — run \`evo ack ${id}\` to confirm you have received this message, then proceed]`);
+plugins/evo/src/evo/opencode_plugin/evo.bundle.js:297:var HOST_SPAWN_PREFIX_RE = /^\s*(?:nohup\s+)?(?:claude(?:\s|$)|codex(?:\s|$)|cursor-agent(?:\s|$)|opencode(?:\s|$)|hermes(?:\s|$)|openclaw(?:\s|$)|pi(?:\s|$)|pi-coding-agent(?:\s|$))/;
+plugins/evo/src/evo/opencode_plugin/evo.bundle.js:729:    "chat.message": async (input, output) => {
+plugins/evo/src/evo/opencode_plugin/index.ts:5://   - `chat.message`: fires per user message; mutating `parts` injects text
+plugins/evo/src/evo/opencode_plugin/index.ts:6://     into LLM input. Used to drain directives + auto-arm optimize_mode.
+plugins/evo/src/evo/opencode_plugin/index.ts:8://     the error message to the model as "Blocked by policy" feedback.
+plugins/evo/src/evo/opencode_plugin/index.ts:12://     is the turn-end signal (analogue of claude-code Stop). When the
+plugins/evo/src/evo/opencode_plugin/index.ts:13://     orchestrator session is in optimize_mode, send a follow-up message
+plugins/evo/src/evo/opencode_plugin/index.ts:16:// There is NO `stop` hook on opencode — verified absent from the Hooks
+plugins/evo/src/evo/opencode_plugin/index.ts:40:} from "./drain.js"
+plugins/evo/src/evo/opencode_plugin/index.ts:49:  // chat.message's upstream contract puts the user prompt content in
+plugins/evo/src/evo/opencode_plugin/index.ts:64: * Opencode plugin factory — returns hook handlers per opencode's plugin SDK.
+plugins/evo/src/evo/opencode_plugin/index.ts:81:    "chat.message": async (input: any, output: any) => {
+plugins/evo/src/evo/opencode_plugin/index.ts:89:      // Prompt text lives in output.parts (Part[]), NOT in message — the
+plugins/evo/src/evo/opencode_plugin/index.ts:90:      // upstream `chat.message` contract has UserMessage carry metadata,
+plugins/evo/src/evo/opencode_plugin/index.ts:95:      // Directives are NOT drained here. `chat.message` fires only at
+plugins/evo/src/evo/opencode_plugin/index.ts:96:      // user-message creation, never for a mid-run `evo direct`, so the
+plugins/evo/src/evo/opencode_plugin/index.ts:97:      // directive's text would never ride this hook. Worse, a consume-once
+plugins/evo/src/evo/opencode_plugin/index.ts:98:      // drain here advances the offset + unlinks the marker on unrelated
+plugins/evo/src/evo/opencode_plugin/index.ts:99:      // message creations (including subagent prompts), silently discarding
+plugins/evo/src/evo/opencode_plugin/index.ts:156:      // PRIMARY mid-run directive delivery. In single-shot `opencode run`
+plugins/evo/src/evo/opencode_plugin/index.ts:160:      // `evo direct`. tool.execute hooks DO fire on every tool call during
+plugins/evo/src/evo/opencode_plugin/index.ts:174:      // Peek (don't pop) so a delivery that never lands isn't lost. Append
+plugins/evo/src/evo/opencode_plugin/index.ts:176:      // `evo ack` instruction) to this tool's result, then commit the drain
+plugins/evo/src/evo/opencode_plugin/index.ts:194:      // claude-code Stop). Two INDEPENDENT jobs, both delivered via
+plugins/evo/src/evo/opencode_plugin/index.ts:196:      // mid-run (chat.message can't; it fires only at user-message creation):
+plugins/evo/src/evo/opencode_plugin/index.ts:200:      //      delivers directives targeted at it (its own exp queue), no nudge.
+plugins/evo/src/evo/opencode_plugin/index.ts:213:      // A non-optimize-mode orchestrator has nothing to deliver. Subagents
+plugins/evo/src/evo/opencode_plugin/index.ts:217:      // session.prompt is the only delivery channel here; if it's missing,
+plugins/evo/src/evo/opencode_plugin/index.ts:227:      // delivery must not depend on the nudge being present.
+plugins/evo/src/evo/opencode_plugin/index.ts:239:        // Success — now commit the drain (advance offset, unlink marker).
+plugins/evo/src/evo/opencode_plugin/index.ts:242:        // Don't crash the agent on a delivery failure. Directives stay
+plugins/evo/src/evo/opencode_plugin/drain.ts:1:// TS port of evo.inject.drain — used by in-process plugins on opencode and
+plugins/evo/src/evo/opencode_plugin/drain.ts:2:// openclaw/pi (which wrap the same bundle). Mirrors the Python `drain.py` +
+plugins/evo/src/evo/opencode_plugin/drain.ts:6:// Opencode hook contract (verified against sst/opencode
+plugins/evo/src/evo/opencode_plugin/drain.ts:8://   - `chat.message(input, {message, parts})` — fires on new user message;
+plugins/evo/src/evo/opencode_plugin/drain.ts:11://     (the error message becomes "Blocked by policy" feedback).
+plugins/evo/src/evo/opencode_plugin/drain.ts:13://     signals the agent finished its turn (the analogue of claude-code Stop).
+plugins/evo/src/evo/opencode_plugin/drain.ts:14://   - There is NO `stop` hook on opencode (verified absent from Hooks type).
+plugins/evo/src/evo/opencode_plugin/drain.ts:17://     inject a follow-up user message that re-engages the loop.
+plugins/evo/src/evo/opencode_plugin/drain.ts:45:  // openclaw, pi) detect `evo` shell commands via tool hooks and call
+plugins/evo/src/evo/opencode_plugin/drain.ts:63:  /** Text to inject (`[evo direct] ...` lines joined by newline), or null if nothing to deliver. */
+plugins/evo/src/evo/opencode_plugin/drain.ts:65:  /** New workspace offset to record (or null if no workspace events drained). */
+plugins/evo/src/evo/opencode_plugin/drain.ts:67:  /** New exp offset to record (or null if not a subagent or no exp events drained). */
+plugins/evo/src/evo/opencode_plugin/drain.ts:100: * "replay drained directives every turn" cache re-injects (and the agent
+plugins/evo/src/evo/opencode_plugin/drain.ts:110:/** Extract the directive event ids from a drained banner block
+plugins/evo/src/evo/opencode_plugin/drain.ts:111: * (`[EVO DIRECTIVE id=<id>]`). A single drain may concatenate several. */
+plugins/evo/src/evo/opencode_plugin/drain.ts:213:// Format directive text — mirror evo/inject/drain.py format_directive_text
+plugins/evo/src/evo/opencode_plugin/drain.ts:217:  // Mirrors evo.inject.drain.format_directive_text — embeds the event id
+plugins/evo/src/evo/opencode_plugin/drain.ts:227:      lines.push(`[END EVO DIRECTIVE — run \`evo ack ${id}\` to confirm you have received this message, then proceed]`)
+plugins/evo/src/evo/opencode_plugin/drain.ts:362:// Drain entry point — mirror evo.inject.drain.drain_session
+plugins/evo/src/evo/opencode_plugin/drain.ts:368: * the injection succeeds. Used by hooks where the injection itself can
+plugins/evo/src/evo/opencode_plugin/drain.ts:419: * text into the host's hook contract (e.g. opencode `chat.params.system`).
+plugins/evo/src/evo/opencode_plugin/drain.ts:424:export function drainSession(runDir: string, sessionId: string): DrainResult {
+plugins/evo/src/evo/opencode_plugin/drain.ts:461:// Optimize-mode policy gate + stop nudge — mirrors evo.inject.drain
+plugins/evo/src/evo/opencode_plugin/drain.ts:465: *  Kept in sync with `_POLICY_NUDGE_TEMPLATE` in evo/inject/drain.py. */
+plugins/evo/src/evo/opencode_plugin/drain.ts:484: *  Kept in sync with `_STOP_NUDGE_TEMPLATE` in evo/inject/drain.py. */
+plugins/evo/src/evo/opencode_plugin/drain.ts:505: *  Kept in sync with `_DENY_TOOL_NAMES` in evo/inject/drain.py. */
+plugins/evo/src/evo/opencode_plugin/drain.ts:507:  // claude-code / codex
+plugins/evo/src/evo/opencode_plugin/drain.ts:514:  // cursor
+plugins/evo/src/evo/opencode_plugin/drain.ts:559:  /^\s*(?:nohup\s+)?(?:claude(?:\s|$)|codex(?:\s|$)|cursor-agent(?:\s|$)|opencode(?:\s|$)|hermes(?:\s|$)|openclaw(?:\s|$)|pi(?:\s|$)|pi-coding-agent(?:\s|$))/
+plugins/evo/src/evo/opencode_plugin/drain.ts:949:// shell-quoted invocations land in chat.message with the literal `"` as the
+plugins/evo/src/evo/opencode_plugin/drain.ts:1026: *  under optimize_mode. Mirrors `_should_policy_block` minus the hook-event
+plugins/evo/src/evo/backends/sandbox_providers/__init__.py:125:    dependencies are missing. The error message is the user-facing surface
+plugins/evo/src/evo/hermes_plugin/__init__.py:8:- `pre_llm_call`: per-turn drain of pending `evo direct` events. The
+plugins/evo/src/evo/hermes_plugin/__init__.py:9:  only hook whose return value hermes honors as `{"context": "..."}`
+plugins/evo/src/evo/hermes_plugin/__init__.py:10:  (appended to the current turn's user message — see
+plugins/evo/src/evo/hermes_plugin/__init__.py:13:  `{"action": "block", "message": ...}` short-circuits the tool and
+plugins/evo/src/evo/hermes_plugin/__init__.py:14:  feeds `message` back to the model as the tool error (see
+plugins/evo/src/evo/hermes_plugin/__init__.py:17:- `on_session_end`: stop nudge. Calls `ctx.inject_message(...)` to
+plugins/evo/src/evo/hermes_plugin/__init__.py:23:Gateway-mode caveat: `ctx.inject_message` requires a `_cli_ref`. In
+plugins/evo/src/evo/hermes_plugin/__init__.py:44:from evo.inject.drain import (
+plugins/evo/src/evo/hermes_plugin/__init__.py:91:def _compute_drain_text(root: Path, session_id: str) -> str | None:
+plugins/evo/src/evo/hermes_plugin/__init__.py:93:    marker. Returns the formatted text or None if nothing to deliver."""
+plugins/evo/src/evo/hermes_plugin/__init__.py:146:    in drain.py — same cadence and state shape across hosts.
+plugins/evo/src/evo/hermes_plugin/__init__.py:157:    """Register the session. No drain — hermes ignores this hook's
+plugins/evo/src/evo/hermes_plugin/__init__.py:170:    """Per-turn drain of pending `evo direct` events.
+plugins/evo/src/evo/hermes_plugin/__init__.py:172:    Delivery: appended to the current turn's user message as `{"context":
+plugins/evo/src/evo/hermes_plugin/__init__.py:173:    ...}`. Considered switching to `ctx.inject_message(role="user")` for
+plugins/evo/src/evo/hermes_plugin/__init__.py:175:    `hermes chat` — but `inject_message` queues to `cli._pending_input`,
+plugins/evo/src/evo/hermes_plugin/__init__.py:176:    which only the interactive process_loop drains. The release-smoke
+plugins/evo/src/evo/hermes_plugin/__init__.py:178:    where `process_loop` isn't running, so a queued inject_message
+plugins/evo/src/evo/hermes_plugin/__init__.py:183:    `/optimize`. Hermes has no UserPromptSubmit hook; pre_llm_call is
+plugins/evo/src/evo/hermes_plugin/__init__.py:197:    directive_text = _compute_drain_text(root, session_id)
+plugins/evo/src/evo/hermes_plugin/__init__.py:210:    `{"action": "block", "message": ...}` — hermes short-circuits the
+plugins/evo/src/evo/hermes_plugin/__init__.py:211:    tool and feeds the message back to the model as the tool error
+plugins/evo/src/evo/hermes_plugin/__init__.py:232:        return {"action": "block", "message": _POLICY_NUDGE_TEMPLATE}
+plugins/evo/src/evo/hermes_plugin/__init__.py:237:# `ctx.inject_message(...)` to push a follow-up user message back into
+plugins/evo/src/evo/hermes_plugin/__init__.py:261:        _PLUGIN_CTX.inject_message(_STOP_NUDGE_TEMPLATE, role="user")
+plugins/evo/src/evo/hermes_plugin/__init__.py:270:    ctx.register_hook("on_session_start", _on_session_start)
+plugins/evo/src/evo/hermes_plugin/__init__.py:271:    ctx.register_hook("pre_llm_call", _on_pre_llm_call)
+plugins/evo/src/evo/hermes_plugin/__init__.py:272:    ctx.register_hook("pre_tool_call", _on_pre_tool_call)
+plugins/evo/src/evo/hermes_plugin/__init__.py:273:    ctx.register_hook("on_session_end", _on_session_end)
+plugins/evo/bin/evo-hook-drain-rs/Cargo.lock:6:name = "evo-hook-drain"
+

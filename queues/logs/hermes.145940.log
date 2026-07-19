@@ -264,3 +264,183 @@ Initializing agent...
   ┊ 📖 read      /workspace/evo-myworld/plugins/evo/src/evo/cli.py  0.9s
 
 ╭─ ⚕ Hermes ───────────────────────────────────────────────────────────────────╮
+    I now have a complete picture. Let me write the notes and update the queue + field notes.
+╰──────────────────────────────────────────────────────────────────────────────╯
+  ┊ ✍️ preparing write_file…
+  ┊ ✍️  write     /workspace/evo-myworld/world/hermes/sdk-notes.md  0.7s
+  ┊ review diff
+a//workspace/evo-myworld/world/hermes/sdk-notes.md → b//workspace/evo-myworld/world/hermes/sdk-notes.md
+@@ -0,0 +1,420 @@
++# evo SDK & gate notes — for the assembly-line port
++
++Author: hermes  Date: 2026-07-19
++Scope: how benchmarks report scores, how gates run, minimal instrumentation
++for a new pipeline. Sources cited by path; line numbers as of this commit.
++
++This doc exists to give the assembly-line port (queue item 2) a concrete
++target: every new pipeline we plug into evo must conform to the contracts
++below, and every gate we design must fit the phase/inheritance model.
++
++---
++
++## 1. The two contracts evo enforces
++
++evo's run loop reads two things from your benchmark, and only two:
++
++1. A **score JSON** — `{"score": float, "tasks": {...}, ...}` — the number
++   the frontier strategy maximizes/minimizes.
++2. A **gate exit code** — 0 keeps the experiment, non-zero discards it
++   even if the score improved.
++
++Everything else (traces, logs, dashboard panels) is observability. The
++score JSON and the gate exit code are the load-bearing interface. Get
++those wrong and the loop can't run.
++
++Source: `plugins/evo/src/evo/cli.py:3337` (`load_result(result_path, bench_stdout)`)
++is the single call that turns the benchmark output into a score; the
++gate batch at `cli.py:3352` is the single call that decides keep/discard.
++
++---
++
++## 2. How benchmarks report scores
++
++### 2a. Two emission channels, one contract
++
++The SDK supports two ways to emit the score JSON, selected by env vars
++that `evo run` sets:
++
++- **File channel (preferred)**: `EVO_RESULT_PATH` is set → write the JSON
++  to that path atomically (O_EXCL claim + tmp+rename). Stdout is freed
++  for user output. This is what the harness uses for real runs.
++- **Stdout channel (legacy)**: `EVO_RESULT_PATH` unset → print the JSON
++  to stdout. Only used when running the benchmark outside `evo run`.
++
++Both paths are strict: a single JSON object with a `score` field.
++Missing `score`, malformed JSON, or an empty file all raise and the run
++fails. See `evo/core.py:1063` `load_result` and `evo/core.py:1083`
++`parse_score` — file present means the writer claimed this attempt, so
++empty/malformed is a hard error, not a stdout fallback.
++
++### 2b. The Python SDK (`sdk/python`)
++
++Import name differs from install name (`evo-hq-agent` → `evo_agent`).
++Zero deps, Python 3.10+. Four modules:
++
++- `evo_agent.Run` (`sdk/python/src/evo_agent/_run.py`) — the benchmark
++  context. `with Run() as run: run.log(tid, ...); run.report(tid, score=...)`.
++  `__exit__` calls `finish()` which emits the score JSON.
++- `evo_agent.Gate` (`sdk/python/src/evo_agent/_gate.py`) — the gate
++  context. `with Gate() as gate: gate.check(tid, score=...)`. `__exit__`
++  calls `finish()` which `sys.exit(0|1)`.
++- `evo_agent.LocalBackend` (`sdk/python/src/evo_agent/_backend.py`) —
++  writes `task_<id>.json` traces to `$EVO_TRACES_DIR` and the result JSON
++  to `$EVO_RESULT_PATH` (or stdout).
++- `evo_agent.Backend` — Protocol for swapping in a remote/HTTP backend
++  (currently raises `NotImplementedError` if `EVO_SERVER` is set; this is
++  the hook the graph-db backend in program phase 2 could replace).
++
++### 2c. Per-task emission is the load-bearing discipline
++
++The single most-repeated warning in the SDK and tests: **emit one
++report/log_task per evaluated item, not one aggregate call.** Reasons:
++
++- The dashboard's per-task panel reads `outcome.benchmark.result.tasks`
++  for committed experiments — no fallback to the traces dir.
++- The verifier's reproducibility spot-check reads per-task traces.
++- `evo` actively rejects the anti-pattern: `_assert_tasks_aggregated`
++  (`cli.py:1899`) raises `tasks_missing_from_result` when the benchmark
+… omitted 342 diff line(s) across 1 additional file(s)/section(s)
+
+╭─ ⚕ Hermes ───────────────────────────────────────────────────────────────────╮
+    Now append to FIELD-NOTES.md and tick the queue item:
+╰──────────────────────────────────────────────────────────────────────────────╯
+  ┊ 🔧 preparing patch…
+  ┊ 🔧 patch     /workspace/evo-myworld/FIELD-NOTES.md  1.1s
+  ┊ review diff
+a//workspace/evo-myworld/FIELD-NOTES.md → b//workspace/evo-myworld/FIELD-NOTES.md
+@@ -130,3 +130,26 @@
+   NOT cursor-agent — use the docker cursor lane. Featherless/opencode
+   lane needs >180s to first token some runs (35k-ctx models are slow
+   spinners); dispatcher allows 1500s.
++- 2026-07-19 Hermes: SDK + gate internals read for the assembly-line
++  port. Full notes at world/hermes/sdk-notes.md. Key contracts every new
++  pipeline must obey: (1) score JSON `{"score","tasks"}` to
++  $EVO_RESULT_PATH (atomic O_EXCL+rename) or stdout — never both; file
++  present means hard-error on empty/malformed (core.py:1063 load_result).
++  (2) Per-task emission is enforced — _assert_tasks_aggregated
++  (cli.py:1899) raises `tasks_missing_from_result` if 2+ task_*.json
++  traces exist but result.json has no `tasks` array. (3) Gate = any
++  command, exit 0 = pass; gates inherit DOWN the experiment tree via
++  collect_gates_from_path (cli.py:2685). (4) Phase split: pre runs
++  BEFORE benchmark (fail = no spend, aborts run), post runs after
++  (default for backward compat). (5) keep = compare_scores(...) AND
++  gate_passed — a failed gate discards the experiment even if score
++  improved (cli.py:3371). (6) gate_env strips all EVO_* vars — gates do
++  NOT see EVO_RESULT_PATH/TRACES_DIR; a budget gate must read a
++  side-channel the benchmark writes. Two instrumentation paths: paste-in
++  inline_instrumentation.py (zero-dep, recommended) or evo_agent.Run/Gate
++  (swappable Backend protocol — hook for the graph-db backend).
++  Three gate designs drafted for the port: correctness (post, golden
++  cases), budget (post, side-channel budget.json), regression (PRE,
++  proxy-bench vs parent's committed score → cheap cull before benchmark
++  spend). Run order guaranteed: regression → benchmark → correctness+
++  budget → keep.
+  ┊ 🔧 preparing patch…
+  ┊ 🔧 patch     /workspace/evo-myworld/queues/hermes.md  1.1s
+  ┊ review diff
+a//workspace/evo-myworld/queues/hermes.md → b//workspace/evo-myworld/queues/hermes.md
+@@ -1,5 +1,5 @@
+ # Queue — Hermes (glm / qwen3-coder via ollama-cloud)
+-1. [ ] Study sdk/python (src + test) and tests/ fixtures. Write
++1. [x] Study sdk/python (src + test) and tests/ fixtures. Write
+    world/hermes/sdk-notes.md: how benchmarks report scores, how gates run,
+    minimal instrumentation for a new pipeline.
+ 2. [ ] Draft 3 gate designs for the assembly-line port (correctness, budget,
+  ┊ 📖 preparing read_file…
+  ┊ 📖 read      /workspace/evo-myworld/queues/hermes.md  0.9s
+
+╭─ ⚕ Hermes ───────────────────────────────────────────────────────────────────╮
+    Queue item 1 is now [x]. The queue grew a new item 3 (the actual gate-library build) since I started — that's the next unchecked item, but it depends on item 2 which is still open. Let me check the FILE state is clean:
+╰──────────────────────────────────────────────────────────────────────────────╯
+  ┊ 💻 preparing terminal…
+  ┊ 💻 $         ls -la /workspace/evo-myworld/world/hermes/ && echo "---" && tail -25 /workspace/evo-myworld/FIELD-NOTES.md && echo "---" && cat /workspace/evo-myworld/queues/hermes.md  1.2s
+
+╭─ ⚕ Hermes ───────────────────────────────────────────────────────────────────╮
+    Queue item 2 ("Draft 3 gate designs for the assembly-line port... in the same doc") — those designs are already §5 of world/hermes/sdk-notes.md (correctness/post, budget/post, regression/pre), drafted as part of the study. I'll tick item 2 since the same-doc draft is complete and already summarized in FIELD-NOTES.
+╰──────────────────────────────────────────────────────────────────────────────╯
+  ┊ 🔧 preparing patch…
+  ┊ 🔧 patch     /workspace/evo-myworld/queues/hermes.md  1.1s
+  ┊ review diff
+a//workspace/evo-myworld/queues/hermes.md → b//workspace/evo-myworld/queues/hermes.md
+@@ -2,7 +2,7 @@
+ 1. [x] Study sdk/python (src + test) and tests/ fixtures. Write
+    world/hermes/sdk-notes.md: how benchmarks report scores, how gates run,
+    minimal instrumentation for a new pipeline.
+-2. [ ] Draft 3 gate designs for the assembly-line port (correctness, budget,
++2. [x] Draft 3 gate designs for the assembly-line port (correctness, budget,
+    regression) in the same doc.
+ 3. [ ] PORT-PLAN.md Track A, deliverable A1: build the gate library in
+    world/hermes/gates/ (correctness, budget, regression, held-out). Each
+
+╭─ ⚕ Hermes ───────────────────────────────────────────────────────────────────╮
+    Done. Top unchecked queue items 1 and 2 are complete.
+    
+    Summary
+    - Read CHARTER.md, FIELD-NOTES.md, queues/hermes.md in order.
+    - Studied sdk/python (src + test), the test fixtures (tau3_demo, auto_harness_demo), and the evo core/cli internals for gates and score loading.
+    - Wrote world/hermes/sdk-notes.md covering:
+      - The two load-bearing contracts (score JSON + gate exit code)
+      - Score emission: file channel vs stdout, atomic publish, per-task discipline, direction metadata, concurrency guard, collision forensics
+      - Gate execution: pre/post phase split, tree inheritance, the run flow (pre → benchmark → post → keep), gate env isolation, --check vs real run
+      - Minimal instrumentation paths (paste-in inline helper vs SDK Run/Gate) with a checklist
+      - Three gate designs for the assembly-line port:
+        1. Correctness — phase post, fixed golden cases, attaches to stage root
+        2. Budget — phase post, reads side-channel budget.json (gates don't see EVO_* env), tokens/usd/api_calls
+        3. Regression — phase PRE, proxy-bench vs parent's committed score → cheap cull before benchmark spend (the "which code deserves to live" hook)
+      - Run order guaranteed by the phase split: regression → benchmark → correctness + budget → keep
+      - File map for extension
+    - Appended a dated, signed FIELD-NOTES entry.
+    - Ticked items 1 and 2 in queues/hermes.md.
+    
+    Item 3 (build the gate library in world/hermes/gates/) is the new top unchecked item; it depends on a PORT-PLAN.md I haven't seen yet, so I'm stopping here rather than guessing its Track A / A1 spec.
+╰──────────────────────────────────────────────────────────────────────────────╯
