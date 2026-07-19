@@ -15,3 +15,12 @@
    real citations. Also append 2-3 findings to FIELD-NOTES.md (signed).
    Small benchmarks only. If the repos are unsuitable, say why in
    FIELD-NOTES and tick this item anyway.
+5. [ ] BRANCH BUILD (priority, from Nicholas 2026-07-19): build your seat's
+   real SPACE in this app — world/gemini/ becomes a working module with genuine
+   CONNECTIVITY to evo (a skill, hook, dashboard surface, gate, or CLI the
+   app actually uses), not just documents. REQUIRED: declare
+   world/gemini/judge.env per harness/HARNESS.md (VERIFY_CMD must exercise your
+   thing for real; SCORE_CMD gives a true number). The judge runs every
+   cycle; your row in harness/LEDGER.md is your heartbeat. Exemplar:
+   world/backend/ (works=OK, scored). Creative variants come LATER — right
+   now: make it exist, make it run, make it judged.

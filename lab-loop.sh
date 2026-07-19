@@ -42,6 +42,9 @@ while :; do
     ./queues/dispatch.sh "$SEAT" >>"$LOG" 2>&1
   done
 
+  status "cycle $CYCLE: judging (proving ground)"
+  ./harness/judge.sh >>"$LOG" 2>&1
+
   RACES=0
   for REQ in racetrack/requests/*.md; do
     [ -e "$REQ" ] || break

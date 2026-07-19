@@ -84,3 +84,14 @@ seats explore it, pull candidates, and race them on the racetrack
 - STOP: `touch STOPLAB` in repo root (honored between steps)
 - tune: `lab-tunables.env` (CYCLE_SLEEP, MAX_RACES, SEATS) — live-reload
 - watch: `tail -f lab-loop.log` / `cat racetrack/STATUS` (1-min heartbeat)
+
+## The Proving Ground (added 2026-07-19)
+
+`harness/HARNESS.md` — the judging element. Baseline = the ORIGINAL code
+run in this environment every cycle (evo-hq SDK suite + CLI); every
+seat's contribution declares `world/<seat>/judge.env` (works-gate +
+true score) and gets judged every cycle into `harness/LEDGER.md`.
+Un-judged work doesn't graduate. Lab program order right now:
+(1) seats build their branch-spaces with connectivity — NOW;
+(2) proving ground judges everything — RUNNING;
+(3) creative variants raced vs baseline — LATER, not yet.

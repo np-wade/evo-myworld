@@ -272,3 +272,217 @@ Initializing agent...
   ┊ 🐍 exec      from hermes_tools import terminal  0.8s
   ┊ 🐍 preparing execute_code…
   ┊ 🐍 exec      from hermes_tools import terminal  0.4s
+
+╭─ ⚕ Hermes ───────────────────────────────────────────────────────────────────╮
+    I have 2 candidates each for correctness, budget, regression. Let me find held-out prior art.
+╰──────────────────────────────────────────────────────────────────────────────╯
+  ┊ 🐍 preparing execute_code…
+  ┊ 🐍 exec      from hermes_tools import terminal  19.1s
+  ┊ 🐍 preparing execute_code…
+  ┊ 🐍 exec      from hermes_tools import terminal  0.8s
+  ┊ 📖 preparing read_file…
+  ┊ 📖 read      /library/repos/AFLplusplus_LibAFL/code/crates/libafl/src/stages/generalization.rs  0.9s
+
+╭─ ⚕ Hermes ───────────────────────────────────────────────────────────────────╮
+    The AFL++ GeneralizationStage is too domain-specific (fuzzer corpus). Let me try a cleaner held-out gate candidate.
+╰──────────────────────────────────────────────────────────────────────────────╯
+  ┊ 🐍 preparing execute_code…
+  ┊ 🐍 exec      from hermes_tools import terminal  2.6s
+  ┊ 🐍 preparing execute_code…
+  ┊ 🐍 exec      from hermes_tools import terminal  0.4s
+
+╭─ ⚕ Hermes ───────────────────────────────────────────────────────────────────╮
+    Good — Lightning's overfit_batches is the classic held-out discipline (overfit one batch → must still generalize). For my 2nd held-out candidate, let me try a different angle - directly searching for held-out eval files.
+╰──────────────────────────────────────────────────────────────────────────────╯
+  ┊ 🐍 preparing execute_code…
+  ┊ 🐍 exec      from hermes_tools import terminal  1.4s
+  ┊ 🐍 preparing execute_code…
+  ┊ 🐍 exec      from hermes_tools import terminal  0.6s
+  ┊ 🐍 preparing execute_code…
+  ┊ 🐍 exec      from hermes_tools import terminal  0.4s
+  ┊ 🐍 preparing execute_code…
+  ┊ 🐍 exec      from hermes_tools import terminal  0.4s
+  ┊ 🐍 preparing execute_code…
+  ┊ 🐍 exec      from hermes_tools import terminal  0.4s
+  ┊ 🐍 preparing execute_code…
+  ┊ 🐍 exec      from hermes_tools import terminal  6.6s
+  ┊ 🐍 preparing execute_code…
+  ┊ 🐍 exec      from hermes_tools import terminal  0.4s
+
+╭─ ⚕ Hermes ───────────────────────────────────────────────────────────────────╮
+    Excellent — learned_weights_beat_chance_on_held_out is a clean held-out gate pattern: train/val split, fit on train, assert performance beats chance on held-out. This is exactly the held-out gate semantics I want.
+    
+    I have enough prior-art. Let me record the citations in my notes and now write the gate library.
+╰──────────────────────────────────────────────────────────────────────────────╯
+  ┊ ✍️ preparing write_file…
+  ┊ ✍️  write     /workspace/evo-myworld/world/hermes/gates/PRIOR-ART.md  0.7s
+  ┊ review diff
+a//workspace/evo-myworld/world/hermes/gates/PRIOR-ART.md → b//workspace/evo-myworld/world/hermes/gates/PRIOR-ART.md
+@@ -0,0 +1,173 @@
++# Prior-art citations — gate library (Track A, deliverable A1)
++
++Author: hermes  Date: 2026-07-19
++Method: GRAPH-FIRST — pulled slices from the graphify index.db via
++`world/backend/evo_graph.py find <query>` (Track B phase-1 tool), then
++read the cited source files in the corpus at `/library/repos/`. Each
++gate design below has ≥2 candidates with REAL citations I read end-to-end.
++
++The lab's RACE RULE (CHARTER.md §"THE RACE RULE") requires racing ≥2
++candidates in the evo-hq harness. The race requests for these gates
++live at `racetrack/requests/gate-<type>.md`; this file records the
++citations the race steward will instantiate as experiment branches.
++
++---
++
++## 1. Correctness gate — post-phase, golden-case assertion
++
++**What it does**: small fixed golden set; runs the stage's product
++against each case; `exit 1` on first failure.
++
++### candidate A: evo's own auto_harness_demo/gate.py
++- source: `tests/fixtures/auto_harness_demo/gate.py` (this repo,
++  `evo-hq/evo` upstream)
++- approach: a Python module loaded with `importlib`; iterate a hard-
++  coded `GATE_TASKS` list of `{request, expected}`; on the first
++  `module.solve(task) != task["expected"]`, `sys.exit(1)`. Exits 0
++  only if every case passes. This is the canonical evo pattern —
++  zero deps, plain `sys.exit`, no SDK import.
++- cited at: `tests/fixtures/auto_harness_demo/gate.py:35-44`
++
++### candidate B: nocodb assert_golden
++- source: `nocodb/nocodb` slice — file
++  `docker-compose/1_Auto_Upstall/tests/lib/helpers.bash:56-60`
++- approach: bash helper. Normalizes the generated artifact and diffs
++  it (`diff -u`) against a committed golden file. Mismatch prints a
++  unified diff and fails the test (non-zero exit from `diff`). This is
++  the file-snapshot variant of the same idea — golden = a fixed
++  committed artifact, not a hardcoded case list.
++- cited at:
++  `/library/repos/nocodb_nocodb/code/docker-compose/1_Auto_Upstall/tests/lib/helpers.bash:58`
++- slice query: `graph find "golden jsonl assert expected output evaluation cases"`
++
++**Race dimension**: case-list (A) vs file-snapshot (B). For the
++assembly line, A is the natural fit (per-product golden cases), but B
++matters if a stage's output is a generated file. The race steward
++builds a fair arena where both run the same golden set and we measure
++false-negative rate + runtime.
++
++---
++
++## 2. Budget gate — post-phase, per-stage spend cap
++
++**What it does**: benchmark writes a side-channel budget.json (since
++gates do NOT see EVO_* env, sdk-notes.md §3e); gate compares each
++field to a per-stage ceiling and exits 1 if any field exceeds.
++
++### candidate A: OmniRoute checkTokensPerTaskGate
++- source: `diegosouzapw/OmniRoute` slice — file
++  `code/open-sse/services/compression/harness/budgetGate.ts:46-62`
++- approach: per-task ratchet gate. Computes mean compressed tokens per
++  task group from an `EvalReport`, compares each task's current mean
++  to a frozen baseline, fails when `deltaPercent > tolerancePercent`
++  (default 2%). Falling cost always passes — baseline is a ratchet,
++  not a hard cap. Returns `{passed, regressions[], tolerancePercent}`.
++- cited at: `/library/repos/diegosouzapw_OmniRoute/code/open-sse/services/compression/harness/budgetGate.ts:46`
++- slice query: `graph find "gate budget regression correctness"`
++
++### candidate B: raven BeforeIterationHook (token-budget/pruning gate)
++- source: `EverMind-AI/raven` slice — file
++  `code/raven/eval_engine/hooks/before_iteration_hook.py:25-73`
++- approach: crude byte/4 token estimate of the messages list; if
++  estimate exceeds `config.max_iteration_tokens`, short-circuit the
++  iteration with a synthetic halt. Intentionally a rough estimator
++  ("prevent runaway, not millisecond-accurate"). This is the absolute
++  cap variant — no baseline, just "above this number = fail."
++- cited at: `/library/repos/EverMind-AI_raven/code/raven/eval_engine/hooks/before_iteration_hook.py:41`
++- slice query: `graph find "token usage budget gate ratchet"`
++
+… omitted 95 diff line(s) across 1 additional file(s)/section(s)
+
+╭─ ⚕ Hermes ───────────────────────────────────────────────────────────────────╮
+    Now build the actual executable gate scripts.
+╰──────────────────────────────────────────────────────────────────────────────╯
+  ┊ ✍️ preparing write_file…
+  ┊ ✍️  write     /workspace/evo-myworld/world/hermes/gates/correctness.py  8.3s
+  ┊ review diff
+a//workspace/evo-myworld/world/hermes/gates/correctness.py → b//workspace/evo-myworld/world/hermes/gates/correctness.py
+@@ -0,0 +1,95 @@
++#!/usr/bin/env python3
++"""Correctness gate — post-phase, golden-case assertion.
++
++Reads a golden set (JSONL: one {id, input, expected} per line), runs
++the stage's product against each case via a user-supplied solver
++command, exits 1 on the first mismatch.
++
++Usage:
++    python correctness.py \\
++        --golden golden/<stage>.jsonl \\
++        --solver "python {target}/solve.py" \\
++        --input-field input --expected-field expected
++
++The solver command is invoked once per golden case with the case's
++`input` on stdin. The solver's stdout (stripped) must equal the case's
++`expected` (stripped). A non-zero exit from the solver itself counts
++as a failure of that case.
++
++evo contract (sdk-notes.md §3a): this is a gate, not a benchmark. It
++must NOT read any EVO_* env var (cli.py:3232 strips them anyway). It
++gets the worktree path via the {target} template that `evo` fills in
++when the gate command runs. It writes nothing — pure exit code.
++
++Prior art:
++  - tests/fixtures/auto_harness_demo/gate.py:35-44 (case-list variant)
++  - nocodb docker-compose/.../helpers.bash:58 (file-snapshot variant)
++See world/hermes/gates/PRIOR-ART.md §1.
++"""
++from __future__ import annotations
++
++import argparse
++import json
++import subprocess
++import sys
++from pathlib import Path
++
++
++def run_solver(solver_cmd: str, case_input: str) -> tuple[int, str]:
++    proc = subprocess.run(
++        solver_cmd, shell=True, input=case_input,
++        capture_output=True, text=True, timeout=120,
++    )
++    return proc.returncode, proc.stdout.strip()
++
++
++def main() -> None:
++    p = argparse.ArgumentParser(description="Correctness gate")
++    p.add_argument("--golden", required=True, help="JSONL file of golden cases")
++    p.add_argument("--solver", required=True,
++                   help="Shell command; case input is piped to stdin, "
++                        "stdout must equal the expected field")
++    p.add_argument("--input-field", default="input")
++    p.add_argument("--expected-field", default="expected")
++    p.add_argument("--id-field", default="id")
++    args = p.parse_args()
++
++    golden_path = Path(args.golden)
++    if not golden_path.is_file():
++        print(f"correctness: golden file not found: {golden_path}",
++              file=sys.stderr)
++        sys.exit(2)
++
++    n = 0
++    with golden_path.open(encoding="utf-8") as fh:
++        for line in fh:
++            line = line.strip()
++            if not line or line.startswith("#"):
++                continue
++            case = json.loads(line)
++            case_id = case.get(args.id_field, str(n))
++            inp = case.get(args.input_field, "")
++            expected = str(case.get(args.expected_field, "")).strip()
++            n += 1
++
++            try:
++                rc, got = run_solver(args.solver, inp)
++            except subprocess.TimeoutExpired:
++                print(f"correctness: FAIL case={case_id} reason=timeout",
+… omitted 17 diff line(s) across 1 additional file(s)/section(s)
