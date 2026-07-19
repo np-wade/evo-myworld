@@ -486,3 +486,460 @@ a//workspace/evo-myworld/world/hermes/gates/correctness.py → b//workspace/evo-
 +            except subprocess.TimeoutExpired:
 +                print(f"correctness: FAIL case={case_id} reason=timeout",
 … omitted 17 diff line(s) across 1 additional file(s)/section(s)
+  ┊ ✍️ preparing write_file…
+  ┊ ✍️  write     /workspace/evo-myworld/world/hermes/gates/budget.py  1.3s
+  ┊ review diff
+a//workspace/evo-myworld/world/hermes/gates/budget.py → b//workspace/evo-myworld/world/hermes/gates/budget.py
+@@ -0,0 +1,146 @@
++#!/usr/bin/env python3
++"""Budget gate — post-phase, per-stage spend cap.
++
++The benchmark writes a side-channel budget.json (because gates do NOT
++see EVO_* env — sdk-notes.md §3e; the result JSON is for scores, not
++budget). This gate reads that file and exits 1 if any field exceeds a
++per-stage ceiling.
++
++Two modes, selected by flags (races ratchet vs absolute-cap, see
++PRIOR-ART.md §2):
++
++  --ceilings budgets.yaml   absolute cap: each field has a hard ceiling;
++                            exceeding any one fails. (raven variant)
++  --baseline baseline.json --toleration-percent P   ratchet: each
++                            field has a frozen baseline; fails when
++                            the current value rose by more than P%
++                            above the baseline. (OmniRoute variant)
++
++Both modes accept a missing field as a pass for that field (graceful
++degrade — adk-rust BaselineStore pattern, baseline.rs:121-130).
++
++Usage:
++    python budget.py --stage intake \\
++        --budget-file {worktree}/.evo/budget.json \\
++        --ceiliers budgets.yaml
++
++evo contract: post-phase gate. Reads the side-channel by an explicit
++path, never EVO_* env. Exit 0 = pass, 1 = fail, 2 = misconfigured.
++
++Prior art:
++  - OmniRoute budgetGate.ts:46-62 (ratchet, % delta vs baseline)
++  - raven before_iteration_hook.py:41-63 (absolute cap, byte/4 est)
++See world/hermes/gates/PRIOR-ART.md §2.
++"""
++from __future__ import annotations
++
++import argparse
++import json
++import sys
++from pathlib import Path
++
++
++def load_json(path: Path) -> dict:
++    if not path.is_file():
++        print(f"budget: budget file not found: {path}", file=sys.stderr)
++        sys.exit(2)
++    try:
++        return json.loads(path.read_text(encoding="utf-8"))
++    except json.JSONDecodeError as exc:
++        print(f"budget: malformed budget.json: {exc}", file=sys.stderr)
++        sys.exit(2)
++
++
++def load_ceilings_yaml(path: Path, stage: str) -> dict:
++    """Minimal YAML reader for the flat mapping we need:
++        stages:
++          intake:
++            tokens: 100000
++            usd: 5.0
++    No external dep — stdlib only (the lab avoids heavy imports,
++    CHARTER gotcha on WSL2 RAM)."""
++    if not path.is_file():
++        print(f"budget: ceilings file not found: {path}", file=sys.stderr)
++        sys.exit(2)
++    text = path.read_text(encoding="utf-8")
++    stages: dict[str, dict[str, float]] = {}
++    cur_stage: str | None = None
++    for raw in text.splitlines():
++        line = raw.rstrip()
++        if not line or line.lstrip().startswith("#"):
++            continue
++        if not line.startswith(" ") and line.endswith(":"):
++            cur_stage = line[:-1].strip()
++            stages[cur_stage] = {}
++            continue
++        if line.startswith("  ") and ":" in line and cur_stage is not None:
++            key, _, val = line.strip().partition(":")
++            try:
+… omitted 68 diff line(s) across 1 additional file(s)/section(s)
+  ┊ ✍️ preparing write_file…
+  ┊ ✍️  write     /workspace/evo-myworld/world/hermes/gates/regression.py  1.3s
+  ┊ review diff
+a//workspace/evo-myworld/world/hermes/gates/regression.py → b//workspace/evo-myworld/world/hermes/gates/regression.py
+@@ -0,0 +1,135 @@
++#!/usr/bin/env python3
++"""Regression gate — pre-phase, parent-score comparison.
++
++Compares a cheap proxy metric on the stage's worktree against the
++parent's committed proxy score; if worse beyond a tolerance, exits 1
++BEFORE the benchmark runs (pre-phase saves benchmark spend,
++sdk-notes.md §3d). This is the recursive-testing cull hook — the
++"which code deserves to live" discipline the charter wants.
++
++Two shapes (race: absolute-delta vs percentage-drop, PRIOR-ART.md §3):
++
++  --mode absolute    fail when parent - current > tolerance
++                     (adk-rust BaselineStore::check_regressions,
++                      baseline.rs:138-147)
++  --mode percent     fail when (parent - current) / parent > tolerance
++                     (repowise density_regression, kg_checks.py:347-367)
++
++Default --mode percent, --tolerance 0.0 (any regression fails; raise
++to allow small regressions through).
++
++The parent's proxy score is read from a JSON file the caller passes
++explicitly (typically written by the previous winning experiment's
++benchmark). evo records scores in the experiment graph node; the run
++config can dump the parent's committed score to a sidecar before this
++gate runs. We do NOT read EVO_* env (gates don't see it, sdk-notes.md
++§3e).
++
++Usage:
++    python regression.py \\
++        --parent-score parent_proxy.json \\
++        --current-score {worktree}/proxy_score.json \\
++        --field score --mode percent --tolerance 0.0
++
++parent_proxy.json / proxy_score.json: {"score": <float>, ...}
++A missing file on the parent side = no baseline = pass (graceful,
++adk-rust pattern). A missing file on the current side = misconfigured
++= exit 2.
++
++Prior art:
++  - adk-rust BaselineStore::check_regressions, baseline.rs:116-154
++  - repowise density_regression, kg_checks.py:347-367
++See world/hermes/gates/PRIOR-ART.md §3.
++"""
++from __future__ import annotations
++
++import argparse
++import json
++import sys
++from pathlib import Path
++
++
++def read_score(path: Path, field: str) -> float | None:
++    if not path.is_file():
++        return None
++    try:
++        data = json.loads(path.read_text(encoding="utf-8"))
++    except json.JSONDecodeError as exc:
++        print(f"regression: malformed score file {path}: {exc}",
++              file=sys.stderr)
++        sys.exit(2)
++    val = data.get(field) if isinstance(data, dict) else None
++    if val is None:
++        return None
++    try:
++        return float(val)
++    except (TypeError, ValueError):
++        print(f"regression: field {field!r} in {path} is not a number",
++              file=sys.stderr)
++        sys.exit(2)
++
++
++def main() -> None:
++    p = argparse.ArgumentParser(description="Regression gate")
++    p.add_argument("--parent-score", required=True,
++                   help="JSON with parent's committed proxy score")
++    p.add_argument("--current-score", required=True,
++                   help="JSON with current stage's proxy score")
++    p.add_argument("--field", default="score",
+… omitted 57 diff line(s) across 1 additional file(s)/section(s)
+  ┊ ✍️ preparing write_file…
+  ┊ ✍️  write     /workspace/evo-myworld/world/hermes/gates/held_out.py  1.3s
+  ┊ review diff
+a//workspace/evo-myworld/world/hermes/gates/held_out.py → b//workspace/evo-myworld/world/hermes/gates/held_out.py
+@@ -0,0 +1,128 @@
++#!/usr/bin/env python3
++"""Held-out gate — post-phase, generalization check.
++
++Runs the stage's product on a held-out slice the benchmark never saw,
++exits 1 if the held-out score drops below a threshold. This is the
++overfitting check — the thing that deletes code that memorized the
++benchmark instead of generalizing.
++
++Design (races paired-overfit vs single-threshold, PRIOR-ART.md §4):
++This script implements the single-threshold variant (ruvector
++learned_weights_beat_chance_on_held_out, weight_learning.rs:460-487)
++because it's the natural fit for the assembly line — the benchmark
++already runs on the training set; this gate runs on a disjoint slice
++and asserts one scalar threshold. The paired-overfit variant
++(Lightning-AI overfit_batches) needs a separate training run and only
++pays off when we explicitly suspect memorization; the README documents
++how to wire that as a separate gate if needed.
++
++Usage:
++    python held_out.py \\
++        --held-out golden/<stage>.held_out.jsonl \\
++        --solver "python {target}/solve.py" \\
++        --input-field input --expected-field expected \\
++        --threshold 0.7
++
++Each held-out case is one JSONL line {id, input, expected}. The
++solver gets the case input on stdin and prints its answer on stdout
++(99s timeout per case — held-out sets should be small). Score =
++fraction of cases where stripped(stdout) == stripped(expected).
++--threshold is the minimum score required to pass (default 0.7,
++ruvector's value). Exit 1 if score < threshold.
++
++evo contract: post-phase gate. No EVO_* env. {target} is filled by
++evo when the gate command runs. Writes nothing. Pure exit code.
++
++Prior art:
++  - ruvector learned_weights_beat_chance_on_held_out,
++    weight_learning.rs:460-487 (train/val split, AUC > 0.7 assert)
++  - Lightning-AI overfit_batches, test_overfit_batches.py:175-200
++    (paired overfit + disjoint eval)
++See world/hermes/gates/PRIOR-ART.md §4.
++"""
++from __future__ import annotations
++
++import argparse
++import json
++import subprocess
++import sys
++from pathlib import Path
++
++
++def main() -> None:
++    p = argparse.ArgumentParser(description="Held-out generalization gate")
++    p.add_argument("--held-out", required=True,
++                   help="JSONL of held-out cases {id, input, expected}")
++    p.add_argument("--solver", required=True,
++                   help="Shell command; case input on stdin, "
++                        "stdout = prediction")
++    p.add_argument("--input-field", default="input")
++    p.add_argument("--expected-field", default="expected")
++    p.add_argument("--id-field", default="id")
++    p.add_argument("--threshold", type=float, default=0.7,
++                   help="Minimum fraction of cases that must pass "
++                        "(default 0.7)")
++    p.add_argument("--per-case-timeout", type=float, default=99.0,
++                   help="Per-case solver timeout seconds (default 99)")
++    args = p.parse_args()
++
++    if not 0.0 <= args.threshold <= 1.0:
++        print(f"held_out: --threshold must be in [0,1], got "
++              f"{args.threshold}", file=sys.stderr)
++        sys.exit(2)
++
++    held_path = Path(args.held_out)
++    if not held_path.is_file():
++        print(f"held_out: held-out file not found: {held_path}",
++              file=sys.stderr)
++        sys.exit(2)
+… omitted 50 diff line(s) across 1 additional file(s)/section(s)
+
+╭─ ⚕ Hermes ───────────────────────────────────────────────────────────────────╮
+    Now a small self-test and a README.
+╰──────────────────────────────────────────────────────────────────────────────╯
+  ┊ ✍️ preparing write_file…
+  ┊ ✍️  write     /workspace/evo-myworld/world/hermes/gates/test_gates.py  1.4s
+  ┊ review diff
+a//workspace/evo-myworld/world/hermes/gates/test_gates.py → b//workspace/evo-myworld/world/hermes/gates/test_gates.py
+@@ -0,0 +1,257 @@
++#!/usr/bin/env python3
++"""Self-tests for the gate library. Pure stdlib, fast.
++
++Run:  python3 test_gates.py
++Exit 0 = all gates behave under their evo contract.
++
++Tests cover the load-bearing behaviors only:
++  - exit codes (0 pass / 1 fail / 2 misconfig)
++  - graceful degrade on missing baseline (regression)
++  - ratchet vs absolute-cap (budget)
++  - per-case solver invocation (correctness, held_out)
++  - threshold semantics (held_out)
++"""
++from __future__ import annotations
++
++import json
++import os
++import subprocess
++import sys
++import tempfile
++import textwrap
++from pathlib import Path
++
++HERE = Path(__file__).resolve().parent
++PY = sys.executable
++
++
++def run(script: str, *args: str, stdin: str | None = None) -> tuple[int, str, str]:
++    proc = subprocess.run(
++        [PY, str(HERE / script), *args],
++        capture_output=True, text=True, timeout=30, input=stdin,
++    )
++    return proc.returncode, proc.stdout, proc.stderr
++
++
++def write_jsonl(path: Path, rows: list[dict]) -> None:
++    with path.open("w", encoding="utf-8") as fh:
++        for r in rows:
++            fh.write(json.dumps(r) + "\n")
++
++
++def write_json(path: Path, data: dict) -> None:
++    path.write_text(json.dumps(data), encoding="utf-8")
++
++
++def test_correctness_passes() -> None:
++    with tempfile.TemporaryDirectory() as td:
++        td = Path(td)
++        golden = td / "g.jsonl"
++        write_jsonl(golden, [
++            {"id": "0", "input": "hi", "expected": "ok"},
++            {"id": "1", "input": "bye", "expected": "ok"},
++        ])
++        solver = f"{PY} -c \"import sys; print('ok')\""
++        rc, _, err = run("correctness.py", "--golden", str(golden),
++                         "--solver", solver)
++        assert rc == 0, f"expected pass, got rc={rc} err={err}"
++
++
++def test_correctness_fails_on_mismatch() -> None:
++    with tempfile.TemporaryDirectory() as td:
++        td = Path(td)
++        golden = td / "g.jsonl"
++        write_jsonl(golden, [{"id": "0", "input": "x", "expected": "ok"}])
++        solver = f"{PY} -c \"import sys; print('wrong')\""
++        rc, _, err = run("correctness.py", "--golden", str(golden),
++                         "--solver", solver)
++        assert rc == 1, f"expected fail, got rc={rc} err={err}"
++
++
++def test_correctness_missing_golden_exit2() -> None:
++    rc, _, _ = run("correctness.py", "--golden", "/no/such.jsonl",
++                   "--solver", "true")
++    assert rc == 2, f"expected 2, got {rc}"
++
++
++def test_budget_absolute_pass() -> None:
++    with tempfile.TemporaryDirectory() as td:
+… omitted 179 diff line(s) across 1 additional file(s)/section(s)
+  ┊ 💻 preparing terminal…
+  ┊ 💻 $         cd /workspace/evo-myworld/world/hermes/gates && python3 test_gates.py 2>&1 | tail -30  0.9s
+
+╭─ ⚕ Hermes ───────────────────────────────────────────────────────────────────╮
+    One YAML parser bug — my naive parser dropped the indented entries. Let me fix it.
+╰──────────────────────────────────────────────────────────────────────────────╯
+  ┊ 🔧 preparing patch…
+  ┊ 🔧 patch     /workspace/evo-myworld/world/hermes/gates/budget.py  1.6s
+  ┊ review diff
+a//workspace/evo-myworld/world/hermes/gates/budget.py → b//workspace/evo-myworld/world/hermes/gates/budget.py
+@@ -69,12 +69,16 @@
+         line = raw.rstrip()
+         if not line or line.lstrip().startswith("#"):
+             continue
+-        if not line.startswith(" ") and line.endswith(":"):
+-            cur_stage = line[:-1].strip()
++        indent = len(line) - len(line.lstrip())
++        body = line.strip()
++        if indent == 0 and body.endswith(":"):
++            cur_stage = body[:-1].strip()
+             stages[cur_stage] = {}
+             continue
+-        if line.startswith("  ") and ":" in line and cur_stage is not None:
+-            key, _, val = line.strip().partition(":")
++        if indent == 0 and body == "stages:":
++            continue
++        if indent >= 2 and ":" in body and cur_stage is not None:
++            key, _, val = body.partition(":")
+             try:
+                 stages[cur_stage][key.strip()] = float(val.strip())
+             except ValueError:
+
+╭─ ⚕ Hermes ───────────────────────────────────────────────────────────────────╮
+    The issue is stages: matched the "ends with :" branch first. With my fix stages: is checked separately. Let me re-run.
+╰──────────────────────────────────────────────────────────────────────────────╯
+  ┊ 💻 preparing terminal…
+  ┊ 💻 $         cd /workspace/evo-myworld/world/hermes/gates && python3 test_gates.py 2>&1 | tail -5  0.7s
+  ┊ 💻 preparing terminal…
+  ┊ 💻 $         cd /workspace/evo-myworld/world/hermes/gates && python3 test_gates.py 2>&1 | grep -i fail  0.7s
+⚠️ Iteration budget exhausted (60/60) — asking model to summarise
+⚠️  Reached maximum iterations (60). Requesting summary...
+ ─  ⚕ Hermes  ───────────────────────────────────────────────────────────────── 
+                                                                                
+     Summary                                                                    
+                                                                                
+     Queue item 3 (PORT-PLAN.md Track A, deliverable A1) — building the         
+     gate library in world/hermes/gates/ — is functionally complete:            
+     prior-art pulled and cited for all four gate designs, four executable      
+     gate scripts written, and 14 of 15 self-tests green. One budget-YAML       
+     parser ordering bug remains (described below with the one-line fix).       
+     Files written (all inside /workspace/evo-myworld/world/hermes/gates/)      
+                                                                                
+     1. PRIOR-ART.md — GRAPH-FIRST citations, ≥2 real candidates per gate       
+     design, all read end-to-end from /library/repos/:                          
+        - Correctness: evo's tests/fixtures/auto_harness_demo/gate.py:35-44     
+     + nocodb helpers.bash:58                                                   
+        - Budget: OmniRoute budgetGate.ts:46-62 (ratchet) + raven               
+     before_iteration_hook.py:41-63 (absolute cap)                              
+        - Regression: adk-rust baseline.rs:116-154 (absolute-delta) +           
+     repowise kg_checks.py:347-367 (percent-drop)                               
+        - Held-out: ruvector weight_learning.rs:460-487 (threshold on           
+     held-out) + Lightning-AI test_overfit_batches.py:175-200 (paired           
+     overfit+eval)                                                              
+                                                                                
+     2. correctness.py — post-phase golden-case gate; pipes each case's         
+     input to a solver, exits 1 on first mismatch.                              
+     3. budget.py — post-phase spend gate; two modes (--ceilings absolute       
+     cap, --baseline ratchet); graceful on missing fields.                      
+     4. regression.py — pre-phase parent-score comparison; --mode               
+     absolute|percent; no-parent-baseline = pass (adk-rust graceful-skip).      
+     5. held_out.py — post-phase generalization gate; runs solver on            
+     disjoint slice, fails if score < --threshold.                              
+     6. test_gates.py — 15 stdlib-only self-tests covering exit codes,          
+     graceful degrade, ratchet/cap, threshold semantics.                        
+     Conformance to evo contract (verified against sdk-notes.md)                
+                                                                                
+     - Every gate is a plain sys.exit(0|1|2) script — evo runs gates via sh     
+     -c and reads only exit code (cli.py:3352).                                 
+     - No gate reads EVO_ env (gates are stripped of it, §3e); budget uses      
+     an explicit --budget-file side-channel, regression uses explicit           
+     --parent-score/--current-score paths.                                      
+     - Phase mapping matches §5 of sdk-notes: correctness + budget +            
+     held_out = post, regression = pre → run order is regression →              
+     benchmark → correctness+budget+held_out → keep, exactly the §3d flow.      
+     - Inheritance: each gate attaches to a stage's root branch and             
+     inherits down (CHARTER pattern) — no per-sub-stage re-attachment           
+     needed.                                                                    
+     Remaining bug (one-line fix)                                               
+                                                                                
+     budget.py load_ceilings_yaml parses stages: as a stage because the         
+     endswith(":") branch fires before the body == "stages:" branch. Swap       
+     the two if checks in load_ceilings_yaml so if indent == 0 and body ==      
+     "stages:" comes BEFORE if indent == 0 and body.endswith(":"). Then         
+     test_budget_absolute_fail will pass and all 15 tests go green. The         
+     race-mode behavior (ratchet via --baseline) is unaffected and already      
+     fully working.                                                             
+     Race requests                                                              
+                                                                                
+     I did not yet write racetrack/requests/gate-.md files. The RACE RULE       
+     requires ≥2 candidates raced in the evo-hq harness before adoption —       
+     the citations are gathered in PRIOR-ART.md, but the actual races           
+     (bench.py + gate per candidate, run via racetrack/run-race.sh) are a       
+     separate step that the lab loop picks up. I recommend filing four race     
+     requests as the next hermes queue item.                                    
+     FIELD-NOTES + queue tick                                                   
+                                                                                
+     I have NOT yet appended the FIELD-NOTES entry or ticked [ ] → [x] in       
+     queues/hermes.md — I hit the tool-call cap before those two writes.        
+     The next hermes turn should:                                               
+     1. Append to FIELD-NOTES.md: dated, signed hermes — gate library           
+     shipped at world/hermes/gates/, four scripts + tests + prior-art           
+     citations, 14/15 green, one YAML-parse bug noted.                          
+     2. Change item 3 [ ] to [x] in queues/hermes.md.                           
+                                                                                
+ ────────────────────────────────────────────────────────────────────────────── 
+
+⚠ Iteration budget reached (60/60) — response may be incomplete
