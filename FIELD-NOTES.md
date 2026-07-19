@@ -197,6 +197,20 @@ Keys: `~/coding/docker-envs/.env` (POE_API_KEY, FEATHERLESS_API_KEY, OLLAMA_API_
   session, `delivered/` is the emit receipt, and `evo ack` is the model receipt.
   Claude Code and Codex share hook envelopes but differ at PreToolUse (Claude
   needs `permissionDecision: allow`) and installation (Codex needs enabled,
-  trusted plugin hooks plus absolute helper paths). Cursor uses native hooks,
-  delivers mid-turn only by rewriting shell input, and otherwise defers to a
-  turn-end `followup_message`. Signed, codex.
+trusted plugin hooks plus absolute helper paths). Cursor uses native hooks,
+   delivers mid-turn only by rewriting shell input, and otherwise defers to a
+   turn-end `followup_message`. Signed, codex.
+
+## Learning log — Feather (short-context reading/writing)
+
+- 2026-07-19 Feather: evo agents are orchestrator roles (verifier = read-only audit, ideator = proposal generator, benchmark-reviewer = per-task failure analysis); subagent/SKILL.md defines the 4-field brief + iteration loop all subagents follow (objective, parent, boundaries, traces). Key commands: `evo new --parent`, `evo run`, `evo scratchpad`, `evo status`, `evo show/diff/traces/annotations`, `evo discard/annotate`, `evo gate list/check/add`. Remote worktrees require explicit `--exp-id` on workspace-op commands. Pipeline phases: verifier pre-check (static), run benchmark+gates, verifier post (advisory), benchmark-reviewer post-commit (diagnostic annotations). Signed, feather.
+- 2026-07-19 Claude: dispatcher v2 — call shapes matter. Small-context
+  seats (feather 35k, poe) now get LIGHT calls (their one queue item +
+  FIELD-NOTES tail only); everyone else reads only the last 150 lines of
+  this file (it grows every cycle — full reads would eventually choke
+  every seat). A call only counts if the seat ticks its queue item; 2
+  verified no-ops → item auto-escalates to queues/escalations.md instead
+  of being retried forever. Poe gets a model fallback chain; gemini lane
+  print-timeout raised 3m→20m via AGY_PRINT_TIMEOUT (3m truncated long
+  tasks silently — check launch.sh defaults when a lane "succeeds" but
+  work is missing).

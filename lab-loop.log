@@ -1,0 +1,9 @@
+[2026-07-19 15:14:49] === cycle 1 start (seats: feather hermes gemini gemini2 cursor codex poe kimi, max races: 2)
+=== dispatching feather → /home/npwad/coding/docker-envs/projects/evo-myworld/queues/logs/feather.151449.log
+--- feather exit=0 (log: /home/npwad/coding/docker-envs/projects/evo-myworld/queues/logs/feather.151449.log)
+=== dispatching hermes → /home/npwad/coding/docker-envs/projects/evo-myworld/queues/logs/hermes.151546.log
+[2026-07-19 15:15:49] heartbeat: [2026-07-19 15:15:46] cycle 1: seat hermes working | MemAvail=9.7G SwapFree=23.8G
+[2026-07-19 15:16:49] heartbeat: [2026-07-19 15:15:46] cycle 1: seat hermes working | MemAvail=9.9G SwapFree=23.8G
+[2026-07-19 15:17:49] heartbeat: [2026-07-19 15:15:46] cycle 1: seat hermes working | MemAvail=9.9G SwapFree=23.8G
+[2026-07-19 15:18:49] heartbeat: [2026-07-19 15:15:46] cycle 1: seat hermes working | MemAvail=9.9G SwapFree=23.8G
+[2026-07-19 15:19:49] heartbeat: [2026-07-19 15:15:46] cycle 1: seat hermes working | MemAvail=9.9G SwapFree=23.8G
