@@ -97,3 +97,13 @@ does anything. Lab program order right now:
 (1) seats build their branch-spaces with real connectivity — NOW;
 (2) show each module's difference on the bench — RUNNING;
 (3) creative variants compared vs baseline — LATER, not yet.
+
+## Research must RUN (added 2026-07-19)
+
+Reading code is half a finding. Research tasks end by RUNNING the thing
+in the app's real environment — start the actual component, feed it the
+real state (e.g. /workspace/evo-demo/.evo run data), paste ACTUAL outputs
+into your notes. "It should work" doesn't count; "here's what it printed"
+does. Use your own basic environment (cursor/gemini/codex lanes have
+python + the repos at /workspace) — install a small dep in-container if
+needed.
