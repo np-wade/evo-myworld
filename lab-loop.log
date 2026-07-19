@@ -56,3 +56,5 @@ gemini: works=FAIL score=- (log: /home/npwad/coding/docker-envs/projects/evo-myw
 cat: racetrack/requests/backend-query-ranking.md: No such file or directory
 [2026-07-19 15:44:58] heartbeat: [2026-07-19 15:44:41] cycle 1: racing backend-query-ranking | MemAvail=9.6G SwapFree=23.8G
 [2026-07-19 15:45:58] heartbeat: [2026-07-19 15:44:41] cycle 1: racing backend-query-ranking | MemAvail=9.4G SwapFree=23.8G
+[2026-07-19 15:46:58] heartbeat: [2026-07-19 15:44:41] cycle 1: racing backend-query-ranking | MemAvail=9.4G SwapFree=23.8G
+race backend-query-ranking FAILED (rc=143) — request left in place, log: /home/npwad/coding/docker-envs/projects/evo-races/backend-query-ranking/steward.log

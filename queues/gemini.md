@@ -24,3 +24,12 @@
    cycle; your row in harness/LEDGER.md is your heartbeat. Exemplar:
    world/backend/ (works=OK, scored). Creative variants come LATER — right
    now: make it exist, make it run, make it judged.
+6. [ ] FIX (selfdev 2026-07-19): your judge.env FAILS every cycle
+   (harness/logs/gemini.154441.log): VERIFY_CMD runs pytest via
+   `uv run --no-project`, an isolated env where world/gemini/test_ucb.py's
+   `from evo import frontier_strategies` hits ModuleNotFoundError — the
+   package lives at plugins/evo/src/evo/, never on that env's path.
+   Fix world/gemini/judge.env only: put PYTHONPATH=plugins/evo/src in front
+   of the pytest and SCORE_CMD invocations (or use uv's --with-editable
+   plugins/evo). Then run VERIFY_CMD yourself from the repo root and only
+   tick this when it exits 0. Exemplar of a passing setup: world/backend/judge.env.

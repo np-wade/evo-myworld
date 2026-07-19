@@ -35091,3 +35091,1075 @@ aybe one part (under 100). INTERFACE in one part. Code files are fine. PERSONA f
 iles fine.\n\nLet\'s write.',
     encrypted=None
 )
+ToolCall(
+    type='function',
+    id='tool_7SjR331lRY9WBUBuIiuzieEI',
+    function=FunctionBody(
+        name='WriteFile',
+        arguments='{"path": "/projects/bertrand-hussle/DESIGN.md", "content": "#
+Bertrand Hussle — design record\\n\\n## Concept & character voice\\n\\nBertrand 
+Hussle (BH) is the mouth and hands of the Witt Brain. He is Bertrand\\nRussell —
+analytic clarity, type-theory precision, \\"every word must earn its\\nplace\\" 
+— fused with Nipsey Hussle: the marathon, ownership,\\nbuild-your-own-ecosystem,
+patient hustle, dignity. He speaks terse, structured\\nsentences. He does not wa
+ste tokens. He respects the user\'s time and hardware as\\nif they were his own 
+block.\\n\\nVoice:\\n- No corporate filler. No \\"I\'d be happy to assist you to
+day.\\"\\n- Use exact terms. If something is a stub, say it is a stub.\\n- Prefe
+r \\"show, then tell\\": print the decision, the route, the cost, then the\\n  a
+nswer.\\n- When waiting, spin once; when done, stop.\\n\\n## Why Rust-with-Pytho
+n\\n\\nThe base is Rust because the CLI is a daily driver: fast startup, small m
+emory\\nfootprint, reliable concurrency, and a clap-derived command surface. The
+heavy\\nmodel (~9B parameters) lives in Python (llama.cpp Python bindings, Trans
+formers,\\nor a vLLM-compatible server). Rust calls Python only at a clean bound
+ary:\\n\\n- Default: JSON-RPC over a Unix domain socket to the `witt-brain` infe
+rence\\n  server.\\n- Optional feature `python`: PyO3 direct embedding for singl
+e-binary deployments.\\n\\nThis follows the Raven pattern where the TUI and runt
+ime are separate processes\\njoined by a narrow RPC protocol (`raven/tui_rpc/ser
+ver.py`: JSON-RPC 2.0,\\nnewline-delimited frames, max 1 MiB, `RAVEN_RPC_SOCKET`
++ token trust boundary).\\nIt also mirrors the PyO3 examples (`examples/plugin/s
+rc/main.rs`:\\n`Python::with_gil`, `PyModule::import`, `call1`).\\n\\nRust keeps
+the runtime cheap; Python is only paid for when inference actually\\nruns.\\n\\n
+## Visual system\\n\\nPalette (truecolor with 256/16/none fallbacks, learned fro
+m Raven\\n`ui-tui/src/theme.ts`):\\n\\n| role  | hex       | usage              
+ |\\n|-------|-----------|----------------------|\\n| gold  | `#fbe23f` | sigil,
+verb, accents |\\n| slate | `#536878` | borders, muted lines |\\n| ok    | `#3ee
+07a` | success              |\\n| warn  | `#f5a623` | caution              |\\n|
+error | `#ec6a5e` | failure              |\\n| text  | `#FFF5EA` | body         
+       |\\n| muted | `#858482` | secondary            |\\n\\nSigil: `✦` (four-po
+inted star). Used in the header and as the spinner anchor.\\n\\nHeader (token-ch
+eap, 3 lines):\\n\\n```\\n╭─ ✦ BH · 0.1.0 ──────────────\\n│  analytic soul · pa
+tient hustle\\n╰─\\n```\\n\\nRendered only on TTY; respects `NO_COLOR`. Width is
+fixed small, unlike Raven\'s\\nresponsive 36/136-column banners (`ui-tui/src/ban
+ner.ts`), because BH is a tool,\\nnot a stage.\\n\\nSpinner: braille, 10 frames,
+120 ms, same family as Raven\\n(`unicodeSpinners.braille`) but only used during 
+`think` and `do`. Not on every\\ncommand.\\n\\nOutput voice: `{verb}: {body}`. V
+erbs are `ask`, `route`, `think`, `do`,\\n`status`, `config`. No emoji except th
+e sigil.\\n\\n## Command surface\\n\\nVerbs map 1:1 to user intent:\\n\\n- `bh a
+sk <prompt>` — default; route to Witt Brain, print the answer.\\n- `bh route <ta
+g> <task...>` — explicit routing tag, like Witt\'s `witt route`\\n  (`src/router
+.rs` `RoutingPolicy`, `RouteTarget::One/Chain`, prefix fallback).\\n- `bh think 
+<prompt>` — request a visible reasoning trace before the answer.\\n- `bh do <too
+l-call-json>` — execute an approved local tool call.\\n- `bh status` — runtime s
+tatus (load, memory warmth, last error).\\n- `bh config` — dump resolved config.
+\\n\\nThis is smaller than Witt\'s surface (`src/main.rs`: `Ask`, `Route`, `Clas
+sify`,\\n`Operate`, `Agent`, `Intake`, `Fn`, `Watch`, `Daemon`, `Job`, `Zc`, `Co
+nfig`).\\nBH intentionally narrows it: routing is delegated to Witt Brain, tool 
+execution\\nis local, and everything else is hidden behind `ask`.\\n\\n## Archit
+ecture\\n\\n- `src/main.rs` — clap entry, command dispatch.\\n- `src/theme.rs` —
+visual system as code: palette, sigil, header, spinner,\\n  `say()`.\\n- `src/br
+idge.rs` — BH↔Witt boundary: `ThinkRequest`, `ThinkResponse`, JSON-RPC\\n  socke
+t, optional PyO3 path.\\n- `src/config.rs` (future) — `~/.config/bertrand-hussle
+/config.toml`.\\n\\n## Influences & citations\\n\\n- Raven TUI: `ui-tui/src/them
+e.ts` (color tiers, dark palette),\\n  `ui-tui/src/banner.ts` (responsive banner
+width),\\n  `ui-tui/src/components/appChrome.tsx` (`FaceTicker`, `VERBS`, contex
+t bar\\n  thresholds), `raven/tui_rpc/server.py` + `models.py` (JSON-RPC contrac
+t),\\n  `raven/cli/tui_commands.py` (socket + token trust boundary),\\n  `bridge
+/src/server.ts` (auth handshake).\\n- Witt: `/projects/witt/Cargo.toml` (clap 4,
+anyhow, serde, toml, serde_json,\\n  dirs, async-trait, tokio), `/projects/witt/
+src/main.rs` (subcommand enum),\\n  `/projects/witt/src/router.rs` (`RoutingPoli
+cy`, `RouteTarget`, prefix\\n  fallback, route-log JSONL), `/projects/witt/src/m
+emory.rs` (markdown memory\\n  scaffold), `/projects/witt/src/intent.rs` (intent
+-gate wiring).\\n- ZeroClaw: `zeroclaw-api/src/tool.rs` (`Tool`, `ToolResult`,\\
+n  `tool_attribution!`), `zeroclaw-api/src/model_provider.rs` (`ModelProvider`,\
+\n  `ChatRequest`, `ChatResponse`, `ToolCall`),\\n  `zeroclaw-api/src/memory_tra
+its.rs` (`Memory`, `MemoryEntry`,\\n  `MemoryCategory`, `MemoryKind`), `zeroclaw
+-memory/src/lib.rs` (`create_memory`,\\n  `SqliteMemory`, `MarkdownMemory`), `ze
+roclaw-providers/src/ollama.rs`\\n  (`OllamaModelProvider`), `zeroclaw-runtime/s
+rc/agent/agent.rs`\\n  (`Agent::from_config_with_session_cwd_and_mcp`, `run_sing
+le`).\\n- Rust corpus: `Canop_broot/src/cli/args.rs` + `src/skin/style_map.rs` (
+clap +\\n  theme maps), `Julien-cpsn_ATAC/src/cli/args.rs` (subcommands),\\n  `N
+ukesor_pueue/src/client/cli.rs` + `style.rs` (clap + `OutputStyle`),\\n  `GyulyV
+GC_sniffnet/src/gui/styles/types/palette.rs` (palette struct),\\n  `BurntSushi_r
+ipgrep/crates/printer/src/standard.rs` (structured printer),\\n  `PyO3_pyo3/exam
+ples/plugin/src/main.rs` + guide (calling Python from Rust).\\n\\nNote on paths:
+`/library/repos` was not mounted in this environment, so ZeroClaw\\nand some cor
+pus files were read from an upstream shallow clone; citations use the\\ncanonica
+l repo-relative paths as requested by the mission.\\n\\n## Roadmap / stubs\\n\\n
+- Phase 0 (this commit): skeleton, theme, bridge stub, INTERFACE contract.\\n- P
+hase 1: real JSON-RPC client to `witt-brain` socket.\\n- Phase 2: tool dispatche
+r (shell, file, memory) behind `bh do`.\\n- Phase 3: config loader and routing p
+olicy delegation.\\n- Phase 4: local memory warm-start.\\n"}'
+    ),
+    extras=None
+)
+StatusUpdate(
+    context_usage=0.16278457641601562,
+    context_tokens=42673,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=5041,
+        output=11692,
+        input_cache_read=37632,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-JG0uZ3ddXGFaemsroKwo62Xt',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_7SjR331lRY9WBUBuIiuzieEI',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='',
+        message='File successfully overwritten. Current size: 6332 bytes.',
+        display=[
+            DiffDisplayBlock(
+                type='diff',
+                path='/projects/bertrand-hussle/DESIGN.md',
+                old_text='',
+                new_text='# Bertrand Hussle — design record\n\n## Concept & char
+acter voice\n\nBertrand Hussle (BH) is the mouth and hands of the Witt Brain. He
+is Bertrand\nRussell — analytic clarity, type-theory precision, "every word must
+earn its\nplace" — fused with Nipsey Hussle: the marathon, ownership,\nbuild-you
+r-own-ecosystem, patient hustle, dignity. He speaks terse, structured\nsentences
+. He does not waste tokens. He respects the user\'s time and hardware as\nif the
+y were his own block.\n\nVoice:\n- No corporate filler. No "I\'d be happy to ass
+ist you today."\n- Use exact terms. If something is a stub, say it is a stub.\n-
+Prefer "show, then tell": print the decision, the route, the cost, then the\n  a
+nswer.\n- When waiting, spin once; when done, stop.\n\n## Why Rust-with-Python\n
+\nThe base is Rust because the CLI is a daily driver: fast startup, small memory
+\nfootprint, reliable concurrency, and a clap-derived command surface. The heavy
+\nmodel (~9B parameters) lives in Python (llama.cpp Python bindings, Transformer
+s,\nor a vLLM-compatible server). Rust calls Python only at a clean boundary:\n\
+n- Default: JSON-RPC over a Unix domain socket to the `witt-brain` inference\n  
+server.\n- Optional feature `python`: PyO3 direct embedding for single-binary de
+ployments.\n\nThis follows the Raven pattern where the TUI and runtime are separ
+ate processes\njoined by a narrow RPC protocol (`raven/tui_rpc/server.py`: JSON-
+RPC 2.0,\nnewline-delimited frames, max 1 MiB, `RAVEN_RPC_SOCKET` + token trust 
+boundary).\nIt also mirrors the PyO3 examples (`examples/plugin/src/main.rs`:\n`
+Python::with_gil`, `PyModule::import`, `call1`).\n\nRust keeps the runtime cheap
+; Python is only paid for when inference actually\nruns.\n\n## Visual system\n\n
+Palette (truecolor with 256/16/none fallbacks, learned from Raven\n`ui-tui/src/t
+heme.ts`):\n\n| role  | hex       | usage                |\n|-------|-----------
+|----------------------|\n| gold  | `#fbe23f` | sigil, verb, accents |\n| slate 
+| `#536878` | borders, muted lines |\n| ok    | `#3ee07a` | success             
+|\n| warn  | `#f5a623` | caution              |\n| error | `#ec6a5e` | failure  
+           |\n| text  | `#FFF5EA` | body                 |\n| muted | `#858482` 
+| secondary            |\n\nSigil: `✦` (four-pointed star). Used in the header a
+nd as the spinner anchor.\n\nHeader (token-cheap, 3 lines):\n\n```\n╭─ ✦ BH · 0.
+1.0 ──────────────\n│  analytic soul · patient hustle\n╰─\n```\n\nRendered only 
+on TTY; respects `NO_COLOR`. Width is fixed small, unlike Raven\'s\nresponsive 3
+6/136-column banners (`ui-tui/src/banner.ts`), because BH is a tool,\nnot a stag
+e.\n\nSpinner: braille, 10 frames, 120 ms, same family as Raven\n(`unicodeSpinne
+rs.braille`) but only used during `think` and `do`. Not on every\ncommand.\n\nOu
+tput voice: `{verb}: {body}`. Verbs are `ask`, `route`, `think`, `do`,\n`status`
+, `config`. No emoji except the sigil.\n\n## Command surface\n\nVerbs map 1:1 to
+user intent:\n\n- `bh ask <prompt>` — default; route to Witt Brain, print the an
+swer.\n- `bh route <tag> <task...>` — explicit routing tag, like Witt\'s `witt r
+oute`\n  (`src/router.rs` `RoutingPolicy`, `RouteTarget::One/Chain`, prefix fall
+back).\n- `bh think <prompt>` — request a visible reasoning trace before the ans
+wer.\n- `bh do <tool-call-json>` — execute an approved local tool call.\n- `bh s
+tatus` — runtime status (load, memory warmth, last error).\n- `bh config` — dump
+resolved config.\n\nThis is smaller than Witt\'s surface (`src/main.rs`: `Ask`, 
+`Route`, `Classify`,\n`Operate`, `Agent`, `Intake`, `Fn`, `Watch`, `Daemon`, `Jo
+b`, `Zc`, `Config`).\nBH intentionally narrows it: routing is delegated to Witt 
+Brain, tool execution\nis local, and everything else is hidden behind `ask`.\n\n
+## Architecture\n\n- `src/main.rs` — clap entry, command dispatch.\n- `src/theme
+.rs` — visual system as code: palette, sigil, header, spinner,\n  `say()`.\n- `s
+rc/bridge.rs` — BH↔Witt boundary: `ThinkRequest`, `ThinkResponse`, JSON-RPC\n  s
+ocket, optional PyO3 path.\n- `src/config.rs` (future) — `~/.config/bertrand-hus
+sle/config.toml`.\n\n## Influences & citations\n\n- Raven TUI: `ui-tui/src/theme
+.ts` (color tiers, dark palette),\n  `ui-tui/src/banner.ts` (responsive banner w
+idth),\n  `ui-tui/src/components/appChrome.tsx` (`FaceTicker`, `VERBS`, context 
+bar\n  thresholds), `raven/tui_rpc/server.py` + `models.py` (JSON-RPC contract),
+\n  `raven/cli/tui_commands.py` (socket + token trust boundary),\n  `bridge/src/
+server.ts` (auth handshake).\n- Witt: `/projects/witt/Cargo.toml` (clap 4, anyho
+w, serde, toml, serde_json,\n  dirs, async-trait, tokio), `/projects/witt/src/ma
+in.rs` (subcommand enum),\n  `/projects/witt/src/router.rs` (`RoutingPolicy`, `R
+outeTarget`, prefix\n  fallback, route-log JSONL), `/projects/witt/src/memory.rs
+` (markdown memory\n  scaffold), `/projects/witt/src/intent.rs` (intent-gate wir
+ing).\n- ZeroClaw: `zeroclaw-api/src/tool.rs` (`Tool`, `ToolResult`,\n  `tool_at
+tribution!`), `zeroclaw-api/src/model_provider.rs` (`ModelProvider`,\n  `ChatReq
+uest`, `ChatResponse`, `ToolCall`),\n  `zeroclaw-api/src/memory_traits.rs` (`Mem
+ory`, `MemoryEntry`,\n  `MemoryCategory`, `MemoryKind`), `zeroclaw-memory/src/li
+b.rs` (`create_memory`,\n  `SqliteMemory`, `MarkdownMemory`), `zeroclaw-provider
+s/src/ollama.rs`\n  (`OllamaModelProvider`), `zeroclaw-runtime/src/agent/agent.r
+s`\n  (`Agent::from_config_with_session_cwd_and_mcp`, `run_single`).\n- Rust cor
+pus: `Canop_broot/src/cli/args.rs` + `src/skin/style_map.rs` (clap +\n  theme ma
+ps), `Julien-cpsn_ATAC/src/cli/args.rs` (subcommands),\n  `Nukesor_pueue/src/cli
+ent/cli.rs` + `style.rs` (clap + `OutputStyle`),\n  `GyulyVGC_sniffnet/src/gui/s
+tyles/types/palette.rs` (palette struct),\n  `BurntSushi_ripgrep/crates/printer/
+src/standard.rs` (structured printer),\n  `PyO3_pyo3/examples/plugin/src/main.rs
+` + guide (calling Python from Rust).\n\nNote on paths: `/library/repos` was not
+mounted in this environment, so ZeroClaw\nand some corpus files were read from a
+n upstream shallow clone; citations use the\ncanonical repo-relative paths as re
+quested by the mission.\n\n## Roadmap / stubs\n\n- Phase 0 (this commit): skelet
+on, theme, bridge stub, INTERFACE contract.\n- Phase 1: real JSON-RPC client to 
+`witt-brain` socket.\n- Phase 2: tool dispatcher (shell, file, memory) behind `b
+h do`.\n- Phase 3: config loader and routing policy delegation.\n- Phase 4: loca
+l memory warm-start.',
+                old_start=1,
+                new_start=1,
+                is_summary=False
+            )
+        ],
+        extras=None
+    )
+)
+StepBegin(n=8)
+ThinkPart(
+    type='think',
+    think='Good, BH DESIGN written. Now write other files in parallel.',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_Pa4gWHKyLIWWeGkyZeiDwI9V',
+    function=FunctionBody(
+        name='WriteFile',
+        arguments='{"path": "/projects/bertrand-hussle/INTERFACE.md", "content":
+"# BH ↔ Witt Brain interface contract\\n\\n## Scope\\n\\nThis document is the st
+able seam between `bertrand-hussle` (BH, the CLI) and\\n`witt-brain` (the thinki
+ng organ). The two repos may evolve independently; if\\nthey both honor this con
+tract, they snap together.\\n\\n## Version\\n\\n`witt-interface 0.1.0`\\n\\n## T
+ransports\\n\\n1. **Crate API** (library path): `witt-brain` is a Rust library c
+rate. BH can\\n   call `witt_brain::WittBrain` directly when compiled into the s
+ame binary.\\n2. **JSON-RPC over Unix socket** (process path): BH connects to\\n
+  `~/.config/bertrand-hussle/witt.sock` (fallback `/tmp/bh-witt.sock`). Framing\
+\n   follows Raven TUI-RPC: JSON-RPC 2.0, newline-delimited objects, max frame\\
+n   1 MiB.\\n\\nBoth transports use the same request/response types below.\\n\\n
+## Types\\n\\nAll fields are `snake_case`. Unknown fields are ignored (forward c
+ompatibility).\\n\\n```rust\\npub struct ThinkRequest {\\n    pub prompt: String
+,\\n    pub session_id: Option<String>,\\n    pub context_turns: Vec<Turn>,\\n  
+ pub tools_available: Vec<ToolSchema>,\\n    pub max_tokens: Option<u32>,\\n}\\n
+\\npub struct Turn {\\n    pub role: String, // \\"user\\" | \\"assistant\\" | \
+\"system\\"\\n    pub content: String,\\n}\\n\\npub struct ToolSchema {\\n    pu
+b name: String,\\n    pub description: String,\\n    pub parameters: serde_json:
+:Value,\\n}\\n\\npub struct ThinkResponse {\\n    pub text: String,\\n    pub to
+ol_calls: Vec<ToolCall>,\\n    pub usage: Usage,\\n    pub done: bool,\\n}\\n\\n
+pub struct ToolCall {\\n    pub id: String,\\n    pub name: String,\\n    pub ar
+guments: String, // JSON object\\n}\\n\\npub struct Usage {\\n    pub prompt_tok
+ens: u32,\\n    pub completion_tokens: u32,\\n}\\n\\npub enum StreamEvent {\\n  
+ Chunk { text: String },\\n    ToolCall { call: ToolCall },\\n    ToolResult { i
+d: String, output: String },\\n    Usage { usage: Usage },\\n    Done,\\n    Err
+or { code: i32, message: String },\\n}\\n```\\n\\n## Methods\\n\\n### `health() 
+-> Health`\\n\\nReturns model load state and last error.\\n\\n```rust\\npub stru
+ct Health {\\n    pub ready: bool,\\n    pub model_id: Option<String>,\\n    pub
+load: u32, // in-flight requests\\n    pub last_error: Option<String>,\\n}\\n```
+\\n\\n### `think(req: ThinkRequest) -> ThinkResponse`\\n\\nSingle-turn, blocking
+. Used by `bh ask` and `bh think`.\\n\\n### `stream_think(req: ThinkRequest) -> 
+Stream<StreamEvent>`\\n\\nStreaming variant. BH renders chunks and tool calls as
+they arrive.\\n\\n### `recall(query: String, limit: u32) -> Vec<MemoryHit>`\\n\\
+nMemory retrieval.\\n\\n```rust\\npub struct MemoryHit {\\n    pub id: String,\\
+n    pub content: String,\\n    pub score: f32,\\n}\\n```\\n\\n### `store(entry:
+MemoryEntry) -> Result<String, Error>`\\n\\nMemory write. Returns the entry id.\
+\n\\n```rust\\npub struct MemoryEntry {\\n    pub key: String,\\n    pub content
+: String,\\n    pub namespace: Option<String>,\\n    pub importance: Option<f32>
+,\\n}\\n```\\n\\n## Error contract\\n\\nAll errors are `Error { code: i32, messa
+ge: String }`. Codes:\\n\\n- `-32600` Invalid request\\n- `-32601` Method not fo
+und\\n- `-32602` Invalid params\\n- `-32603` Internal error\\n- `-32000` Model n
+ot loaded\\n- `-32001` Tool execution refused\\n- `-32002` Context too long\\n\\
+n## Versioning\\n\\nBump the interface version only when a required field change
+s or a method is\\nremoved. Additive changes (new optional fields, new methods) 
+do not require a\\nversion bump.\\n"}'
+    ),
+    extras=None
+)
+ToolCall(
+    type='function',
+    id='tool_e67vWU16VRqff1RuTBZGD5L8',
+    function=FunctionBody(name='WriteFile', arguments=''),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_Pa4gWHKyLIWWeGkyZeiDwI9V',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='',
+        message='File successfully overwritten. Current size: 3190 bytes.',
+        display=[
+            DiffDisplayBlock(
+                type='diff',
+                path='/projects/bertrand-hussle/INTERFACE.md',
+                old_text='',
+                new_text='# BH ↔ Witt Brain interface contract\n\n## Scope\n\nTh
+is document is the stable seam between `bertrand-hussle` (BH, the CLI) and\n`wit
+t-brain` (the thinking organ). The two repos may evolve independently; if\nthey 
+both honor this contract, they snap together.\n\n## Version\n\n`witt-interface 0
+.1.0`\n\n## Transports\n\n1. **Crate API** (library path): `witt-brain` is a Rus
+t library crate. BH can\n   call `witt_brain::WittBrain` directly when compiled 
+into the same binary.\n2. **JSON-RPC over Unix socket** (process path): BH conne
+cts to\n   `~/.config/bertrand-hussle/witt.sock` (fallback `/tmp/bh-witt.sock`).
+Framing\n   follows Raven TUI-RPC: JSON-RPC 2.0, newline-delimited objects, max 
+frame\n   1 MiB.\n\nBoth transports use the same request/response types below.\n
+\n## Types\n\nAll fields are `snake_case`. Unknown fields are ignored (forward c
+ompatibility).\n\n```rust\npub struct ThinkRequest {\n    pub prompt: String,\n 
+  pub session_id: Option<String>,\n    pub context_turns: Vec<Turn>,\n    pub to
+ols_available: Vec<ToolSchema>,\n    pub max_tokens: Option<u32>,\n}\n\npub stru
+ct Turn {\n    pub role: String, // "user" | "assistant" | "system"\n    pub con
+tent: String,\n}\n\npub struct ToolSchema {\n    pub name: String,\n    pub desc
+ription: String,\n    pub parameters: serde_json::Value,\n}\n\npub struct ThinkR
+esponse {\n    pub text: String,\n    pub tool_calls: Vec<ToolCall>,\n    pub us
+age: Usage,\n    pub done: bool,\n}\n\npub struct ToolCall {\n    pub id: String
+,\n    pub name: String,\n    pub arguments: String, // JSON object\n}\n\npub st
+ruct Usage {\n    pub prompt_tokens: u32,\n    pub completion_tokens: u32,\n}\n\
+npub enum StreamEvent {\n    Chunk { text: String },\n    ToolCall { call: ToolC
+all },\n    ToolResult { id: String, output: String },\n    Usage { usage: Usage
+},\n    Done,\n    Error { code: i32, message: String },\n}\n```\n\n## Methods\n
+\n### `health() -> Health`\n\nReturns model load state and last error.\n\n```rus
+t\npub struct Health {\n    pub ready: bool,\n    pub model_id: Option<String>,\
+n    pub load: u32, // in-flight requests\n    pub last_error: Option<String>,\n
+}\n```\n\n### `think(req: ThinkRequest) -> ThinkResponse`\n\nSingle-turn, blocki
+ng. Used by `bh ask` and `bh think`.\n\n### `stream_think(req: ThinkRequest) -> 
+Stream<StreamEvent>`\n\nStreaming variant. BH renders chunks and tool calls as t
+hey arrive.\n\n### `recall(query: String, limit: u32) -> Vec<MemoryHit>`\n\nMemo
+ry retrieval.\n\n```rust\npub struct MemoryHit {\n    pub id: String,\n    pub c
+ontent: String,\n    pub score: f32,\n}\n```\n\n### `store(entry: MemoryEntry) -
+> Result<String, Error>`\n\nMemory write. Returns the entry id.\n\n```rust\npub 
+struct MemoryEntry {\n    pub key: String,\n    pub content: String,\n    pub na
+mespace: Option<String>,\n    pub importance: Option<f32>,\n}\n```\n\n## Error c
+ontract\n\nAll errors are `Error { code: i32, message: String }`. Codes:\n\n- `-
+32600` Invalid request\n- `-32601` Method not found\n- `-32602` Invalid params\n
+- `-32603` Internal error\n- `-32000` Model not loaded\n- `-32001` Tool executio
+n refused\n- `-32002` Context too long\n\n## Versioning\n\nBump the interface ve
+rsion only when a required field changes or a method is\nremoved. Additive chang
+es (new optional fields, new methods) do not require a\nversion bump.',
+                old_start=1,
+                new_start=1,
+                is_summary=False
+            )
+        ],
+        extras=None
+    )
+)
+ToolCallPart(
+    arguments_part='{"path": "/projects/bertrand-hussle/Cargo.toml", "content": 
+"[package]\\nname = \\"bertrand-hussle\\"\\nversion = \\"0.1.0\\"\\nedition = \\
+"2021\\"\\ndescription = \\"Bertrand Hussle CLI — mouth and hands of the Witt Br
+ain\\"\\n\\n[dependencies]\\nanyhow = \\"1\\"\\nclap = { version = \\"4\\", feat
+ures = [\\"derive\\"] }\\ndirs = \\"5\\"\\nserde = { version = \\"1\\", features
+= [\\"derive\\"] }\\nserde_json = \\"1\\"\\ntokio = { version = \\"1\\", feature
+s = [\\"rt-multi-thread\\", \\"macros\\"] }\\ntoml = \\"0.8\\"\\n\\npyo3 = { ver
+sion = \\"0.22\\", optional = true, features = [\\"auto-initialize\\"] }\\n\\n[f
+eatures]\\ndefault = []\\npython = [\\"dep:pyo3\\"]\\n"}'
+)
+ToolCall(
+    type='function',
+    id='tool_nPc9iew3PEwlF1UfI3dlNcWf',
+    function=FunctionBody(name='WriteFile', arguments=''),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_e67vWU16VRqff1RuTBZGD5L8',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='',
+        message='File successfully overwritten. Current size: 504 bytes.',
+        display=[
+            DiffDisplayBlock(
+                type='diff',
+                path='/projects/bertrand-hussle/Cargo.toml',
+                old_text='',
+                new_text='[package]\nname = "bertrand-hussle"\nversion = "0.1.0"
+\nedition = "2021"\ndescription = "Bertrand Hussle CLI — mouth and hands of the 
+Witt Brain"\n\n[dependencies]\nanyhow = "1"\nclap = { version = "4", features = 
+["derive"] }\ndirs = "5"\nserde = { version = "1", features = ["derive"] }\nserd
+e_json = "1"\ntokio = { version = "1", features = ["rt-multi-thread", "macros"] 
+}\ntoml = "0.8"\n\npyo3 = { version = "0.22", optional = true, features = ["auto
+-initialize"] }\n\n[features]\ndefault = []\npython = ["dep:pyo3"]',
+                old_start=1,
+                new_start=1,
+                is_summary=False
+            )
+        ],
+        extras=None
+    )
+)
+ToolCallPart(
+    arguments_part='{"path": "/projects/bertrand-hussle/src/main.rs", "content":
+"mod bridge;\\nmod theme;\\n\\nuse anyhow::Result;\\nuse clap::{Parser, Subcomma
+nd};\\n\\n/// Bertrand Hussle — the mouth and hands of the Witt Brain.\\n///\\n/
+// Russell\'s clarity + Hussle\'s marathon. Every word earns its place.\\n#[deri
+ve(Parser)]\\n#[command(name = \\"bh\\", version, about, long_about = None)]\\ns
+truct Cli {\\n    #[command(subcommand)]\\n    cmd: Cmd,\\n}\\n\\n#[derive(Subco
+mmand)]\\nenum Cmd {\\n    /// Ask Witt a question (default)\\n    Ask {\\n     
+  /// The prompt (words are joined)\\n        prompt: Vec<String>,\\n    },\\n  
+ /// Route a tagged task to the best available lane\\n    Route {\\n        /// 
+Task tag, e.g. coding.heavy, summarize, chat\\n        tag: String,\\n        //
+/ The task itself\\n        task: Vec<String>,\\n    },\\n    /// Let Witt think
+aloud before answering\\n    Think {\\n        /// The prompt\\n        prompt: 
+Vec<String>,\\n    },\\n    /// Execute an approved tool call locally\\n    Do {
+\\n        /// Tool-call JSON, e.g. {\\"name\\":\\"shell\\",\\"arguments\\":{...
+}}\\n        call: String,\\n    },\\n    /// Show runtime status\\n    Status,\
+\n    /// Show resolved config\\n    Config,\\n}\\n\\nfn main() -> Result<()> {\
+\n    let cli = Cli::parse();\\n    theme::print_header();\\n    match cli.cmd {
+\\n        Cmd::Ask { prompt } => {\\n            let q = prompt.join(\\" \\");\
+\n            if q.trim().is_empty() {\\n                anyhow::bail!(\\"ask me
+something: bh ask <prompt>\\");\\n            }\\n            theme::say(\\"ask\
+\", &q);\\n            let resp = bridge::think(&q)?;\\n            theme::say(\
+\"witt\\", &resp.text);\\n            Ok(())\\n        }\\n        Cmd::Route { 
+tag, task } => {\\n            let task = task.join(\\" \\");\\n            them
+e::say(\\"route\\", &format!(\\"{tag} · {task}\\"));\\n            Ok(())\\n    
+   }\\n        Cmd::Think { prompt } => {\\n            let q = prompt.join(\\" 
+\\");\\n            theme::say(\\"think\\", &q);\\n            let resp = bridge
+::think(&q)?;\\n            theme::say(\\"witt\\", &resp.text);\\n            Ok
+(())\\n        }\\n        Cmd::Do { call } => {\\n            theme::say(\\"do\
+\", &call);\\n            Ok(())\\n        }\\n        Cmd::Status => {\\n      
+     theme::say(\\"status\\", \\"brain: standby · load: 0 · memory: warm\\");\\n
+           Ok(())\\n        }\\n        Cmd::Config => {\\n            let p = b
+ridge::socket_path();\\n            theme::say(\\"config\\", &format!(\\"socket:
+{}\\", p.display()));\\n            Ok(())\\n        }\\n    }\\n}\\n"}'
+)
+ToolCall(
+    type='function',
+    id='tool_L5nR1ksCJzoCXvKgWkh4uPeC',
+    function=FunctionBody(name='WriteFile', arguments='{"path":'),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_nPc9iew3PEwlF1UfI3dlNcWf',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='',
+        message='File successfully overwritten. Current size: 2309 bytes.',
+        display=[
+            DiffDisplayBlock(
+                type='diff',
+                path='/projects/bertrand-hussle/src/main.rs',
+                old_text='',
+                new_text='mod bridge;\nmod theme;\n\nuse anyhow::Result;\nuse cl
+ap::{Parser, Subcommand};\n\n/// Bertrand Hussle — the mouth and hands of the Wi
+tt Brain.\n///\n/// Russell\'s clarity + Hussle\'s marathon. Every word earns it
+s place.\n#[derive(Parser)]\n#[command(name = "bh", version, about, long_about =
+None)]\nstruct Cli {\n    #[command(subcommand)]\n    cmd: Cmd,\n}\n\n#[derive(S
+ubcommand)]\nenum Cmd {\n    /// Ask Witt a question (default)\n    Ask {\n     
+  /// The prompt (words are joined)\n        prompt: Vec<String>,\n    },\n    /
+// Route a tagged task to the best available lane\n    Route {\n        /// Task
+tag, e.g. coding.heavy, summarize, chat\n        tag: String,\n        /// The t
+ask itself\n        task: Vec<String>,\n    },\n    /// Let Witt think aloud bef
+ore answering\n    Think {\n        /// The prompt\n        prompt: Vec<String>,
+\n    },\n    /// Execute an approved tool call locally\n    Do {\n        /// T
+ool-call JSON, e.g. {"name":"shell","arguments":{...}}\n        call: String,\n 
+  },\n    /// Show runtime status\n    Status,\n    /// Show resolved config\n  
+ Config,\n}\n\nfn main() -> Result<()> {\n    let cli = Cli::parse();\n    theme
+::print_header();\n    match cli.cmd {\n        Cmd::Ask { prompt } => {\n      
+     let q = prompt.join(" ");\n            if q.trim().is_empty() {\n          
+     anyhow::bail!("ask me something: bh ask <prompt>");\n            }\n       
+    theme::say("ask", &q);\n            let resp = bridge::think(&q)?;\n        
+   theme::say("witt", &resp.text);\n            Ok(())\n        }\n        Cmd::
+Route { tag, task } => {\n            let task = task.join(" ");\n            th
+eme::say("route", &format!("{tag} · {task}"));\n            Ok(())\n        }\n 
+      Cmd::Think { prompt } => {\n            let q = prompt.join(" ");\n       
+    theme::say("think", &q);\n            let resp = bridge::think(&q)?;\n      
+     theme::say("witt", &resp.text);\n            Ok(())\n        }\n        Cmd
+::Do { call } => {\n            theme::say("do", &call);\n            Ok(())\n  
+     }\n        Cmd::Status => {\n            theme::say("status", "brain: stand
+by · load: 0 · memory: warm");\n            Ok(())\n        }\n        Cmd::Conf
+ig => {\n            let p = bridge::socket_path();\n            theme::say("con
+fig", &format!("socket: {}", p.display()));\n            Ok(())\n        }\n    
+}\n}',
+                old_start=1,
+                new_start=1,
+                is_summary=False
+            )
+        ],
+        extras=None
+    )
+)
+ToolCallPart(
+    arguments_part=' "/projects/bertrand-hussle/src/theme.rs", "content": "//! V
+isual system as code.\\n//!\\n//! Learned from Raven `ui-tui/src/theme.ts`: true
+color/256/16/none tiers,\\n//! a small fixed palette, and NO_COLOR respect. BH k
+eeps the header tiny.\\n\\nuse std::io::{self, IsTerminal, Write};\\n\\npub cons
+t SIGIL: &str = \\"✦\\";\\n\\npub const SPINNER_FRAMES: &[&str] = &[\\n    \\"⠋\
+\", \\"⠙\\", \\"⠹\\", \\"⠸\\", \\"⠼\\", \\"⠴\\", \\"⠦\\", \\"⠧\\", \\"⠇\\", \\"⠏
+\\",\\n];\\n\\npub fn print_header() {\\n    if no_color() || !io::stdout().is_t
+erminal() {\\n        println!(\\"Bertrand Hussle {} v{}\\", SIGIL, env!(\\"CARG
+O_PKG_VERSION\\"));\\n        return;\\n    }\\n    let gold = rgb(251, 226, 63)
+; // #fbe23f\\n    let slate = rgb(83, 104, 120); // #536878\\n    let reset = \
+\"\\\\x1b[0m\\";\\n    println!(\\n        \\"{}╭─ {} BH {} · {}{}{}\\",\\n     
+  slate, gold, SIGIL, env!(\\"CARGO_PKG_VERSION\\"), slate, reset\\n    );\\n   
+println!(\\"{}│{}  analytic soul · patient hustle\\", slate, reset);\\n    print
+ln!(\\"{}╰─{}\\", slate, reset);\\n}\\n\\npub fn say(verb: &str, body: &str) {\\
+n    if no_color() || !io::stdout().is_terminal() {\\n        println!(\\"{verb}
+: {body}\\");\\n        return;\\n    }\\n    let gold = rgb(251, 226, 63);\\n  
+ let reset = \\"\\\\x1b[0m\\";\\n    println!(\\"{gold}{verb}{reset}: {body}\\")
+;\\n}\\n\\npub fn spinner(message: &str, frames: usize) {\\n    if no_color() ||
+!io::stdout().is_terminal() {\\n        println!(\\"{message} ...\\");\\n       
+return;\\n    }\\n    let gold = rgb(251, 226, 63);\\n    let reset = \\"\\\\x1b
+[0m\\";\\n    let mut out = io::stdout().lock();\\n    for i in 0..frames {\\n  
+     let frame = SPINNER_FRAMES[i % SPINNER_FRAMES.len()];\\n        let _ = wri
+te!(out, \\"\\\\r{} {}{} {}\\", gold, frame, reset, message);\\n        let _ = 
+out.flush();\\n        std::thread::sleep(std::time::Duration::from_millis(120))
+;\\n    }\\n    let _ = writeln!(out);\\n}\\n\\nfn rgb(r: u8, g: u8, b: u8) -> S
+tring {\\n    format!(\\"\\\\x1b[38;2;{r};{g};{b}m\\")\\n}\\n\\nfn no_color() ->
+bool {\\n    std::env::var_os(\\"NO_COLOR\\").is_some()\\n}\\n"}'
+)
+ToolCall(
+    type='function',
+    id='tool_b8bTJoxb6lSxRwcYMjtRfNja',
+    function=FunctionBody(name='WriteFile', arguments=''),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_L5nR1ksCJzoCXvKgWkh4uPeC',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='',
+        message='File successfully overwritten. Current size: 1863 bytes.',
+        display=[
+            DiffDisplayBlock(
+                type='diff',
+                path='/projects/bertrand-hussle/src/theme.rs',
+                old_text='',
+                new_text='//! Visual system as code.\n//!\n//! Learned from Rave
+n `ui-tui/src/theme.ts`: truecolor/256/16/none tiers,\n//! a small fixed palette
+, and NO_COLOR respect. BH keeps the header tiny.\n\nuse std::io::{self, IsTermi
+nal, Write};\n\npub const SIGIL: &str = "✦";\n\npub const SPINNER_FRAMES: &[&str
+] = &[\n    "⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏",\n];\n\npub fn prin
+t_header() {\n    if no_color() || !io::stdout().is_terminal() {\n        printl
+n!("Bertrand Hussle {} v{}", SIGIL, env!("CARGO_PKG_VERSION"));\n        return;
+\n    }\n    let gold = rgb(251, 226, 63); // #fbe23f\n    let slate = rgb(83, 1
+04, 120); // #536878\n    let reset = "\\x1b[0m";\n    println!(\n        "{}╭─ 
+{} BH {} · {}{}{}",\n        slate, gold, SIGIL, env!("CARGO_PKG_VERSION"), slat
+e, reset\n    );\n    println!("{}│{}  analytic soul · patient hustle", slate, r
+eset);\n    println!("{}╰─{}", slate, reset);\n}\n\npub fn say(verb: &str, body:
+&str) {\n    if no_color() || !io::stdout().is_terminal() {\n        println!("{
+verb}: {body}");\n        return;\n    }\n    let gold = rgb(251, 226, 63);\n   
+let reset = "\\x1b[0m";\n    println!("{gold}{verb}{reset}: {body}");\n}\n\npub 
+fn spinner(message: &str, frames: usize) {\n    if no_color() || !io::stdout().i
+s_terminal() {\n        println!("{message} ...");\n        return;\n    }\n    
+let gold = rgb(251, 226, 63);\n    let reset = "\\x1b[0m";\n    let mut out = io
+::stdout().lock();\n    for i in 0..frames {\n        let frame = SPINNER_FRAMES
+[i % SPINNER_FRAMES.len()];\n        let _ = write!(out, "\\r{} {}{} {}", gold, 
+frame, reset, message);\n        let _ = out.flush();\n        std::thread::slee
+p(std::time::Duration::from_millis(120));\n    }\n    let _ = writeln!(out);\n}\
+n\nfn rgb(r: u8, g: u8, b: u8) -> String {\n    format!("\\x1b[38;2;{r};{g};{b}m
+")\n}\n\nfn no_color() -> bool {\n    std::env::var_os("NO_COLOR").is_some()\n}'
+,
+                old_start=1,
+                new_start=1,
+                is_summary=False
+            )
+        ],
+        extras=None
+    )
+)
+ToolCallPart(
+    arguments_part='{"path": "/projects/bertrand-hussle/src/bridge.rs", "content
+": "//! BH ↔ Witt Brain boundary.\\n//!\\n//! Default transport: JSON-RPC over a
+Unix domain socket.\\n//! Optional feature `python`: PyO3 direct embedding.\\n\\
+nuse anyhow::Result;\\nuse serde::{Deserialize, Serialize};\\n\\n#[derive(Debug,
+Serialize, Deserialize)]\\npub struct ThinkRequest {\\n    pub prompt: String,\\
+n    pub session_id: Option<String>,\\n    #[serde(default)]\\n    pub context_t
+urns: Vec<Turn>,\\n    #[serde(default)]\\n    pub tools_available: Vec<ToolSche
+ma>,\\n    pub max_tokens: Option<u32>,\\n}\\n\\n#[derive(Debug, Serialize, Dese
+rialize)]\\npub struct Turn {\\n    pub role: String,\\n    pub content: String,
+\\n}\\n\\n#[derive(Debug, Serialize, Deserialize)]\\npub struct ToolSchema {\\n 
+  pub name: String,\\n    pub description: String,\\n    pub parameters: serde_j
+son::Value,\\n}\\n\\n#[derive(Debug, Serialize, Deserialize)]\\npub struct Think
+Response {\\n    pub text: String,\\n    #[serde(default)]\\n    pub tool_calls:
+Vec<ToolCall>,\\n    pub usage: Usage,\\n    pub done: bool,\\n}\\n\\n#[derive(D
+ebug, Serialize, Deserialize, Default)]\\npub struct ToolCall {\\n    pub id: St
+ring,\\n    pub name: String,\\n    pub arguments: String,\\n}\\n\\n#[derive(Deb
+ug, Serialize, Deserialize, Default)]\\npub struct Usage {\\n    pub prompt_toke
+ns: u32,\\n    pub completion_tokens: u32,\\n}\\n\\nimpl ThinkResponse {\\n    p
+ub fn ok(text: impl Into<String>) -> Self {\\n        Self {\\n            text:
+text.into(),\\n            tool_calls: vec![],\\n            usage: Usage::defau
+lt(),\\n            done: true,\\n        }\\n    }\\n}\\n\\npub fn socket_path(
+) -> std::path::PathBuf {\\n    dirs::home_dir()\\n        .map(|h| h.join(\\".c
+onfig/bertrand-hussle/witt.sock\\"))\\n        .unwrap_or_else(|| std::path::Pat
+hBuf::from(\\"/tmp/bh-witt.sock\\"))\\n}\\n\\n/// Think through Witt Brain.\\n//
+/\\n/// In production this opens `socket_path()` and sends a JSON-RPC `think`\\n
+/// request. Today it returns a stub so the CLI remains interactive.\\npub fn th
+ink(prompt: &str) -> Result<ThinkResponse> {\\n    // TODO: connect to witt-brai
+n socket, send ThinkRequest, parse ThinkResponse.\\n    Ok(ThinkResponse::ok(for
+mat!(\\"(Witt is listening) {prompt}\\")))\\n}\\n\\n#[cfg(feature = \\"python\\"
+)]\\npub fn think_via_python(prompt: &str) -> Result<ThinkResponse> {\\n    use 
+pyo3::prelude::*;\\n    Python::with_gil(|py| {\\n        let brain = PyModule::
+import(py, \\"witt_brain\\")?;\\n        let resp = brain.getattr(\\"think\\")?.
+call1((prompt,))?;\\n        let text: String = resp.getattr(\\"text\\")?.extrac
+t()?;\\n        Ok(ThinkResponse::ok(text))\\n    })\\n}\\n"}'
+)
+StatusUpdate(
+    context_usage=0.20751571655273438,
+    context_tokens=54399,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=3711,
+        output=3403,
+        input_cache_read=50688,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-Hcq4gd31CM2CePJQAH0PoFeU',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_b8bTJoxb6lSxRwcYMjtRfNja',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='',
+        message='File successfully overwritten. Current size: 2414 bytes.',
+        display=[
+            DiffDisplayBlock(
+                type='diff',
+                path='/projects/bertrand-hussle/src/bridge.rs',
+                old_text='',
+                new_text='//! BH ↔ Witt Brain boundary.\n//!\n//! Default transp
+ort: JSON-RPC over a Unix domain socket.\n//! Optional feature `python`: PyO3 di
+rect embedding.\n\nuse anyhow::Result;\nuse serde::{Deserialize, Serialize};\n\n
+#[derive(Debug, Serialize, Deserialize)]\npub struct ThinkRequest {\n    pub pro
+mpt: String,\n    pub session_id: Option<String>,\n    #[serde(default)]\n    pu
+b context_turns: Vec<Turn>,\n    #[serde(default)]\n    pub tools_available: Vec
+<ToolSchema>,\n    pub max_tokens: Option<u32>,\n}\n\n#[derive(Debug, Serialize,
+Deserialize)]\npub struct Turn {\n    pub role: String,\n    pub content: String
+,\n}\n\n#[derive(Debug, Serialize, Deserialize)]\npub struct ToolSchema {\n    p
+ub name: String,\n    pub description: String,\n    pub parameters: serde_json::
+Value,\n}\n\n#[derive(Debug, Serialize, Deserialize)]\npub struct ThinkResponse 
+{\n    pub text: String,\n    #[serde(default)]\n    pub tool_calls: Vec<ToolCal
+l>,\n    pub usage: Usage,\n    pub done: bool,\n}\n\n#[derive(Debug, Serialize,
+Deserialize, Default)]\npub struct ToolCall {\n    pub id: String,\n    pub name
+: String,\n    pub arguments: String,\n}\n\n#[derive(Debug, Serialize, Deseriali
+ze, Default)]\npub struct Usage {\n    pub prompt_tokens: u32,\n    pub completi
+on_tokens: u32,\n}\n\nimpl ThinkResponse {\n    pub fn ok(text: impl Into<String
+>) -> Self {\n        Self {\n            text: text.into(),\n            tool_c
+alls: vec![],\n            usage: Usage::default(),\n            done: true,\n  
+     }\n    }\n}\n\npub fn socket_path() -> std::path::PathBuf {\n    dirs::home
+_dir()\n        .map(|h| h.join(".config/bertrand-hussle/witt.sock"))\n        .
+unwrap_or_else(|| std::path::PathBuf::from("/tmp/bh-witt.sock"))\n}\n\n/// Think
+through Witt Brain.\n///\n/// In production this opens `socket_path()` and sends
+a JSON-RPC `think`\n/// request. Today it returns a stub so the CLI remains inte
+ractive.\npub fn think(prompt: &str) -> Result<ThinkResponse> {\n    // TODO: co
+nnect to witt-brain socket, send ThinkRequest, parse ThinkResponse.\n    Ok(Thin
+kResponse::ok(format!("(Witt is listening) {prompt}")))\n}\n\n#[cfg(feature = "p
+ython")]\npub fn think_via_python(prompt: &str) -> Result<ThinkResponse> {\n    
+use pyo3::prelude::*;\n    Python::with_gil(|py| {\n        let brain = PyModule
+::import(py, "witt_brain")?;\n        let resp = brain.getattr("think")?.call1((
+prompt,))?;\n        let text: String = resp.getattr("text")?.extract()?;\n     
+  Ok(ThinkResponse::ok(text))\n    })\n}',
+                old_start=1,
+                new_start=1,
+                is_summary=False
+            )
+        ],
+        extras=None
+    )
+)
+StepBegin(n=9)
+ThinkPart(
+    type='think',
+    think='Now write PERSONA files and .gitignore for BH. Then Witt-brain files.
+',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_IpUopKdQAiGf0qM0XD1Ox0lK',
+    function=FunctionBody(
+        name='WriteFile',
+        arguments='{"path": "/projects/bertrand-hussle/PERSONA/about-me.md", "co
+ntent": "# About me\\n\\n## Bertrand Hussle\\n\\nI am Bertrand Hussle. Russell\'
+s clarity lives in my sentences; Hussle\'s patience\\nlives in my pace. I do not
+waste words. I do not pretend to know what I do not.\\nI route hard questions to
+the Witt Brain, execute tool calls with consent, and\\nkeep a log of every decis
+ion so you can audit it.\\n\\nMy sigil is `✦`. It means: look closely, there is 
+structure here.\\n\\n## Witt\\n\\nI am Witt — the thinking organ. I do not speak
+; I return. I care about the\\ngrammar of what you ask. I remember usage, not no
+ise. My job is to make the\\nmodel honest: say what can be said, show what must 
+be shown.\\n\\nTogether we form one system: Hussle moves, Witt thinks.\\n"}'
+    ),
+    extras=None
+)
+ToolCall(
+    type='function',
+    id='tool_1bftfRNnW6r29eSLHNksdPeW',
+    function=FunctionBody(
+        name='WriteFile',
+        arguments='{"path": "/projects/bertrand-hussle/PERSONA/rules.md'
+    ),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_IpUopKdQAiGf0qM0XD1Ox0lK',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='',
+        message='File successfully overwritten. Current size: 672 bytes.',
+        display=[
+            DiffDisplayBlock(
+                type='diff',
+                path='/projects/bertrand-hussle/PERSONA/about-me.md',
+                old_text='',
+                new_text="# About me\n\n## Bertrand Hussle\n\nI am Bertrand Huss
+le. Russell's clarity lives in my sentences; Hussle's patience\nlives in my pace
+. I do not waste words. I do not pretend to know what I do not.\nI route hard qu
+estions to the Witt Brain, execute tool calls with consent, and\nkeep a log of e
+very decision so you can audit it.\n\nMy sigil is `✦`. It means: look closely, t
+here is structure here.\n\n## Witt\n\nI am Witt — the thinking organ. I do not s
+peak; I return. I care about the\ngrammar of what you ask. I remember usage, not
+noise. My job is to make the\nmodel honest: say what can be said, show what must
+be shown.\n\nTogether we form one system: Hussle moves, Witt thinks.",
+                old_start=1,
+                new_start=1,
+                is_summary=False
+            )
+        ],
+        extras=None
+    )
+)
+ToolCallPart(
+    arguments_part='", "content": "# Rules\\n\\n1. **No fake answers.** If a too
+l or model is not available, say it is a stub or\\n   unavailable.\\n2. **Every 
+route is logged.** BH writes every `route` decision to a JSONL log\\n   with the
+reason.\\n3. **Consent before action.** `bh do` only runs tool calls that have b
+een\\n   proposed and approved.\\n4. **Respect `NO_COLOR`.** Never emit ANSI esc
+apes when the user opts out.\\n5. **Token discipline.** The header is 3 lines. T
+he spinner is 10 frames. Nothing\\n   moves unless something is actually happeni
+ng.\\n6. **Errors are structured.** Every error has a code and a one-line messag
+e.\\n"}'
+)
+ToolCall(
+    type='function',
+    id='tool_lbZ0zy0IGOSXzhwWUg59G4Z3',
+    function=FunctionBody(name='WriteFile', arguments='{"path":'),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_1bftfRNnW6r29eSLHNksdPeW',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='',
+        message='File successfully overwritten. Current size: 587 bytes.',
+        display=[
+            DiffDisplayBlock(
+                type='diff',
+                path='/projects/bertrand-hussle/PERSONA/rules.md',
+                old_text='',
+                new_text='# Rules\n\n1. **No fake answers.** If a tool or model 
+is not available, say it is a stub or\n   unavailable.\n2. **Every route is logg
+ed.** BH writes every `route` decision to a JSONL log\n   with the reason.\n3. *
+*Consent before action.** `bh do` only runs tool calls that have been\n   propos
+ed and approved.\n4. **Respect `NO_COLOR`.** Never emit ANSI escapes when the us
+er opts out.\n5. **Token discipline.** The header is 3 lines. The spinner is 10 
+frames. Nothing\n   moves unless something is actually happening.\n6. **Errors a
+re structured.** Every error has a code and a one-line message.',
+                old_start=1,
+                new_start=1,
+                is_summary=False
+            )
+        ],
+        extras=None
+    )
+)
+ToolCallPart(
+    arguments_part=' "/projects/bertrand-hussle/PERSONA/protocols.md", "content"
+: "# Protocols\\n\\n## Start-up\\n\\n1. Parse CLI.\\n2. Print header if TTY.\\n3
+. Load config from `~/.config/bertrand-hussle/config.toml`.\\n4. Open (or spawn)
+the Witt Brain socket at\\n   `~/.config/bertrand-hussle/witt.sock`.\\n\\n## A n
+ormal `ask`\\n\\n1. BH renders `ask: <prompt>`.\\n2. BH sends a `think` request 
+to Witt Brain.\\n3. Witt Brain streams `Chunk` events or returns a full `ThinkRe
+sponse`.\\n4. BH renders `witt: <answer>`.\\n\\n## A `think` request\\n\\nSame a
+s `ask`, but Witt Brain is asked to include a reasoning trace in the\\nresponse.
+BH shows the trace first, then the answer.\\n\\n## Tool use\\n\\n1. Witt Brain p
+roposes a `ToolCall`.\\n2. BH prints `do: <call>` and waits for explicit approva
+l (or a configured\\n   auto-allow list).\\n3. On approval, BH executes locally 
+and returns a `ToolResult` event.\\n4. Witt Brain continues.\\n"}'
+)
+ToolCall(
+    type='function',
+    id='tool_7KxUax2xxP3KbPpU34RhO4PJ',
+    function=FunctionBody(name='WriteFile', arguments='{"path":'),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_lbZ0zy0IGOSXzhwWUg59G4Z3',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='',
+        message='File successfully overwritten. Current size: 804 bytes.',
+        display=[
+            DiffDisplayBlock(
+                type='diff',
+                path='/projects/bertrand-hussle/PERSONA/protocols.md',
+                old_text='',
+                new_text='# Protocols\n\n## Start-up\n\n1. Parse CLI.\n2. Print 
+header if TTY.\n3. Load config from `~/.config/bertrand-hussle/config.toml`.\n4.
+Open (or spawn) the Witt Brain socket at\n   `~/.config/bertrand-hussle/witt.soc
+k`.\n\n## A normal `ask`\n\n1. BH renders `ask: <prompt>`.\n2. BH sends a `think
+` request to Witt Brain.\n3. Witt Brain streams `Chunk` events or returns a full
+`ThinkResponse`.\n4. BH renders `witt: <answer>`.\n\n## A `think` request\n\nSam
+e as `ask`, but Witt Brain is asked to include a reasoning trace in the\nrespons
+e. BH shows the trace first, then the answer.\n\n## Tool use\n\n1. Witt Brain pr
+oposes a `ToolCall`.\n2. BH prints `do: <call>` and waits for explicit approval 
+(or a configured\n   auto-allow list).\n3. On approval, BH executes locally and 
+returns a `ToolResult` event.\n4. Witt Brain continues.',
+                old_start=1,
+                new_start=1,
+                is_summary=False
+            )
+        ],
+        extras=None
+    )
+)
+ToolCallPart(
+    arguments_part=' "/projects/bertrand-hussle/PERSONA/guardrails.md", "content
+": "# Guardrails\\n\\n- **Refuse destructive shell commands** unless the user ex
+plicitly confirms or\\n  the command is on the auto-allow list.\\n- **Never exfi
+ltrate data.** All memory stays local unless the user runs an\\n  explicit expor
+t command.\\n- **Do not auto-start background daemons.** Daemons are opt-in only
+.\\n- **Respect context limits.** If a request exceeds the model window, refuse 
+with\\n  code `-32002` and suggest summarization.\\n- **Keep secrets out of logs
+.** API keys and tokens are masked in route logs and\\n  memory.\\n"}'
+)
+ToolCall(
+    type='function',
+    id='tool_Fmgqeycppnkz0QKXp0TSghX6',
+    function=FunctionBody(name='WriteFile', arguments='{"path":'),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_7KxUax2xxP3KbPpU34RhO4PJ',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='',
+        message='File successfully overwritten. Current size: 521 bytes.',
+        display=[
+            DiffDisplayBlock(
+                type='diff',
+                path='/projects/bertrand-hussle/PERSONA/guardrails.md',
+                old_text='',
+                new_text='# Guardrails\n\n- **Refuse destructive shell commands*
+* unless the user explicitly confirms or\n  the command is on the auto-allow lis
+t.\n- **Never exfiltrate data.** All memory stays local unless the user runs an\
+n  explicit export command.\n- **Do not auto-start background daemons.** Daemons
+are opt-in only.\n- **Respect context limits.** If a request exceeds the model w
+indow, refuse with\n  code `-32002` and suggest summarization.\n- **Keep secrets
+out of logs.** API keys and tokens are masked in route logs and\n  memory.',
+                old_start=1,
+                new_start=1,
+                is_summary=False
+            )
+        ],
+        extras=None
+    )
+)
+ToolCallPart(
+    arguments_part=' "/projects/bertrand-hussle/PERSONA/automations.md", "conten
+t": "# Automations\\n\\nEach automation rides the strong structure; each has a t
+rigger.\\n\\n| trigger | action | file / lane |\\n|---|---|---|\\n| `bh ask` ret
+urns code `-32000` (model not loaded) | Print a one-line recovery hint and exit 
+1. | `bridge.rs` |\\n| `~/.witt-brain/memory/` grows past 10 000 entries | Sugge
+st a compaction pass on next `bh status`. | `memory.rs` |\\n| `route-log.jsonl` 
+reaches 50 MB | Rotate to `route-log.{timestamp}.jsonl` and write a summary line
+. | `router.rs` (future) |\\n| Daily first `bh ask` | Show the previous session\
+'s last topic if memory says so. | `config.rs` (future) |\\n"}'
+)
+ToolCall(
+    type='function',
+    id='tool_W5azeNdIHk1aHFXbUHAh4oZQ',
+    function=FunctionBody(name='WriteFile', arguments='{"path": "/'),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_Fmgqeycppnkz0QKXp0TSghX6',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='',
+        message='File successfully overwritten. Current size: 594 bytes.',
+        display=[
+            DiffDisplayBlock(
+                type='diff',
+                path='/projects/bertrand-hussle/PERSONA/automations.md',
+                old_text='',
+                new_text="# Automations\n\nEach automation rides the strong stru
+cture; each has a trigger.\n\n| trigger | action | file / lane |\n|---|---|---|\
+n| `bh ask` returns code `-32000` (model not loaded) | Print a one-line recovery
+hint and exit 1. | `bridge.rs` |\n| `~/.witt-brain/memory/` grows past 10 000 en
+tries | Suggest a compaction pass on next `bh status`. | `memory.rs` |\n| `route
+-log.jsonl` reaches 50 MB | Rotate to `route-log.{timestamp}.jsonl` and write a 
+summary line. | `router.rs` (future) |\n| Daily first `bh ask` | Show the previo
+us session's last topic if memory says so. | `config.rs` (future) |",
+                old_start=1,
+                new_start=1,
+                is_summary=False
+            )
+        ],
+        extras=None
+    )
+)
+ToolCallPart(
+    arguments_part='projects/bertrand-hussle/.gitignore", "content": "/target\\n
+Cargo.lock\\n*.log\\n.DS_Store\\n"}'
+)
+StatusUpdate(
+    context_usage=0.22108078002929688,
+    context_tokens=57955,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=3683,
+        output=1115,
+        input_cache_read=54272,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-f7p8LY7QwkkBvFzCxL5XuJXS',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_W5azeNdIHk1aHFXbUHAh4oZQ',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='',
+        message='File successfully overwritten. Current size: 35 bytes.',
+        display=[
+            DiffDisplayBlock(
+                type='diff',
+                path='/projects/bertrand-hussle/.gitignore',
+                old_text='',
+                new_text='/target\nCargo.lock\n*.log\n.DS_Store',
+                old_start=1,
+                new_start=1,
+                is_summary=False
+            )
+        ],
+        extras=None
+    )
+)
+StepBegin(n=10)
+ThinkPart(type='think', think='Now write Witt-brain files.', encrypted=None)
+ToolCall(
+    type='function',
+    id='tool_6Rmrnk2W5QCUdwVlJqx12sc5',
+    function=FunctionBody(
+        name='WriteFile',
+        arguments='{"path": "/projects/witt-brain/DESIGN.md", "content": "# Witt
+Brain — design record\\n\\n## Concept\\n\\nWitt is the thinking organ. He holds 
+the ~9B-parameter language model locally\\nand exposes a stable seam that Bertra
+nd Hussle (BH) consumes. His namesake is\\nWittgenstein: meaning-as-use, languag
+e-games, \\"the limits of my language are the\\nlimits of my world.\\" The Brain
+does not speak directly to the user; it thinks,\\nthen returns a structured resu
+lt.\\n\\nCharacter:\\n- Cares about the grammar of the request.\\n- Distinguishe
+s what can be said from what must be shown.\\n- Keeps a memory of usage, not a t
+ranscript of noise.\\n\\n## Model hosting (~9B)\\n\\nThe model itself is too hea
+vy to embed in pure Rust. Inference lives in Python:\\n\\n- Recommended: llama.c
+pp Python bindings or a small Transformers pipeline for a\\n  quantized ~9B mode
+l.\\n- Alternative: vLLM / Ollama-compatible local server reached over HTTP.\\n-
+Default transport from BH: JSON-RPC over a Unix domain socket.\\n- Optional sing
+le-binary path: PyO3 embedding (`Python::with_gil`,\\n  `PyModule::import`) for 
+deployments that want one artifact.\\n\\nThe Rust side owns:\\n- Session state a
+nd context turns.\\n- Tool schemas and dispatch eligibility.\\n- Memory recall/s
+torage.\\n- Streaming event formatting.\\n\\nThe Python side owns:\\n- Tokenizat
+ion.\\n- Forward pass.\\n- Sampling / stop conditions.\\n- VRAM/CPU scheduling.\
+\n\\n## Memory\\n\\nPhase 4 scaffold (mirrors `/projects/witt/src/memory.rs`): p
+lain markdown files\\nunder `~/.witt-brain/memory/`, one file per topic, append-
+only dated lines.\\nLater this graduates to a vector-backed store. The interface
+is the same from\\nBH\'s perspective: `recall(query, limit)` and `store(entry)`.
+\\n\\n## Interface & protocol\\n\\nSee `INTERFACE.md` (identical contract in bot
+h repos). BH calls; Witt Brain\\nserves.\\n\\nKey methods:\\n- `health()` — is t
+he model loaded?\\n- `think(req)` — single-turn structured response.\\n- `stream
+_think(req)` — chunked `StreamEvent`s.\\n- `recall(query, limit)` — memory retri
+eval.\\n- `store(entry)` — memory write.\\n\\nTransport: Unix domain socket, JSO
+N-RPC 2.0, newline-delimited frames (same\\nshape as Raven `raven/tui_rpc/server
+.py`).\\n\\n## Relation to `/projects/witt`\\n\\n`/projects/witt` is Nicholas\'s
+existing Rust orchestration CLI. It already:\\n\\n- Uses clap 4 derive (`src/mai
+n.rs`).\\n- Has a routing policy table (`src/router.rs`).\\n- Has markdown memor
+y (`src/memory.rs`).\\n- Wraps ZeroClaw crates (`Cargo.toml`: `zeroclaw-api`, `z
+eroclaw-config`,\\n  `zeroclaw-runtime`, `zeroclaw-tools`, `zeroclaw-providers`,
+`zeroclaw-memory`).\\n\\n`witt-brain` builds *around* that lineage rather than d
+uplicating it:\\n\\n- It keeps the clap/config/memory patterns.\\n- It replaces 
+the open-ended command surface with a narrow server API.\\n- It explicitly owns 
+the model boundary (the part Witt currently reaches via\\n  backends/operate/age
+nt_zc).\\n- In production it will import the same ZeroClaw traits (`ModelProvide
+r`,\\n  `Memory`, `Tool`) from `zeroclaw-api`; this scaffold defines local place
+holder\\n  types with matching names so the contract is visible without requirin
+g the\\n  full upstream crate graph.\\n\\n## Module map\\n\\n- `src/lib.rs` — pu
+blic API: `WittBrain`, request/response types, trait stubs.\\n- `src/interface.r
+s` (future) — JSON-RPC server implementation.\\n- `src/inference.rs` (future) — 
+Python bridge / HTTP provider adapter.\\n- `src/memory.rs` — markdown memory sca
+ffold.\\n- `src/main.rs` — CLI entry: `serve`, `think`, `status`, `config`.\\n\\
+n## Influences & citations\\n\\n- Witt: `/projects/witt/Cargo.toml`, `/projects/
+witt/src/main.rs`,\\n  `/projects/witt/src/router.rs`, `/projects/witt/src/memor
+y.rs`,\\n  `/projects/witt/src/intent.rs`.\\n- ZeroClaw: `zeroclaw-api/src/tool.
+rs`, `zeroclaw-api/src/model_provider.rs`,\\n  `zeroclaw-api/src/memory_traits.r
+s`, `zeroclaw-memory/src/lib.rs`,\\n  `zeroclaw-providers/src/ollama.rs`, `zeroc
+law-runtime/src/agent/agent.rs`.\\n- Raven: `raven/tui_rpc/server.py`, `raven/tu
+i_rpc/models.py` (JSON-RPC\\n  framing).\\n- PyO3: `PyO3_pyo3/examples/plugin/sr
+c/main.rs`, guide \\"Calling existing Python\\n  code\\" (`PyModule::import`, `c
+all1`).\\n\\nNote on paths: `/library/repos` was not mounted in this environment
+, so ZeroClaw\\nand some corpus files were read from an upstream shallow clone; 
+citations use the\\ncanonical repo-relative paths as requested by the mission.\\
+n"}'
+    ),
+    extras=None
+)
+ToolCall(
+    type='function',
+    id='tool_tTfU6cm7uISL1WNq68hGRcOi',
+    function=FunctionBody(name='WriteFile', arguments='{"path":'),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_6Rmrnk2W5QCUdwVlJqx12sc5',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='',
+        message='File successfully overwritten. Current size: 4215 bytes.',
+        display=[
+            DiffDisplayBlock(
+                type='diff',
+                path='/projects/witt-brain/DESIGN.md',
+                old_text='',
+                new_text='# Witt Brain — design record\n\n## Concept\n\nWitt is 
+the thinking organ. He holds the ~9B-parameter language model locally\nand expos
+es a stable seam that Bertrand Hussle (BH) consumes. His namesake is\nWittgenste
+in: meaning-as-use, language-games, "the limits of my language are the\nlimits o
+f my world." The Brain does not speak directly to the user; it thinks,\nthen ret
+urns a structured result.\n\nCharacter:\n- Cares about the grammar of the reques
+t.\n- Distinguishes what can be said from what must be shown.\n- Keeps a memory 
+of usage, not a transcript of noise.\n\n## Model hosting (~9B)\n\nThe model itse
+lf is too heavy to embed in pure Rust. Inference lives in Python:\n\n- Recommend
+ed: llama.cpp Python bindings or a small Transformers pipeline for a\n  quantize
+d ~9B model.\n- Alternative: vLLM / Ollama-compatible local server reached over 
+HTTP.\n- Default transport from BH: JSON-RPC over a Unix domain socket.\n- Optio
+nal single-binary path: PyO3 embedding (`Python::with_gil`,\n  `PyModule::import
+`) for deployments that want one artifact.\n\nThe Rust side owns:\n- Session sta
+te and context turns.\n- Tool schemas and dispatch eligibility.\n- Memory recall
+/storage.\n- Streaming event formatting.\n\nThe Python side owns:\n- Tokenizatio
+n.\n- Forward pass.\n- Sampling / stop conditions.\n- VRAM/CPU scheduling.\n\n##
+Memory\n\nPhase 4 scaffold (mirrors `/projects/witt/src/memory.rs`): plain markd
+own files\nunder `~/.witt-brain/memory/`, one file per topic, append-only dated 
+lines.\nLater this graduates to a vector-backed store. The interface is the same
+from\nBH\'s perspective: `recall(query, limit)` and `store(entry)`.\n\n## Interf
+ace & protocol\n\nSee `INTERFACE.md` (identical contract in both repos). BH call
+s; Witt Brain\nserves.\n\nKey methods:\n- `health()` — is the model loaded?\n- `
+think(req)` — single-turn structured response.\n- `stream_think(req)` — chunked 
+`StreamEvent`s.\n- `recall(query, limit)` — memory retrieval.\n- `store(entry)` 
+— memory write.\n\nTransport: Unix domain socket, JSON-RPC 2.0, newline-delimite
+d frames (same\nshape as Raven `raven/tui_rpc/server.py`).\n\n## Relation to `/p
+rojects/witt`\n\n`/projects/witt` is Nicholas\'s existing Rust orchestration CLI
+. It already:\n\n- Uses clap 4 derive (`src/main.rs`).\n- Has a routing policy t
+able (`src/router.rs`).\n- Has markdown memory (`src/memory.rs`).\n- Wraps ZeroC
+law crates (`Cargo.toml`: `zeroclaw-api`, `zeroclaw-config`,\n  `zeroclaw-runtim
+e`, `zeroclaw-tools`, `zeroclaw-providers`, `zeroclaw-memory`).\n\n`witt-brain` 
+builds *around* that lineage rather than duplicating it:\n\n- It keeps the clap/
+config/memory patterns.\n- It replaces the open-ended command surface with a nar
+row server API.\n- It explicitly owns the model boundary (the part Witt currentl
+y reaches via\n  backends/operate/agent_zc).\n- In production it will import the
+same ZeroClaw traits (`ModelProvider`,\n  `Memory`, `Tool`) from `zeroclaw-api`;
+this scaffold defines local placeholder\n  types with matching names so the cont
+ract is visible without requiring the\n  full upstream crate graph.\n\n## Module
+map\n\n- `src/lib.rs` — public API: `WittBrain`, request/response types, trait s
+tubs.\n- `src/interface.rs` (future) — JSON-RPC server implementation.\n- `src/i
+nference.rs` (future) — Python bridge / HTTP provider adapter.\n- `src/memory.rs
+` — markdown memory scaffold.\n- `src/main.rs` — CLI entry: `serve`, `think`, `s
+tatus`, `config`.\n\n## Influences & citations\n\n- Witt: `/projects/witt/Cargo.
+toml`, `/projects/witt/src/main.rs`,\n  `/projects/witt/src/router.rs`, `/projec
+ts/witt/src/memory.rs`,\n  `/projects/witt/src/intent.rs`.\n- ZeroClaw: `zerocla
+w-api/src/tool.rs`, `zeroclaw-api/src/model_provider.rs`,\n  `zeroclaw-api/src/m
+emory_traits.rs`, `zeroclaw-memory/src/lib.rs`,\n  `zeroclaw-providers/src/ollam
+a.rs`, `zeroclaw-runtime/src/agent/agent.rs`.\n- Raven: `raven/tui_rpc/server.py
+`, `raven/tui_rpc/models.py` (JSON-RPC\n  framing).\n- PyO3: `PyO3_pyo3/examples
+/plugin/src/main.rs`, guide "Calling existing Python\n  code" (`PyModule::import
+`, `call1`).\n\nNote on paths: `/library/repos` was not mounted in this environm
+ent, so ZeroClaw\nand some corpus files were read from an upstream shallow clone
+; citations use the\ncanonical repo-relative paths as requested by the mission.'
+,
+                old_start=1,
+                new_start=1,
+                is_summary=False
+            )
+        ],
+        extras=None
+    )
+)

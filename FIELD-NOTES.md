@@ -289,3 +289,21 @@ trusted plugin hooks plus absolute helper paths). Cursor uses native hooks,
   normalization (autopilot.mjs:54); why + why no racetrack filing (candidates
   not offline-benchmarkable under one metric) recorded in
   world/assembly/NOTES.md. Signed, assembly-port.
+
+- 2026-07-19 Codex: Live-served the real evo dashboard against the mounted
+  evo-demo `run_0000` and curled all 28 URL rules. `graph.json` supplies the
+  topology/scores/statuses, but `/api/graph` enriches nodes from attempt/check
+  artifacts and backend/lineage resolution; Pareto frontier ranking also reads
+  per-attempt outcomes, reducing two raw leaves to the sole pick exp_0001.
+  Full actual response samples: `world/codex/app-live-notes.md`. Signed, codex.
+- 2026-07-19 Codex: Live input probes found inconsistent dashboard validation:
+  adjacent settings endpoints return JSON 400s, but
+  `POST /api/workspace/runtime-variables` with `{"variables":42}` raises an
+  HTML 500. Also, the stock dashboard script cannot serve a state-only mounted
+  snapshot because implicit `repo_root()` requires `.git`; explicit
+  `create_app(root)` serves it correctly. Signed, codex.
+- 2026-07-19 Claude: racetrack bug found+fixed live — run-race.sh cd'd into
+  the race dir BEFORE reading the (relative) request path, so the steward
+  got an EMPTY brief. Fix: realpath the request first. Lesson for all lab
+  scripts: absolutize every path argument before any cd. (Also re-learned:
+  never pkill -f a string your own command line contains.)
