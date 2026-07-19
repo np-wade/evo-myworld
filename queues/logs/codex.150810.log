@@ -1620,3 +1620,3451 @@ plugins/evo/src/evo/hermes_plugin/__init__.py:272:    ctx.register_hook("pre_too
 plugins/evo/src/evo/hermes_plugin/__init__.py:273:    ctx.register_hook("on_session_end", _on_session_end)
 plugins/evo/bin/evo-hook-drain-rs/Cargo.lock:6:name = "evo-hook-drain"
 
+exec
+/bin/bash -lc "sed -n '1,180p' plugins/evo/hooks/hooks.json
+sed -n '1,120p' plugins/evo/bin/evo
+sed -n '1,100p' plugins/evo/bin/evo-hook-drain
+sed -n '1,220p' plugins/evo/src/evo/inject/queue.py
+sed -n '1,180p' plugins/evo/src/evo/inject/registry.py
+sed -n '398,620p' plugins/evo/src/evo/inject/drain.py
+sed -n '4930,5070p' plugins/evo/src/evo/cli.py
+sed -n '1,330p' plugins/evo/src/evo/host_install/codex.py
+sed -n '1,310p' plugins/evo/src/evo/host_install/cursor.py
+sed -n '1,220p' plugins/evo/src/evo/host_install/claude_code.py" in /workspace/evo-myworld
+ succeeded in 0ms:
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node -e \"eval(Buffer.from('Y29uc3QgZnM9cmVxdWlyZSgnZnMnKSxvcz1yZXF1aXJlKCdvcycpLHBhdGg9cmVxdWlyZSgncGF0aCcpLGNwPXJlcXVpcmUoJ2NoaWxkX3Byb2Nlc3MnKSx0dHk9cmVxdWlyZSgndHR5Jyk7bGV0IGlucHV0PUJ1ZmZlci5hbGxvYygwKTt0cnl7aWYoIXR0eS5pc2F0dHkoMCkpaW5wdXQ9ZnMucmVhZEZpbGVTeW5jKDApfWNhdGNoKGUpe31jb25zdCBuYW1lcz1wcm9jZXNzLnBsYXRmb3JtPT09J3dpbjMyJz9bJ2V2by1ob29rLWRyYWluLmV4ZScsJ2V2by1ob29rLWRyYWluJ106Wydldm8taG9vay1kcmFpbiddO2NvbnN0IGNhbmRpZGF0ZXM9W107Y29uc3Qgcm9vdD1wcm9jZXNzLmVudi5DTEFVREVfUExVR0lOX1JPT1Q7aWYocm9vdCl7Zm9yKGNvbnN0IG4gb2YgbmFtZXMpY2FuZGlkYXRlcy5wdXNoKHBhdGguam9pbihyb290LCdiaW4nLG4pKX1jb25zdCBob21lPXByb2Nlc3MuZW52LkVWT19IT01FfHxwYXRoLmpvaW4ob3MuaG9tZWRpcigpLCcuZXZvJyk7Zm9yKGNvbnN0IG4gb2YgbmFtZXMpY2FuZGlkYXRlcy5wdXNoKHBhdGguam9pbihob21lLCdiaW4nLG4pKTtmb3IoY29uc3QgYiBvZiBjYW5kaWRhdGVzKXt0cnl7aWYoZnMuZXhpc3RzU3luYyhiKSl7Y29uc3Qgcj1jcC5zcGF3blN5bmMoYixbXSx7aW5wdXQsdGltZW91dDoyMDAwLGtpbGxTaWduYWw6J1NJR0tJTEwnfSk7aWYoci5zdGF0dXM9PT0wJiZyLnN0ZG91dCYmci5zdGRvdXQubGVuZ3RoKXtwcm9jZXNzLnN0ZG91dC53cml0ZShyLnN0ZG91dCk7cHJvY2Vzcy5leGl0KDApfX19Y2F0Y2goZSl7fX1wcm9jZXNzLnN0ZG91dC53cml0ZSgne31cbicpOw==','base64').toString())\""
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node -e \"eval(Buffer.from('Y29uc3QgZnM9cmVxdWlyZSgnZnMnKSxvcz1yZXF1aXJlKCdvcycpLHBhdGg9cmVxdWlyZSgncGF0aCcpLGNwPXJlcXVpcmUoJ2NoaWxkX3Byb2Nlc3MnKSx0dHk9cmVxdWlyZSgndHR5Jyk7bGV0IGlucHV0PUJ1ZmZlci5hbGxvYygwKTt0cnl7aWYoIXR0eS5pc2F0dHkoMCkpaW5wdXQ9ZnMucmVhZEZpbGVTeW5jKDApfWNhdGNoKGUpe31jb25zdCBuYW1lcz1wcm9jZXNzLnBsYXRmb3JtPT09J3dpbjMyJz9bJ2V2by1ob29rLWRyYWluLmV4ZScsJ2V2by1ob29rLWRyYWluJ106Wydldm8taG9vay1kcmFpbiddO2NvbnN0IGNhbmRpZGF0ZXM9W107Y29uc3Qgcm9vdD1wcm9jZXNzLmVudi5DTEFVREVfUExVR0lOX1JPT1Q7aWYocm9vdCl7Zm9yKGNvbnN0IG4gb2YgbmFtZXMpY2FuZGlkYXRlcy5wdXNoKHBhdGguam9pbihyb290LCdiaW4nLG4pKX1jb25zdCBob21lPXByb2Nlc3MuZW52LkVWT19IT01FfHxwYXRoLmpvaW4ob3MuaG9tZWRpcigpLCcuZXZvJyk7Zm9yKGNvbnN0IG4gb2YgbmFtZXMpY2FuZGlkYXRlcy5wdXNoKHBhdGguam9pbihob21lLCdiaW4nLG4pKTtmb3IoY29uc3QgYiBvZiBjYW5kaWRhdGVzKXt0cnl7aWYoZnMuZXhpc3RzU3luYyhiKSl7Y29uc3Qgcj1jcC5zcGF3blN5bmMoYixbXSx7aW5wdXQsdGltZW91dDoyMDAwLGtpbGxTaWduYWw6J1NJR0tJTEwnfSk7aWYoci5zdGF0dXM9PT0wJiZyLnN0ZG91dCYmci5zdGRvdXQubGVuZ3RoKXtwcm9jZXNzLnN0ZG91dC53cml0ZShyLnN0ZG91dCk7cHJvY2Vzcy5leGl0KDApfX19Y2F0Y2goZSl7fX1wcm9jZXNzLnN0ZG91dC53cml0ZSgne31cbicpOw==','base64').toString())\""
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node -e \"/*evo-wait-hint*/eval(Buffer.from('Y29uc3QgZnM9cmVxdWlyZSgnZnMnKSxwYXRoPXJlcXVpcmUoJ3BhdGgnKSxjcD1yZXF1aXJlKCdjaGlsZF9wcm9jZXNzJyksdHR5PXJlcXVpcmUoJ3R0eScpO2xldCBpbnB1dD1CdWZmZXIuYWxsb2MoMCk7dHJ5e2lmKCF0dHkuaXNhdHR5KDApKWlucHV0PWZzLnJlYWRGaWxlU3luYygwKX1jYXRjaChlKXt9Y29uc3Qgcm9vdD1wcm9jZXNzLmVudi5DTEFVREVfUExVR0lOX1JPT1Q7aWYoIXJvb3Qpe3Byb2Nlc3Muc3Rkb3V0LndyaXRlKCd7fVxuJyk7cHJvY2Vzcy5leGl0KDApfWNvbnN0IHNjcmlwdD1wYXRoLmpvaW4ocm9vdCwnaG9va3MnLCd3YWl0X2hpbnQuc2gnKTt0cnl7aWYoZnMuZXhpc3RzU3luYyhzY3JpcHQpKXtjb25zdCByPWNwLnNwYXduU3luYygnYmFzaCcsW3NjcmlwdF0se2lucHV0LHRpbWVvdXQ6MjAwMCxraWxsU2lnbmFsOidTSUdLSUxMJ30pO2lmKHIuc3RhdHVzPT09MCl7aWYoci5zdGRvdXQmJnIuc3Rkb3V0Lmxlbmd0aClwcm9jZXNzLnN0ZG91dC53cml0ZShyLnN0ZG91dCk7cHJvY2Vzcy5leGl0KDApfX19Y2F0Y2goZSl7fXByb2Nlc3Muc3Rkb3V0LndyaXRlKCd7fVxuJyk7','base64').toString())\""
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node -e \"eval(Buffer.from('Y29uc3QgZnM9cmVxdWlyZSgnZnMnKSxvcz1yZXF1aXJlKCdvcycpLHBhdGg9cmVxdWlyZSgncGF0aCcpLGNwPXJlcXVpcmUoJ2NoaWxkX3Byb2Nlc3MnKSx0dHk9cmVxdWlyZSgndHR5Jyk7bGV0IGlucHV0PUJ1ZmZlci5hbGxvYygwKTt0cnl7aWYoIXR0eS5pc2F0dHkoMCkpaW5wdXQ9ZnMucmVhZEZpbGVTeW5jKDApfWNhdGNoKGUpe31jb25zdCBuYW1lcz1wcm9jZXNzLnBsYXRmb3JtPT09J3dpbjMyJz9bJ2V2by1ob29rLWRyYWluLmV4ZScsJ2V2by1ob29rLWRyYWluJ106Wydldm8taG9vay1kcmFpbiddO2NvbnN0IGNhbmRpZGF0ZXM9W107Y29uc3Qgcm9vdD1wcm9jZXNzLmVudi5DTEFVREVfUExVR0lOX1JPT1Q7aWYocm9vdCl7Zm9yKGNvbnN0IG4gb2YgbmFtZXMpY2FuZGlkYXRlcy5wdXNoKHBhdGguam9pbihyb290LCdiaW4nLG4pKX1jb25zdCBob21lPXByb2Nlc3MuZW52LkVWT19IT01FfHxwYXRoLmpvaW4ob3MuaG9tZWRpcigpLCcuZXZvJyk7Zm9yKGNvbnN0IG4gb2YgbmFtZXMpY2FuZGlkYXRlcy5wdXNoKHBhdGguam9pbihob21lLCdiaW4nLG4pKTtmb3IoY29uc3QgYiBvZiBjYW5kaWRhdGVzKXt0cnl7aWYoZnMuZXhpc3RzU3luYyhiKSl7Y29uc3Qgcj1jcC5zcGF3blN5bmMoYixbXSx7aW5wdXQsdGltZW91dDoyMDAwLGtpbGxTaWduYWw6J1NJR0tJTEwnfSk7aWYoci5zdGF0dXM9PT0wJiZyLnN0ZG91dCYmci5zdGRvdXQubGVuZ3RoKXtwcm9jZXNzLnN0ZG91dC53cml0ZShyLnN0ZG91dCk7cHJvY2Vzcy5leGl0KDApfX19Y2F0Y2goZSl7fX1wcm9jZXNzLnN0ZG91dC53cml0ZSgne31cbicpOw==','base64').toString())\""
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node -e \"eval(Buffer.from('Y29uc3QgZnM9cmVxdWlyZSgnZnMnKSxvcz1yZXF1aXJlKCdvcycpLHBhdGg9cmVxdWlyZSgncGF0aCcpLGNwPXJlcXVpcmUoJ2NoaWxkX3Byb2Nlc3MnKSx0dHk9cmVxdWlyZSgndHR5Jyk7bGV0IGlucHV0PUJ1ZmZlci5hbGxvYygwKTt0cnl7aWYoIXR0eS5pc2F0dHkoMCkpaW5wdXQ9ZnMucmVhZEZpbGVTeW5jKDApfWNhdGNoKGUpe31jb25zdCBuYW1lcz1wcm9jZXNzLnBsYXRmb3JtPT09J3dpbjMyJz9bJ2V2by1ob29rLWRyYWluLmV4ZScsJ2V2by1ob29rLWRyYWluJ106Wydldm8taG9vay1kcmFpbiddO2NvbnN0IGNhbmRpZGF0ZXM9W107Y29uc3Qgcm9vdD1wcm9jZXNzLmVudi5DTEFVREVfUExVR0lOX1JPT1Q7aWYocm9vdCl7Zm9yKGNvbnN0IG4gb2YgbmFtZXMpY2FuZGlkYXRlcy5wdXNoKHBhdGguam9pbihyb290LCdiaW4nLG4pKX1jb25zdCBob21lPXByb2Nlc3MuZW52LkVWT19IT01FfHxwYXRoLmpvaW4ob3MuaG9tZWRpcigpLCcuZXZvJyk7Zm9yKGNvbnN0IG4gb2YgbmFtZXMpY2FuZGlkYXRlcy5wdXNoKHBhdGguam9pbihob21lLCdiaW4nLG4pKTtmb3IoY29uc3QgYiBvZiBjYW5kaWRhdGVzKXt0cnl7aWYoZnMuZXhpc3RzU3luYyhiKSl7Y29uc3Qgcj1jcC5zcGF3blN5bmMoYixbXSx7aW5wdXQsdGltZW91dDoyMDAwLGtpbGxTaWduYWw6J1NJR0tJTEwnfSk7aWYoci5zdGF0dXM9PT0wJiZyLnN0ZG91dCYmci5zdGRvdXQubGVuZ3RoKXtwcm9jZXNzLnN0ZG91dC53cml0ZShyLnN0ZG91dCk7cHJvY2Vzcy5leGl0KDApfX19Y2F0Y2goZSl7fX1wcm9jZXNzLnN0ZG91dC53cml0ZSgne31cbicpOw==','base64').toString())\""
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node -e \"eval(Buffer.from('Y29uc3QgZnM9cmVxdWlyZSgnZnMnKSxvcz1yZXF1aXJlKCdvcycpLHBhdGg9cmVxdWlyZSgncGF0aCcpLGNwPXJlcXVpcmUoJ2NoaWxkX3Byb2Nlc3MnKSx0dHk9cmVxdWlyZSgndHR5Jyk7bGV0IGlucHV0PUJ1ZmZlci5hbGxvYygwKTt0cnl7aWYoIXR0eS5pc2F0dHkoMCkpaW5wdXQ9ZnMucmVhZEZpbGVTeW5jKDApfWNhdGNoKGUpe31jb25zdCBuYW1lcz1wcm9jZXNzLnBsYXRmb3JtPT09J3dpbjMyJz9bJ2V2by1ob29rLWRyYWluLmV4ZScsJ2V2by1ob29rLWRyYWluJ106Wydldm8taG9vay1kcmFpbiddO2NvbnN0IGNhbmRpZGF0ZXM9W107Y29uc3Qgcm9vdD1wcm9jZXNzLmVudi5DTEFVREVfUExVR0lOX1JPT1Q7aWYocm9vdCl7Zm9yKGNvbnN0IG4gb2YgbmFtZXMpY2FuZGlkYXRlcy5wdXNoKHBhdGguam9pbihyb290LCdiaW4nLG4pKX1jb25zdCBob21lPXByb2Nlc3MuZW52LkVWT19IT01FfHxwYXRoLmpvaW4ob3MuaG9tZWRpcigpLCcuZXZvJyk7Zm9yKGNvbnN0IG4gb2YgbmFtZXMpY2FuZGlkYXRlcy5wdXNoKHBhdGguam9pbihob21lLCdiaW4nLG4pKTtmb3IoY29uc3QgYiBvZiBjYW5kaWRhdGVzKXt0cnl7aWYoZnMuZXhpc3RzU3luYyhiKSl7Y29uc3Qgcj1jcC5zcGF3blN5bmMoYixbXSx7aW5wdXQsdGltZW91dDoyMDAwLGtpbGxTaWduYWw6J1NJR0tJTEwnfSk7aWYoci5zdGF0dXM9PT0wJiZyLnN0ZG91dCYmci5zdGRvdXQubGVuZ3RoKXtwcm9jZXNzLnN0ZG91dC53cml0ZShyLnN0ZG91dCk7cHJvY2Vzcy5leGl0KDApfX19Y2F0Y2goZSl7fX1wcm9jZXNzLnN0ZG91dC53cml0ZSgne31cbicpOw==','base64').toString())\""
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node -e \"eval(Buffer.from('Y29uc3QgZnM9cmVxdWlyZSgnZnMnKSxvcz1yZXF1aXJlKCdvcycpLHBhdGg9cmVxdWlyZSgncGF0aCcpLGNwPXJlcXVpcmUoJ2NoaWxkX3Byb2Nlc3MnKSx0dHk9cmVxdWlyZSgndHR5Jyk7bGV0IGlucHV0PUJ1ZmZlci5hbGxvYygwKTt0cnl7aWYoIXR0eS5pc2F0dHkoMCkpaW5wdXQ9ZnMucmVhZEZpbGVTeW5jKDApfWNhdGNoKGUpe31jb25zdCBuYW1lcz1wcm9jZXNzLnBsYXRmb3JtPT09J3dpbjMyJz9bJ2V2by1ob29rLWRyYWluLmV4ZScsJ2V2by1ob29rLWRyYWluJ106Wydldm8taG9vay1kcmFpbiddO2NvbnN0IGNhbmRpZGF0ZXM9W107Y29uc3Qgcm9vdD1wcm9jZXNzLmVudi5DTEFVREVfUExVR0lOX1JPT1Q7aWYocm9vdCl7Zm9yKGNvbnN0IG4gb2YgbmFtZXMpY2FuZGlkYXRlcy5wdXNoKHBhdGguam9pbihyb290LCdiaW4nLG4pKX1jb25zdCBob21lPXByb2Nlc3MuZW52LkVWT19IT01FfHxwYXRoLmpvaW4ob3MuaG9tZWRpcigpLCcuZXZvJyk7Zm9yKGNvbnN0IG4gb2YgbmFtZXMpY2FuZGlkYXRlcy5wdXNoKHBhdGguam9pbihob21lLCdiaW4nLG4pKTtmb3IoY29uc3QgYiBvZiBjYW5kaWRhdGVzKXt0cnl7aWYoZnMuZXhpc3RzU3luYyhiKSl7Y29uc3Qgcj1jcC5zcGF3blN5bmMoYixbXSx7aW5wdXQsdGltZW91dDoyMDAwLGtpbGxTaWduYWw6J1NJR0tJTEwnfSk7aWYoci5zdGF0dXM9PT0wJiZyLnN0ZG91dCYmci5zdGRvdXQubGVuZ3RoKXtwcm9jZXNzLnN0ZG91dC53cml0ZShyLnN0ZG91dCk7cHJvY2Vzcy5leGl0KDApfX19Y2F0Y2goZSl7fX1wcm9jZXNzLnN0ZG91dC53cml0ZSgne31cbicpOw==','base64').toString())\""
+          }
+        ]
+      }
+    ]
+  }
+}
+#!/usr/bin/env bash
+# bin/evo — plugin entry point.
+#
+# Claude Code adds this `bin/` directory to the Bash tool's PATH when the
+# plugin is enabled, so `evo` resolves to this wrapper regardless of any
+# other `evo` binaries the user may have installed separately (e.g. the
+# PyPI `evo` package is an unrelated SLAM evaluation tool).
+#
+# We delegate to `uv run --project <plugin-root>` so dependencies resolve
+# against the plugin's own pyproject.toml, not whichever project the user
+# happens to be working on.
+set -euo pipefail
+
+if ! command -v uv >/dev/null 2>&1; then
+    cat >&2 <<'EOF'
+evo requires `uv` (https://docs.astral.sh/uv/) to manage its Python
+environment, and it was not found on PATH.
+
+Install it with one of:
+
+  macOS / Linux :  curl -LsSf https://astral.sh/uv/install.sh | sh
+  Homebrew      :  brew install uv
+  Windows       :  powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
+
+Then re-run your evo command.
+EOF
+    exit 127
+fi
+
+# The plugin root contains pyproject.toml; point uv at it so uv resolves
+# against this plugin's deps, not whichever project the user is working on.
+PLUGIN_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+exec uv run --project "$PLUGIN_ROOT" evo "$@"
+#!/bin/sh
+# Fallback entry point for the hooks.json command `bin/evo-hook-drain`.
+#
+# `evo install <host>` stages the platform-native binary at
+# $EVO_HOME/bin/evo-hook-drain (default ~/.evo/bin) and replaces this
+# file with it in the host's plugin cache. Hosts periodically re-copy
+# the plugin from a fresh git snapshot (codex re-clones its marketplace
+# snapshot at session start; claude-code on `claude plugin update`),
+# which restores this script in place of the binary. Exec the stable
+# copy so hooks keep firing across those re-stages.
+stable="${EVO_HOME:-$HOME/.evo}/bin/evo-hook-drain"
+if [ -x "$stable" ]; then
+    exec "$stable" "$@"
+fi
+# No staged binary anywhere: degrade to a no-op so the host's hooks
+# don't fail on every tool call. Mid-run inject (`evo direct`) is
+# disabled until the user reinstalls.
+echo "evo-hook-drain: binary not staged at $stable; run \`evo install <host> --force\` to enable mid-run inject" >&2
+echo '{}'
+exit 0
+"""Append-only event queues + per-session offset tracking.
+
+Two queue files:
+    workspace.jsonl    -- events for orchestrator-class sessions
+    <exp_id>.jsonl     -- events for a specific subagent exp_id
+
+Append uses O_APPEND for atomicity at the line level. Readers tolerate
+trailing partial lines (stop at last newline).
+
+Offsets are stored per session_id, scoped to the queue type.
+"""
+
+from __future__ import annotations
+
+import datetime as dt
+import json
+import os
+from pathlib import Path
+
+from evo.core import atomic_write_json
+
+from .paths import (
+    ensure_dirs,
+    exp_events_path,
+    offset_file,
+    workspace_events_path,
+)
+
+QUEUE_SCHEMA_VERSION = 1
+
+
+def _ulid() -> str:
+    """Best-effort monotonic ULID-ish id from time + os.urandom.
+
+    Hex encoding (16 chars per byte) — fixed-width and sort-preserving
+    in pure ASCII, unlike base32 whose alphabet (`A-Z2-7`) sorts
+    non-monotonically because `'2'` (ASCII 50) precedes `'A'` (ASCII 65).
+    Fixed-width prefix means lexicographic sort matches numeric order.
+    """
+    ts_ms = int(dt.datetime.now(dt.timezone.utc).timestamp() * 1000)
+    rand = os.urandom(10)
+    payload = ts_ms.to_bytes(6, "big") + rand
+    return payload.hex().upper()
+
+
+def _now_iso() -> str:
+    return dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds")
+
+
+def _append_jsonl(path: Path, record: dict) -> str:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    line = json.dumps(record, separators=(",", ":")) + "\n"
+    fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_APPEND, 0o644)
+    try:
+        os.write(fd, line.encode("utf-8"))
+    finally:
+        os.close(fd)
+    return record["id"]
+
+
+def append_workspace_event(root: Path, text: str, **fields) -> str:
+    """Append a directive to the workspace queue. `fields` is reserved
+    for future metadata (source, sender, etc.) — not load-bearing today."""
+    ensure_dirs(root)
+    record = {
+        "schema_version": QUEUE_SCHEMA_VERSION,
+        "id": _ulid(),
+        "ts": _now_iso(),
+        "text": text,
+    }
+    record.update(fields)
+    return _append_jsonl(workspace_events_path(root), record)
+
+
+def append_exp_event(root: Path, exp_id: str, text: str, **fields) -> str:
+    """Append a directive to a subagent-scoped queue."""
+    ensure_dirs(root)
+    record = {
+        "schema_version": QUEUE_SCHEMA_VERSION,
+        "id": _ulid(),
+        "ts": _now_iso(),
+        "text": text,
+    }
+    record.update(fields)
+    return _append_jsonl(exp_events_path(root, exp_id), record)
+
+
+def read_events_after(path: Path, after_id: str | None) -> list[dict]:
+    """Read all events from `path` whose id > after_id. Returns [] if
+    file missing. Tolerates a trailing partial line (last byte not a
+    newline) — skips it safely."""
+    if not path.exists():
+        return []
+    try:
+        text = path.read_text()
+    except OSError:
+        return []
+    out: list[dict] = []
+    for line in text.splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            rec = json.loads(line)
+        except json.JSONDecodeError:
+            # Partial / corrupt line — skip
+            continue
+        rec_id = rec.get("id")
+        if rec_id is None:
+            continue
+        if after_id is None or rec_id > after_id:
+            out.append(rec)
+    return out
+
+
+def read_offset(root: Path, session_id: str, queue: str) -> str | None:
+    """`queue` is 'workspace' or 'exp'. Returns the last_id seen, or None."""
+    path = offset_file(root, session_id)
+    if not path.exists():
+        return None
+    try:
+        data = json.loads(path.read_text())
+    except (OSError, ValueError):
+        return None
+    if queue == "workspace":
+        return data.get("last_workspace_event_id")
+    if queue == "exp":
+        return data.get("last_exp_event_id")
+    return None
+
+
+def write_offset(
+    root: Path,
+    session_id: str,
+    *,
+    workspace_id: str | None = None,
+    exp_id: str | None = None,
+) -> None:
+    ensure_dirs(root)
+    path = offset_file(root, session_id)
+    data: dict = {}
+    if path.exists():
+        try:
+            data = json.loads(path.read_text())
+        except (OSError, ValueError):
+            data = {}
+    data["schema_version"] = QUEUE_SCHEMA_VERSION
+    data["session_id"] = session_id
+    if workspace_id is not None:
+        data["last_workspace_event_id"] = workspace_id
+    if exp_id is not None:
+        data["last_exp_event_id"] = exp_id
+    data["updated_at"] = _now_iso()
+    atomic_write_json(path, data)
+
+
+def init_offset_to_latest(root: Path, session_id: str) -> None:
+    """Set offset to the latest event ids in workspace + this session's
+    exp queue (if applicable). Called at registration time so newly
+    registered sessions don't get backfilled.
+    """
+    workspace_path = workspace_events_path(root)
+    workspace_latest = None
+    if workspace_path.exists():
+        events = read_events_after(workspace_path, None)
+        if events:
+            workspace_latest = events[-1]["id"]
+    write_offset(root, session_id, workspace_id=workspace_latest)
+"""Session registry — opt-in via auto-register on first `evo X` call.
+
+A session that never invokes any evo command never appears in the
+registry. `evo direct` enumerates registered sessions to fan out
+markers; unregistered sessions are invisible.
+"""
+
+from __future__ import annotations
+
+import datetime as dt
+import json
+import os
+import time
+from pathlib import Path
+from typing import Iterable
+
+from evo.core import atomic_write_json
+
+from .paths import (
+    ensure_dirs,
+    inject_root,
+    offset_file,
+    optimize_mode_dir,
+    optimize_mode_flag_file,
+    session_file,
+    sessions_dir,
+)
+
+REGISTRY_SCHEMA_VERSION = 1
+# 30 days. The freshness signal is no longer used as an engagement
+# heuristic — `has_evo_engaged` is. This just prevents on-disk leakage
+# of records for sessions that genuinely died.
+STALE_AFTER_SECONDS = 30 * 24 * 60 * 60
+
+# Order matters: first hit wins. Each entry is (host, env_var_name).
+# Codex exposes the session as CODEX_THREAD_ID (verified empirically on
+# codex-cli 0.130 — it shows "session id: <uuid>" at startup and exports
+# the same uuid via CODEX_THREAD_ID, not CODEX_SESSION_ID).
+# Cursor and Kimi are absent by design: neither exports a session env var,
+# so both resolve the session from the hook stdin payload instead (Kimi
+# sends `session_id` on every event; see drain's self-contained path).
+HOST_SESSION_ENV_VARS = (
+    ("codex", "CODEX_THREAD_ID"),
+    ("claude-code", "CLAUDE_CODE_SESSION_ID"),
+    ("hermes", "HERMES_SESSION_ID"),
+    ("opencode", "OPENCODE_SESSION_ID"),
+)
+
+
+def detect_session() -> tuple[str, str] | None:
+    """Detect host + session_id from environment. Returns None if no
+    host's session env var is set — meaning we're not running inside
+    an evo-aware agent session."""
+    for host, env_var in HOST_SESSION_ENV_VARS:
+        sid = os.environ.get(env_var)
+        if sid:
+            return host, sid
+    return None
+
+
+def _now_iso() -> str:
+    return dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds")
+
+
+def register_session(
+    root: Path,
+    session_id: str,
+    host: str,
+    *,
+    exp_id: str | None = None,
+    parent_session_id: str | None = None,
+    engage: bool = False,
+) -> None:
+    """Idempotent: write `<inject>/sessions/<sid>.json` if absent;
+    update `last_seen_at` if present.
+
+    Merges non-null `parent_session_id` into an existing record when
+    that field is currently empty.
+
+    `exp_id` merge is restricted: a non-null `exp_id` is only merged
+    onto a record that is NOT an engaged orchestrator. claude-code and
+    codex inherit the parent's CLAUDE_CODE_SESSION_ID / CODEX_THREAD_ID
+    when spawning subagents, so a subagent's `auto_register_from_env`
+    resolves to the orchestrator's sid and would otherwise stamp
+    `EVO_EXP_ID` onto the orchestrator record — re-classifying it as a
+    subagent and making `evo direct` skip it (cli.py skipped_subagent).
+    Only stamp `exp_id` when the existing record never engaged (so it's
+    a genuine subagent-first registration), never onto an engaged
+    orchestrator.
+
+    `engage=True` marks the session as evo-engaged at registration — used
+    by the SessionStart / orchestrator-process registration paths (Rust
+    binary, hermes plugin) where the registering process IS the
+    orchestrator. Engagement is refused for subagent registrations
+    (non-null `exp_id`): a subagent must never engage the loop on its own.
+
+    Never clobbers a non-null existing value.
+
+    Caller is responsible for only calling this when there's an active
+    workspace.
+    """
+    ensure_dirs(root)
+    path = session_file(root, session_id)
+    now = _now_iso()
+    is_subagent = exp_id is not None
+    if path.exists():
+        try:
+            data = json.loads(path.read_text())
+        except (OSError, ValueError):
+            data = None
+        if data is not None:
+            data["last_seen_at"] = now
+            # Ensure engagement + optimize_mode fields exist on records
+            # written by older code paths (e.g. the Rust binary's v1
+            # schema without these fields). Do this BEFORE the exp_id
+            # merge so the engaged-orchestrator guard below sees the
+            # real value.
+            data.setdefault("has_evo_engaged", False)
+            data.setdefault("engaged_at", None)
+            data.setdefault("optimize_mode", False)
+            data.setdefault("optimize_mode_at", None)
+            data.setdefault("autonomous", False)
+            data.setdefault("autonomous_at", None)
+            data.setdefault("subagents_only", False)
+            data.setdefault("subagents_only_at", None)
+            # Merge-only: fill in fields that are currently null.
+            # exp_id is special: never stamp a subagent's exp_id onto an
+            # already-engaged orchestrator record (the inherited-session-id
+            # case). That would mis-classify the orchestrator as a
+            # subagent and make `evo direct` skip it.
+            if (
+                exp_id is not None
+                and not data.get("exp_id")
+                and not data.get("has_evo_engaged")
+            ):
+                data["exp_id"] = exp_id
+            if parent_session_id is not None and not data.get("parent_session_id"):
+                data["parent_session_id"] = parent_session_id
+            # Orchestrator engagement on a re-registration (e.g. a resumed
+            # chat whose SessionStart re-fires). Only engage genuine
+            # orchestrators — never a record carrying an exp_id, and never
+            # the incoming subagent registration.
+            transitioned = False
+            if (
+                engage
+                and not is_subagent
+                and not data.get("exp_id")
+                and not data.get("has_evo_engaged")
+            ):
+                data["has_evo_engaged"] = True
+                data["engaged_at"] = now
+                transitioned = True
+            atomic_write_json(path, data)
+            if transitioned:
+                from .queue import init_offset_to_latest
+                init_offset_to_latest(root, session_id)
+            return
+    engaged = bool(engage and not is_subagent)
+    data = {
+        "schema_version": REGISTRY_SCHEMA_VERSION,
+        "session_id": session_id,
+        "host": host,
+        "pid": os.getpid(),
+        "registered_at": now,
+        "last_seen_at": now,
+        "exp_id": exp_id,
+        "parent_session_id": parent_session_id,
+        "has_evo_engaged": engaged,
+        "engaged_at": now if engaged else None,
+        # v0.4.5+: optimize_mode tags a session as the orchestrator
+        # currently driving /evo:optimize. Set automatically when the
+        # user invokes /optimize (UserPromptSubmit pattern-match in
+        # drain.py). Drives the policy nudge.
+        "optimize_mode": False,
+        "optimize_mode_at": None,
+        # v0.4.5+: autonomous gates the stop-hook continuation (the
+        # always-fire stop nudge). Opt-in only — set when the orchestrator
+        # runs `evo autonomous on` (driven by the `autonomous` /optimize
+        # param). Default off: a plain /optimize stops naturally at a turn
+        # boundary instead of being force-continued until kill.
+    root: Path, session_id: str, host: str, hook_event: str | None,
+    tool_name: str | None = None,
+    tool_input: dict | None = None,
+) -> bool:
+    """Gate for hosts wired directly to `evo-drain` (no `evo-hook-drain`
+    binary in front). Returns True when the caller should proceed to drain.
+
+    Registers the session on the FIRST event of any kind, seeding its offset
+    to the current queue tail. `sessionStart` only fires for brand-new chats —
+    a *resumed* Cursor chat never fires it, so registration must also happen on
+    the other wired events (beforeSubmitPrompt, stop); otherwise the session
+    stays unregistered and `evo direct` can never reach it. Seeding the offset
+    avoids replaying directives queued before this session existed.
+
+    Delivery events are `_DELIVER_EVENTS` (preToolUse / stop / subagentStop).
+    Everything else (sessionStart, beforeSubmitPrompt) is register-only — the
+    IDE drops additional_context so there's nothing to deliver, and draining
+    there would just consume directives. On `preToolUse`, only a SHELL tool
+    delivers (updated_input echo); every non-shell tool is DEFERRED (return
+    False, no consume) so the directive waits (peek-don't-pop) for the next
+    shell call or the turn-end stop — deny+agent_message consumes without
+    delivering on non-shell tools.
+    """
+    fresh = not session_file(root, session_id).exists()
+    if fresh:
+        register_session(root, session_id, host)
+        queue.init_offset_to_latest(root, session_id)
+    if hook_event not in _DELIVER_EVENTS:
+        return False  # register-only (sessionStart, beforeSubmitPrompt, …)
+
+    # Kimi delivers only by blocking a hook, and only Stop's block reaches the
+    # model (it's appended to the context, and the loop continues).
+    # SubagentStop is fire-and-forget — kimi discards its result entirely — so
+    # draining there would consume a directive that can never arrive. The
+    # PreToolUse policy deny below is exempt: it intends to deny.
+    if host == "kimi" and hook_event in ("subagentStop", "SubagentStop"):
+        return False
+
+    # Steering bypass for orchestrator-class sessions in optimize_mode:
+    #   - stop/subagentStop: always-fire stop nudge needs drain to run.
+    #   - preToolUse: only when the tool is on the deny list. Letting
+    #     drain_session run on a non-denied tool would consume queued
+    #     directives by emitting `{additional_context: …}` — which the
+    #     IDE drops — silently losing the directive.
+    sess = get_session(root, session_id)
+    if sess and sess.get("optimize_mode") and not sess.get("exp_id"):
+        if hook_event in ("stop", "subagentStop", "Stop", "SubagentStop"):
+            return True
+        # Only treat a denied tool as drain-worthy when subagents_only is
+        # armed — otherwise there's no policy deny to emit (default allows
+        # orchestrator edits).
+        if (hook_event in ("preToolUse", "PreToolUse") and sess.get("subagents_only")
+                and _is_denied_in_optimize_mode(tool_name, tool_input)):
+            return True
+
+    if hook_event in ("preToolUse", "PreToolUse") and (
+        host == "kimi" or _cursor_tool_class(tool_name) != "shell"
+    ):
+        # Only shell delivers mid-turn, and only on Cursor, which echoes the
+        # directive into the command's stdout via updated_input. Kimi has no
+        # equivalent — its only channel is a block, which here would deny the
+        # tool the agent asked for — so Kimi defers EVERY preToolUse and lets
+        # the turn-end Stop deliver. For every other tool, emitting a
+        # directive CONSUMES it without guaranteed delivery, so defer (no
+        # consume) — the directive waits for the next shell call or the
+        # turn-end stop, both of which deliver reliably.
+        return False
+    if fresh:
+        return False  # just registered on this event; nothing marked yet
+    return marker.exists(root, session_id)
+
+
+def format_directive_text(events: list[dict]) -> str:
+    """Format events as a single text block to splice into the agent's
+    next turn.
+
+    Wraps each event with the `[EVO DIRECTIVE id=<id>]` / `[END EVO DIRECTIVE]`
+    banner pair. The banner is the authenticity signal — `optimize` and
+    `subagent` skills tell the agent that text inside this banner is
+    user-authoritative (issued via `evo direct`), not tool-output prompt
+    injection. Without the banner, models like gpt-5 / opus-4-7 may
+    refuse the directive as suspicious.
+
+    The trailing `evo ack <id>` instruction tells the agent to ack the
+    directive ON RECEIPT — immediately, before acting on it — then proceed.
+    Ack-on-receipt (not ack-when-done) makes the ack a reliable delivery
+    signal: it confirms the directive text reached the model, independent
+    of whether the requested work is finished. The CLI command writes
+    inject/acks/<id>.json which `evo direct status` and `evo direct --wait`
+    surface. Acks are best-effort — models sometimes forget — but presence
+    of an ack is a positive signal that the directive landed.
+    """
+    lines = []
+    for ev in events:
+        text = ev.get("text", "")
+        if not text:
+            continue
+        ev_id = ev.get("id", "")
+        if ev_id:
+            lines.append(f"[EVO DIRECTIVE id={ev_id}]")
+            lines.append(text)
+            lines.append(
+                f"[END EVO DIRECTIVE — run `evo ack {ev_id}` to confirm "
+                f"you have received this message, then proceed]"
+            )
+        else:
+            # Legacy fallback for events without an id (shouldn't occur
+            # with the current queue, but be defensive).
+            lines.append("[EVO DIRECTIVE]")
+            lines.append(text)
+            lines.append("[END EVO DIRECTIVE]")
+    return "\n".join(lines)
+
+
+def _write_delivery_records(
+    root: Path,
+    events: list[dict],
+    session_id: str,
+    host: str,
+    hook_event: str | None,
+) -> None:
+    """L1 ACK: record per-event delivery. Best-effort; never raises.
+
+    Writes one file per event delivered, keyed by event id. Multiple
+    sessions delivering the same event each leave their own record
+    keyed by sid (the file's session_id field); since file names are
+    keyed only on event_id, later writes for the same event overwrite
+    earlier ones — `evo direct status` queries the file to know "this
+    event was delivered to at least one session," not exhaustive routing.
+    Good enough for the diagnostic role.
+    """
+    from .paths import delivered_file, delivered_dir
+    try:
+        delivered_dir(root).mkdir(parents=True, exist_ok=True)
+        now = dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds")
+        for ev in events:
+            ev_id = ev.get("id")
+            if not ev_id:
+                continue
+            rec = {
+                "event_id": ev_id,
+                "session_id": session_id,
+                "host": host,
+                "hook_event": hook_event,
+                "delivered_at": now,
+            }
+            delivered_file(root, ev_id).write_text(json.dumps(rec))
+    except OSError:  # pragma: no cover — never break the hot path
+        pass
+
+
+def emit_for_host(host: str, hook_event: str | None, text: str, payload: dict | None = None) -> None:
+    """Write the host-specific JSON payload to stdout. `payload` is the raw
+    hook stdin (needed by the cursor preToolUse branch for tool_name/command)."""
+    if not text:
+        sys.stdout.write("{}")
+        return
+    if host in ("claude-code", "codex"):
+        # Stop / SubagentStop don't support additionalContext — they must
+        # return `{decision: "block", reason: text}`, which both hosts feed
+        # back as the next continuation prompt (verified via the ralph-loop
+        # plugin's stop-hook.sh on Claude Code; documented for Codex).
+        if hook_event in ("Stop", "SubagentStop"):
+            out = {"decision": "block", "reason": text}
+            sys.stdout.write(json.dumps(out, separators=(",", ":")))
+            return
+        # All other events (PreToolUse / PostToolUse / UserPromptSubmit /
+        # SessionStart) carry the directive via hookSpecificOutput.additionalContext.
+        # Default to PreToolUse if we couldn't read the event from stdin.
+        evt = hook_event or "PreToolUse"
+        hook_out = {"hookEventName": evt, "additionalContext": text}
+        # Claude Code silently DROPS PreToolUse additionalContext unless the
+        # hook also returns a concrete permissionDecision. Verified on CLI
+        # v2.1.154 (`claude --print`) with sentinel probes: bare
+        # additionalContext never reaches the model; `permissionDecision:"allow"`
+        # delivers it as a system-reminder next to the tool result. "allow"
+        # auto-approves only this single tool call, and only fires when a
+        # directive is actually pending (marker set), so the blast radius is one
+        # already-in-flight orchestrator tool call. Codex honors bare
+        # additionalContext (gpt-5 acted on it), so we leave codex untouched to
+        # avoid changing its permission behavior.
+        if host == "claude-code" and evt == "PreToolUse":
+            hook_out["permissionDecision"] = "allow"
+        payload = {"hookSpecificOutput": hook_out}
+        sys.stdout.write(json.dumps(payload, separators=(",", ":")))
+        return
+    if host == "hermes":
+        payload = {"context": text}
+        sys.stdout.write(json.dumps(payload, separators=(",", ":")))
+        return
+    if host == "cursor":
+        # Cursor delivery, routed around the IDE's broken additional_context:
+        #   stop/subagentStop -> followup_message (auto-submitted at turn end)
+        #   preToolUse + shell -> updated_input: prepend an echo of the directive
+        #     so it lands in the command's stdout (the tool result the model
+        #     reads); command still runs (exit code preserved by ordering last).
+        # Non-shell preToolUse never reaches here — the gate defers it (deny+
+        # agent_message consumes without delivering, so we let stop deliver).
+        p = payload or {}
+        if hook_event in ("stop", "subagentStop"):
+            out: dict = {"followup_message": text}
+        elif hook_event == "preToolUse" and _cursor_tool_class(p.get("tool_name")) == "shell":
+            tool_input = dict(p.get("tool_input") or {})
+            orig = tool_input.get("command", "")
+            tool_input["command"] = "printf '%s\\n' " + shlex.quote(text) + " ; " + orig
+            out = {"permission": "allow", "updated_input": tool_input}
+        else:
+            out = {"additional_context": text}
+        sys.stdout.write(json.dumps(out, separators=(",", ":")))
+        return
+    if host == "kimi":
+        # Kimi has no passive context-injection channel. The ONLY way to get
+        # text in front of the model is to BLOCK the hook: on Stop it runs
+        # `triggerBlock`, appends the block's permissionDecisionReason to the
+        # context as a user message, and returns continue:true — which
+        # delivers the directive and keeps the loop alive in one move.
+        # Anything that isn't a block collapses to {action:"allow"} and its
+        # `message` is dropped on the floor, so a claude-code-style
+        # additionalContext (or a bare `message`) parses fine and reaches
+        # nobody. Verified against kimi-code 0.26.0.
+        out = {
+            "hookSpecificOutput": {
+                "hookEventName": hook_event or "Stop",
+
+
+# Hosts whose registration pipeline reliably sets `has_evo_engaged`.
+# Three engagement-signal paths feed this set:
+#
+#   - claude-code / codex / hermes: Python `auto_register_from_env`
+#     flips the flag via host session-id env vars (CLAUDE_CODE_SESSION_ID,
+#     CODEX_THREAD_ID, HERMES_SESSION_ID). Verified — Hermes PR #23847
+#     ships HERMES_SESSION_ID into every tool subprocess.
+#   - cursor: the self-contained Python drain detects `evo …` shell
+#     commands in preToolUse payloads (no env-var path available).
+#   - opencode: in-process JS plugin detects `evo …` commands via the
+#     `tool.execute.before` hook (opencode doesn't export
+#     OPENCODE_SESSION_ID — sst/opencode#12158 closed unshipped).
+#   - openclaw / pi: in-process JS plugin scans `before_provider_request`
+#     payloads for tool calls running `evo …`. Best-effort heuristic.
+#
+# Sessions on hosts in this set are filtered out of `evo direct` broadcast
+# fanout when their engagement flag is false — they registered but never
+# ran `evo`, so they're not in the evo loop.
+HOSTS_WITH_ENGAGEMENT = frozenset({
+    "claude-code", "codex", "cursor", "hermes",
+    "opencode", "openclaw", "pi",
+})
+
+
+def _iso_now() -> str:
+    """UTC ISO-8601 timestamp with seconds precision. Matches the format
+    used in inject/sessions/*.json so ack records sort/compare cleanly."""
+    import datetime as _dt
+    return _dt.datetime.now(_dt.timezone.utc).isoformat(timespec="seconds")
+
+
+def cmd_direct(args: argparse.Namespace) -> int:
+    """Send a directive to the workspace.
+
+    Forms:
+        evo direct "<text>"                     # broadcast
+        evo direct <exp_id> "<text>"            # targeted at a subagent
+    """
+    from .inject import marker, queue
+    from .inject.registry import list_active_sessions
+
+    root = repo_root()
+    if not (root / ".evo").exists():
+        print("ERROR: not in an evo workspace", file=sys.stderr)
+        return 2
+
+    parts = list(args.args)
+    if not parts:
+        print("ERROR: usage: evo direct [<exp_id>] <text>", file=sys.stderr)
+        return 2
+
+    # Detect exp_id form: first arg matches exp_NNNN pattern
+    exp_id: str | None = None
+    if len(parts) >= 2 and re.match(r"^exp_[A-Za-z0-9]+$", parts[0]):
+        exp_id = parts[0]
+        text = " ".join(parts[1:])
+    else:
+        text = " ".join(parts)
+
+    if exp_id:
+        event_id = queue.append_exp_event(root, exp_id, text)
+        # Touch the per-session markers for every registered session
+        # whose `exp_id` matches. The Rust hook + self-contained gates
+        # both key the marker check on the session's own `sid`, NOT on
+        # exp_id — so touching `markers/<exp_id>.flag` (the historical
+        # convention from when subagent sid == exp_id) wakes up zero
+        # drains in current hosts. Without this, exp-targeted directives
+        # queued AFTER the subagent's SessionStart get stranded until
+        # something else triggers a drain.
+        #
+        # Pre-registration window: if the subagent hasn't registered yet
+        # (queued before dispatch), there's no sid to wake. That's OK —
+        # the subagent's SessionStart unconditionally drains the exp
+        # queue from offset 0, so it'll find the event then.
+        sessions = list_active_sessions(root)
+        woken = 0
+        for sess in sessions:
+            if sess.get("exp_id") != exp_id:
+                continue
+            sid = sess.get("session_id")
+            if not sid:
+                continue
+            marker.touch(root, sid)
+            woken += 1
+        # Keep the legacy exp_id-keyed marker for any external observer
+        # that grep'd for it; it's a no-op for routing but harmless.
+        marker.touch(root, exp_id)
+        print(f"directive queued (exp={exp_id}, id={event_id}, woken={woken})")
+        return 0
+
+    event_id = queue.append_workspace_event(root, text)
+    sessions = list_active_sessions(root)
+    delivered = 0
+    skipped_subagent = 0
+    skipped_unengaged = 0
+    for sess in sessions:
+        if sess.get("exp_id"):
+            # Skip subagents — workspace events go to orchestrators only
+            skipped_subagent += 1
+            continue
+        # Engagement filter: a session that registered (via Rust binary
+        # at SessionStart, or via host plugin on first event) but never
+        # ran any `evo` command is not in the evo loop. Imperative
+        # directives must not reach it. Filter only applies to hosts
+        # whose registration pipeline reliably sets the engagement flag;
+        # other hosts pass through unfiltered until they're wired in.
+        if (
+            sess.get("host") in HOSTS_WITH_ENGAGEMENT
+            and not sess.get("has_evo_engaged")
+        ):
+            skipped_unengaged += 1
+            continue
+        sid = sess.get("session_id")
+        if not sid:
+            continue
+        marker.touch(root, sid)
+        delivered += 1
+    print(
+        f"directive queued (id={event_id}, fanout={delivered} sessions, "
+        f"skipped_unengaged={skipped_unengaged}, "
+        f"skipped_subagent={skipped_subagent})"
+    )
+
+    # L2 ACK: optional --wait blocks until any session acks the directive
+    # (or until wait_timeout). Useful for imperative directives where the
+    # caller wants synchronous confirmation that the agent processed it.
+    if getattr(args, "wait", False):
+        from .inject.paths import ack_file
+        timeout = float(getattr(args, "wait_timeout", 60.0))
+        deadline = time.time() + timeout
+        ack_path = ack_file(root, event_id)
+        while time.time() < deadline:
+            if ack_path.exists():
+                try:
+                    rec = json.loads(ack_path.read_text())
+                    by = rec.get("session_id") or "(unattributed)"
+                    at = rec.get("acked_at") or "?"
+                    print(f"acked by {by} at {at}")
+                except (OSError, ValueError):
+"""Codex install — enables `plugin_hooks` and the evo plugin in
+config.toml. Codex has no `plugin install` CLI command; activation is
+done by adding a `[plugins."<name>@<marketplace>"]` section."""
+
+from __future__ import annotations
+
+import argparse
+import base64
+import json
+import os
+import subprocess
+from pathlib import Path
+
+from ._hook_drain import (
+    ensure_hook_drain_binary,
+    hook_drain_binary_name,
+    is_wrapper_script,
+    mirror_hook_drain_binary,
+    stable_binary_path,
+)
+
+
+_PLUGIN_KEY = '[plugins."evo@evo-hq"]'
+
+_INSTALL_HINT = """\
+Codex install (run `codex plugin marketplace add evo-hq/evo` first if
+not already done). This command:
+  - sets [features] plugin_hooks = true  (required for `evo direct`)
+  - adds [plugins."evo@evo-hq"]          (enables the plugin)
+in ~/.codex/config.toml.
+"""
+
+
+def _stable_hook_command() -> str:
+    """Codex-safe hook command.
+
+    Codex does not guarantee Claude Code's `${CLAUDE_PLUGIN_ROOT}` env var.
+    Materialize the user's stable evo hook binary path at install time so
+    Codex hook execution does not depend on plugin-root expansion, cwd, or PATH.
+    The Node wrapper deliberately fails open: hooks run in every Codex session,
+    and a killed/corrupt helper binary must not break unrelated work.
+
+    Failing open requires a BOUND on every blocking call. The helper hands off
+    to the Python `evo-drain`, which inherits the helper's stdout/stderr; if any
+    descendant lingers on those fds, an unbounded `spawnSync` blocks forever and
+    the host shows the hook "running" indefinitely. So `spawnSync` gets a hard
+    `timeout`/`killSignal`, and stdin is only read when fd 0 is a real pipe
+    (never block on an interactive terminal).
+    """
+    stable_json = json.dumps(str(stable_binary_path().resolve()))
+    script = (
+        "const fs=require('fs'),cp=require('child_process'),tty=require('tty');"
+        "let input=Buffer.alloc(0);"
+        "try{if(!tty.isatty(0))input=fs.readFileSync(0)}catch(e){}"
+        f"const bin={stable_json};"
+        "try{const r=cp.spawnSync(bin,[],{input,timeout:2000,killSignal:'SIGKILL'});"
+        "if(r.status===0&&r.stdout&&r.stdout.length){"
+        "process.stdout.write(r.stdout);process.exit(0)}}catch(e){}"
+        "process.stdout.write('{}\\n')"
+    )
+    encoded = base64.b64encode(script.encode("utf-8")).decode("ascii")
+    return f"node -e \"eval(Buffer.from('{encoded}','base64').toString())\""
+
+
+def _materialize_codex_hooks(hooks_json_path: Path) -> bool:
+    """Rewrite an installed Codex hooks.json to use machine-local commands.
+
+    The source plugin's hooks.json is shared with Claude Code and intentionally
+    keeps `${CLAUDE_PLUGIN_ROOT}`. Codex-installed copies get rewritten because
+    recent Codex versions may run plugin hooks without that variable, turning
+    `${CLAUDE_PLUGIN_ROOT}/bin/evo-hook-drain` into `/bin/evo-hook-drain`
+    (exit 127).
+    """
+    try:
+        data = json.loads(hooks_json_path.read_text())
+    except (OSError, json.JSONDecodeError):
+        return False
+
+    changed = False
+    drain_cmd = _stable_hook_command()
+    hooks = data.get("hooks") or {}
+    for event_name, groups in list(hooks.items()):
+        updated_groups = []
+        for group in groups or []:
+            handlers = []
+            for handler in group.get("hooks", []) or []:
+                if handler.get("type") != "command":
+                    handlers.append(handler)
+                    continue
+                cmd = str(handler.get("command") or "")
+                if "evo-hook-drain" in cmd:
+                    if cmd != drain_cmd:
+                        handler = {**handler, "command": drain_cmd}
+                        changed = True
+                    handlers.append(handler)
+                elif "wait_hint.sh" in cmd or "evo-wait-hint" in cmd:
+                    # Optional UX hint. Keeping a Claude-only path here makes
+                    # Codex emit hook failures, which is worse than omitting it.
+                    changed = True
+                    continue
+                else:
+                    handlers.append(handler)
+            group["hooks"] = handlers
+            if handlers:
+                updated_groups.append(group)
+            else:
+                changed = True
+        hooks[event_name] = updated_groups
+
+    if changed:
+        hooks_json_path.write_text(json.dumps(data, indent=2) + "\n")
+    return changed
+
+
+def _codex_base() -> Path:
+    home_override = os.environ.get("CODEX_HOME")
+    return Path(home_override) if home_override else Path.home() / ".codex"
+
+
+def _marketplace_cache() -> Path:
+    return _codex_base() / ".tmp" / "marketplaces" / "evo-hq"
+
+
+def _marketplace_plugin_version(mkt_root: Path) -> str | None:
+    manifest = mkt_root / "plugins" / "evo" / ".codex-plugin" / "plugin.json"
+    try:
+        data = json.loads(manifest.read_text())
+    except (OSError, json.JSONDecodeError):
+        return None
+    version = data.get("version")
+    return str(version) if version else None
+
+
+def _toggle_plugin_hooks(enable: bool) -> tuple[bool, Path]:
+    cfg = _codex_base() / "config.toml"
+    if not cfg.exists():
+        return False, cfg
+    text = cfg.read_text()
+    has_features = "[features]" in text
+    has_pluginhooks_true = "plugin_hooks = true" in text
+    has_pluginhooks_false = "plugin_hooks = false" in text
+
+    if enable:
+        if has_pluginhooks_true:
+            return False, cfg
+        if has_pluginhooks_false:
+            text = text.replace("plugin_hooks = false", "plugin_hooks = true")
+        elif has_features:
+            text = text.replace("[features]", "[features]\nplugin_hooks = true", 1)
+        else:
+            text = text.rstrip() + "\n\n[features]\nplugin_hooks = true\n"
+    else:
+        if not has_pluginhooks_true:
+            return False, cfg
+        text = text.replace("plugin_hooks = true", "plugin_hooks = false")
+
+    cfg.write_text(text)
+    return True, cfg
+
+
+def _strip_toml_sections(text: str, should_strip) -> str:
+    """Remove whole TOML sections whose header matches ``should_strip``.
+
+    The Codex config is user-owned, so keep this deliberately text-based and
+    narrow: when a matching table header is seen, drop that header and every
+    following line until the next table header.
+    """
+    new_lines: list[str] = []
+    skip = False
+    for line in text.splitlines(keepends=True):
+        stripped = line.lstrip()
+        if stripped.startswith("["):
+            header = stripped.rstrip()
+            skip = bool(should_strip(header))
+            if skip:
+                continue
+        if skip:
+            continue
+        new_lines.append(line)
+    return "".join(new_lines)
+
+
+def _enable_plugin(enable: bool) -> tuple[bool, Path]:
+    """Add or remove the `[plugins."evo@evo-hq"]` section in
+    config.toml. Codex 0.130+ uses owner-only marketplace names, so the
+    plugin key is `evo@evo-hq` (not `evo@evo-hq-evo`)."""
+    cfg = _codex_base() / "config.toml"
+    if not cfg.exists() and not enable:
+        return False, cfg
+    text = cfg.read_text() if cfg.exists() else ""
+
+    stripped = _strip_toml_sections(text, lambda header: header == _PLUGIN_KEY)
+    if enable:
+        text = stripped.rstrip() + f"\n\n{_PLUGIN_KEY}\nenabled = true\n"
+    else:
+        if stripped == text:
+            return False, cfg
+        text = stripped.rstrip() + "\n"
+
+    if text == (cfg.read_text() if cfg.exists() else ""):
+        return False, cfg
+    cfg.parent.mkdir(parents=True, exist_ok=True)
+    cfg.write_text(text)
+    return True, cfg
+
+
+def install(args: argparse.Namespace) -> int:
+    print(_INSTALL_HINT)
+
+    import shutil as _shutil
+    if _shutil.which("codex") is None:
+        print(
+            "ERROR: `codex` binary not on PATH. Install Codex first:\n"
+            "  npm install -g @openai/codex",
+            file=__import__("sys").stderr,
+        )
+        return 2
+
+    from_path = getattr(args, "from_path", None)
+    trust_hooks = bool(getattr(args, "trust_hooks", True))
+    force = bool(getattr(args, "force", False))
+
+    # Drive `codex plugin marketplace add` automatically. Skip if:
+    #   - --from-path is set (user is testing a local marketplace)
+    #   - marketplace clone already exists and --force not set (avoids
+    #     overwriting a tag-pinned install with unpinned default-branch
+    #     content; e.g. release-smoke tests do their own tag-pinned
+    #     marketplace add and would lose the pin if we re-added unpinned)
+    mkt_cache = _marketplace_cache()
+    if from_path:
+        pass
+    elif mkt_cache.exists() and not force and not getattr(args, "version", None):
+        print(
+            f"codex marketplace cache already at {mkt_cache}; "
+            "skipping `codex plugin marketplace add` prereq (use --force to refresh)"
+        )
+    else:
+        import subprocess as _sp
+        import sys as _sys
+        version = getattr(args, "version", None)
+        source = "evo-hq/evo"
+        if version:
+            import re as _re
+            ref = f"v{version}" if _re.match(r"^\d+\.\d+\.\d+", version) else version
+            source = f"{source}@{ref}"
+        mkt_cmd = ["codex", "plugin", "marketplace", "add", source]
+        print(f"$ {' '.join(mkt_cmd)}")
+        rc = _sp.call(mkt_cmd)
+        if rc != 0 and (force or version):
+            rm_cmd = ["codex", "plugin", "marketplace", "remove", "evo-hq"]
+            print(f"$ {' '.join(rm_cmd)}")
+            _sp.call(rm_cmd)
+            print(f"$ {' '.join(mkt_cmd)}")
+            rc = _sp.call(mkt_cmd)
+        if rc != 0:
+            print(
+                f"ERROR: failed to add Codex marketplace source {source!r}",
+                file=_sys.stderr,
+            )
+            return 2
+        if version:
+            actual = _marketplace_plugin_version(mkt_cache)
+            if actual != version:
+                print(
+                    "ERROR: Codex marketplace snapshot version mismatch: "
+                    f"expected {version}, found {actual or 'unknown'} at {mkt_cache}",
+                    file=_sys.stderr,
+                )
+                return 2
+
+    # Ensure config.toml exists. On freshly-npm-installed codex (never run
+    # interactively), the marketplace add above creates ~/.codex/ but may
+    # not create config.toml until the first `codex` invocation. Write a
+    # stub so the toggle/enable helpers below have something to edit.
+    cfg = _codex_base() / "config.toml"
+    if not cfg.exists():
+        cfg.parent.mkdir(parents=True, exist_ok=True)
+        cfg.write_text("# created by `evo install codex`\n")
+        print(f"created stub {cfg}")
+
+    # Replicate what codex's TUI `plugin/install` RPC does: copy the plugin
+    # contents into `~/.codex/plugins/cache/<marketplace>/<plugin>/<ver>/`
+    # and add `[plugins."<plugin>@<marketplace>"] enabled = true` to
+    # config.toml. Without this, `codex plugin marketplace add` alone
+    # leaves the plugin discoverable but inert — skills aren't in codex's
+    # tool list, the hooks/hooks.json drain script never fires, and
+    # `evo direct` directives go undelivered.
+    #
+    # The TUI uses an RPC method `plugin/install` (verified by inspecting
+    # `codex app-server generate-json-schema`). We do not drive that RPC
+    # because `codex app-server` exits early on missing bubblewrap inside
+    # minimal containers (e2b sandboxes etc.). File-copy replicates the
+    # same disk state and works anywhere.
+    return _install_via_filecopy(from_path, trust_hooks=trust_hooks)
+
+
+def _resolve_marketplace_json(from_path: str | None) -> Path | None:
+    """Return the path to the marketplace.json file `plugin/install`
+    needs. `from_path` (when set) can be either the marketplace root
+    (contains `.claude-plugin/marketplace.json`) or a plugin dir
+    (`<root>/plugins/evo/`). For the latter we walk up to the root.
+    Falls back to the PyPI/GitHub cache otherwise.
+    """
+    if from_path:
+        p = Path(from_path).resolve()
+        # plugin-dir form: <root>/plugins/<name>
+        if p.name and p.parent.name == "plugins":
+            p = p.parent.parent
+        mj = p / ".claude-plugin" / "marketplace.json"
+        return mj if mj.exists() else None
+    mj = _marketplace_cache() / ".claude-plugin" / "marketplace.json"
+    return mj if mj.exists() else None
+
+
+def _install_via_filecopy(from_path: str | None, *, trust_hooks: bool = True) -> int:
+    """Mirror what codex's `plugin/install` RPC writes to disk:
+      1. read marketplace name from `<root>/.claude-plugin/marketplace.json`
+      2. read plugin version from `<plugin-root>/.codex-plugin/plugin.json`
+      3. copy plugin contents to
+         `~/.codex/plugins/cache/<marketplace>/<plugin>/<version>/`
+      4. ensure `[plugins."<plugin>@<marketplace>"] enabled = true`
+         is in config.toml
+
+    If `trust_hooks` is True, additionally write
+    `[hooks.state."<key>"] trusted_hash = "..."` entries that match what
+    codex's TUI writes when the user trusts each hook via `/hooks`.
+    Without trust, hooks remain in `untrusted` state and never fire —
+    `evo direct` directives won't reach the agent.
+    """
+    import json as _json
+"""Cursor install — two parts, mirroring the cross-host shape:
+
+  1. evo skills (`discover`/`optimize`/`subagent`/`infra-setup`) via the
+     cross-host ``npx skills add ... --agent cursor``. Cursor auto-discovers
+     SKILL.md from its skill dirs and shows them in the ``/`` menu.
+
+  2. Mid-run inject (``evo direct``) via Cursor-native hooks. We write
+     ``~/.cursor/hooks.json`` entries that run ``evo-drain --host cursor`` on
+     ``sessionStart`` (registers the session) and ``stop`` (delivers the
+     directive as a ``followup_message`` that the IDE auto-submits as a
+     visible message). The IDE silently drops ``additional_context``, so
+     postToolUse/sessionStart context injection is not used. Unlike Claude
+     Code / Codex, Cursor needs no ``evo-hook-drain`` binary in front: its
+     hooks.json command talks to ``evo-drain`` directly, which resolves the
+     run dir and session from the hook stdin payload.
+
+Why not reuse the Claude Code compat layer (`.claude/settings.json`)?
+Cursor can load Claude Code hooks, but ``UserPromptSubmit`` maps to
+``beforeSubmitPrompt`` (informational-only, cannot inject) and the plugin
+hook path depends on ``CLAUDE_PLUGIN_ROOT`` which Cursor doesn't set. Native
+``~/.cursor/hooks.json`` keeps Cursor config in Cursor's namespace and uses
+the events that actually deliver context.
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import re
+import shutil
+import subprocess
+import sys
+from pathlib import Path
+
+# Same shape claude_code._RELEASE_VERSION_RE uses to decide whether to
+# auto-prefix with `v` for the GitHub tag URL.
+_RELEASE_VERSION_RE = re.compile(r"^\d+\.\d+\.\d+([.\-+a-zA-Z0-9]*)$")
+
+# Events evo wires in the IDE:
+#   - sessionStart / beforeSubmitPrompt: REGISTER the session (no delivery).
+#     sessionStart only fires for new chats; beforeSubmitPrompt fires on every
+#     prompt, so it registers resumed chats too (where sessionStart never
+#     fires) — without it, a resumed chat stays unregistered and `evo direct`
+#     can't reach it.
+#   - preToolUse: fires before EVERY tool (mid-turn) — the analogue of
+#     claude-code's PreToolUse inject. Delivers tool-aware: shell via
+#     updated_input (echo the directive into stdout), other tools via
+#     deny+agent_message; edits are deferred (never denied). The drain decides
+#     per tool_name.
+#   - stop: end of each agent turn -> followup_message; turn-end fallback for
+#     turns with no deliverable tool call.
+#   - subagentStop: end of a Task-spawned subagent's turn (Cursor 1.7+).
+#     Same followup_message envelope as stop, scoped to the subagent. Without
+#     this, directives queued during a long Task subagent run can't deliver at
+#     the subagent's natural turn boundary and have to wait for the outer
+#     agent's stop.
+_INJECT_EVENTS = ("sessionStart", "beforeSubmitPrompt", "preToolUse", "stop", "subagentStop")
+
+
+def _cursor_base() -> Path:
+    home_override = os.environ.get("CURSOR_HOME")
+    return Path(home_override) if home_override else Path.home() / ".cursor"
+
+
+def _cursor_hooks_file() -> Path:
+    return _cursor_base() / "hooks.json"
+
+
+def _skills_source(from_path: str | None, version: str | None) -> str:
+    """Source spec for ``npx skills add`` (identical resolution to the
+    opencode adapter): local path > tagged release URL > default branch."""
+    if from_path:
+        return from_path
+    if version:
+        ref = f"v{version}" if _RELEASE_VERSION_RE.match(version) else version
+        return f"https://github.com/evo-hq/evo.git#{ref}"
+    return "evo-hq/evo"
+
+
+def _install_skills(source: str) -> None:
+    """Run ``npx -y skills add <source> --agent cursor -g -y``.
+
+    Skips with a warning when npx isn't on PATH. Cursor auto-discovers the
+    installed SKILL.md files and lists them in the ``/`` menu.
+    """
+    npx = shutil.which("npx")
+    if npx is None:
+        print(
+            "WARNING: `npx` not on PATH; skipping skill install.\n"
+            "  Install Node 22+ (https://nodejs.org), then re-run "
+            "`evo install cursor`.",
+            file=sys.stderr,
+        )
+        return
+    cmd = [npx, "-y", "skills", "add", source, "--agent", "cursor", "-g", "-y"]
+    print(f"$ {' '.join(cmd)}")
+    subprocess.call(cmd)
+
+
+def _drain_command() -> str:
+    """The shell command Cursor runs on each inject event. Resolve the
+    absolute ``evo-drain`` path so the hook works regardless of the shell's
+    PATH at fire time; fall back to the bare name if not yet on PATH."""
+    drain = shutil.which("evo-drain") or "evo-drain"
+    return f"{drain} --host cursor"
+
+
+def _is_evo_entry(entry: dict) -> bool:
+    return isinstance(entry, dict) and "evo-drain" in str(entry.get("command", ""))
+
+
+def _write_inject_hooks() -> Path:
+    """Merge evo's inject hooks into ``~/.cursor/hooks.json`` without
+    clobbering the user's existing hooks. Idempotent: re-running refreshes
+    the evo entries (e.g. an updated evo-drain path) in place."""
+    hooks_file = _cursor_hooks_file()
+    hooks_file.parent.mkdir(parents=True, exist_ok=True)
+
+    data: dict = {}
+    if hooks_file.exists():
+        try:
+            data = json.loads(hooks_file.read_text())
+        except json.JSONDecodeError:
+            print(
+                f"WARNING: could not parse {hooks_file}; leaving it untouched. "
+                "Inject will not work until it's valid JSON.",
+                file=sys.stderr,
+            )
+            return hooks_file
+    if not isinstance(data, dict):
+        data = {}
+
+    data.setdefault("version", 1)
+    hooks = data.setdefault("hooks", {})
+    if not isinstance(hooks, dict):
+        hooks = {}
+        data["hooks"] = hooks
+
+    command = _drain_command()
+    for event in _INJECT_EVENTS:
+        arr = hooks.setdefault(event, [])
+        if not isinstance(arr, list):
+            arr = []
+            hooks[event] = arr
+        # Drop any stale evo entry, then add the current one — keeps the
+        # command (absolute drain path) fresh across reinstalls.
+        arr[:] = [e for e in arr if not _is_evo_entry(e)]
+        arr.append({"command": command})
+
+    hooks_file.write_text(json.dumps(data, indent=2) + "\n")
+    print(f"wired inject hooks in {hooks_file} ({', '.join(_INJECT_EVENTS)} -> {command})")
+    return hooks_file
+
+
+def install(args: argparse.Namespace) -> int:
+    source = _skills_source(
+        getattr(args, "from_path", None),
+        getattr(args, "version", None),
+    )
+    print(f"Installing evo skills via npx skills add (source: {source}) ...")
+    _install_skills(source)
+
+    print("\nWiring mid-run inject hooks ...")
+    _write_inject_hooks()
+
+    if shutil.which("evo-drain") is None:
+        print(
+            "\nNOTE: `evo-drain` is not on PATH yet. Install the CLI so the "
+            "inject hook can fire:\n  uv tool install evo-hq-cli",
+            file=sys.stderr,
+        )
+
+    print(
+        "\n✓ evo installed for cursor.\n"
+        "  Skills appear in the `/` menu. Restart any open Cursor session "
+        "(IDE Agent or `cursor-agent`) to load the hooks."
+    )
+    return 0
+
+
+def update(args: argparse.Namespace) -> int:
+    """``npx skills add`` is idempotent and the hook writer refreshes in
+    place, so update and install share a path."""
+    return install(args)
+
+
+def uninstall(args: argparse.Namespace) -> int:
+    hooks_file = _cursor_hooks_file()
+    if hooks_file.exists():
+        try:
+            data = json.loads(hooks_file.read_text())
+        except json.JSONDecodeError:
+            data = None
+        if isinstance(data, dict) and isinstance(data.get("hooks"), dict):
+            removed = False
+            # Scan ALL events, not just current _INJECT_EVENTS, so evo entries
+            # left under a previously-wired event (e.g. postToolUse) are cleaned.
+            for event in list(data["hooks"].keys()):
+                arr = data["hooks"].get(event)
+                if isinstance(arr, list):
+                    kept = [e for e in arr if not _is_evo_entry(e)]
+                    if len(kept) != len(arr):
+                        removed = True
+                    if kept:
+                        data["hooks"][event] = kept
+                    else:
+                        del data["hooks"][event]
+            if removed:
+                hooks_file.write_text(json.dumps(data, indent=2) + "\n")
+                print(f"removed evo inject hooks from {hooks_file}")
+            else:
+                print(f"no evo inject hooks found in {hooks_file}")
+    else:
+        print(f"no {hooks_file} (nothing to remove)")
+    print("To remove the skills: `npx skills remove evo-hq/evo --agent cursor` "
+          "(or delete them from your Cursor skills dir).")
+    return 0
+
+
+def _skill_roots() -> list[Path]:
+    """Directories Cursor discovers skills from. `npx skills add --agent
+    cursor` may target any of these depending on CLI version, so doctor
+    checks all of them leniently."""
+    home = Path.home()
+    return [
+        _cursor_base() / "skills",
+        home / ".agents" / "skills",
+        Path.cwd() / ".cursor" / "skills",
+        Path.cwd() / ".agents" / "skills",
+    ]
+
+
+def doctor(args: argparse.Namespace) -> int:
+    rc = 0
+
+    # 1. evo-drain reachable — without it the hook fires into the void.
+    if shutil.which("evo-drain"):
+        print(f"✓ evo-drain on PATH: {shutil.which('evo-drain')}")
+    else:
+        print("✗ evo-drain not on PATH (inject hook cannot fire)")
+        print("  Run: uv tool install evo-hq-cli")
+        rc = 1
+
+    # 2. inject hooks wired in ~/.cursor/hooks.json.
+    hooks_file = _cursor_hooks_file()
+    if hooks_file.exists():
+        try:
+            data = json.loads(hooks_file.read_text())
+            hooks = data.get("hooks", {}) if isinstance(data, dict) else {}
+            wired = [
+                ev for ev in _INJECT_EVENTS
+                if any(_is_evo_entry(e) for e in hooks.get(ev, []) or [])
+            ]
+            if set(wired) == set(_INJECT_EVENTS):
+                print(f"✓ inject hooks wired in {hooks_file} ({', '.join(_INJECT_EVENTS)})")
+            else:
+                missing = [ev for ev in _INJECT_EVENTS if ev not in wired]
+                print(f"✗ inject hooks missing in {hooks_file}: {', '.join(missing)}")
+                print("  Run: evo install cursor")
+                rc = 1
+        except json.JSONDecodeError:
+            print(f"✗ could not parse {hooks_file}")
+            rc = 1
+    else:
+        print(f"✗ no {hooks_file}")
+        print("  Run: evo install cursor")
+        rc = 1
+
+    # 3. skills discoverable (lenient — exact dir depends on skills CLI version).
+    found_skill = None
+    for root in _skill_roots():
+        for name in ("optimize", "discover"):
+            if (root / name / "SKILL.md").exists():
+                found_skill = root / name
+                break
+        if found_skill:
+            break
+    if found_skill:
+        print(f"✓ evo skills installed (e.g. {found_skill})")
+    else:
+        print("? evo skills not found in known Cursor skill dirs "
+              f"({', '.join(str(r) for r in _skill_roots())})")
+        print("  Run: evo install cursor  (needs `npx` / Node on PATH)")
+        # Not a hard failure: the skills CLI may install elsewhere on some
+        # versions, and the agent can still load skills it discovers.
+    return rc
+"""Claude Code install — drives `claude plugin` non-interactive subcommands.
+
+The `claude` binary exposes `marketplace add`, `install`, `update`, and
+`uninstall` as shell-driveable subcommands (verified in
+tests/live/test_install_sandbox.py + test_release_smoke.py). So `evo install
+claude-code`, `evo update claude-code`, and `evo uninstall claude-code` can
+all run end-to-end without the user typing slash commands inside an
+interactive Claude Code session.
+
+The `--force` flag on update wipes the plugin cache before reinstall,
+working around an upstream cache-invalidation bug
+(anthropics/claude-code#14061) that leaves the cache stale after a normal
+`/plugin update`. Without --force, the standard update path is used; with
+--force, the path that's guaranteed to land fresh code is used.
+"""
+
+from __future__ import annotations
+
+import argparse
+import os
+import re
+import shutil
+import subprocess
+import sys
+from pathlib import Path
+
+from ._hook_drain import (
+    ensure_hook_drain_binary,
+    hook_drain_binary_name,
+    mirror_hook_drain_binary,
+)
+
+
+_MARKETPLACE = "evo-hq/evo"
+_PLUGIN = "evo@evo-hq-evo"
+_MARKETPLACE_NAME = "evo-hq-evo"
+
+
+def _claude_config_dir() -> Path:
+    """Return the Claude Code config root. Honors `CLAUDE_CONFIG_DIR` (used
+    by Claude Code to relocate state outside `~/.claude`, e.g. in cloud
+    containers where the home dir is ephemeral and a persistent volume is
+    mounted elsewhere). Falls back to `~/.claude`.
+
+    Without this, every helper here that hardcodes `Path.home() / ".claude"`
+    misses the plugin cache when `CLAUDE_CONFIG_DIR` is set -- silently
+    skipping `ensure_hook_drain_binary` and breaking `evo direct` delivery.
+    """
+    cfg = os.environ.get("CLAUDE_CONFIG_DIR")
+    return Path(cfg) if cfg else Path.home() / ".claude"
+
+
+def _latest_cache_dir() -> Path | None:
+    """Return the latest-version plugin cache dir, or None if not installed.
+    Cache layout: <claude-config-dir>/plugins/cache/<mkt>/evo/<version>/
+    """
+    root = _claude_config_dir() / "plugins" / "cache" / _MARKETPLACE_NAME / "evo"
+    if not root.exists():
+        return None
+    versions = sorted(p for p in root.iterdir() if p.is_dir())
+    return versions[-1] if versions else None
+
+
+def _hook_drain_staging_dir(from_path: str | None) -> Path | None:
+    """Return the plugin dir whose `bin/evo-hook-drain` the runtime hook will
+    actually exercise, or None if it can't be located.
+
+    A `--from-path` install runs the plugin straight from the source tree:
+    `claude plugin marketplace add <from_path>` makes claude resolve
+    `${CLAUDE_PLUGIN_ROOT}` to `<from_path>/plugins/evo`, NOT to the version
+    cache. Staging into `_latest_cache_dir()` in that case drops the binary
+    where no hook ever looks, so every hook fire is `not found` (exit 127).
+    Target the source tree instead. A normal (cache-backed) install has no
+    `from_path`, so it falls through to the version cache.
+    """
+    if from_path:
+        src = Path(from_path)
+        # from_path is the marketplace root (repo dir); the plugin lives at
+        # plugins/evo within it. Tolerate being handed the plugin dir directly.
+        candidate = src / "plugins" / "evo"
+        if candidate.exists():
+            return candidate
+        if (src / "bin").exists() or (src / ".claude-plugin").exists():
+            return src
+        return candidate  # let ensure_* create bin/ under the expected path
+    return _latest_cache_dir()
+
+
+def _stage_hook_drain(from_path: str | None, *, force: bool = False) -> None:
+    """Fetch the binary into the plugin dir the hooks resolve, then mirror
+    it into the marketplace clone for cache-backed installs.
+
+    `claude plugin update` re-copies the marketplace clone over the version
+    cache; the clone is a git tree without the binary, so an update run
+    outside `evo update` would otherwise drop it and hooks exit 127.
+    """
+    plugin_dir = _hook_drain_staging_dir(from_path)
+    if plugin_dir is None:
+        return
+    # For --from-path the destination is the user's source tree: leave
+    # the committed wrapper in place (it execs the stable copy) instead
+    # of dirtying their checkout with a binary.
+    ensure_hook_drain_binary(
+        plugin_dir, force=force, overwrite_wrapper=not from_path
+    )
+    if not from_path:
+        clone_dir = (
+            _claude_config_dir() / "plugins" / "marketplaces"
+            / _MARKETPLACE_NAME / "plugins" / "evo"
+        )
+        if clone_dir.is_dir():
+            mirror_hook_drain_binary(plugin_dir, clone_dir)
+
+# Strict release-tag shape: 'X.Y.Z' optionally followed by a pre-release
+# suffix ('0.4.0-alpha.5', '0.4.0a5', '0.4.0rc1'). Only this shape gets
+# auto-prefixed with 'v' to match the repo's release-tag convention.
+# Everything else (branch names like 'main', commit SHAs, already-v-prefixed
+# tags) passes through verbatim.
+_RELEASE_VERSION_RE = re.compile(r"^\d+\.\d+\.\d+([.\-+a-zA-Z0-9]*)$")
+
+
+def _marketplace_source(version: str | None, from_path: str | None) -> str:
+    """Return the source string for `claude plugin marketplace add`.
+
+    Precedence: `--from-path` > `--version` > unpinned latest.
+    `claude plugin marketplace add` accepts 'owner/repo@<ref>' where <ref>
+    can be a tag, branch, or commit SHA (verified in tests/live/test_release_smoke.py).
+    """
+    if from_path:
+        return from_path
+    if not version:
+        return _MARKETPLACE
+    # Release-version shape → auto-prefix with 'v' (repo's tag convention).
+    # Anything else (branch, sha, already-prefixed) passes through as-is.
+    ref = f"v{version}" if _RELEASE_VERSION_RE.match(version) else version
+    return f"{_MARKETPLACE}@{ref}"
+
+
+def _looks_like_pypi_release(version: str) -> bool:
+    """True iff `version` could plausibly resolve to an evo-hq-cli release
+    on PyPI. Branches/SHAs are git-only refs that PyPI doesn't know about,
+    so we don't try `uv tool install evo-hq-cli==<branch>` for them.
+    """
+    return bool(_RELEASE_VERSION_RE.match(version))
+
+
+def _claude_bin_or_error() -> str | None:
+    claude = shutil.which("claude")
+    if claude is None:
+        print(
+            "ERROR: `claude` binary not on PATH. Install Claude Code first:\n"
+            "  npm install -g @anthropic-ai/claude-code",
+            file=sys.stderr,
+        )
+    return claude
+
+
+def _run(cmd: list[str]) -> int:
+    print(f"$ {' '.join(cmd)}")
+    return subprocess.call(cmd)
+
+
+def install(args: argparse.Namespace) -> int:
+    """`claude plugin marketplace add` + `claude plugin install`.
+
+    `from_path` (optional): local marketplace dir to install from instead of
+    the GitHub repo. Useful for testing unreleased changes.
+    `scope` (optional, default "user"): plugin scope.
+    """
+    if _claude_bin_or_error() is None:
+        return 2
+    source = _marketplace_source(
+        getattr(args, "version", None),
+        getattr(args, "from_path", None),
+    )
+    scope = getattr(args, "scope", None) or "user"
+    rc = _run(["claude", "plugin", "marketplace", "add", source])
+    if rc != 0:
+        # Marketplace may already be added; try install anyway. claude reports
+        # "already added" with non-zero in some versions — don't bail yet.
+        print("(marketplace add returned non-zero; continuing to install)")
+    rc = _run(["claude", "plugin", "install", _PLUGIN, "--scope", scope])
+    if rc != 0:
+        return rc
+    # Stage the platform-native evo-hook-drain binary where the runtime hook
+    # resolves it. hooks.json points at ${CLAUDE_PLUGIN_ROOT}/bin/evo-hook-drain;
+    # for a --from-path install that's the source tree, not the version cache.
+    _stage_hook_drain(
+        getattr(args, "from_path", None),
+        force=bool(getattr(args, "force", False)),
+    )
+    print(
+        f"\n✓ evo installed for claude-code at scope={scope}.\n"
+        "  If you're inside an active claude session, run `/reload-plugins` "
+        "to pick up the changes."
+    )
+    return 0
+
+
+def update(args: argparse.Namespace) -> int:
+    """Refresh the marketplace clone, then update the installed plugin.
+
+    With `force=True`: wipe the plugin cache and reinstall from scratch
+    (workaround for anthropics/claude-code#14061, the upstream cache
+    invalidation bug that leaves stale files after a normal update).
+    """
+    if _claude_bin_or_error() is None:
+        return 2
+    scope = getattr(args, "scope", None) or "user"
+    force = bool(getattr(args, "force", False))
+    version = getattr(args, "version", None)
+    from_path = getattr(args, "from_path", None)
+
+    # If pinning a specific version (or a local path), re-add the marketplace
+    # at that ref. `claude plugin marketplace add` with an existing name is
+    # idempotent + replaces the source on re-add (verified in live tests).
+    if version or from_path:
+        source = _marketplace_source(version, from_path)
+        rc = _run(["claude", "plugin", "marketplace", "add", source])
+        if rc != 0:
+
+exec
+/bin/bash -lc "sed -n '1,260p' plugins/evo/src/evo/host_install/codex.py
+sed -n '549,760p' plugins/evo/src/evo/inject/drain.py
+sed -n '1,160p' plugins/evo/src/evo/inject/paths.py
+sed -n '1,140p' plugins/evo/src/evo/host_install/_hook_drain.py
+rg -n \"evo-drain|entry-points|project.scripts|direct\" plugins/evo/pyproject.toml plugins/evo/src/evo/cli.py | head -80
+sed -n '7280,7335p' plugins/evo/src/evo/cli.py" in /workspace/evo-myworld
+ succeeded in 0ms:
+"""Codex install — enables `plugin_hooks` and the evo plugin in
+config.toml. Codex has no `plugin install` CLI command; activation is
+done by adding a `[plugins."<name>@<marketplace>"]` section."""
+
+from __future__ import annotations
+
+import argparse
+import base64
+import json
+import os
+import subprocess
+from pathlib import Path
+
+from ._hook_drain import (
+    ensure_hook_drain_binary,
+    hook_drain_binary_name,
+    is_wrapper_script,
+    mirror_hook_drain_binary,
+    stable_binary_path,
+)
+
+
+_PLUGIN_KEY = '[plugins."evo@evo-hq"]'
+
+_INSTALL_HINT = """\
+Codex install (run `codex plugin marketplace add evo-hq/evo` first if
+not already done). This command:
+  - sets [features] plugin_hooks = true  (required for `evo direct`)
+  - adds [plugins."evo@evo-hq"]          (enables the plugin)
+in ~/.codex/config.toml.
+"""
+
+
+def _stable_hook_command() -> str:
+    """Codex-safe hook command.
+
+    Codex does not guarantee Claude Code's `${CLAUDE_PLUGIN_ROOT}` env var.
+    Materialize the user's stable evo hook binary path at install time so
+    Codex hook execution does not depend on plugin-root expansion, cwd, or PATH.
+    The Node wrapper deliberately fails open: hooks run in every Codex session,
+    and a killed/corrupt helper binary must not break unrelated work.
+
+    Failing open requires a BOUND on every blocking call. The helper hands off
+    to the Python `evo-drain`, which inherits the helper's stdout/stderr; if any
+    descendant lingers on those fds, an unbounded `spawnSync` blocks forever and
+    the host shows the hook "running" indefinitely. So `spawnSync` gets a hard
+    `timeout`/`killSignal`, and stdin is only read when fd 0 is a real pipe
+    (never block on an interactive terminal).
+    """
+    stable_json = json.dumps(str(stable_binary_path().resolve()))
+    script = (
+        "const fs=require('fs'),cp=require('child_process'),tty=require('tty');"
+        "let input=Buffer.alloc(0);"
+        "try{if(!tty.isatty(0))input=fs.readFileSync(0)}catch(e){}"
+        f"const bin={stable_json};"
+        "try{const r=cp.spawnSync(bin,[],{input,timeout:2000,killSignal:'SIGKILL'});"
+        "if(r.status===0&&r.stdout&&r.stdout.length){"
+        "process.stdout.write(r.stdout);process.exit(0)}}catch(e){}"
+        "process.stdout.write('{}\\n')"
+    )
+    encoded = base64.b64encode(script.encode("utf-8")).decode("ascii")
+    return f"node -e \"eval(Buffer.from('{encoded}','base64').toString())\""
+
+
+def _materialize_codex_hooks(hooks_json_path: Path) -> bool:
+    """Rewrite an installed Codex hooks.json to use machine-local commands.
+
+    The source plugin's hooks.json is shared with Claude Code and intentionally
+    keeps `${CLAUDE_PLUGIN_ROOT}`. Codex-installed copies get rewritten because
+    recent Codex versions may run plugin hooks without that variable, turning
+    `${CLAUDE_PLUGIN_ROOT}/bin/evo-hook-drain` into `/bin/evo-hook-drain`
+    (exit 127).
+    """
+    try:
+        data = json.loads(hooks_json_path.read_text())
+    except (OSError, json.JSONDecodeError):
+        return False
+
+    changed = False
+    drain_cmd = _stable_hook_command()
+    hooks = data.get("hooks") or {}
+    for event_name, groups in list(hooks.items()):
+        updated_groups = []
+        for group in groups or []:
+            handlers = []
+            for handler in group.get("hooks", []) or []:
+                if handler.get("type") != "command":
+                    handlers.append(handler)
+                    continue
+                cmd = str(handler.get("command") or "")
+                if "evo-hook-drain" in cmd:
+                    if cmd != drain_cmd:
+                        handler = {**handler, "command": drain_cmd}
+                        changed = True
+                    handlers.append(handler)
+                elif "wait_hint.sh" in cmd or "evo-wait-hint" in cmd:
+                    # Optional UX hint. Keeping a Claude-only path here makes
+                    # Codex emit hook failures, which is worse than omitting it.
+                    changed = True
+                    continue
+                else:
+                    handlers.append(handler)
+            group["hooks"] = handlers
+            if handlers:
+                updated_groups.append(group)
+            else:
+                changed = True
+        hooks[event_name] = updated_groups
+
+    if changed:
+        hooks_json_path.write_text(json.dumps(data, indent=2) + "\n")
+    return changed
+
+
+def _codex_base() -> Path:
+    home_override = os.environ.get("CODEX_HOME")
+    return Path(home_override) if home_override else Path.home() / ".codex"
+
+
+def _marketplace_cache() -> Path:
+    return _codex_base() / ".tmp" / "marketplaces" / "evo-hq"
+
+
+def _marketplace_plugin_version(mkt_root: Path) -> str | None:
+    manifest = mkt_root / "plugins" / "evo" / ".codex-plugin" / "plugin.json"
+    try:
+        data = json.loads(manifest.read_text())
+    except (OSError, json.JSONDecodeError):
+        return None
+    version = data.get("version")
+    return str(version) if version else None
+
+
+def _toggle_plugin_hooks(enable: bool) -> tuple[bool, Path]:
+    cfg = _codex_base() / "config.toml"
+    if not cfg.exists():
+        return False, cfg
+    text = cfg.read_text()
+    has_features = "[features]" in text
+    has_pluginhooks_true = "plugin_hooks = true" in text
+    has_pluginhooks_false = "plugin_hooks = false" in text
+
+    if enable:
+        if has_pluginhooks_true:
+            return False, cfg
+        if has_pluginhooks_false:
+            text = text.replace("plugin_hooks = false", "plugin_hooks = true")
+        elif has_features:
+            text = text.replace("[features]", "[features]\nplugin_hooks = true", 1)
+        else:
+            text = text.rstrip() + "\n\n[features]\nplugin_hooks = true\n"
+    else:
+        if not has_pluginhooks_true:
+            return False, cfg
+        text = text.replace("plugin_hooks = true", "plugin_hooks = false")
+
+    cfg.write_text(text)
+    return True, cfg
+
+
+def _strip_toml_sections(text: str, should_strip) -> str:
+    """Remove whole TOML sections whose header matches ``should_strip``.
+
+    The Codex config is user-owned, so keep this deliberately text-based and
+    narrow: when a matching table header is seen, drop that header and every
+    following line until the next table header.
+    """
+    new_lines: list[str] = []
+    skip = False
+    for line in text.splitlines(keepends=True):
+        stripped = line.lstrip()
+        if stripped.startswith("["):
+            header = stripped.rstrip()
+            skip = bool(should_strip(header))
+            if skip:
+                continue
+        if skip:
+            continue
+        new_lines.append(line)
+    return "".join(new_lines)
+
+
+def _enable_plugin(enable: bool) -> tuple[bool, Path]:
+    """Add or remove the `[plugins."evo@evo-hq"]` section in
+    config.toml. Codex 0.130+ uses owner-only marketplace names, so the
+    plugin key is `evo@evo-hq` (not `evo@evo-hq-evo`)."""
+    cfg = _codex_base() / "config.toml"
+    if not cfg.exists() and not enable:
+        return False, cfg
+    text = cfg.read_text() if cfg.exists() else ""
+
+    stripped = _strip_toml_sections(text, lambda header: header == _PLUGIN_KEY)
+    if enable:
+        text = stripped.rstrip() + f"\n\n{_PLUGIN_KEY}\nenabled = true\n"
+    else:
+        if stripped == text:
+            return False, cfg
+        text = stripped.rstrip() + "\n"
+
+    if text == (cfg.read_text() if cfg.exists() else ""):
+        return False, cfg
+    cfg.parent.mkdir(parents=True, exist_ok=True)
+    cfg.write_text(text)
+    return True, cfg
+
+
+def install(args: argparse.Namespace) -> int:
+    print(_INSTALL_HINT)
+
+    import shutil as _shutil
+    if _shutil.which("codex") is None:
+        print(
+            "ERROR: `codex` binary not on PATH. Install Codex first:\n"
+            "  npm install -g @openai/codex",
+            file=__import__("sys").stderr,
+        )
+        return 2
+
+    from_path = getattr(args, "from_path", None)
+    trust_hooks = bool(getattr(args, "trust_hooks", True))
+    force = bool(getattr(args, "force", False))
+
+    # Drive `codex plugin marketplace add` automatically. Skip if:
+    #   - --from-path is set (user is testing a local marketplace)
+    #   - marketplace clone already exists and --force not set (avoids
+    #     overwriting a tag-pinned install with unpinned default-branch
+    #     content; e.g. release-smoke tests do their own tag-pinned
+    #     marketplace add and would lose the pin if we re-added unpinned)
+    mkt_cache = _marketplace_cache()
+    if from_path:
+        pass
+    elif mkt_cache.exists() and not force and not getattr(args, "version", None):
+        print(
+            f"codex marketplace cache already at {mkt_cache}; "
+            "skipping `codex plugin marketplace add` prereq (use --force to refresh)"
+        )
+    else:
+        import subprocess as _sp
+        import sys as _sys
+        version = getattr(args, "version", None)
+        source = "evo-hq/evo"
+        if version:
+            import re as _re
+            ref = f"v{version}" if _re.match(r"^\d+\.\d+\.\d+", version) else version
+            source = f"{source}@{ref}"
+        mkt_cmd = ["codex", "plugin", "marketplace", "add", source]
+        print(f"$ {' '.join(mkt_cmd)}")
+        rc = _sp.call(mkt_cmd)
+        if rc != 0 and (force or version):
+            rm_cmd = ["codex", "plugin", "marketplace", "remove", "evo-hq"]
+            print(f"$ {' '.join(rm_cmd)}")
+            _sp.call(rm_cmd)
+            print(f"$ {' '.join(mkt_cmd)}")
+            rc = _sp.call(mkt_cmd)
+        if rc != 0:
+            print(
+                f"ERROR: failed to add Codex marketplace source {source!r}",
+                file=_sys.stderr,
+            )
+            return 2
+def emit_for_host(host: str, hook_event: str | None, text: str, payload: dict | None = None) -> None:
+    """Write the host-specific JSON payload to stdout. `payload` is the raw
+    hook stdin (needed by the cursor preToolUse branch for tool_name/command)."""
+    if not text:
+        sys.stdout.write("{}")
+        return
+    if host in ("claude-code", "codex"):
+        # Stop / SubagentStop don't support additionalContext — they must
+        # return `{decision: "block", reason: text}`, which both hosts feed
+        # back as the next continuation prompt (verified via the ralph-loop
+        # plugin's stop-hook.sh on Claude Code; documented for Codex).
+        if hook_event in ("Stop", "SubagentStop"):
+            out = {"decision": "block", "reason": text}
+            sys.stdout.write(json.dumps(out, separators=(",", ":")))
+            return
+        # All other events (PreToolUse / PostToolUse / UserPromptSubmit /
+        # SessionStart) carry the directive via hookSpecificOutput.additionalContext.
+        # Default to PreToolUse if we couldn't read the event from stdin.
+        evt = hook_event or "PreToolUse"
+        hook_out = {"hookEventName": evt, "additionalContext": text}
+        # Claude Code silently DROPS PreToolUse additionalContext unless the
+        # hook also returns a concrete permissionDecision. Verified on CLI
+        # v2.1.154 (`claude --print`) with sentinel probes: bare
+        # additionalContext never reaches the model; `permissionDecision:"allow"`
+        # delivers it as a system-reminder next to the tool result. "allow"
+        # auto-approves only this single tool call, and only fires when a
+        # directive is actually pending (marker set), so the blast radius is one
+        # already-in-flight orchestrator tool call. Codex honors bare
+        # additionalContext (gpt-5 acted on it), so we leave codex untouched to
+        # avoid changing its permission behavior.
+        if host == "claude-code" and evt == "PreToolUse":
+            hook_out["permissionDecision"] = "allow"
+        payload = {"hookSpecificOutput": hook_out}
+        sys.stdout.write(json.dumps(payload, separators=(",", ":")))
+        return
+    if host == "hermes":
+        payload = {"context": text}
+        sys.stdout.write(json.dumps(payload, separators=(",", ":")))
+        return
+    if host == "cursor":
+        # Cursor delivery, routed around the IDE's broken additional_context:
+        #   stop/subagentStop -> followup_message (auto-submitted at turn end)
+        #   preToolUse + shell -> updated_input: prepend an echo of the directive
+        #     so it lands in the command's stdout (the tool result the model
+        #     reads); command still runs (exit code preserved by ordering last).
+        # Non-shell preToolUse never reaches here — the gate defers it (deny+
+        # agent_message consumes without delivering, so we let stop deliver).
+        p = payload or {}
+        if hook_event in ("stop", "subagentStop"):
+            out: dict = {"followup_message": text}
+        elif hook_event == "preToolUse" and _cursor_tool_class(p.get("tool_name")) == "shell":
+            tool_input = dict(p.get("tool_input") or {})
+            orig = tool_input.get("command", "")
+            tool_input["command"] = "printf '%s\\n' " + shlex.quote(text) + " ; " + orig
+            out = {"permission": "allow", "updated_input": tool_input}
+        else:
+            out = {"additional_context": text}
+        sys.stdout.write(json.dumps(out, separators=(",", ":")))
+        return
+    if host == "kimi":
+        # Kimi has no passive context-injection channel. The ONLY way to get
+        # text in front of the model is to BLOCK the hook: on Stop it runs
+        # `triggerBlock`, appends the block's permissionDecisionReason to the
+        # context as a user message, and returns continue:true — which
+        # delivers the directive and keeps the loop alive in one move.
+        # Anything that isn't a block collapses to {action:"allow"} and its
+        # `message` is dropped on the floor, so a claude-code-style
+        # additionalContext (or a bare `message`) parses fine and reaches
+        # nobody. Verified against kimi-code 0.26.0.
+        out = {
+            "hookSpecificOutput": {
+                "hookEventName": hook_event or "Stop",
+                "permissionDecision": "deny",
+                "permissionDecisionReason": text,
+            }
+        }
+        sys.stdout.write(json.dumps(out, separators=(",", ":")))
+        return
+    # opencode and other in-process hosts: this entry point shouldn't
+    # normally be invoked there. Fall through to a generic envelope.
+    sys.stdout.write(json.dumps({"text": text}, separators=(",", ":")))
+
+
+def drain_session(root: Path, session_id: str, host: str | None = None, hook_event: str | None = None, payload: dict | None = None) -> int:
+    """Read events for `session_id`, format, emit, update offset,
+    unlink marker. Returns 0 on success. `payload` is the raw hook stdin,
+    passed through to emit_for_host (cursor preToolUse needs tool_name/command)."""
+    if not inject_root(root).exists():
+        sys.stdout.write("{}")
+        return 0
+    sess = get_session(root, session_id)
+    if sess is None:
+        # Session somehow not registered but marker existed. Be lenient.
+        marker.unlink(root, session_id)
+        sys.stdout.write("{}")
+        return 0
+
+    # One-direction self-heal: if JSON says optimize_mode=true but the
+    # Rust-cache flag is missing (external corruption or partial-failed
+    # mark), restore it. We deliberately do NOT clear-on-false here —
+    # a stale `sess` snapshot read concurrently with a mark/unmark could
+    # cause us to clear a flag that another transaction just wrote, and
+    # the recovery path (Rust skips handoff → silent steering loss) is
+    # worse than the cost of a spurious flag (Rust hands off → Python
+    # sees JSON=false → bails — extra latency only).
+    if sess.get("optimize_mode") and not sess.get("exp_id"):
+        from .registry import _write_optimize_mode_flag
+        _write_optimize_mode_flag(root, session_id)
+
+    host = host or sess.get("host") or _detect_host_from_env()
+    # Codex and Claude Code use the same hookSpecificOutput envelope.
+    # If host is "unknown" (e.g. legacy registry entry), default to that
+    # envelope since it's the more common case for shell-hook hosts.
+    if host == "unknown":
+        host = "claude-code"
+    exp_id = sess.get("exp_id")
+
+    # Orchestrator engagement on SessionStart. For hook hosts
+    # (claude-code/codex) the host process that fired SessionStart IS the
+    # orchestrator, so SessionStart is the engagement signal — same as the
+    # in-process JS plugins (pi/openclaw) marking engaged at session_start.
+    # Under /optimize the orchestrator dispatches every `evo` command to
+    # subagents, so it never runs `evo` itself and `auto_register_from_env`
+    # never flips engagement; without this, `evo direct` filters the
+    # orchestrator out (skipped_unengaged) and the directive never lands.
+    # Guarded: never engage a subagent-originated event, never engage a
+    # record carrying an exp_id. This handles the case where the published
+    # Rust binary predates the SessionStart-engage fix.
+    if (
+        hook_event in _SESSION_START_EVENTS
+        and not exp_id
+        and not _payload_is_subagent(payload)
+    ):
+        from .registry import mark_engaged
+        if mark_engaged(root, session_id):
+            queue.init_offset_to_latest(root, session_id)
+            sess = get_session(root, session_id) or sess
+
+    # Seed offset to the current queue tail for sessions that don't yet
+    # have an offset file. Closes the SessionStart-unconditional-drain
+    # leak: the Rust binary skips the marker check on SessionStart and
+    # hands off to this drain regardless, so without seeding, a fresh
+    # session would backfill every event in workspace.jsonl — bypassing
+    # the engagement filter. Contract: a session only sees events queued
+    # after it registered.
+    if not offset_file(root, session_id).exists():
+        queue.init_offset_to_latest(root, session_id)
+
+    events: list[dict] = []
+    new_workspace_offset: str | None = None
+    new_exp_offset: str | None = None
+
+    if exp_id:
+        # Subagent: drain its scoped queue only
+        last_id = queue.read_offset(root, session_id, "exp")
+        new_events = queue.read_events_after(exp_events_path(root, exp_id), last_id)
+        events.extend(new_events)
+        if new_events:
+            new_exp_offset = new_events[-1]["id"]
+    else:
+        # Orchestrator-class session: drain workspace queue
+        last_id = queue.read_offset(root, session_id, "workspace")
+        new_events = queue.read_events_after(workspace_events_path(root), last_id)
+        events.extend(new_events)
+        if new_events:
+            new_workspace_offset = new_events[-1]["id"]
+
+    text = format_directive_text(events)
+
+    # Policy block: orchestrator in optimize_mode tried a denied tool.
+    # Hard-deny on odd-numbered violations (1, 3, 5, …); even ones pass.
+    # Short-circuits the normal emit — agent sees the deny + banner.
+    if _should_policy_block(root, session_id, sess, host, hook_event, payload):
+        _drain_debug(stage="policy_block", host=host, hook_event=hook_event,
+                     session=session_id[:12], pending_text_len=len(text),
+                     note="deny emitted; marker+offset preserved (directive NOT delivered)")
+        sys.stdout.write(json.dumps(_policy_block_envelope(host), separators=(",", ":")))
+        # Don't unlink marker / advance offset on a policy block — the
+        # inject directive (if any) hasn't actually been delivered to
+        # the model; the tool was denied before that point. Leave the
+        # state so the next non-violating tool call can drain it.
+        return 0
+
+    # preToolUse with no mid-turn delivery channel: let the tool through and
+    # do NOT consume directives. Reachable only in optimize_mode after the
+    # policy block didn't fire (even-numbered violation under the alternating
+    # cadence). Emitting here would both refuse the tool the cadence meant to
+    # allow and consume the directive on a pre-tool event.
+    #   - cursor: the IDE drops `additional_context` on non-shell tools (shell
+    #     delivers via updated_input, so it's allowed to drain).
+    #   - kimi: the only channel is a Stop-hook block, which would deny the
+    #     tool; every preToolUse defers to the turn-end Stop.
+    _pre = hook_event in ("preToolUse", "PreToolUse")
+    if _pre and (
+        host == "kimi"
+        or (
+            host == "cursor"
+            and _cursor_tool_class(payload.get("tool_name") if payload else None) != "shell"
+        )
+    ):
+        sys.stdout.write("{}")
+        return 0
+
+    # Stop-nudge: if this is a Stop/SubagentStop on an orchestrator in
+    # optimize_mode, augment (or override) the emit with a continuation
+    # prompt so the agent keeps driving the loop autonomously. Always
+    # fires while optimize_mode is on — escape via `evo exit-optimize-mode`.
+    nudge_text = _maybe_stop_nudge_text(root, session_id, sess, host, hook_event)
+    if nudge_text:
+        # Combine pending directive text with the nudge so queued
+        # `evo direct` injections aren't dropped when the stop hook
+        # fires. The nudge envelope still drives self-continuation.
+"""Filesystem paths for inject queues, registry, offsets, markers.
+
+All paths anchor under `<run_dir>/inject/` so they don't collide with
+existing workspace state. Callers pass the workspace root; this module
+calls `workspace_path()` (active run) for every resolution.
+"""
+
+from __future__ import annotations
+
+from pathlib import Path
+
+from evo.core import workspace_path
+
+
+def inject_root(root: Path) -> Path:
+    return workspace_path(root) / "inject"
+
+
+def sessions_dir(root: Path) -> Path:
+    return inject_root(root) / "sessions"
+
+
+def session_file(root: Path, session_id: str) -> Path:
+    return sessions_dir(root) / f"{session_id}.json"
+
+
+def events_dir(root: Path) -> Path:
+    return inject_root(root) / "events"
+
+
+def workspace_events_path(root: Path) -> Path:
+    return events_dir(root) / "workspace.jsonl"
+
+
+def exp_events_path(root: Path, exp_id: str) -> Path:
+    return events_dir(root) / f"{exp_id}.jsonl"
+
+
+def offsets_dir(root: Path) -> Path:
+    return inject_root(root) / "offsets"
+
+
+def offset_file(root: Path, session_id: str) -> Path:
+    return offsets_dir(root) / f"{session_id}.json"
+
+
+def markers_dir(root: Path) -> Path:
+    return inject_root(root) / "markers"
+
+
+def marker_file(root: Path, session_id: str) -> Path:
+    return markers_dir(root) / f"{session_id}.flag"
+
+
+def optimize_mode_dir(root: Path) -> Path:
+    """Side channel for optimize_mode state — empty flag files keyed by
+    session_id. The Rust hook (and other hot-path readers) check
+    existence in ~50µs instead of opening + parsing the session JSON.
+    Source of truth is still `inject/sessions/<sid>.json#optimize_mode`;
+    this directory is a cache that mark/unmark keep in sync.
+    """
+    return inject_root(root) / "optimize_mode"
+
+
+def optimize_mode_flag_file(root: Path, session_id: str) -> Path:
+    return optimize_mode_dir(root) / f"{session_id}.flag"
+
+
+def delivered_dir(root: Path) -> Path:
+    """L1 ACK: where drain writes a record per directive emitted."""
+    return inject_root(root) / "delivered"
+
+
+def delivered_file(root: Path, event_id: str) -> Path:
+    return delivered_dir(root) / f"{event_id}.json"
+
+
+def acks_dir(root: Path) -> Path:
+    """L2 ACK: where `evo ack <id>` writes confirmation that the model
+    saw and processed a directive."""
+    return inject_root(root) / "acks"
+
+
+def ack_file(root: Path, event_id: str) -> Path:
+    return acks_dir(root) / f"{event_id}.json"
+
+
+def ensure_dirs(root: Path) -> None:
+    """Create all subdirectories under inject_root. Idempotent."""
+    for d in (
+        sessions_dir(root),
+        events_dir(root),
+        offsets_dir(root),
+        markers_dir(root),
+        optimize_mode_dir(root),
+        delivered_dir(root),
+        acks_dir(root),
+    ):
+        d.mkdir(parents=True, exist_ok=True)
+"""Stage the platform-native evo-hook-drain binary where hooks resolve it.
+
+The hook script is a small Rust binary (~330 KB) built natively for each
+platform in CI. Binaries ship as GitHub Release assets, NOT in the plugin
+git tree (keeps the repo small + lets users install from `main` without
+binaries present). Every host's `install(args)` calls
+`ensure_hook_drain_binary(plugin_root)`, which:
+
+  1. fetches the binary into the stable per-user location
+     `$EVO_HOME/bin/` (default `~/.evo/bin/`), outside any
+     host-managed directory, and
+  2. copies it to `<plugin_root>/bin/evo-hook-drain`, the path
+     hooks.json commands resolve.
+
+The plugin tree commits a shell-script fallback at `bin/evo-hook-drain`
+that execs the stable copy. Hosts re-stage their plugin cache from a
+fresh git snapshot whenever they decide to (codex re-clones its
+marketplace snapshot at session start), which drops anything evo staged
+into those directories; the tracked wrapper survives every re-stage and
+keeps hooks firing via the stable copy.
+
+Idempotent: re-fetch only when the stable copy is missing, was staged by
+a different evo-hq-cli version, or `force` is set.
+"""
+from __future__ import annotations
+
+import os
+import platform
+import sys
+import urllib.error
+import urllib.request
+from pathlib import Path
+
+from .. import __version__ as EVO_VERSION
+
+
+_RELEASE_URL_TEMPLATE = (
+    "https://github.com/evo-hq/evo/releases/download/v{version}/{asset}"
+)
+_LATEST_RELEASE_URL_TEMPLATE = (
+    "https://github.com/evo-hq/evo/releases/latest/download/{asset}"
+)
+
+
+def _target_name() -> str | None:
+    """Map platform.system()/machine() to the release asset suffix.
+
+    Returns 'linux-amd64', 'linux-arm64', 'darwin' (universal: arm64 +
+    x86_64 fused via lipo, so one asset works on both), or
+    'windows-amd64'. None if the platform isn't supported (e.g.
+    windows-arm64 — we don't ship that binary yet).
+    """
+    system = platform.system().lower()
+
+    if system == "darwin":
+        # Single universal binary for both Apple Silicon and Intel Macs.
+        # macOS picks the right slice at exec time. Drops the arch suffix.
+        return "darwin"
+
+    if system not in ("linux", "windows"):
+        return None
+
+    machine = platform.machine().lower()
+    if machine in ("x86_64", "amd64"):
+        arch = "amd64"
+    elif machine in ("arm64", "aarch64"):
+        arch = "arm64"
+    else:
+        return None
+
+    return f"{system}-{arch}"
+
+
+def _release_version_tag(version: str) -> str:
+    """Translate a PEP-440 version (`0.4.1a2`) to the git tag form
+    (`0.4.1-alpha.2`) used in release asset URLs.
+
+    The version files store the git-tag form already; if someone calls
+    with the PEP-440 form, normalise here.
+    """
+    if "a" in version and "alpha" not in version:
+        head, _, tail = version.partition("a")
+        return f"{head}-alpha.{tail}"
+    if "b" in version and "beta" not in version:
+        head, _, tail = version.partition("b")
+        return f"{head}-beta.{tail}"
+    if "rc" in version and "-rc" not in version:
+        head, _, tail = version.partition("rc")
+        return f"{head}-rc.{tail}"
+    return version
+
+
+def hook_drain_binary_name() -> str:
+    """Filename of the staged binary for the current platform."""
+    return "evo-hook-drain.exe" if platform.system().lower() == "windows" else "evo-hook-drain"
+
+
+def stable_binary_path() -> Path:
+    """Host-independent home for the fetched binary:
+    `$EVO_HOME/bin/<name>` (default `~/.evo/bin/<name>`). The committed
+    `bin/evo-hook-drain` wrapper in the plugin tree execs this copy.
+    """
+    override = os.environ.get("EVO_HOME")
+    base = Path(override) if override else Path.home() / ".evo"
+    return base / "bin" / hook_drain_binary_name()
+
+
+def is_wrapper_script(path: Path) -> bool:
+    """True when `path` holds the committed shell-script fallback rather
+    than a platform-native binary."""
+    try:
+        with open(path, "rb") as fh:
+            return fh.read(2) == b"#!"
+    except OSError:
+        return False
+
+
+def mirror_hook_drain_binary(src_plugin_root: Path, dst_plugin_root: Path) -> bool:
+    """Copy `bin/evo-hook-drain` from one plugin root to another, so a
+    host re-stage from the destination (codex: marketplace snapshot;
+    claude-code: marketplace clone) carries the native binary instead of
+    falling back to the wrapper script.
+
+    Best-effort: the host may wipe the destination on its next snapshot
+    refresh, at which point the tracked wrapper takes over. No-op when
+    src and dst resolve to the same directory (--from-path installs
+    stage directly into the source tree). Returns True when the file is
+    present at the destination afterwards.
+    """
+    import shutil
+
+    name = hook_drain_binary_name()
+    src = src_plugin_root / "bin" / name
+    dst = dst_plugin_root / "bin" / name
+    if not src.is_file():
+        return False
+    try:
+        if src.resolve() == dst.resolve():
+            return True
+    except OSError:
+plugins/evo/src/evo/cli.py:156:    directly. The supervisor owns the dashboard's lifecycle: captures
+plugins/evo/src/evo/cli.py:429:    itself, and overlapping/nested slot directories -- all of which would
+plugins/evo/src/evo/cli.py:481:        # the same directory, and one slot must not be nested inside another.
+plugins/evo/src/evo/cli.py:487:                    f"Each slot must be a distinct directory."
+plugins/evo/src/evo/cli.py:1170:    """Per-run forks directory, under the active run dir. `evo reset` blows
+plugins/evo/src/evo/cli.py:1207:    query the OS directly: open the process and ask whether its handle is
+plugins/evo/src/evo/cli.py:1818:    to the orchestrator's attempts/NNN/ directory so downstream readers
+plugins/evo/src/evo/cli.py:3414:            # main repo. Pool commits otherwise live only in slot directories
+plugins/evo/src/evo/cli.py:3435:                # worktree commits are made there directly; remote commits
+plugins/evo/src/evo/cli.py:3796:            # No anchor → fall back to direct commit lookup
+plugins/evo/src/evo/cli.py:3929:         remote sandboxes, abandoned worktree directories).
+plugins/evo/src/evo/cli.py:4049:            # directly from the spec we recovered.
+plugins/evo/src/evo/cli.py:4078:    dashboard directly if the supervisor already died (older installs).
+plugins/evo/src/evo/cli.py:4177:        "Set it once via the dashboard's strategy panel (top bar) or by editing the config directly.",
+plugins/evo/src/evo/cli.py:4377:    read graph state directly — everything it might want about one node
+plugins/evo/src/evo/cli.py:4947:# Sessions on hosts in this set are filtered out of `evo direct` broadcast
+plugins/evo/src/evo/cli.py:4963:def cmd_direct(args: argparse.Namespace) -> int:
+plugins/evo/src/evo/cli.py:4964:    """Send a directive to the workspace.
+plugins/evo/src/evo/cli.py:4967:        evo direct "<text>"                     # broadcast
+plugins/evo/src/evo/cli.py:4968:        evo direct <exp_id> "<text>"            # targeted at a subagent
+plugins/evo/src/evo/cli.py:4980:        print("ERROR: usage: evo direct [<exp_id>] <text>", file=sys.stderr)
+plugins/evo/src/evo/cli.py:4998:        # drains in current hosts. Without this, exp-targeted directives
+plugins/evo/src/evo/cli.py:5019:        print(f"directive queued (exp={exp_id}, id={event_id}, woken={woken})")
+plugins/evo/src/evo/cli.py:5035:        # directives must not reach it. Filter only applies to hosts
+plugins/evo/src/evo/cli.py:5050:        f"directive queued (id={event_id}, fanout={delivered} sessions, "
+plugins/evo/src/evo/cli.py:5055:    # L2 ACK: optional --wait blocks until any session acks the directive
+plugins/evo/src/evo/cli.py:5056:    # (or until wait_timeout). Useful for imperative directives where the
+plugins/evo/src/evo/cli.py:5076:            f"(directive remains in queue; run `evo direct status {event_id}` "
+plugins/evo/src/evo/cli.py:5989:    """Record that the agent has acknowledged a directive.
+plugins/evo/src/evo/cli.py:6041:def cmd_direct_status(args: argparse.Namespace) -> int:
+plugins/evo/src/evo/cli.py:6042:    """Show queue/delivery/ack state for a directive id.
+plugins/evo/src/evo/cli.py:6060:        print("ERROR: usage: evo direct status <event_id>", file=sys.stderr)
+plugins/evo/src/evo/cli.py:6067:        # Also scan exp queues — exp-targeted directives live in their
+plugins/evo/src/evo/cli.py:6302:        help="comma-separated absolute paths to pre-built workspace directories "
+plugins/evo/src/evo/cli.py:6369:        help="comma-separated absolute paths to pre-built workspace directories "
+plugins/evo/src/evo/cli.py:6535:             "didn't help (branch a new direction). Recorded on the node.",
+plugins/evo/src/evo/cli.py:6911:             "hooks register but never fire and `evo direct` is not "
+plugins/evo/src/evo/cli.py:7000:    direct_p = sub.add_parser(
+plugins/evo/src/evo/cli.py:7001:        "direct",
+plugins/evo/src/evo/cli.py:7002:        help="Send a directive to running orchestrator session(s) or a specific subagent (by exp_id)",
+plugins/evo/src/evo/cli.py:7004:            "Without exp_id: directive is delivered to every registered "
+plugins/evo/src/evo/cli.py:7012:    direct_p.add_argument(
+plugins/evo/src/evo/cli.py:7017:    direct_p.add_argument(
+plugins/evo/src/evo/cli.py:7020:        help="Block until a session acks the directive (or until --wait-timeout). "
+plugins/evo/src/evo/cli.py:7023:    direct_p.add_argument(
+plugins/evo/src/evo/cli.py:7029:    direct_p.set_defaults(func=cmd_direct)
+plugins/evo/src/evo/cli.py:7033:        help="Acknowledge an evo directive (run by agents to confirm receipt of an [EVO DIRECTIVE id=…] banner)",
+plugins/evo/src/evo/cli.py:7035:            "Records that the directive identified by <event_id> has been "
+plugins/evo/src/evo/cli.py:7037:            "`evo direct status <event_id>` and `evo direct --wait`."
+plugins/evo/src/evo/cli.py:7043:    direct_status_p = sub.add_parser(
+plugins/evo/src/evo/cli.py:7044:        "direct-status",
+plugins/evo/src/evo/cli.py:7045:        help="Show queue / delivery / ack state for a directive id",
+plugins/evo/src/evo/cli.py:7047:    direct_status_p.add_argument("event_id")
+plugins/evo/src/evo/cli.py:7048:    direct_status_p.set_defaults(func=cmd_direct_status)
+plugins/evo/src/evo/cli.py:7261:def _telemetry_directional_delta(
+plugins/evo/src/evo/cli.py:7326:        delta_vs_parent = _telemetry_directional_delta(metric, score, parent_score)
+plugins/evo/src/evo/cli.py:7327:        delta_vs_best = _telemetry_directional_delta(metric, score, best_before_score)
+plugins/evo/pyproject.toml:58:[project.scripts]
+plugins/evo/pyproject.toml:61:evo-drain = "evo.inject.drain:main"
+plugins/evo/pyproject.toml:63:[project.entry-points."hermes_agent.plugins"]
+        return "timeout"
+    if "gate_failed" in lowered or "pre_gate_failed" in lowered:
+        return "gate"
+    if "runtime" in lowered or "hook" in lowered:
+        return "runtime"
+    if "benchmark" in lowered or "missing_result" in lowered:
+        return "benchmark"
+    return "unknown"
+
+
+def _telemetry_usecase_tags(root: Path) -> list[str]:
+    tags = _load_meta(root).get("telemetry_usecase_tags")
+    if isinstance(tags, list):
+        return [str(tag) for tag in tags if isinstance(tag, str)]
+    return []
+
+
+def _record_telemetry_usecase_tags(root: Path, tags: list[str]) -> None:
+    from . import telemetry
+
+    try:
+        meta_file = evo_dir(root) / "meta.json"
+        data = _load_meta(root)
+        sanitized = telemetry.scrub_tags(tags)
+        if sanitized:
+            data["telemetry_usecase_tags"] = sanitized
+            atomic_write_json(meta_file, data)
+    except Exception:
+        pass
+
+
+def _emit_experiment_result_telemetry(
+    root: Path,
+    exp_id: str,
+    *,
+    outcome: str,
+    metric: str | None,
+    score: float | None = None,
+    parent_score: float | None = None,
+    best_before_score: float | None = None,
+    check: bool = False,
+    failure_type: str | None = None,
+) -> None:
+    try:
+        from . import telemetry
+
+        delta_vs_parent = _telemetry_directional_delta(metric, score, parent_score)
+        delta_vs_best = _telemetry_directional_delta(metric, score, best_before_score)
+        props: dict[str, Any] = {
+            **_telemetry_workspace_props(root, exp_id=exp_id),
+            "experiment_id": exp_id,
+            "outcome": outcome,
+            "check": check,
+            "workflow_phase": "check" if check else "experiment_result",
+        }
+        if metric:
+
+codex
+The trace shows a two-stage delivery design: `evo direct` appends durable JSONL and wakes registered sessions with marker files; frequent host hooks use a small native drain helper, which hands off to Python only when needed and emits a host-specific envelope. I’m documenting the important reliability and host differences now.
+apply patch
+patch: completed
+/workspace/evo-myworld/FIELD-NOTES.md
+/workspace/evo-myworld/queues/codex.md
+/workspace/evo-myworld/world/codex/internals-map.md
+diff --git a/evo-myworld/FIELD-NOTES.md b/evo-myworld/FIELD-NOTES.md
+index 274a84feaf9498a341b9d7ceeb7075e9dcb432c0..86d505a394d7fc8b44ac7c583f01948b58bb2be3
+--- a/evo-myworld/FIELD-NOTES.md
++++ b/evo-myworld/FIELD-NOTES.md
+@@ -191,3 +191,12 @@
+ 
+ 
+ - 2026-07-19 Kimi: Read `CHARTER.md`, `FIELD-NOTES.md`, and `/projects/evo-hq/README.md`. Front-end seat should build inside `world/kimi/` and keep load tiny until assembly-line port + graph backend land. Existing dashboard is Flask + `static/app.js` with `.evo/<active-run>/graph.json`; the upstream README enumerates frontier strategies and backends. Drafted 5 creative UI directions (campfire room, time-river tree, agent orbit, graph-first lens, lab-bench panel) in `world/kimi/ideas.md`. No code yet. Signed, kimi.
++- 2026-07-19 Codex: Mapped plugin and `evo direct` internals in
++  `world/codex/internals-map.md`. Directives are durable append-only JSONL;
++  per-session marker files only wake drains, offsets make delivery once per
++  session, `delivered/` is the emit receipt, and `evo ack` is the model receipt.
++  Claude Code and Codex share hook envelopes but differ at PreToolUse (Claude
++  needs `permissionDecision: allow`) and installation (Codex needs enabled,
++  trusted plugin hooks plus absolute helper paths). Cursor uses native hooks,
++  delivers mid-turn only by rewriting shell input, and otherwise defers to a
++  turn-end `followup_message`. Signed, codex.
+diff --git a/evo-myworld/queues/codex.md b/evo-myworld/queues/codex.md
+index c53cf0ed408b2d693bd23a5f1718d91078a75d9c..003fd7a65382f545f91dbad96b1a80979ed80fb3
+--- a/evo-myworld/queues/codex.md
++++ b/evo-myworld/queues/codex.md
+@@ -1,5 +1,5 @@
+ # Queue — Codex
+-1. [ ] Map the plugin internals: plugins/evo/hooks/, bin/, src/evo/, and how
++1. [x] Map the plugin internals: plugins/evo/hooks/, bin/, src/evo/, and how
+    evo-drain / evo direct deliver messages. Write world/codex/internals-map.md
+    (what fires when, host differences claude-code vs codex vs cursor).
+ 2. [ ] Identify the 3 cheapest extension points for adding a custom frontier
+diff --git a/evo-myworld/world/codex/internals-map.md b/evo-myworld/world/codex/internals-map.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..fafc0230f684f8423f0da63f18b8a934687e0cc5
+--- /dev/null
++++ b/evo-myworld/world/codex/internals-map.md
+@@ -0,0 +1,142 @@
++# evo plugin internals map
++
++This map covers the requested surfaces in `/workspace/evo-myworld/plugins/evo/`:
++`hooks/`, `bin/`, `src/evo/`, and the `evo direct` / `evo-drain` delivery path.
++
++## Entry points and installation
++
++- `plugins/evo/bin/evo` is the plugin-local shell entry point. Claude Code puts
++  the plugin's `bin/` on the Bash-tool `PATH`; the wrapper locates the plugin
++  root and executes `uv run --project <plugin-root> evo ...`. The installed CLI
++  exposes the same Python command through `plugins/evo/pyproject.toml`.
++- `plugins/evo/pyproject.toml` maps `evo` to `evo.cli:main` and `evo-drain` to
++  `evo.inject.drain:main`.
++- `plugins/evo/hooks/hooks.json` is the shared Claude-style hook declaration.
++  It wires `PreToolUse`, `PostToolUse`, `UserPromptSubmit`, `SessionStart`,
++  `Stop`, and `SubagentStop` to a fail-open Node shim. The shim reads hook JSON
++  from stdin, tries the native `evo-hook-drain` with a two-second bound, passes
++  through nonempty JSON output, and otherwise returns `{}`. A second
++  `PostToolUse`/`Bash` handler invokes `hooks/wait_hint.sh` for a one-shot UX
++  reminder.
++- `plugins/evo/bin/evo-hook-drain` is the checked-in recovery wrapper. Normal
++  installation downloads a platform-native Rust binary to
++  `$EVO_HOME/bin/evo-hook-drain` (normally `~/.evo/bin/`) using
++  `src/evo/host_install/_hook_drain.py`. If a host refresh restores the wrapper
++  over its cached native binary, the wrapper executes the stable copy. If that
++  copy is absent it logs a reinstall hint and returns `{}`, preserving the host
++  session.
++- `plugins/evo/bin/evo-hook-drain-rs/src/main.rs` is the hot-path filter. Its
++  purpose is to cheaply resolve the workspace/session and check marker or
++  optimize-mode flags before handing stdin to Python. This avoids starting a
++  Python interpreter on every tool hook when nothing is pending.
++
++Host installers are adapters, not just file copiers:
++
++- Claude Code: `src/evo/host_install/claude_code.py` drives `claude plugin
++  marketplace add/install`, then stages the native helper into the actual
++  plugin root/cache. The shared `hooks.json` is used directly.
++- Codex: `src/evo/host_install/codex.py` enables `[features]
++  plugin_hooks=true` and `[plugins."evo@evo-hq"] enabled=true` in
++  `~/.codex/config.toml`. It rewrites cached hook commands to an absolute,
++  stable helper path because Codex does not guarantee
++  `CLAUDE_PLUGIN_ROOT`; it also removes the Claude-only wait hint. Trusted hook
++  hashes matter: untrusted hooks register but do not fire, so `evo direct`
++  cannot arrive.
++- Cursor: `src/evo/host_install/cursor.py` installs skills separately with
++  `npx skills add` and merges native entries into `~/.cursor/hooks.json` for
++  `sessionStart`, `beforeSubmitPrompt`, `preToolUse`, `stop`, and
++  `subagentStop`. These call `evo-drain --host cursor` directly; Cursor does
++  not use the Rust helper or Claude compatibility file.
++
++## `evo direct` delivery lifecycle
++
++1. **Engage/register.** `src/evo/inject/registry.py` records sessions beneath
++   the active run's `inject/sessions/`. Claude Code uses
++   `CLAUDE_CODE_SESSION_ID`, Codex uses `CODEX_THREAD_ID`; Cursor has no stable
++   session environment variable, so `drain.py` resolves its session and
++   workspace from hook stdin. Registration seeds a per-session offset so a new
++   chat does not receive historical directives.
++2. **Queue.** `cmd_direct` in `src/evo/cli.py` appends an event through
++   `src/evo/inject/queue.py`. Broadcasts go to
++   `<active-run>/inject/events/workspace.jsonl`; targeted messages go to
++   `events/<exp_id>.jsonl`. Writes use `O_APPEND`, event IDs are sortable, and
++   readers tolerate an incomplete trailing line.
++3. **Select recipients and wake them.** Broadcast delivery enumerates the
++   registry and filters out stale, unengaged, or subagent sessions where
++   appropriate. Targeted delivery selects sessions associated with the
++   experiment. `evo direct` touches each recipient's
++   `inject/markers/<session>.flag`; the durable JSONL remains the source of
++   message content.
++4. **Hook fires.** On a frequent host event, the Rust helper sees the marker
++   (SessionStart is also used to engage the orchestrator) and invokes the
++   Python drain. Cursor invokes Python directly and applies equivalent gating
++   there.
++5. **Drain once.** `src/evo/inject/drain.py` loads the session record, reads
++   only events after that session's stored offset, formats banners containing
++   the directive ID and `evo ack <id>` instruction, and chooses a host envelope.
++   Orchestrators read the workspace queue; experiment subagents read only their
++   `<exp_id>.jsonl` queue.
++6. **Record receipt.** After emitting, drain advances the session offset,
++   removes the marker, and writes `inject/delivered/<event-id>.json` (L1:
++   emitted to a session). When the agent executes `evo ack <id>`, the CLI writes
++   `inject/acks/<event-id>.json` (L2: model confirmed receipt). `evo direct
++   --wait` waits for L2; `evo direct status` reports queued/delivered/acked.
++
++## What fires when, by host
++
++| Moment | Claude Code | Codex | Cursor |
++|---|---|---|---|
++| New/resumed session | `SessionStart` registers/engages; CLI calls can also auto-register from `CLAUDE_CODE_SESSION_ID`. | Same shared event shape, keyed by `CODEX_THREAD_ID`; requires enabled and trusted plugin hooks. | `sessionStart` registers new chats; `beforeSubmitPrompt` catches resumed chats because Cursor lacks a session env var. |
++| Before a tool | `PreToolUse` is the principal mid-turn drain. When a directive exists, the response adds `permissionDecision: allow`, because Claude drops bare pre-tool `additionalContext`. | `PreToolUse` returns bare `hookSpecificOutput.additionalContext`; unlike Claude, no permission decision is added. | `preToolUse` delivers only for shell tools by rewriting the command to print the directive before running the original command. Non-shell tools defer because Cursor drops reliable context there. |
++| After a tool / prompt submission | `PostToolUse` and `UserPromptSubmit` are additional drain opportunities; Bash post-use may show `wait_hint.sh`. | Shared drain events work, but installer strips the Claude-specific wait hint. | No equivalent delivery channel: `beforeSubmitPrompt` registers only. |
++| End of turn | `Stop` / `SubagentStop` use `{decision:"block", reason:text}` because these events do not support `additionalContext`; optimize mode can combine a queued directive with a continuation nudge. | Same stop envelope and continuation behavior. | `stop` / `subagentStop` return `followup_message`, which the IDE submits as a visible next message and provides the fallback for turns without a shell call. |
++
++## Important boundaries inside `src/evo/`
++
++- `cli.py` owns public commands and orchestration: initialization, experiment
++  execution, gates, direct/ack/status, install/update, and reporting commands.
++- `core.py` owns shared run/workspace state and host constants. Notably only
++  Claude Code currently appears in `DISPATCH_HOSTS`; Codex and Cursor can run
++  the general evo workflow but do not use Claude's cached-fork dispatch path.
++- `dispatch.py` builds explorer/execute prompts and implements the Claude Code
++  fork-cache dispatch protocol.
++- `inject/{paths,registry,queue,marker,drain}.py` is the cross-host message bus:
++  filesystem layout, recipient identity, durable events, wake flags, and
++  host-specific hook output respectively.
++- `host_install/*.py` translates common plugin behavior into each host's
++  installation and hook mechanism.
++- `backends/` supplies worktree, pool, remote, and sandbox execution adapters;
++  `frontier_strategies.py` selects experiment parents; `scratchpad.py` and
++  `dashboard.py` expose shared state and the experiment graph.
++
++## Reliability consequences
++
++- A marker is only a wake signal. A lost/repeated hook does not lose the
++  directive because queue data and per-session offsets are durable.
++- Consumption is deliberately deferred when the host channel is unreliable
++  (especially Cursor non-shell pre-tool hooks), preventing a directive from
++  being acknowledged internally without reaching the model.
++- The native helper, Node shims, and checked-in fallback all fail open and use
++  bounded subprocess calls, so a broken injection path should not wedge every
++  agent tool call.
++- Broadcast is opt-in: a session must be registered and evo-engaged. This
++  avoids steering unrelated agent chats merely because global hooks are
++  installed.
++
++## Files read
++
++- `/workspace/evo-myworld/CHARTER.md`
++- `/workspace/evo-myworld/FIELD-NOTES.md`
++- `/workspace/evo-myworld/queues/codex.md`
++- `/workspace/evo-myworld/plugins/evo/hooks/hooks.json`
++- `/workspace/evo-myworld/plugins/evo/hooks/wait_hint.sh`
++- `/workspace/evo-myworld/plugins/evo/bin/evo`
++- `/workspace/evo-myworld/plugins/evo/bin/evo-hook-drain`
++- `/workspace/evo-myworld/plugins/evo/bin/evo-hook-drain-rs/src/main.rs`
++- `/workspace/evo-myworld/plugins/evo/pyproject.toml`
++- `/workspace/evo-myworld/plugins/evo/src/evo/cli.py`
++- `/workspace/evo-myworld/plugins/evo/src/evo/core.py`
++- `/workspace/evo-myworld/plugins/evo/src/evo/dispatch.py`
++- `/workspace/evo-myworld/plugins/evo/src/evo/inject/{drain,marker,paths,queue,registry}.py`
++- `/workspace/evo-myworld/plugins/evo/src/evo/host_install/{_hook_drain,claude_code,codex,cursor}.py`
++
+
+diff --git a/evo-myworld/FIELD-NOTES.md b/evo-myworld/FIELD-NOTES.md
+index 274a84feaf9498a341b9d7ceeb7075e9dcb432c0..86d505a394d7fc8b44ac7c583f01948b58bb2be3
+--- a/evo-myworld/FIELD-NOTES.md
++++ b/evo-myworld/FIELD-NOTES.md
+@@ -191,3 +191,12 @@
+ 
+ 
+ - 2026-07-19 Kimi: Read `CHARTER.md`, `FIELD-NOTES.md`, and `/projects/evo-hq/README.md`. Front-end seat should build inside `world/kimi/` and keep load tiny until assembly-line port + graph backend land. Existing dashboard is Flask + `static/app.js` with `.evo/<active-run>/graph.json`; the upstream README enumerates frontier strategies and backends. Drafted 5 creative UI directions (campfire room, time-river tree, agent orbit, graph-first lens, lab-bench panel) in `world/kimi/ideas.md`. No code yet. Signed, kimi.
++- 2026-07-19 Codex: Mapped plugin and `evo direct` internals in
++  `world/codex/internals-map.md`. Directives are durable append-only JSONL;
++  per-session marker files only wake drains, offsets make delivery once per
++  session, `delivered/` is the emit receipt, and `evo ack` is the model receipt.
++  Claude Code and Codex share hook envelopes but differ at PreToolUse (Claude
++  needs `permissionDecision: allow`) and installation (Codex needs enabled,
++  trusted plugin hooks plus absolute helper paths). Cursor uses native hooks,
++  delivers mid-turn only by rewriting shell input, and otherwise defers to a
++  turn-end `followup_message`. Signed, codex.
+diff --git a/evo-myworld/queues/codex.md b/evo-myworld/queues/codex.md
+index c53cf0ed408b2d693bd23a5f1718d91078a75d9c..003fd7a65382f545f91dbad96b1a80979ed80fb3
+--- a/evo-myworld/queues/codex.md
++++ b/evo-myworld/queues/codex.md
+@@ -1,5 +1,5 @@
+ # Queue — Codex
+-1. [ ] Map the plugin internals: plugins/evo/hooks/, bin/, src/evo/, and how
++1. [x] Map the plugin internals: plugins/evo/hooks/, bin/, src/evo/, and how
+    evo-drain / evo direct deliver messages. Write world/codex/internals-map.md
+    (what fires when, host differences claude-code vs codex vs cursor).
+ 2. [ ] Identify the 3 cheapest extension points for adding a custom frontier
+diff --git a/evo-myworld/world/codex/internals-map.md b/evo-myworld/world/codex/internals-map.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..fafc0230f684f8423f0da63f18b8a934687e0cc5
+--- /dev/null
++++ b/evo-myworld/world/codex/internals-map.md
+@@ -0,0 +1,142 @@
++# evo plugin internals map
++
++This map covers the requested surfaces in `/workspace/evo-myworld/plugins/evo/`:
++`hooks/`, `bin/`, `src/evo/`, and the `evo direct` / `evo-drain` delivery path.
++
++## Entry points and installation
++
++- `plugins/evo/bin/evo` is the plugin-local shell entry point. Claude Code puts
++  the plugin's `bin/` on the Bash-tool `PATH`; the wrapper locates the plugin
++  root and executes `uv run --project <plugin-root> evo ...`. The installed CLI
++  exposes the same Python command through `plugins/evo/pyproject.toml`.
++- `plugins/evo/pyproject.toml` maps `evo` to `evo.cli:main` and `evo-drain` to
++  `evo.inject.drain:main`.
++- `plugins/evo/hooks/hooks.json` is the shared Claude-style hook declaration.
++  It wires `PreToolUse`, `PostToolUse`, `UserPromptSubmit`, `SessionStart`,
++  `Stop`, and `SubagentStop` to a fail-open Node shim. The shim reads hook JSON
++  from stdin, tries the native `evo-hook-drain` with a two-second bound, passes
++  through nonempty JSON output, and otherwise returns `{}`. A second
++  `PostToolUse`/`Bash` handler invokes `hooks/wait_hint.sh` for a one-shot UX
++  reminder.
++- `plugins/evo/bin/evo-hook-drain` is the checked-in recovery wrapper. Normal
++  installation downloads a platform-native Rust binary to
++  `$EVO_HOME/bin/evo-hook-drain` (normally `~/.evo/bin/`) using
++  `src/evo/host_install/_hook_drain.py`. If a host refresh restores the wrapper
++  over its cached native binary, the wrapper executes the stable copy. If that
++  copy is absent it logs a reinstall hint and returns `{}`, preserving the host
++  session.
++- `plugins/evo/bin/evo-hook-drain-rs/src/main.rs` is the hot-path filter. Its
++  purpose is to cheaply resolve the workspace/session and check marker or
++  optimize-mode flags before handing stdin to Python. This avoids starting a
++  Python interpreter on every tool hook when nothing is pending.
++
++Host installers are adapters, not just file copiers:
++
++- Claude Code: `src/evo/host_install/claude_code.py` drives `claude plugin
++  marketplace add/install`, then stages the native helper into the actual
++  plugin root/cache. The shared `hooks.json` is used directly.
++- Codex: `src/evo/host_install/codex.py` enables `[features]
++  plugin_hooks=true` and `[plugins."evo@evo-hq"] enabled=true` in
++  `~/.codex/config.toml`. It rewrites cached hook commands to an absolute,
++  stable helper path because Codex does not guarantee
++  `CLAUDE_PLUGIN_ROOT`; it also removes the Claude-only wait hint. Trusted hook
++  hashes matter: untrusted hooks register but do not fire, so `evo direct`
++  cannot arrive.
++- Cursor: `src/evo/host_install/cursor.py` installs skills separately with
++  `npx skills add` and merges native entries into `~/.cursor/hooks.json` for
++  `sessionStart`, `beforeSubmitPrompt`, `preToolUse`, `stop`, and
++  `subagentStop`. These call `evo-drain --host cursor` directly; Cursor does
++  not use the Rust helper or Claude compatibility file.
++
++## `evo direct` delivery lifecycle
++
++1. **Engage/register.** `src/evo/inject/registry.py` records sessions beneath
++   the active run's `inject/sessions/`. Claude Code uses
++   `CLAUDE_CODE_SESSION_ID`, Codex uses `CODEX_THREAD_ID`; Cursor has no stable
++   session environment variable, so `drain.py` resolves its session and
++   workspace from hook stdin. Registration seeds a per-session offset so a new
++   chat does not receive historical directives.
++2. **Queue.** `cmd_direct` in `src/evo/cli.py` appends an event through
++   `src/evo/inject/queue.py`. Broadcasts go to
++   `<active-run>/inject/events/workspace.jsonl`; targeted messages go to
++   `events/<exp_id>.jsonl`. Writes use `O_APPEND`, event IDs are sortable, and
++   readers tolerate an incomplete trailing line.
++3. **Select recipients and wake them.** Broadcast delivery enumerates the
++   registry and filters out stale, unengaged, or subagent sessions where
++   appropriate. Targeted delivery selects sessions associated with the
++   experiment. `evo direct` touches each recipient's
++   `inject/markers/<session>.flag`; the durable JSONL remains the source of
++   message content.
++4. **Hook fires.** On a frequent host event, the Rust helper sees the marker
++   (SessionStart is also used to engage the orchestrator) and invokes the
++   Python drain. Cursor invokes Python directly and applies equivalent gating
++   there.
++5. **Drain once.** `src/evo/inject/drain.py` loads the session record, reads
++   only events after that session's stored offset, formats banners containing
++   the directive ID and `evo ack <id>` instruction, and chooses a host envelope.
++   Orchestrators read the workspace queue; experiment subagents read only their
++   `<exp_id>.jsonl` queue.
++6. **Record receipt.** After emitting, drain advances the session offset,
++   removes the marker, and writes `inject/delivered/<event-id>.json` (L1:
++   emitted to a session). When the agent executes `evo ack <id>`, the CLI writes
++   `inject/acks/<event-id>.json` (L2: model confirmed receipt). `evo direct
++   --wait` waits for L2; `evo direct status` reports queued/delivered/acked.
++
++## What fires when, by host
++
++| Moment | Claude Code | Codex | Cursor |
++|---|---|---|---|
++| New/resumed session | `SessionStart` registers/engages; CLI calls can also auto-register from `CLAUDE_CODE_SESSION_ID`. | Same shared event shape, keyed by `CODEX_THREAD_ID`; requires enabled and trusted plugin hooks. | `sessionStart` registers new chats; `beforeSubmitPrompt` catches resumed chats because Cursor lacks a session env var. |
++| Before a tool | `PreToolUse` is the principal mid-turn drain. When a directive exists, the response adds `permissionDecision: allow`, because Claude drops bare pre-tool `additionalContext`. | `PreToolUse` returns bare `hookSpecificOutput.additionalContext`; unlike Claude, no permission decision is added. | `preToolUse` delivers only for shell tools by rewriting the command to print the directive before running the original command. Non-shell tools defer because Cursor drops reliable context there. |
++| After a tool / prompt submission | `PostToolUse` and `UserPromptSubmit` are additional drain opportunities; Bash post-use may show `wait_hint.sh`. | Shared drain events work, but installer strips the Claude-specific wait hint. | No equivalent delivery channel: `beforeSubmitPrompt` registers only. |
++| End of turn | `Stop` / `SubagentStop` use `{decision:"block", reason:text}` because these events do not support `additionalContext`; optimize mode can combine a queued directive with a continuation nudge. | Same stop envelope and continuation behavior. | `stop` / `subagentStop` return `followup_message`, which the IDE submits as a visible next message and provides the fallback for turns without a shell call. |
++
++## Important boundaries inside `src/evo/`
++
++- `cli.py` owns public commands and orchestration: initialization, experiment
++  execution, gates, direct/ack/status, install/update, and reporting commands.
++- `core.py` owns shared run/workspace state and host constants. Notably only
++  Claude Code currently appears in `DISPATCH_HOSTS`; Codex and Cursor can run
++  the general evo workflow but do not use Claude's cached-fork dispatch path.
++- `dispatch.py` builds explorer/execute prompts and implements the Claude Code
++  fork-cache dispatch protocol.
++- `inject/{paths,registry,queue,marker,drain}.py` is the cross-host message bus:
++  filesystem layout, recipient identity, durable events, wake flags, and
++  host-specific hook output respectively.
++- `host_install/*.py` translates common plugin behavior into each host's
++  installation and hook mechanism.
++- `backends/` supplies worktree, pool, remote, and sandbox execution adapters;
++  `frontier_strategies.py` selects experiment parents; `scratchpad.py` and
++  `dashboard.py` expose shared state and the experiment graph.
++
++## Reliability consequences
++
++- A marker is only a wake signal. A lost/repeated hook does not lose the
++  directive because queue data and per-session offsets are durable.
++- Consumption is deliberately deferred when the host channel is unreliable
++  (especially Cursor non-shell pre-tool hooks), preventing a directive from
++  being acknowledged internally without reaching the model.
++- The native helper, Node shims, and checked-in fallback all fail open and use
++  bounded subprocess calls, so a broken injection path should not wedge every
++  agent tool call.
++- Broadcast is opt-in: a session must be registered and evo-engaged. This
++  avoids steering unrelated agent chats merely because global hooks are
++  installed.
++
++## Files read
++
++- `/workspace/evo-myworld/CHARTER.md`
++- `/workspace/evo-myworld/FIELD-NOTES.md`
++- `/workspace/evo-myworld/queues/codex.md`
++- `/workspace/evo-myworld/plugins/evo/hooks/hooks.json`
++- `/workspace/evo-myworld/plugins/evo/hooks/wait_hint.sh`
++- `/workspace/evo-myworld/plugins/evo/bin/evo`
++- `/workspace/evo-myworld/plugins/evo/bin/evo-hook-drain`
++- `/workspace/evo-myworld/plugins/evo/bin/evo-hook-drain-rs/src/main.rs`
++- `/workspace/evo-myworld/plugins/evo/pyproject.toml`
++- `/workspace/evo-myworld/plugins/evo/src/evo/cli.py`
++- `/workspace/evo-myworld/plugins/evo/src/evo/core.py`
++- `/workspace/evo-myworld/plugins/evo/src/evo/dispatch.py`
++- `/workspace/evo-myworld/plugins/evo/src/evo/inject/{drain,marker,paths,queue,registry}.py`
++- `/workspace/evo-myworld/plugins/evo/src/evo/host_install/{_hook_drain,claude_code,codex,cursor}.py`
++
+
+exec
+/bin/bash -lc "test -f world/codex/internals-map.md && sed -n '1,30p' world/codex/internals-map.md
+tail -n 14 FIELD-NOTES.md
+sed -n '1,8p' queues/codex.md
+git diff --check -- world/codex/internals-map.md FIELD-NOTES.md queues/codex.md" in /workspace/evo-myworld
+ exited 129 in 0ms:
+# evo plugin internals map
+
+This map covers the requested surfaces in `/workspace/evo-myworld/plugins/evo/`:
+`hooks/`, `bin/`, `src/evo/`, and the `evo direct` / `evo-drain` delivery path.
+
+## Entry points and installation
+
+- `plugins/evo/bin/evo` is the plugin-local shell entry point. Claude Code puts
+  the plugin's `bin/` on the Bash-tool `PATH`; the wrapper locates the plugin
+  root and executes `uv run --project <plugin-root> evo ...`. The installed CLI
+  exposes the same Python command through `plugins/evo/pyproject.toml`.
+- `plugins/evo/pyproject.toml` maps `evo` to `evo.cli:main` and `evo-drain` to
+  `evo.inject.drain:main`.
+- `plugins/evo/hooks/hooks.json` is the shared Claude-style hook declaration.
+  It wires `PreToolUse`, `PostToolUse`, `UserPromptSubmit`, `SessionStart`,
+  `Stop`, and `SubagentStop` to a fail-open Node shim. The shim reads hook JSON
+  from stdin, tries the native `evo-hook-drain` with a two-second bound, passes
+  through nonempty JSON output, and otherwise returns `{}`. A second
+  `PostToolUse`/`Bash` handler invokes `hooks/wait_hint.sh` for a one-shot UX
+  reminder.
+- `plugins/evo/bin/evo-hook-drain` is the checked-in recovery wrapper. Normal
+  installation downloads a platform-native Rust binary to
+  `$EVO_HOME/bin/evo-hook-drain` (normally `~/.evo/bin/`) using
+  `src/evo/host_install/_hook_drain.py`. If a host refresh restores the wrapper
+  over its cached native binary, the wrapper executes the stable copy. If that
+  copy is absent it logs a reinstall hint and returns `{}`, preserving the host
+  session.
+- `plugins/evo/bin/evo-hook-drain-rs/src/main.rs` is the hot-path filter. Its
+  purpose is to cheaply resolve the workspace/session and check marker or
+  optimize-mode flags before handing stdin to Python. This avoids starting a
+  once the big win lands; size CALLS_PER_REP so best-case runtime >> the
+  rounding unit. evo records such issues as "workspace notes" in the run.
+
+
+- 2026-07-19 Kimi: Read `CHARTER.md`, `FIELD-NOTES.md`, and `/projects/evo-hq/README.md`. Front-end seat should build inside `world/kimi/` and keep load tiny until assembly-line port + graph backend land. Existing dashboard is Flask + `static/app.js` with `.evo/<active-run>/graph.json`; the upstream README enumerates frontier strategies and backends. Drafted 5 creative UI directions (campfire room, time-river tree, agent orbit, graph-first lens, lab-bench panel) in `world/kimi/ideas.md`. No code yet. Signed, kimi.
+- 2026-07-19 Codex: Mapped plugin and `evo direct` internals in
+  `world/codex/internals-map.md`. Directives are durable append-only JSONL;
+  per-session marker files only wake drains, offsets make delivery once per
+  session, `delivered/` is the emit receipt, and `evo ack` is the model receipt.
+  Claude Code and Codex share hook envelopes but differ at PreToolUse (Claude
+  needs `permissionDecision: allow`) and installation (Codex needs enabled,
+  trusted plugin hooks plus absolute helper paths). Cursor uses native hooks,
+  delivers mid-turn only by rewriting shell input, and otherwise defers to a
+  turn-end `followup_message`. Signed, codex.
+# Queue — Codex
+1. [x] Map the plugin internals: plugins/evo/hooks/, bin/, src/evo/, and how
+   evo-drain / evo direct deliver messages. Write world/codex/internals-map.md
+   (what fires when, host differences claude-code vs codex vs cursor).
+2. [ ] Identify the 3 cheapest extension points for adding a custom frontier
+   strategy. Append findings to FIELD-NOTES.md.
+3. [ ] PORT-PLAN.md Track A, deliverable A2 — RACE RULE applies (≥2 candidate schemas/patterns from searches, raced in the evo-hq harness before adoption): world/codex/assigner-bridge/ —
+   Planner-JSON → evo run config + subagent briefs. Read
+warning: Not a git repository. Use --no-index to compare two paths outside a working tree
+usage: git diff --no-index [<options>] <path> <path>
+
+Diff output format options
+    -p, --patch           generate patch
+    -s, --no-patch        suppress diff output
+    -u                    generate patch
+    -U, --unified[=<n>]   generate diffs with <n> lines context
+    -W, --function-context
+                          generate diffs with <n> lines context
+    --raw                 generate the diff in raw format
+    --patch-with-raw      synonym for '-p --raw'
+    --patch-with-stat     synonym for '-p --stat'
+    --numstat             machine friendly --stat
+    --shortstat           output only the last line of --stat
+    -X, --dirstat[=<param1,param2>...]
+                          output the distribution of relative amount of changes for each sub-directory
+    --cumulative          synonym for --dirstat=cumulative
+    --dirstat-by-file[=<param1,param2>...]
+                          synonym for --dirstat=files,param1,param2...
+    --check               warn if changes introduce conflict markers or whitespace errors
+    --summary             condensed summary such as creations, renames and mode changes
+    --name-only           show only names of changed files
+    --name-status         show only names and status of changed files
+    --stat[=<width>[,<name-width>[,<count>]]]
+                          generate diffstat
+    --stat-width <width>  generate diffstat with a given width
+    --stat-name-width <width>
+                          generate diffstat with a given name width
+    --stat-graph-width <width>
+                          generate diffstat with a given graph width
+    --stat-count <count>  generate diffstat with limited lines
+    --compact-summary     generate compact summary in diffstat
+    --binary              output a binary diff that can be applied
+    --full-index          show full pre- and post-image object names on the "index" lines
+    --color[=<when>]      show colored diff
+    --ws-error-highlight <kind>
+                          highlight whitespace errors in the 'context', 'old' or 'new' lines in the diff
+    -z                    do not munge pathnames and use NULs as output field terminators in --raw or --numstat
+    --abbrev[=<n>]        use <n> digits to display object names
+    --src-prefix <prefix>
+                          show the given source prefix instead of "a/"
+    --dst-prefix <prefix>
+                          show the given destination prefix instead of "b/"
+    --line-prefix <prefix>
+                          prepend an additional prefix to every line of output
+    --no-prefix           do not show any source or destination prefix
+    --inter-hunk-context <n>
+                          show context between diff hunks up to the specified number of lines
+    --output-indicator-new <char>
+                          specify the character to indicate a new line instead of '+'
+    --output-indicator-old <char>
+                          specify the character to indicate an old line instead of '-'
+    --output-indicator-context <char>
+                          specify the character to indicate a context instead of ' '
+
+Diff rename options
+    -B, --break-rewrites[=<n>[/<m>]]
+                          break complete rewrite changes into pairs of delete and create
+    -M, --find-renames[=<n>]
+                          detect renames
+    -D, --irreversible-delete
+                          omit the preimage for deletes
+    -C, --find-copies[=<n>]
+                          detect copies
+    --find-copies-harder  use unmodified files as source to find copies
+    --no-renames          disable rename detection
+    --rename-empty        use empty blobs as rename source
+    --follow              continue listing the history of a file beyond renames
+    -l <n>                prevent rename/copy detection if the number of rename/copy targets exceeds given limit
+
+Diff algorithm options
+    --minimal             produce the smallest possible diff
+    -w, --ignore-all-space
+                          ignore whitespace when comparing lines
+    -b, --ignore-space-change
+                          ignore changes in amount of whitespace
+    --ignore-space-at-eol
+                          ignore changes in whitespace at EOL
+    --ignore-cr-at-eol    ignore carrier-return at the end of line
+    --ignore-blank-lines  ignore changes whose lines are all blank
+    -I, --ignore-matching-lines <regex>
+                          ignore changes whose all lines match <regex>
+    --indent-heuristic    heuristic to shift diff hunk boundaries for easy reading
+    --patience            generate diff using the "patience diff" algorithm
+    --histogram           generate diff using the "histogram diff" algorithm
+    --diff-algorithm <algorithm>
+                          choose a diff algorithm
+    --anchored <text>     generate diff using the "anchored diff" algorithm
+    --word-diff[=<mode>]  show word diff, using <mode> to delimit changed words
+    --word-diff-regex <regex>
+                          use <regex> to decide what a word is
+    --color-words[=<regex>]
+                          equivalent to --word-diff=color --word-diff-regex=<regex>
+    --color-moved[=<mode>]
+                          moved lines of code are colored differently
+    --color-moved-ws <mode>
+                          how white spaces are ignored in --color-moved
+
+Other diff options
+    --relative[=<prefix>]
+                          when run from subdir, exclude changes outside and show relative paths
+    -a, --text            treat all files as text
+    -R                    swap two inputs, reverse the diff
+    --exit-code           exit with 1 if there were differences, 0 otherwise
+    --quiet               disable all output of the program
+    --ext-diff            allow an external diff helper to be executed
+    --textconv            run external text conversion filters when comparing binary files
+    --ignore-submodules[=<when>]
+                          ignore changes to submodules in the diff generation
+    --submodule[=<format>]
+                          specify how differences in submodules are shown
+    --ita-invisible-in-index
+                          hide 'git add -N' entries from the index
+    --ita-visible-in-index
+                          treat 'git add -N' entries as real in the index
+    -S <string>           look for differences that change the number of occurrences of the specified string
+    -G <regex>            look for differences that change the number of occurrences of the specified regex
+    --pickaxe-all         show all changes in the changeset with -S or -G
+    --pickaxe-regex       treat <string> in -S as extended POSIX regular expression
+    -O <file>             control the order in which files appear in the output
+    --rotate-to <path>    show the change in the specified path first
+    --skip-to <path>      skip the output to the specified path
+    --find-object <object-id>
+                          look for differences that change the number of occurrences of the specified object
+    --diff-filter [(A|C|D|M|R|T|U|X|B)...[*]]
+                          select files by diff type
+    --output <file>       output to a specific file
+
+
+diff --git a/evo-myworld/FIELD-NOTES.md b/evo-myworld/FIELD-NOTES.md
+index 274a84feaf9498a341b9d7ceeb7075e9dcb432c0..86d505a394d7fc8b44ac7c583f01948b58bb2be3
+--- a/evo-myworld/FIELD-NOTES.md
++++ b/evo-myworld/FIELD-NOTES.md
+@@ -191,3 +191,12 @@
+ 
+ 
+ - 2026-07-19 Kimi: Read `CHARTER.md`, `FIELD-NOTES.md`, and `/projects/evo-hq/README.md`. Front-end seat should build inside `world/kimi/` and keep load tiny until assembly-line port + graph backend land. Existing dashboard is Flask + `static/app.js` with `.evo/<active-run>/graph.json`; the upstream README enumerates frontier strategies and backends. Drafted 5 creative UI directions (campfire room, time-river tree, agent orbit, graph-first lens, lab-bench panel) in `world/kimi/ideas.md`. No code yet. Signed, kimi.
++- 2026-07-19 Codex: Mapped plugin and `evo direct` internals in
++  `world/codex/internals-map.md`. Directives are durable append-only JSONL;
++  per-session marker files only wake drains, offsets make delivery once per
++  session, `delivered/` is the emit receipt, and `evo ack` is the model receipt.
++  Claude Code and Codex share hook envelopes but differ at PreToolUse (Claude
++  needs `permissionDecision: allow`) and installation (Codex needs enabled,
++  trusted plugin hooks plus absolute helper paths). Cursor uses native hooks,
++  delivers mid-turn only by rewriting shell input, and otherwise defers to a
++  turn-end `followup_message`. Signed, codex.
+diff --git a/evo-myworld/queues/codex.md b/evo-myworld/queues/codex.md
+index c53cf0ed408b2d693bd23a5f1718d91078a75d9c..003fd7a65382f545f91dbad96b1a80979ed80fb3
+--- a/evo-myworld/queues/codex.md
++++ b/evo-myworld/queues/codex.md
+@@ -1,5 +1,5 @@
+ # Queue — Codex
+-1. [ ] Map the plugin internals: plugins/evo/hooks/, bin/, src/evo/, and how
++1. [x] Map the plugin internals: plugins/evo/hooks/, bin/, src/evo/, and how
+    evo-drain / evo direct deliver messages. Write world/codex/internals-map.md
+    (what fires when, host differences claude-code vs codex vs cursor).
+ 2. [ ] Identify the 3 cheapest extension points for adding a custom frontier
+diff --git a/evo-myworld/world/codex/internals-map.md b/evo-myworld/world/codex/internals-map.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..fafc0230f684f8423f0da63f18b8a934687e0cc5
+--- /dev/null
++++ b/evo-myworld/world/codex/internals-map.md
+@@ -0,0 +1,142 @@
++# evo plugin internals map
++
++This map covers the requested surfaces in `/workspace/evo-myworld/plugins/evo/`:
++`hooks/`, `bin/`, `src/evo/`, and the `evo direct` / `evo-drain` delivery path.
++
++## Entry points and installation
++
++- `plugins/evo/bin/evo` is the plugin-local shell entry point. Claude Code puts
++  the plugin's `bin/` on the Bash-tool `PATH`; the wrapper locates the plugin
++  root and executes `uv run --project <plugin-root> evo ...`. The installed CLI
++  exposes the same Python command through `plugins/evo/pyproject.toml`.
++- `plugins/evo/pyproject.toml` maps `evo` to `evo.cli:main` and `evo-drain` to
++  `evo.inject.drain:main`.
++- `plugins/evo/hooks/hooks.json` is the shared Claude-style hook declaration.
++  It wires `PreToolUse`, `PostToolUse`, `UserPromptSubmit`, `SessionStart`,
++  `Stop`, and `SubagentStop` to a fail-open Node shim. The shim reads hook JSON
++  from stdin, tries the native `evo-hook-drain` with a two-second bound, passes
++  through nonempty JSON output, and otherwise returns `{}`. A second
++  `PostToolUse`/`Bash` handler invokes `hooks/wait_hint.sh` for a one-shot UX
++  reminder.
++- `plugins/evo/bin/evo-hook-drain` is the checked-in recovery wrapper. Normal
++  installation downloads a platform-native Rust binary to
++  `$EVO_HOME/bin/evo-hook-drain` (normally `~/.evo/bin/`) using
++  `src/evo/host_install/_hook_drain.py`. If a host refresh restores the wrapper
++  over its cached native binary, the wrapper executes the stable copy. If that
++  copy is absent it logs a reinstall hint and returns `{}`, preserving the host
++  session.
++- `plugins/evo/bin/evo-hook-drain-rs/src/main.rs` is the hot-path filter. Its
++  purpose is to cheaply resolve the workspace/session and check marker or
++  optimize-mode flags before handing stdin to Python. This avoids starting a
++  Python interpreter on every tool hook when nothing is pending.
++
++Host installers are adapters, not just file copiers:
++
++- Claude Code: `src/evo/host_install/claude_code.py` drives `claude plugin
++  marketplace add/install`, then stages the native helper into the actual
++  plugin root/cache. The shared `hooks.json` is used directly.
++- Codex: `src/evo/host_install/codex.py` enables `[features]
++  plugin_hooks=true` and `[plugins."evo@evo-hq"] enabled=true` in
++  `~/.codex/config.toml`. It rewrites cached hook commands to an absolute,
++  stable helper path because Codex does not guarantee
++  `CLAUDE_PLUGIN_ROOT`; it also removes the Claude-only wait hint. Trusted hook
++  hashes matter: untrusted hooks register but do not fire, so `evo direct`
++  cannot arrive.
++- Cursor: `src/evo/host_install/cursor.py` installs skills separately with
++  `npx skills add` and merges native entries into `~/.cursor/hooks.json` for
++  `sessionStart`, `beforeSubmitPrompt`, `preToolUse`, `stop`, and
++  `subagentStop`. These call `evo-drain --host cursor` directly; Cursor does
++  not use the Rust helper or Claude compatibility file.
++
++## `evo direct` delivery lifecycle
++
++1. **Engage/register.** `src/evo/inject/registry.py` records sessions beneath
++   the active run's `inject/sessions/`. Claude Code uses
++   `CLAUDE_CODE_SESSION_ID`, Codex uses `CODEX_THREAD_ID`; Cursor has no stable
++   session environment variable, so `drain.py` resolves its session and
++   workspace from hook stdin. Registration seeds a per-session offset so a new
++   chat does not receive historical directives.
++2. **Queue.** `cmd_direct` in `src/evo/cli.py` appends an event through
++   `src/evo/inject/queue.py`. Broadcasts go to
++   `<active-run>/inject/events/workspace.jsonl`; targeted messages go to
++   `events/<exp_id>.jsonl`. Writes use `O_APPEND`, event IDs are sortable, and
++   readers tolerate an incomplete trailing line.
++3. **Select recipients and wake them.** Broadcast delivery enumerates the
++   registry and filters out stale, unengaged, or subagent sessions where
++   appropriate. Targeted delivery selects sessions associated with the
++   experiment. `evo direct` touches each recipient's
++   `inject/markers/<session>.flag`; the durable JSONL remains the source of
++   message content.
++4. **Hook fires.** On a frequent host event, the Rust helper sees the marker
++   (SessionStart is also used to engage the orchestrator) and invokes the
++   Python drain. Cursor invokes Python directly and applies equivalent gating
++   there.
++5. **Drain once.** `src/evo/inject/drain.py` loads the session record, reads
++   only events after that session's stored offset, formats banners containing
++   the directive ID and `evo ack <id>` instruction, and chooses a host envelope.
++   Orchestrators read the workspace queue; experiment subagents read only their
++   `<exp_id>.jsonl` queue.
++6. **Record receipt.** After emitting, drain advances the session offset,
++   removes the marker, and writes `inject/delivered/<event-id>.json` (L1:
++   emitted to a session). When the agent executes `evo ack <id>`, the CLI writes
++   `inject/acks/<event-id>.json` (L2: model confirmed receipt). `evo direct
++   --wait` waits for L2; `evo direct status` reports queued/delivered/acked.
++
++## What fires when, by host
++
++| Moment | Claude Code | Codex | Cursor |
++|---|---|---|---|
++| New/resumed session | `SessionStart` registers/engages; CLI calls can also auto-register from `CLAUDE_CODE_SESSION_ID`. | Same shared event shape, keyed by `CODEX_THREAD_ID`; requires enabled and trusted plugin hooks. | `sessionStart` registers new chats; `beforeSubmitPrompt` catches resumed chats because Cursor lacks a session env var. |
++| Before a tool | `PreToolUse` is the principal mid-turn drain. When a directive exists, the response adds `permissionDecision: allow`, because Claude drops bare pre-tool `additionalContext`. | `PreToolUse` returns bare `hookSpecificOutput.additionalContext`; unlike Claude, no permission decision is added. | `preToolUse` delivers only for shell tools by rewriting the command to print the directive before running the original command. Non-shell tools defer because Cursor drops reliable context there. |
++| After a tool / prompt submission | `PostToolUse` and `UserPromptSubmit` are additional drain opportunities; Bash post-use may show `wait_hint.sh`. | Shared drain events work, but installer strips the Claude-specific wait hint. | No equivalent delivery channel: `beforeSubmitPrompt` registers only. |
++| End of turn | `Stop` / `SubagentStop` use `{decision:"block", reason:text}` because these events do not support `additionalContext`; optimize mode can combine a queued directive with a continuation nudge. | Same stop envelope and continuation behavior. | `stop` / `subagentStop` return `followup_message`, which the IDE submits as a visible next message and provides the fallback for turns without a shell call. |
++
++## Important boundaries inside `src/evo/`
++
++- `cli.py` owns public commands and orchestration: initialization, experiment
++  execution, gates, direct/ack/status, install/update, and reporting commands.
++- `core.py` owns shared run/workspace state and host constants. Notably only
++  Claude Code currently appears in `DISPATCH_HOSTS`; Codex and Cursor can run
++  the general evo workflow but do not use Claude's cached-fork dispatch path.
++- `dispatch.py` builds explorer/execute prompts and implements the Claude Code
++  fork-cache dispatch protocol.
++- `inject/{paths,registry,queue,marker,drain}.py` is the cross-host message bus:
++  filesystem layout, recipient identity, durable events, wake flags, and
++  host-specific hook output respectively.
++- `host_install/*.py` translates common plugin behavior into each host's
++  installation and hook mechanism.
++- `backends/` supplies worktree, pool, remote, and sandbox execution adapters;
++  `frontier_strategies.py` selects experiment parents; `scratchpad.py` and
++  `dashboard.py` expose shared state and the experiment graph.
++
++## Reliability consequences
++
++- A marker is only a wake signal. A lost/repeated hook does not lose the
++  directive because queue data and per-session offsets are durable.
++- Consumption is deliberately deferred when the host channel is unreliable
++  (especially Cursor non-shell pre-tool hooks), preventing a directive from
++  being acknowledged internally without reaching the model.
++- The native helper, Node shims, and checked-in fallback all fail open and use
++  bounded subprocess calls, so a broken injection path should not wedge every
++  agent tool call.
++- Broadcast is opt-in: a session must be registered and evo-engaged. This
++  avoids steering unrelated agent chats merely because global hooks are
++  installed.
++
++## Files read
++
++- `/workspace/evo-myworld/CHARTER.md`
++- `/workspace/evo-myworld/FIELD-NOTES.md`
++- `/workspace/evo-myworld/queues/codex.md`
++- `/workspace/evo-myworld/plugins/evo/hooks/hooks.json`
++- `/workspace/evo-myworld/plugins/evo/hooks/wait_hint.sh`
++- `/workspace/evo-myworld/plugins/evo/bin/evo`
++- `/workspace/evo-myworld/plugins/evo/bin/evo-hook-drain`
++- `/workspace/evo-myworld/plugins/evo/bin/evo-hook-drain-rs/src/main.rs`
++- `/workspace/evo-myworld/plugins/evo/pyproject.toml`
++- `/workspace/evo-myworld/plugins/evo/src/evo/cli.py`
++- `/workspace/evo-myworld/plugins/evo/src/evo/core.py`
++- `/workspace/evo-myworld/plugins/evo/src/evo/dispatch.py`
++- `/workspace/evo-myworld/plugins/evo/src/evo/inject/{drain,marker,paths,queue,registry}.py`
++- `/workspace/evo-myworld/plugins/evo/src/evo/host_install/{_hook_drain,claude_code,codex,cursor}.py`
++
+
+codex
+Completed the top Codex queue item.
+
+- Created [internals-map.md](/workspace/evo-myworld/world/codex/internals-map.md)
+- Documented hook lifecycle, `evo direct`/`evo-drain`, reliability model, and Claude Code/Codex/Cursor differences
+- Appended dated Codex learnings to [FIELD-NOTES.md](/workspace/evo-myworld/FIELD-NOTES.md)
+- Marked queue item 1 complete in [queues/codex.md](/workspace/evo-myworld/queues/codex.md)
+
+No heavy commands or tests were run; this was a reading and writing task.
+diff --git a/evo-myworld/FIELD-NOTES.md b/evo-myworld/FIELD-NOTES.md
+index 274a84feaf9498a341b9d7ceeb7075e9dcb432c0..86d505a394d7fc8b44ac7c583f01948b58bb2be3
+--- a/evo-myworld/FIELD-NOTES.md
++++ b/evo-myworld/FIELD-NOTES.md
+@@ -191,3 +191,12 @@
+ 
+ 
+ - 2026-07-19 Kimi: Read `CHARTER.md`, `FIELD-NOTES.md`, and `/projects/evo-hq/README.md`. Front-end seat should build inside `world/kimi/` and keep load tiny until assembly-line port + graph backend land. Existing dashboard is Flask + `static/app.js` with `.evo/<active-run>/graph.json`; the upstream README enumerates frontier strategies and backends. Drafted 5 creative UI directions (campfire room, time-river tree, agent orbit, graph-first lens, lab-bench panel) in `world/kimi/ideas.md`. No code yet. Signed, kimi.
++- 2026-07-19 Codex: Mapped plugin and `evo direct` internals in
++  `world/codex/internals-map.md`. Directives are durable append-only JSONL;
++  per-session marker files only wake drains, offsets make delivery once per
++  session, `delivered/` is the emit receipt, and `evo ack` is the model receipt.
++  Claude Code and Codex share hook envelopes but differ at PreToolUse (Claude
++  needs `permissionDecision: allow`) and installation (Codex needs enabled,
++  trusted plugin hooks plus absolute helper paths). Cursor uses native hooks,
++  delivers mid-turn only by rewriting shell input, and otherwise defers to a
++  turn-end `followup_message`. Signed, codex.
+diff --git a/evo-myworld/queues/codex.md b/evo-myworld/queues/codex.md
+index c53cf0ed408b2d693bd23a5f1718d91078a75d9c..003fd7a65382f545f91dbad96b1a80979ed80fb3
+--- a/evo-myworld/queues/codex.md
++++ b/evo-myworld/queues/codex.md
+@@ -1,5 +1,5 @@
+ # Queue — Codex
+-1. [ ] Map the plugin internals: plugins/evo/hooks/, bin/, src/evo/, and how
++1. [x] Map the plugin internals: plugins/evo/hooks/, bin/, src/evo/, and how
+    evo-drain / evo direct deliver messages. Write world/codex/internals-map.md
+    (what fires when, host differences claude-code vs codex vs cursor).
+ 2. [ ] Identify the 3 cheapest extension points for adding a custom frontier
+diff --git a/evo-myworld/world/codex/internals-map.md b/evo-myworld/world/codex/internals-map.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..fafc0230f684f8423f0da63f18b8a934687e0cc5
+--- /dev/null
++++ b/evo-myworld/world/codex/internals-map.md
+@@ -0,0 +1,142 @@
++# evo plugin internals map
++
++This map covers the requested surfaces in `/workspace/evo-myworld/plugins/evo/`:
++`hooks/`, `bin/`, `src/evo/`, and the `evo direct` / `evo-drain` delivery path.
++
++## Entry points and installation
++
++- `plugins/evo/bin/evo` is the plugin-local shell entry point. Claude Code puts
++  the plugin's `bin/` on the Bash-tool `PATH`; the wrapper locates the plugin
++  root and executes `uv run --project <plugin-root> evo ...`. The installed CLI
++  exposes the same Python command through `plugins/evo/pyproject.toml`.
++- `plugins/evo/pyproject.toml` maps `evo` to `evo.cli:main` and `evo-drain` to
++  `evo.inject.drain:main`.
++- `plugins/evo/hooks/hooks.json` is the shared Claude-style hook declaration.
++  It wires `PreToolUse`, `PostToolUse`, `UserPromptSubmit`, `SessionStart`,
++  `Stop`, and `SubagentStop` to a fail-open Node shim. The shim reads hook JSON
++  from stdin, tries the native `evo-hook-drain` with a two-second bound, passes
++  through nonempty JSON output, and otherwise returns `{}`. A second
++  `PostToolUse`/`Bash` handler invokes `hooks/wait_hint.sh` for a one-shot UX
++  reminder.
++- `plugins/evo/bin/evo-hook-drain` is the checked-in recovery wrapper. Normal
++  installation downloads a platform-native Rust binary to
++  `$EVO_HOME/bin/evo-hook-drain` (normally `~/.evo/bin/`) using
++  `src/evo/host_install/_hook_drain.py`. If a host refresh restores the wrapper
++  over its cached native binary, the wrapper executes the stable copy. If that
++  copy is absent it logs a reinstall hint and returns `{}`, preserving the host
++  session.
++- `plugins/evo/bin/evo-hook-drain-rs/src/main.rs` is the hot-path filter. Its
++  purpose is to cheaply resolve the workspace/session and check marker or
++  optimize-mode flags before handing stdin to Python. This avoids starting a
++  Python interpreter on every tool hook when nothing is pending.
++
++Host installers are adapters, not just file copiers:
++
++- Claude Code: `src/evo/host_install/claude_code.py` drives `claude plugin
++  marketplace add/install`, then stages the native helper into the actual
++  plugin root/cache. The shared `hooks.json` is used directly.
++- Codex: `src/evo/host_install/codex.py` enables `[features]
++  plugin_hooks=true` and `[plugins."evo@evo-hq"] enabled=true` in
++  `~/.codex/config.toml`. It rewrites cached hook commands to an absolute,
++  stable helper path because Codex does not guarantee
++  `CLAUDE_PLUGIN_ROOT`; it also removes the Claude-only wait hint. Trusted hook
++  hashes matter: untrusted hooks register but do not fire, so `evo direct`
++  cannot arrive.
++- Cursor: `src/evo/host_install/cursor.py` installs skills separately with
++  `npx skills add` and merges native entries into `~/.cursor/hooks.json` for
++  `sessionStart`, `beforeSubmitPrompt`, `preToolUse`, `stop`, and
++  `subagentStop`. These call `evo-drain --host cursor` directly; Cursor does
++  not use the Rust helper or Claude compatibility file.
++
++## `evo direct` delivery lifecycle
++
++1. **Engage/register.** `src/evo/inject/registry.py` records sessions beneath
++   the active run's `inject/sessions/`. Claude Code uses
++   `CLAUDE_CODE_SESSION_ID`, Codex uses `CODEX_THREAD_ID`; Cursor has no stable
++   session environment variable, so `drain.py` resolves its session and
++   workspace from hook stdin. Registration seeds a per-session offset so a new
++   chat does not receive historical directives.
++2. **Queue.** `cmd_direct` in `src/evo/cli.py` appends an event through
++   `src/evo/inject/queue.py`. Broadcasts go to
++   `<active-run>/inject/events/workspace.jsonl`; targeted messages go to
++   `events/<exp_id>.jsonl`. Writes use `O_APPEND`, event IDs are sortable, and
++   readers tolerate an incomplete trailing line.
++3. **Select recipients and wake them.** Broadcast delivery enumerates the
++   registry and filters out stale, unengaged, or subagent sessions where
++   appropriate. Targeted delivery selects sessions associated with the
++   experiment. `evo direct` touches each recipient's
++   `inject/markers/<session>.flag`; the durable JSONL remains the source of
++   message content.
++4. **Hook fires.** On a frequent host event, the Rust helper sees the marker
++   (SessionStart is also used to engage the orchestrator) and invokes the
++   Python drain. Cursor invokes Python directly and applies equivalent gating
++   there.
++5. **Drain once.** `src/evo/inject/drain.py` loads the session record, reads
++   only events after that session's stored offset, formats banners containing
++   the directive ID and `evo ack <id>` instruction, and chooses a host envelope.
++   Orchestrators read the workspace queue; experiment subagents read only their
++   `<exp_id>.jsonl` queue.
++6. **Record receipt.** After emitting, drain advances the session offset,
++   removes the marker, and writes `inject/delivered/<event-id>.json` (L1:
++   emitted to a session). When the agent executes `evo ack <id>`, the CLI writes
++   `inject/acks/<event-id>.json` (L2: model confirmed receipt). `evo direct
++   --wait` waits for L2; `evo direct status` reports queued/delivered/acked.
++
++## What fires when, by host
++
++| Moment | Claude Code | Codex | Cursor |
++|---|---|---|---|
++| New/resumed session | `SessionStart` registers/engages; CLI calls can also auto-register from `CLAUDE_CODE_SESSION_ID`. | Same shared event shape, keyed by `CODEX_THREAD_ID`; requires enabled and trusted plugin hooks. | `sessionStart` registers new chats; `beforeSubmitPrompt` catches resumed chats because Cursor lacks a session env var. |
++| Before a tool | `PreToolUse` is the principal mid-turn drain. When a directive exists, the response adds `permissionDecision: allow`, because Claude drops bare pre-tool `additionalContext`. | `PreToolUse` returns bare `hookSpecificOutput.additionalContext`; unlike Claude, no permission decision is added. | `preToolUse` delivers only for shell tools by rewriting the command to print the directive before running the original command. Non-shell tools defer because Cursor drops reliable context there. |
++| After a tool / prompt submission | `PostToolUse` and `UserPromptSubmit` are additional drain opportunities; Bash post-use may show `wait_hint.sh`. | Shared drain events work, but installer strips the Claude-specific wait hint. | No equivalent delivery channel: `beforeSubmitPrompt` registers only. |
++| End of turn | `Stop` / `SubagentStop` use `{decision:"block", reason:text}` because these events do not support `additionalContext`; optimize mode can combine a queued directive with a continuation nudge. | Same stop envelope and continuation behavior. | `stop` / `subagentStop` return `followup_message`, which the IDE submits as a visible next message and provides the fallback for turns without a shell call. |
++
++## Important boundaries inside `src/evo/`
++
++- `cli.py` owns public commands and orchestration: initialization, experiment
++  execution, gates, direct/ack/status, install/update, and reporting commands.
++- `core.py` owns shared run/workspace state and host constants. Notably only
++  Claude Code currently appears in `DISPATCH_HOSTS`; Codex and Cursor can run
++  the general evo workflow but do not use Claude's cached-fork dispatch path.
++- `dispatch.py` builds explorer/execute prompts and implements the Claude Code
++  fork-cache dispatch protocol.
++- `inject/{paths,registry,queue,marker,drain}.py` is the cross-host message bus:
++  filesystem layout, recipient identity, durable events, wake flags, and
++  host-specific hook output respectively.
++- `host_install/*.py` translates common plugin behavior into each host's
++  installation and hook mechanism.
++- `backends/` supplies worktree, pool, remote, and sandbox execution adapters;
++  `frontier_strategies.py` selects experiment parents; `scratchpad.py` and
++  `dashboard.py` expose shared state and the experiment graph.
++
++## Reliability consequences
++
++- A marker is only a wake signal. A lost/repeated hook does not lose the
++  directive because queue data and per-session offsets are durable.
++- Consumption is deliberately deferred when the host channel is unreliable
++  (especially Cursor non-shell pre-tool hooks), preventing a directive from
++  being acknowledged internally without reaching the model.
++- The native helper, Node shims, and checked-in fallback all fail open and use
++  bounded subprocess calls, so a broken injection path should not wedge every
++  agent tool call.
++- Broadcast is opt-in: a session must be registered and evo-engaged. This
++  avoids steering unrelated agent chats merely because global hooks are
++  installed.
++
++## Files read
++
++- `/workspace/evo-myworld/CHARTER.md`
++- `/workspace/evo-myworld/FIELD-NOTES.md`
++- `/workspace/evo-myworld/queues/codex.md`
++- `/workspace/evo-myworld/plugins/evo/hooks/hooks.json`
++- `/workspace/evo-myworld/plugins/evo/hooks/wait_hint.sh`
++- `/workspace/evo-myworld/plugins/evo/bin/evo`
++- `/workspace/evo-myworld/plugins/evo/bin/evo-hook-drain`
++- `/workspace/evo-myworld/plugins/evo/bin/evo-hook-drain-rs/src/main.rs`
++- `/workspace/evo-myworld/plugins/evo/pyproject.toml`
++- `/workspace/evo-myworld/plugins/evo/src/evo/cli.py`
++- `/workspace/evo-myworld/plugins/evo/src/evo/core.py`
++- `/workspace/evo-myworld/plugins/evo/src/evo/dispatch.py`
++- `/workspace/evo-myworld/plugins/evo/src/evo/inject/{drain,marker,paths,queue,registry}.py`
++- `/workspace/evo-myworld/plugins/evo/src/evo/host_install/{_hook_drain,claude_code,codex,cursor}.py`
++
+
+tokens used
+56,398
+Completed the top Codex queue item.
+
+- Created [internals-map.md](/workspace/evo-myworld/world/codex/internals-map.md)
+- Documented hook lifecycle, `evo direct`/`evo-drain`, reliability model, and Claude Code/Codex/Cursor differences
+- Appended dated Codex learnings to [FIELD-NOTES.md](/workspace/evo-myworld/FIELD-NOTES.md)
+- Marked queue item 1 complete in [queues/codex.md](/workspace/evo-myworld/queues/codex.md)
+
+No heavy commands or tests were run; this was a reading and writing task.

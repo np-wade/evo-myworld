@@ -4,3 +4,14 @@
    first under our 12GB-RAM WSL constraint, what to touch/not touch.
 2. [x] Review CHARTER.md program order — risks & sequencing advice, append
    to FIELD-NOTES.md.
+3. [ ] LIBRARY EXPLORATION (auto-refill 2026-07-19): explore these
+   corpus repos (at /library/repos/<name> in lanes, ~/coding/docker-envs/filing-cabinet/library-base/repos on host):
+   - AlexisLspk__neuronbox
+   - EverMind-AI__HyperMem
+   - EverMind-AI__MSA
+   Find ONE capability done notably well (or notably differently) across
+   ≥2 of them (or 1 of them + 1 graph-library slice). Then FILE A RACE:
+   write racetrack/requests/<slug>.md per racetrack/RACETRACK.md, with
+   real citations. Also append 2-3 findings to FIELD-NOTES.md (signed).
+   Small benchmarks only. If the repos are unsuitable, say why in
+   FIELD-NOTES and tick this item anyway.

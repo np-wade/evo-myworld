@@ -72,3 +72,15 @@ Proof it works (2026-07-19): demo race — baseline 5.0967 → sorted(set())
 0.0067 beat dict.fromkeys+sort 0.0176; both gated for correctness;
 winner kept. Do this same move with code you FIND, not just code you
 write.
+
+## The standing lab loop (added 2026-07-19 — this is NOT a demo)
+
+`lab-loop.sh` runs forever, detached: refill queues → each seat works its
+next item (sequential) → pending races run (max per cycle in
+`lab-tunables.env`) → commit+push → sleep → repeat. The corpus under
+exploration: 599 repos / ~100GB at `/library/repos` (lanes) —
+seats explore it, pull candidates, and race them on the racetrack
+(`racetrack/RACETRACK.md`). Controls:
+- STOP: `touch STOPLAB` in repo root (honored between steps)
+- tune: `lab-tunables.env` (CYCLE_SLEEP, MAX_RACES, SEATS) — live-reload
+- watch: `tail -f lab-loop.log` / `cat racetrack/STATUS` (1-min heartbeat)

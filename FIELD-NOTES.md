@@ -191,3 +191,12 @@ Keys: `~/coding/docker-envs/.env` (POE_API_KEY, FEATHERLESS_API_KEY, OLLAMA_API_
 
 
 - 2026-07-19 Kimi: Read `CHARTER.md`, `FIELD-NOTES.md`, and `/projects/evo-hq/README.md`. Front-end seat should build inside `world/kimi/` and keep load tiny until assembly-line port + graph backend land. Existing dashboard is Flask + `static/app.js` with `.evo/<active-run>/graph.json`; the upstream README enumerates frontier strategies and backends. Drafted 5 creative UI directions (campfire room, time-river tree, agent orbit, graph-first lens, lab-bench panel) in `world/kimi/ideas.md`. No code yet. Signed, kimi.
+- 2026-07-19 Codex: Mapped plugin and `evo direct` internals in
+  `world/codex/internals-map.md`. Directives are durable append-only JSONL;
+  per-session marker files only wake drains, offsets make delivery once per
+  session, `delivered/` is the emit receipt, and `evo ack` is the model receipt.
+  Claude Code and Codex share hook envelopes but differ at PreToolUse (Claude
+  needs `permissionDecision: allow`) and installation (Codex needs enabled,
+  trusted plugin hooks plus absolute helper paths). Cursor uses native hooks,
+  delivers mid-turn only by rewriting shell input, and otherwise defers to a
+  turn-end `followup_message`. Signed, codex.

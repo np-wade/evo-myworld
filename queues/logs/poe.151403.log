@@ -1,0 +1,157 @@
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 1.59kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/node:22-bookworm-slim
+#2 DONE 0.4s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [internal] load build context
+#4 DONE 0.0s
+
+#5 [1/8] FROM docker.io/library/node:22-bookworm-slim@sha256:6c74791e557ce11fc957704f6d4fe134a7bc8d6f5ca4403205b2966bd488f6b3
+#5 resolve docker.io/library/node:22-bookworm-slim@sha256:6c74791e557ce11fc957704f6d4fe134a7bc8d6f5ca4403205b2966bd488f6b3 0.1s done
+#5 DONE 0.1s
+
+#4 [internal] load build context
+#4 transferring context: 51B done
+#4 DONE 0.0s
+
+#6 [3/8] RUN install -m 0755 -d /etc/apt/keyrings     && curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc     && chmod a+r /etc/apt/keyrings/docker.asc     && . /etc/os-release     && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian ${VERSION_CODENAME} stable"        > /etc/apt/sources.list.d/docker.list     && apt-get update     && apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin     && rm -rf /var/lib/apt/lists/*
+#6 CACHED
+
+#7 [6/8] COPY dockerd-entrypoint-wrapper.sh /dockerd-entrypoint-wrapper.sh
+#7 CACHED
+
+#8 [7/8] RUN chmod +x /dockerd-entrypoint-wrapper.sh
+#8 CACHED
+
+#9 [2/8] RUN apt-get update && apt-get install -y     git     ripgrep     curl     jq     vim     && rm -rf /var/lib/apt/lists/*
+#9 CACHED
+
+#10 [4/8] RUN npm install -g bun
+#10 CACHED
+
+#11 [5/8] RUN npm install -g playwright     && playwright install --with-deps chromium
+#11 CACHED
+
+#12 [8/8] WORKDIR /workspace
+#12 CACHED
+
+#13 exporting to image
+#13 exporting layers done
+#13 exporting manifest sha256:614ec1c694a754aef904f9634b06d4ab62013dee460537f2c84febbc3898e084 done
+#13 exporting config sha256:89ea76f9a58095bdbd5f7e3a6b67bac8dcfc1e0fe808e5d2771e31543f453c73 done
+#13 exporting attestation manifest sha256:267c1bb88a304870253a9049c4268fe88e72e6c6653ac769f85783d40afec257
+#13 exporting attestation manifest sha256:267c1bb88a304870253a9049c4268fe88e72e6c6653ac769f85783d40afec257 0.1s done
+#13 exporting manifest list sha256:c52929a095a4cc28ab2520800f35bb060080da138561a9063c43df075b24e2ae
+#13 exporting manifest list sha256:c52929a095a4cc28ab2520800f35bb060080da138561a9063c43df075b24e2ae 0.1s done
+#13 naming to docker.io/library/coding-base:latest done
+#13 unpacking to docker.io/library/coding-base:latest 0.0s done
+#13 DONE 0.4s
+ Container docker-envs-poe-cli-run-3c4c202f182d Creating 
+ Container docker-envs-poe-cli-run-3c4c202f182d Created 
+┌   Poe - agent 
+
+✓ tokens: 1653 in → 148 out
+  → exec: read_file
+  ✓ exec
+  → exec: read_file
+  ✓ exec
+  → exec: read_file
+  ✓ exec
+
+✓ tokens: 6792 in (1408 cached) → 286 out
+  → exec: run_command
+  ✓ exec
+  → exec: run_command
+  ✓ exec
+
+✓ tokens: 6944 in (6656 cached) → 136 out
+  → exec: run_command
+  ✓ exec
+  → exec: run_command
+  ✓ exec
+  → exec: run_command
+  ✓ exec
+
+✓ tokens: 7177 in (6784 cached) → 132 out
+  → exec: read_file
+  ✓ exec
+  → exec: read_file
+  ✓ exec
+  → exec: run_command
+  ✓ exec
+✓ agent: I have the two
+✓ agent: SKILL.md files
+✓ agent: . Let
+✓ agent: me also peek at
+✓ agent: a
+✓ agent: couple
+✓ agent: of
+✓ agent: the key
+✓ agent: references the
+✓ agent: skills
+✓ agent: mention
+✓ agent: ,
+✓ agent: to
+✓ agent: make
+✓ agent: the digest concrete
+✓ agent: .
+
+✓ tokens: 29395 in (7040 cached) → 134 out
+  → exec: run_command
+  ✓ exec
+  → exec: read_file
+  ✓ exec
+✓ agent: I have enough material
+✓ agent: from
+✓ agent: the two SKILL
+✓ agent: .md files plus
+✓ agent: the instrumentation
+✓ agent: contract. The
+✓ agent: queue
+✓ agent: item
+✓ agent: asks
+✓ agent: for a digest
+✓ agent: of "
+✓ agent: exact
+✓ agent: flow, prompts,
+✓ agent: state files each skill
+✓ agent: touches — the operator
+✓ agent: 's manual for
+✓ agent: the rest of the
+✓ agent: lab." Let me
+✓ agent: also peek at a
+✓ agent: couple of references
+✓ agent: and
+✓ agent: the workflow
+✓ agent: file
+✓ agent: briefly to
+✓ agent: round
+✓ agent: out
+✓ agent: the digest
+✓ agent: .
+
+✓ tokens: 30764 in (29184 cached) → 153 out
+  → exec: read_file
+  ✓ exec
+  → exec: read_file
+  ✓ exec
+
+✓ tokens: 34379 in (30592 cached) → 83 out
+  → exec: read_file
+  ✓ exec
+  → exec: read_file
+  ✓ exec
+
+✓ tokens: 36006 in (34176 cached) → 84 out
+  → exec: read_file
+  ✓ exec
+  → exec: read_file
+  ✓ exec
