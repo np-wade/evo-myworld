@@ -55,3 +55,20 @@ folder; cross-cutting edits go through Claude.**
   time; long runs `setsid nohup … & disown`. See FIELD-NOTES gotchas.
 - Your work queue lives in `queues/<name>.md`. Do the top item; append
   results + a FIELD-NOTES entry; mark it done.
+
+## THE RACE RULE (standing, from Nicholas 2026-07-19)
+
+**Never adopt a pattern or implementation on trust.** As you build:
+1. SEARCH first — graph library (GRAPH-FIRST: TOPICS.md → slices →
+   `world/backend/evo_graph.py find`) plus your own repo searches — and
+   pull **at least 2 candidate implementations** of the thing you need.
+2. RACE them in the base harness (`projects/evo-hq` install + a small
+   evo run like projects/evo-demo): each candidate = one experiment
+   branch, same benchmark, same gates.
+3. ADOPT the winner by score; record winner AND loser scores + source
+   citations in FIELD-NOTES.md. Losers get deleted, not kept "just in
+   case" — that's the culling discipline.
+Proof it works (2026-07-19): demo race — baseline 5.0967 → sorted(set())
+0.0067 beat dict.fromkeys+sort 0.0176; both gated for correctness;
+winner kept. Do this same move with code you FIND, not just code you
+write.
