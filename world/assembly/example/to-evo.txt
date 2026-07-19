@@ -1,0 +1,23 @@
+# to-evo — run asm-cli-stopwatch
+
+## 1. Discover seed (headless — benchmark+metric seeded, no questions)
+
+claude -p "/evo:discover Build this product as an experiment tree: a CLI stopwatch. Stages in order: scaffold -> harness -> variants -> review. Benchmark: metric min, seconds per benchmark rep (bench.py prints 'seconds: X'). Test profile: python-pytest. The variants stage races >=2 sibling implementations under the same gates; losers are discarded. Correctness is asserted by gates, not by the benchmark."
+
+## 2. Gate registration (after `evo new` gives each stage its root exp id;
+##    gates inherit DOWN the tree — register once per stage root,
+##    cli-quick-reference.md:258 / cli.py:2685)
+
+evo gate add $EXP_SCAFFOLD --name correctness --command "python3 world/hermes/gates/correctness.py --golden golden/scaffold.jsonl --solver 'python3 {target}/src/cli_stopwatch.py'" --phase post
+
+evo gate add $EXP_HARNESS --name regression --command "python3 world/hermes/gates/regression.py --parent-score .evo/parent_proxy.json --current-score {worktree}/proxy_score.json --field score --mode percent --tolerance 0.0" --phase pre
+evo gate add $EXP_HARNESS --name correctness --command "python3 world/hermes/gates/correctness.py --golden golden/harness.jsonl --solver 'python3 {target}/src/cli_stopwatch.py'" --phase post
+
+evo gate add $EXP_VARIANTS --name regression --command "python3 world/hermes/gates/regression.py --parent-score .evo/parent_proxy.json --current-score {worktree}/proxy_score.json --field score --mode percent --tolerance 0.0" --phase pre
+evo gate add $EXP_VARIANTS --name correctness --command "python3 world/hermes/gates/correctness.py --golden golden/variants.jsonl --solver 'python3 {target}/src/cli_stopwatch.py'" --phase post
+evo gate add $EXP_VARIANTS --name budget --command "python3 world/hermes/gates/budget.py --stage variants --budget-file {worktree}/.evo/budget.json --ceilings budgets.yaml" --phase post
+evo gate add $EXP_VARIANTS --name held_out --command "python3 world/hermes/gates/held_out.py --held-out golden/variants.held_out.jsonl --solver 'python3 {target}/src/cli_stopwatch.py' --threshold 0.7" --phase post
+
+evo gate add $EXP_REVIEW --name regression --command "python3 world/hermes/gates/regression.py --parent-score .evo/parent_proxy.json --current-score {worktree}/proxy_score.json --field score --mode percent --tolerance 0.0" --phase pre
+evo gate add $EXP_REVIEW --name correctness --command "python3 world/hermes/gates/correctness.py --golden golden/review.jsonl --solver 'python3 {target}/src/cli_stopwatch.py'" --phase post
+

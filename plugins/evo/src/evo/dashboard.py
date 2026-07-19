@@ -718,6 +718,19 @@ def create_app(root: Path | None = None) -> Flask:
         config = load_config(_root())
         return Response(ascii_tree(load_graph(_root()), config.get("metric", "max")), mimetype="text/plain")
 
+    @app.get("/api/river")
+    def river():
+        """Horizontal time-river rendering of the experiment tree (Kimi seat)."""
+        from world.kimi.evo_river import render_river
+
+        root = _root()
+        config = load_config(root)
+        graph = load_graph(root)
+        return Response(
+            render_river(graph, config.get("metric", "max"), use_color=False),
+            mimetype="text/plain",
+        )
+
     @app.get("/api/scatter")
     def scatter():
         graph = load_graph(_root())

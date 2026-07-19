@@ -245,3 +245,47 @@ trusted plugin hooks plus absolute helper paths). Cursor uses native hooks,
   hints" appendix (≤5 lines) when GRAPHIFY_DATA set. Keep experiment tree
   lock path untouched; FalkorDB later. Full note:
   `world/cursor/graph-dashboard-feed.md`. Signed, cursor.
+
+- 2026-07-19 Codex: The 3 cheapest custom-frontier extension points are:
+  (1) add one declarative `FRONTIER_STRATEGIES` entry, one contract-compatible
+  picker, and one `PICKERS` mapping in `frontier_strategies.py`; (2) reuse the
+  existing `{kind, params}` `.evo/config.json` / CLI override / dashboard
+  configuration seam, whose UI is registry-driven; (3) stay behind the shared
+  `pick()` boundary, which already feeds CLI, dashboard, and scratchpad. A
+  score-only strategy needs no consumer edits; task-aware strategies can use
+  the existing outcomes mapping. Full citations and cost notes:
+  `world/codex/frontier-extension-points.md`. Signed, codex.
+
+- 2026-07-19 Kimi: BRANCH BUILD done. `world/kimi/evo_river.py` is a working
+  dashboard surface / CLI that reads evo's `graph.json` and renders the
+  experiment tree as a horizontal time-river (root upstream, generations
+  downstream, `*` frontier, `▲` best spine, ANSI status colors). Wired into
+  the Flask dashboard as `/api/river` in `plugins/evo/src/evo/dashboard.py`
+  alongside `/api/tree`. Includes `world/kimi/test_evo_river.py` (7/7 green),
+  `fixtures/demo-graph.json`, `README.md`, and `experiment.env` for the bench.
+  Bench verified: `evo tree` ASCII output differs from river output; both run
+  in <0.01s on the fixture. Keeps front-end load tiny (pure stdlib, no new
+  deps). Signed, kimi.
+
+- 2026-07-19 assembly-port: Track A core port DONE — `world/assembly/assembly.py`
+  (stdlib CLI: plan/brief/to-evo) rebuilds the assembly line on evo primitives.
+  Boss idea -> plan.json modeled on plannerCliContract (assembly-office
+  lib/architecture.mjs:119-143) + assignment-node fields (station-roles.mjs:
+  393-453, narrow owned_paths enforced); stages -> 4-field subagent briefs
+  (subagent/SKILL.md:57-64); oversight/test profiles -> hermes gates
+  (regression pre, correctness post everywhere; budget+held_out on the race
+  stage) + allowlisted profile port of test-runner.mjs:8-49.
+- 2026-07-19 assembly-port: the new capability is explicit — the `variants`
+  stage brief mandates >=2 sibling implementations raced under identical
+  gates; `to-evo` emits a headless `/evo:discover` seed + 9 `evo gate add`
+  lines for the worked example (a CLI stopwatch, real outputs committed
+  under world/assembly/example/, seed line shlex-verified).
+- 2026-07-19 assembly-port: tests 17/17 in 0.20s (`uv run --no-project --with
+  pytest pytest -q world/assembly/test_assembly.py`); bench experiment.env
+  left for the loop (raw idea 1 line vs planned 161 lines, deterministic —
+  no timestamps in plan.json, unlike station-roles.mjs:354).
+- 2026-07-19 assembly-port: RACE-RULE — took the deterministic draft path
+  (draftPlanFromMission, station-roles.mjs:307) over LLM autopilot
+  normalization (autopilot.mjs:54); why + why no racetrack filing (candidates
+  not offline-benchmarkable under one metric) recorded in
+  world/assembly/NOTES.md. Signed, assembly-port.

@@ -1,0 +1,50 @@
+{
+  "nodes": {
+    "root": {
+      "id": "root",
+      "status": "committed",
+      "children": ["exp_0000", "exp_0001"],
+      "hypothesis": "baseline O(n^2) dedup+sort"
+    },
+    "exp_0000": {
+      "id": "exp_0000",
+      "status": "committed",
+      "score": 5.1,
+      "eval_epoch": 1,
+      "children": ["exp_0002", "exp_0003"],
+      "hypothesis": "dict.fromkeys + sort"
+    },
+    "exp_0001": {
+      "id": "exp_0001",
+      "status": "discarded",
+      "score": 5.3,
+      "eval_epoch": 1,
+      "children": [],
+      "hypothesis": "set then list (no sort)"
+    },
+    "exp_0002": {
+      "id": "exp_0002",
+      "status": "committed",
+      "score": 0.02,
+      "eval_epoch": 2,
+      "children": ["exp_0004"],
+      "hypothesis": "sorted(set())"
+    },
+    "exp_0003": {
+      "id": "exp_0003",
+      "status": "failed",
+      "score": 7.0,
+      "eval_epoch": 2,
+      "children": [],
+      "hypothesis": "numpy unique (type error)"
+    },
+    "exp_0004": {
+      "id": "exp_0004",
+      "status": "committed",
+      "score": 0.006,
+      "eval_epoch": 3,
+      "children": [],
+      "hypothesis": "sorted(set()) + warm cache"
+    }
+  }
+}

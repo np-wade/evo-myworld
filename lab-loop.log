@@ -37,3 +37,22 @@
 [2026-07-19 15:35:58] heartbeat: [2026-07-19 15:35:05] cycle 1: seat cursor working | MemAvail=9.6G SwapFree=23.8G
 --- cursor OK (ticked an item, rc=0)
 === dispatching codex → /home/npwad/coding/docker-envs/projects/evo-myworld/queues/logs/codex.153603.log
+[2026-07-19 15:36:58] heartbeat: [2026-07-19 15:36:03] cycle 1: seat codex working | MemAvail=10.0G SwapFree=23.8G
+--- codex OK (ticked an item, rc=0)
+=== dispatching poe → /home/npwad/coding/docker-envs/projects/evo-myworld/queues/logs/poe.153704.log
+[2026-07-19 15:37:58] heartbeat: [2026-07-19 15:37:04] cycle 1: seat poe working | MemAvail=9.7G SwapFree=23.8G
+--- poe SOFT-FAIL (no item ticked, rc=1, attempt 1)
+=== dispatching kimi → /home/npwad/coding/docker-envs/projects/evo-myworld/queues/logs/kimi.153838.log
+[2026-07-19 15:38:58] heartbeat: [2026-07-19 15:38:38] cycle 1: seat kimi working | MemAvail=9.8G SwapFree=23.8G
+[2026-07-19 15:39:58] heartbeat: [2026-07-19 15:38:38] cycle 1: seat kimi working | MemAvail=9.8G SwapFree=23.8G
+[2026-07-19 15:40:58] heartbeat: [2026-07-19 15:38:38] cycle 1: seat kimi working | MemAvail=9.8G SwapFree=23.8G
+[2026-07-19 15:41:58] heartbeat: [2026-07-19 15:38:38] cycle 1: seat kimi working | MemAvail=9.8G SwapFree=23.8G
+[2026-07-19 15:42:58] heartbeat: [2026-07-19 15:38:38] cycle 1: seat kimi working | MemAvail=9.8G SwapFree=23.8G
+[2026-07-19 15:43:58] heartbeat: [2026-07-19 15:38:38] cycle 1: seat kimi working | MemAvail=9.5G SwapFree=23.8G
+--- kimi OK (ticked an item, rc=0)
+baseline: OK (evo-hq-cli 0.8.0)
+backend: works=OK score=112.66144199908013 (log: /home/npwad/coding/docker-envs/projects/evo-myworld/harness/logs/backend.154439.log)
+gemini: works=FAIL score=- (log: /home/npwad/coding/docker-envs/projects/evo-myworld/harness/logs/gemini.154441.log)
+cat: racetrack/requests/backend-query-ranking.md: No such file or directory
+[2026-07-19 15:44:58] heartbeat: [2026-07-19 15:44:41] cycle 1: racing backend-query-ranking | MemAvail=9.6G SwapFree=23.8G
+[2026-07-19 15:45:58] heartbeat: [2026-07-19 15:44:41] cycle 1: racing backend-query-ranking | MemAvail=9.4G SwapFree=23.8G

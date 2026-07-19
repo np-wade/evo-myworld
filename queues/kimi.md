@@ -6,7 +6,7 @@
    ideas welcome, no code yet.
 2. [ ] (hold) Front-end buildout of the dashboard begins after assembly-line
    port + backend land.
-3. [ ] BRANCH BUILD (priority, from Nicholas 2026-07-19): build your seat's
+3. [x] BRANCH BUILD (priority, from Nicholas 2026-07-19): build your seat's
    real SPACE in this app — world/kimi/ becomes a working MODULE with genuine
    CONNECTIVITY to evo (a skill, hook, dashboard surface, gate, or CLI the app
    actually uses), not just documents. Then leave a bench experiment:

@@ -1,0 +1,38 @@
+== lab-loop.log tail (heartbeats stripped) ==
+[2026-07-19 15:14:49] === cycle 1 start (seats: feather hermes gemini gemini2 cursor codex poe kimi, max races: 2)
+=== dispatching feather → /home/npwad/coding/docker-envs/projects/evo-myworld/queues/logs/feather.151449.log
+--- feather exit=0 (log: /home/npwad/coding/docker-envs/projects/evo-myworld/queues/logs/feather.151449.log)
+=== dispatching hermes → /home/npwad/coding/docker-envs/projects/evo-myworld/queues/logs/hermes.151546.log
+--- hermes exit=0 (log: /home/npwad/coding/docker-envs/projects/evo-myworld/queues/logs/hermes.151546.log)
+[2026-07-19 15:26:52] === cycle 1 done (0 races). Sleeping 900s.
+[2026-07-19 15:26:52] STOPLAB present — stopping.
+[2026-07-19 15:27:57] === cycle 1 start (seats: feather hermes gemini gemini2 cursor codex poe kimi, max races: 2)
+=== dispatching feather → /home/npwad/coding/docker-envs/projects/evo-myworld/queues/logs/feather.152758.log
+--- feather SOFT-FAIL (no item ticked, rc=1, attempt 1)
+=== dispatching hermes → /home/npwad/coding/docker-envs/projects/evo-myworld/queues/logs/hermes.152812.log
+--- hermes OK (ticked an item, rc=0)
+=== dispatching gemini → /home/npwad/coding/docker-envs/projects/evo-myworld/queues/logs/gemini.153106.log
+--- gemini OK (ticked an item, rc=0)
+=== dispatching gemini2 → /home/npwad/coding/docker-envs/projects/evo-myworld/queues/logs/gemini2.153303.log
+--- gemini2 OK (ticked an item, rc=0)
+=== dispatching cursor → /home/npwad/coding/docker-envs/projects/evo-myworld/queues/logs/cursor.153506.log
+--- cursor OK (ticked an item, rc=0)
+=== dispatching codex → /home/npwad/coding/docker-envs/projects/evo-myworld/queues/logs/codex.153603.log
+--- codex OK (ticked an item, rc=0)
+=== dispatching poe → /home/npwad/coding/docker-envs/projects/evo-myworld/queues/logs/poe.153704.log
+--- poe SOFT-FAIL (no item ticked, rc=1, attempt 1)
+=== dispatching kimi → /home/npwad/coding/docker-envs/projects/evo-myworld/queues/logs/kimi.153838.log
+--- kimi OK (ticked an item, rc=0)
+baseline: OK (evo-hq-cli 0.8.0)
+backend: works=OK score=112.66144199908013 (log: /home/npwad/coding/docker-envs/projects/evo-myworld/harness/logs/backend.154439.log)
+gemini: works=FAIL score=- (log: /home/npwad/coding/docker-envs/projects/evo-myworld/harness/logs/gemini.154441.log)
+cat: racetrack/requests/backend-query-ranking.md: No such file or directory
+
+== bench/trail.md tail ==
+(no trail yet)
+
+== NEW racetrack results (unseen by selfdev) ==
+(none yet)
+
+== queues/escalations.md tail ==
+(no escalations yet)

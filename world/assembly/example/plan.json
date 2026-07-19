@@ -1,0 +1,161 @@
+{
+  "schema_version": 1,
+  "run_id": "asm-cli-stopwatch",
+  "idea": "a CLI stopwatch",
+  "summary": "a CLI stopwatch",
+  "assumptions": [
+    "Product is buildable offline on a 12GB WSL2 box, sequentially.",
+    "Test profile python-pytest covers the integrated result."
+  ],
+  "test_profile": "python-pytest",
+  "metric": {
+    "direction": "min",
+    "meaning": "seconds per benchmark rep (bench.py prints 'seconds: X')"
+  },
+  "acceptance_criteria": [
+    "All stage expected_artifacts exist after their stage commits.",
+    "Every committed node passed its effective gates (inherited included).",
+    "The variants race produced >=2 scored siblings; only the winner survives."
+  ],
+  "risks": [
+    "Benchmark rounding too coarse to rank micro-variants.",
+    "Golden cases too narrow -> held_out gate is the backstop."
+  ],
+  "handoffs": [
+    {
+      "from": "scaffold",
+      "to": "harness"
+    },
+    {
+      "from": "harness",
+      "to": "variants"
+    },
+    {
+      "from": "variants",
+      "to": "review"
+    },
+    {
+      "from": "review",
+      "to": "ship"
+    }
+  ],
+  "stages": [
+    {
+      "id": "scaffold",
+      "job": "Build the smallest working cli-stopwatch: entry point src/cli_stopwatch.py implementing the core behavior of: a CLI stopwatch. Input on argv/stdin, result on stdout. Done when golden/scaffold.jsonl cases pass.",
+      "depends_on": [],
+      "owned_paths": [
+        "src/"
+      ],
+      "expected_artifacts": [
+        "src/cli_stopwatch.py"
+      ],
+      "validation_profile": "python-pytest",
+      "race": false,
+      "gates": [
+        {
+          "name": "correctness",
+          "phase": "post",
+          "command": "python3 world/hermes/gates/correctness.py --golden golden/scaffold.jsonl --solver 'python3 {target}/src/cli_stopwatch.py'"
+        }
+      ]
+    },
+    {
+      "id": "harness",
+      "job": "Build the proving ground: golden cases (golden/<stage>.jsonl, one {id,input,expected} per line), a disjoint held-out slice, and bench.py printing 'seconds: X' (metric min). Size CALLS_PER_REP so best-case runtime is well above the rounding unit (FIELD-NOTES 2026-07-19: score granularity).",
+      "depends_on": [
+        "scaffold"
+      ],
+      "owned_paths": [
+        "golden/",
+        "bench.py",
+        "budgets.yaml"
+      ],
+      "expected_artifacts": [
+        "golden/harness.jsonl",
+        "golden/variants.held_out.jsonl",
+        "bench.py"
+      ],
+      "validation_profile": "python-pytest",
+      "race": false,
+      "gates": [
+        {
+          "name": "regression",
+          "phase": "pre",
+          "command": "python3 world/hermes/gates/regression.py --parent-score .evo/parent_proxy.json --current-score {worktree}/proxy_score.json --field score --mode percent --tolerance 0.0"
+        },
+        {
+          "name": "correctness",
+          "phase": "post",
+          "command": "python3 world/hermes/gates/correctness.py --golden golden/harness.jsonl --solver 'python3 {target}/src/cli_stopwatch.py'"
+        }
+      ]
+    },
+    {
+      "id": "variants",
+      "job": "THE RACE. Propose >=2 candidate implementations of the core operation (different algorithm/idiom/library), one sibling experiment each under this stage's node, same benchmark, same gates. Losers get discarded, winner is committed. Do not merge candidates.",
+      "depends_on": [
+        "harness"
+      ],
+      "owned_paths": [
+        "src/"
+      ],
+      "expected_artifacts": [
+        "src/cli_stopwatch.py"
+      ],
+      "validation_profile": "python-pytest",
+      "race": true,
+      "gates": [
+        {
+          "name": "regression",
+          "phase": "pre",
+          "command": "python3 world/hermes/gates/regression.py --parent-score .evo/parent_proxy.json --current-score {worktree}/proxy_score.json --field score --mode percent --tolerance 0.0"
+        },
+        {
+          "name": "correctness",
+          "phase": "post",
+          "command": "python3 world/hermes/gates/correctness.py --golden golden/variants.jsonl --solver 'python3 {target}/src/cli_stopwatch.py'"
+        },
+        {
+          "name": "budget",
+          "phase": "post",
+          "command": "python3 world/hermes/gates/budget.py --stage variants --budget-file {worktree}/.evo/budget.json --ceilings budgets.yaml"
+        },
+        {
+          "name": "held_out",
+          "phase": "post",
+          "command": "python3 world/hermes/gates/held_out.py --held-out golden/variants.held_out.jsonl --solver 'python3 {target}/src/cli_stopwatch.py' --threshold 0.7"
+        }
+      ]
+    },
+    {
+      "id": "review",
+      "job": "Harden the winner: edge cases into golden/review.jsonl, docstrings, and a clean CLI surface. No behavior change to committed winners without a gate proving it.",
+      "depends_on": [
+        "variants"
+      ],
+      "owned_paths": [
+        "src/",
+        "golden/review.jsonl",
+        "README.md"
+      ],
+      "expected_artifacts": [
+        "README.md"
+      ],
+      "validation_profile": "python-pytest",
+      "race": false,
+      "gates": [
+        {
+          "name": "regression",
+          "phase": "pre",
+          "command": "python3 world/hermes/gates/regression.py --parent-score .evo/parent_proxy.json --current-score {worktree}/proxy_score.json --field score --mode percent --tolerance 0.0"
+        },
+        {
+          "name": "correctness",
+          "phase": "post",
+          "command": "python3 world/hermes/gates/correctness.py --golden golden/review.jsonl --solver 'python3 {target}/src/cli_stopwatch.py'"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,203 @@
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 1.59kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/node:22-bookworm-slim
+#2 DONE 0.2s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [1/8] FROM docker.io/library/node:22-bookworm-slim@sha256:6c74791e557ce11fc957704f6d4fe134a7bc8d6f5ca4403205b2966bd488f6b3
+#4 resolve docker.io/library/node:22-bookworm-slim@sha256:6c74791e557ce11fc957704f6d4fe134a7bc8d6f5ca4403205b2966bd488f6b3 0.0s done
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 51B done
+#5 DONE 0.0s
+
+#6 [2/8] RUN apt-get update && apt-get install -y     git     ripgrep     curl     jq     vim     && rm -rf /var/lib/apt/lists/*
+#6 CACHED
+
+#7 [4/8] RUN npm install -g bun
+#7 CACHED
+
+#8 [7/8] RUN chmod +x /dockerd-entrypoint-wrapper.sh
+#8 CACHED
+
+#9 [3/8] RUN install -m 0755 -d /etc/apt/keyrings     && curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc     && chmod a+r /etc/apt/keyrings/docker.asc     && . /etc/os-release     && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian ${VERSION_CODENAME} stable"        > /etc/apt/sources.list.d/docker.list     && apt-get update     && apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin     && rm -rf /var/lib/apt/lists/*
+#9 CACHED
+
+#10 [5/8] RUN npm install -g playwright     && playwright install --with-deps chromium
+#10 CACHED
+
+#11 [6/8] COPY dockerd-entrypoint-wrapper.sh /dockerd-entrypoint-wrapper.sh
+#11 CACHED
+
+#12 [8/8] WORKDIR /workspace
+#12 CACHED
+
+#13 exporting to image
+#13 exporting layers done
+#13 exporting manifest sha256:614ec1c694a754aef904f9634b06d4ab62013dee460537f2c84febbc3898e084 done
+#13 exporting config sha256:89ea76f9a58095bdbd5f7e3a6b67bac8dcfc1e0fe808e5d2771e31543f453c73 done
+#13 exporting attestation manifest sha256:04b78d34b9b1985887ebaf92a077e4e1bde91eab85fe82c2d5146a2f178856d6 0.0s done
+#13 exporting manifest list sha256:c560d73eff17ed617745b7b5394cf554128ca7d929dafe2c651c5d68f5265a24
+#13 exporting manifest list sha256:c560d73eff17ed617745b7b5394cf554128ca7d929dafe2c651c5d68f5265a24 0.0s done
+#13 naming to docker.io/library/coding-base:latest done
+#13 unpacking to docker.io/library/coding-base:latest 0.0s done
+#13 DONE 0.1s
+ Container docker-envs-poe-cli-run-6d3120ab0be7 Creating 
+ Container docker-envs-poe-cli-run-6d3120ab0be7 Created 
+┌   Poe - agent 
+
+✓ tokens: 1884 in → 330 out
+  → exec: read_file
+  ✓ exec
+  → exec: read_file
+  ✓ exec
+  → exec: list_files
+  ✓ exec
+  → exec: list_files
+  ✓ exec
+
+✓ tokens: 3309 in → 208 out
+  → exec: read_file
+  ✓ exec
+  → exec: read_file
+  ✓ exec
+  → exec: list_files
+  ✓ exec
+  → exec: list_files
+  ✓ exec
+  → exec: list_files
+  ✓ exec
+│
+└  Problems? https://github.com/poe-platform/poe-code/issues
+
+│
+■  Error: Internal server error
+│
+●  See logs at /root/.poe-code/logs/errors.log for more details.
+
+--- poe primary failed, falling back to minimax-m3-el
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 1.59kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/node:22-bookworm-slim
+#2 DONE 0.1s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [1/8] FROM docker.io/library/node:22-bookworm-slim@sha256:6c74791e557ce11fc957704f6d4fe134a7bc8d6f5ca4403205b2966bd488f6b3
+#4 resolve docker.io/library/node:22-bookworm-slim@sha256:6c74791e557ce11fc957704f6d4fe134a7bc8d6f5ca4403205b2966bd488f6b3 0.0s done
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 51B done
+#5 DONE 0.0s
+
+#6 [2/8] RUN apt-get update && apt-get install -y     git     ripgrep     curl     jq     vim     && rm -rf /var/lib/apt/lists/*
+#6 CACHED
+
+#7 [3/8] RUN install -m 0755 -d /etc/apt/keyrings     && curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc     && chmod a+r /etc/apt/keyrings/docker.asc     && . /etc/os-release     && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian ${VERSION_CODENAME} stable"        > /etc/apt/sources.list.d/docker.list     && apt-get update     && apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin     && rm -rf /var/lib/apt/lists/*
+#7 CACHED
+
+#8 [6/8] COPY dockerd-entrypoint-wrapper.sh /dockerd-entrypoint-wrapper.sh
+#8 CACHED
+
+#9 [4/8] RUN npm install -g bun
+#9 CACHED
+
+#10 [5/8] RUN npm install -g playwright     && playwright install --with-deps chromium
+#10 CACHED
+
+#11 [7/8] RUN chmod +x /dockerd-entrypoint-wrapper.sh
+#11 CACHED
+
+#12 [8/8] WORKDIR /workspace
+#12 CACHED
+
+#13 exporting to image
+#13 exporting layers done
+#13 exporting manifest sha256:614ec1c694a754aef904f9634b06d4ab62013dee460537f2c84febbc3898e084 done
+#13 exporting config sha256:89ea76f9a58095bdbd5f7e3a6b67bac8dcfc1e0fe808e5d2771e31543f453c73 done
+#13 exporting attestation manifest sha256:ee5315c2fb3d63c3dfcc6bed41067f6e7e94fbd1400c375430784d6d8ce19f42 0.0s done
+#13 exporting manifest list sha256:d998051c24b04eedcfa05a1998e4d78e1895b71be1c4193edb7b9a5d6dbb0db8
+#13 exporting manifest list sha256:d998051c24b04eedcfa05a1998e4d78e1895b71be1c4193edb7b9a5d6dbb0db8 0.0s done
+#13 naming to docker.io/library/coding-base:latest done
+#13 unpacking to docker.io/library/coding-base:latest 0.0s done
+#13 DONE 0.1s
+ Container docker-envs-poe-cli-run-705e26687450 Creating 
+ Container docker-envs-poe-cli-run-705e26687450 Created 
+┌   Poe - agent 
+
+✓ tokens: 1118 in → 344 out
+  → exec: read_file
+  ✓ exec
+  → exec: read_file
+  ✓ exec
+  → exec: read_file
+  ✓ exec
+  → exec: run_command
+  ✓ exec
+  → exec: list_files
+  ✓ exec
+  → exec: list_files
+  ✓ exec
+  → exec: list_files
+  ✓ exec
+  → exec: list_files
+  ✓ exec
+
+✓ tokens: 4502 in → 478 out
+  → exec: list_files
+  ✓ exec
+  → exec: read_file
+  ✓ exec
+  → exec: glob
+  ✓ exec
+  → exec: glob
+  ✓ exec
+  → exec: read_file
+  ✓ exec
+
+✓ tokens: 8065 in (3584 cached) → 550 out
+  → exec: run_command
+  ✓ exec
+  → exec: read_file
+  ✓ exec
+  → exec: read_file
+  ✓ exec
+  → exec: read_file
+  ✓ exec
+
+✓ tokens: 13166 in (7680 cached) → 624 out
+  → exec: read_file
+  ✓ exec
+  → exec: read_file
+  ✓ exec
+  → exec: read_file
+  ✓ exec
+  → exec: read_file
+  ✓ exec
+  → exec: grep
+  ✓ exec
+  → exec: grep
+  ✓ exec
+│
+└  Problems? https://github.com/poe-platform/poe-code/issues
+
+│
+■  Error: Internal server error
+│
+●  See logs at /root/.poe-code/logs/errors.log for more details.
+
