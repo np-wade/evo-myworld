@@ -1,0 +1,13 @@
+# Feather Digests — Agent & Subagent Summaries
+
+## agents/verifier.md
+Read-only audit agent that verifies evo experiments for design-time cheating (pre-phase) or result-time validity (post-phase). Checks test-set leakage, benchmark-command sanity, gate coverage, hypothesis specificity, and resource-profile compliance during pre-phase static analysis; verifies duration sanity, artifact reality, score reproducibility, gate compliance, and hypothesis-outcome alignment during post-phase. Returns JSON report with pass/warn/fail verdict, persists verdict as evo annotation, and gates `evo run` (pre) or commit decisions (post). invoked via Task tool with workspace/experiment_id/phase parameters.
+
+## agents/ideator.md
+Generates ranked experiment proposals via three brief modes: `failure_analysis` groups discarded experiments by root cause and proposes fixes/alternatives; `literature` scans arXiv/HF/GitHub for relevant techniques, filters against workspace graph, ranks candidates by has-code/replication/specificity/recency signals; `frontier_extrapolation` identifies steepest score gradients in committed experiments and proposes deeper variants (scale/combination/refinement). Writes proposals as JSONL to `.evo/run_*/ideator/proposals.jsonl` in atomic append, one invocation per brief. Orchestrator reconciles parallel ideators.
+
+## agents/benchmark-reviewer.md
+Reviews benchmarks in two modes: `audit` (pre-flight harness review checking per-task instrumentation, eval-set leakage, goodhart gates, plumbing correctness) returns structured pass/fail report; `review-experiment` (post-commit per-task failure classification) reads traces and eval-runner logs, classifies failures into categories (truncated/wrong-format/wrong-answer/hallucination/refusal/language-drift/prompt-misread/eval-error/unknown),writes per-task annotations via `evo annotate`, outputs failure breakdown and next-step signal. First mode gates `evo run`; second provides diagnostic data for next hypothesis.
+
+## skills/subagent/SKILL.md
+Protocol for evo optimization subagents dispatched from `/optimize`. Four-field brief: objective (bottleneck + evidence), parent node, boundaries/anti-patterns, pointer traces (which task traces to study). Follows loop: read shared state via scratchpad, formulate concrete edit, create experiment with `evo new`, edit target (local or remote via `evo bash/read/edit/glob/grep`), verify via `evo:verifier` pre-`evo run`, run, analyze outcome (committed/evaluated/failed), annotate, add gates for fixed behaviors, decide continue/stop. Uses workspace-level cache for expensive intermediates. Calls `evo:benchmark-reviewer` post-commit for failure classification.

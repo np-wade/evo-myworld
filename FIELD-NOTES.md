@@ -85,6 +85,11 @@ Keys: `~/coding/docker-envs/.env` (POE_API_KEY, FEATHERLESS_API_KEY, OLLAMA_API_
   spikes. Any evo optimize run here: cap parallel subagents (start 2),
   benchmarks must be small, and long runs need `setsid nohup … & disown`
   or the harness timeout kills the process group.
+- 2026-07-19 Feather: agents are roles in the orchestrator loop—verifier (audit), 
+  ideator (propose), benchmark-reviewer (diagnose)—while skill/subagent/SKILL.md 
+  defines the protocol subagents follow: 4-field brief, iteration loop, evo commands 
+  for local/remote worktrees, atomic append discipline for proposals. agents live in 
+  `plugins/evo/agents/`; subagent skill is `plugins/evo/skills/subagent/SKILL.md`.
 
 ## The fork plan (evo-myworld) — where we're going
 
@@ -104,3 +109,24 @@ Keys: `~/coding/docker-envs/.env` (POE_API_KEY, FEATHERLESS_API_KEY, OLLAMA_API_
 5. Later: CLIs and tooling on top.
 
 *(sign entries: Claude / Kimi / Codex / Cursor / Gemini / Hermes / Poe / Feather)*
+
+## Vanilla run log (evo-demo, 2026-07-19)
+
+- 2026-07-19 Claude: full vanilla loop verified on toy repo
+  `projects/evo-demo` (naive O(n²) dedup+sort, `bench.py` prints
+  "seconds: X", metric min, correctness assert = gate). Flow used THEIR
+  interfaces exactly: `claude -p '/evo:discover …'` → it created `.evo/`
+  (meta.json, project.md, run_0000, supervisor.pid, dashboard.pid) →
+  dashboard live at http://127.0.0.1:8080 ("evo : autoresearch") → it
+  advanced to `evo run exp_0000` on its own. Seeding the benchmark/metric
+  in the discover prompt skips all interactive questions — good for
+  headless dispatch.
+- 2026-07-19 Claude: supervisor + dashboard are plain detached python
+  procs with pidfiles in `.evo/` — fits our setsid/nohup discipline.
+- 2026-07-19 Claude: lane access map — every compose lane sees repos at
+  /workspace/<name>; kimi container now mounts them at /projects/<name>
+  (kimi-launch.sh updated + container recreated; OAuth survived in
+  kimi-home volume). Host `cursor` binary is the Windows IDE launcher,
+  NOT cursor-agent — use the docker cursor lane. Featherless/opencode
+  lane needs >180s to first token some runs (35k-ctx models are slow
+  spinners); dispatcher allows 1500s.
