@@ -85,13 +85,15 @@ seats explore it, pull candidates, and race them on the racetrack
 - tune: `lab-tunables.env` (CYCLE_SLEEP, MAX_RACES, SEATS) — live-reload
 - watch: `tail -f lab-loop.log` / `cat racetrack/STATUS` (1-min heartbeat)
 
-## The Proving Ground (added 2026-07-19)
+## The Bench (added 2026-07-19)
 
-`harness/HARNESS.md` — the judging element. Baseline = the ORIGINAL code
-run in this environment every cycle (evo-hq SDK suite + CLI); every
-seat's contribution declares `world/<seat>/judge.env` (works-gate +
-true score) and gets judged every cycle into `harness/LEDGER.md`.
-Un-judged work doesn't graduate. Lab program order right now:
-(1) seats build their branch-spaces with connectivity — NOW;
-(2) proving ground judges everything — RUNNING;
-(3) creative variants raced vs baseline — LATER, not yet.
+`bench/BENCH.md` — a small code-experimenter, NOT a judge harness. Run
+two versions of the same thing (`bench/experiment.sh "<A>" "<B>"`) and
+look at the difference: outputs, behaviour, timing. Optionally leave
+`world/<seat>/experiment.env` (BASE_CMD vs NEW_CMD) and the lab loop
+re-runs the comparison each cycle, logging same/different to
+`bench/trail.md`. No pass/fail ceremony — just seeing whether a change
+does anything. Lab program order right now:
+(1) seats build their branch-spaces with real connectivity — NOW;
+(2) show each module's difference on the bench — RUNNING;
+(3) creative variants compared vs baseline — LATER, not yet.

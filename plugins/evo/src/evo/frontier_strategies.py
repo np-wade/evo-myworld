@@ -132,6 +132,24 @@ FRONTIER_STRATEGIES: dict[str, dict[str, Any]] = {
                        "itself Pareto signal."},
         ],
     },
+    "ucb1": {
+        "label": "UCB1 (Upper Confidence Bound)",
+        "description": "Select the frontier node that maximizes the UCB1 formula, balancing node score and exploration frequency. Logs the rng seed.",
+        "detail": (
+            "Applies the Upper Confidence Bound (UCB1) multi-armed bandit algorithm "
+            "to select branch nodes.\n\n"
+            "UCB1 score = score + c * sqrt(ln(N) / (n_i + 1))\n"
+            "where N is the total number of evaluated nodes/experiments, n_i is the "
+            "number of children of node i, and c is the exploration weight.\n\n"
+            "Stochastic only for breaking ties among identical UCB1 values."
+        ),
+        "params": [
+            {"name": "c", "type": "float", "min": 0.0, "max": 1000.0, "default": 1.0, "label": "Exploration Weight (c)",
+             "detail": "Weight factor for exploration. Higher values favor nodes with fewer children, while lower values favor higher scores."},
+            {"name": "k", "type": "int", "min": 1, "max": 50, "default": 5, "label": "Samples",
+             "detail": "Number of top UCB1 candidates to return."},
+        ],
+    },
 }
 
 DEFAULT_FRONTIER_STRATEGY: dict[str, Any] = {
@@ -377,12 +395,49 @@ def _remove_dominated_set_cover(winners: dict[str, set[str]],
     return set(ordered) - dominated
 
 
+def _pick_ucb1(nodes: list[dict], params: dict, metric: str,
+               outcomes: dict, rng: random.Random) -> list[dict]:
+    try:
+        from world.gemini.ucb import pick_ucb1
+        return pick_ucb1(nodes, params, metric, outcomes, rng)
+    except (ImportError, ModuleNotFoundError):
+        c = float(params.get("c", 1.0))
+        k = int(params.get("k", 5))
+        try:
+            from .core import repo_root, load_graph
+            root = repo_root()
+            graph = load_graph(root)
+        except Exception:
+            graph = {"nodes": {}}
+        
+        graph_nodes = graph.get("nodes", {})
+        N = max(1, len(graph_nodes) - 1)
+
+        scored_nodes = []
+        for node in nodes:
+            node_id = node["id"]
+            score = _score_of(node, metric)
+            graph_node = graph_nodes.get(node_id, {})
+            children = graph_node.get("children", [])
+            n_i = len(children)
+            if score == float("-inf"):
+                ucb = float("-inf")
+            else:
+                ucb = score + c * math.sqrt(math.log(N) / (n_i + 1))
+            scored_nodes.append((ucb, node))
+
+        scored_nodes.sort(key=lambda x: (-x[0], rng.random()))
+        selected = [item[1] for item in scored_nodes[:k]]
+        return [_node_summary(n, i + 1) for i, n in enumerate(selected)]
+
+
 PICKERS: dict[str, Callable[[list, dict, str, dict, random.Random], list[dict]]] = {
     "argmax": _pick_argmax,
     "top_k": _pick_top_k,
     "epsilon_greedy": _pick_epsilon_greedy,
     "softmax": _pick_softmax,
     "pareto_per_task": _pick_pareto_per_task,
+    "ucb1": _pick_ucb1,
 }
 
 

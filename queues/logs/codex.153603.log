@@ -1,0 +1,1161 @@
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 1.59kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/node:22-bookworm-slim
+#2 DONE 0.2s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [1/8] FROM docker.io/library/node:22-bookworm-slim@sha256:6c74791e557ce11fc957704f6d4fe134a7bc8d6f5ca4403205b2966bd488f6b3
+#4 resolve docker.io/library/node:22-bookworm-slim@sha256:6c74791e557ce11fc957704f6d4fe134a7bc8d6f5ca4403205b2966bd488f6b3 0.0s done
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 51B done
+#5 DONE 0.0s
+
+#6 [3/8] RUN install -m 0755 -d /etc/apt/keyrings     && curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc     && chmod a+r /etc/apt/keyrings/docker.asc     && . /etc/os-release     && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian ${VERSION_CODENAME} stable"        > /etc/apt/sources.list.d/docker.list     && apt-get update     && apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin     && rm -rf /var/lib/apt/lists/*
+#6 CACHED
+
+#7 [6/8] COPY dockerd-entrypoint-wrapper.sh /dockerd-entrypoint-wrapper.sh
+#7 CACHED
+
+#8 [2/8] RUN apt-get update && apt-get install -y     git     ripgrep     curl     jq     vim     && rm -rf /var/lib/apt/lists/*
+#8 CACHED
+
+#9 [4/8] RUN npm install -g bun
+#9 CACHED
+
+#10 [5/8] RUN npm install -g playwright     && playwright install --with-deps chromium
+#10 CACHED
+
+#11 [7/8] RUN chmod +x /dockerd-entrypoint-wrapper.sh
+#11 CACHED
+
+#12 [8/8] WORKDIR /workspace
+#12 CACHED
+
+#13 exporting to image
+#13 exporting layers done
+#13 exporting manifest sha256:614ec1c694a754aef904f9634b06d4ab62013dee460537f2c84febbc3898e084 done
+#13 exporting config sha256:89ea76f9a58095bdbd5f7e3a6b67bac8dcfc1e0fe808e5d2771e31543f453c73 done
+#13 exporting attestation manifest sha256:3a5f1d05118b2aa77338f02e798be4c33237e2a793335a905981ffdca0fced5e 0.0s done
+#13 exporting manifest list sha256:a3ef6130a0d18f17dc6b4b6eddce0a58150c9c8e7230c90b678035ef0e3a98a6
+#13 exporting manifest list sha256:a3ef6130a0d18f17dc6b4b6eddce0a58150c9c8e7230c90b678035ef0e3a98a6 0.0s done
+#13 naming to docker.io/library/coding-base:latest done
+#13 unpacking to docker.io/library/coding-base:latest 0.0s done
+#13 DONE 0.1s
+ Container docker-envs-codex-cli-run-1eed83a5e626 Creating 
+ Container docker-envs-codex-cli-run-1eed83a5e626 Created 
+Reading additional input from stdin...
+OpenAI Codex v0.144.1
+--------
+workdir: /workspace
+model: gpt-5.6-sol
+provider: openai
+approval: never
+sandbox: danger-full-access
+reasoning effort: none
+reasoning summaries: none
+session id: 019f7be0-f7b3-7c20-8c94-be6de8c7803c
+--------
+user
+You are the "codex" seat of the evo-myworld lab. Work directory: /workspace/evo-myworld
+Context (read in this order, nothing more):
+1. /workspace/evo-myworld/CHARTER.md
+2. the LAST 150 lines only of /workspace/evo-myworld/FIELD-NOTES.md (it is long; do not read it all)
+3. /workspace/evo-myworld/queues/codex.md — your queue
+Then DO the top unchecked "[ ]" item. Rules:
+- Write outputs ONLY inside /workspace/evo-myworld/world/codex/ (create it) or, for race filings,
+  /workspace/evo-myworld/racetrack/requests/ per /workspace/evo-myworld/racetrack/RACETRACK.md.
+- Append learnings to /workspace/evo-myworld/FIELD-NOTES.md (dated, signed codex).
+- REQUIRED: tick the finished item in /workspace/evo-myworld/queues/codex.md ("[ ]" -> "[x]").
+  If you cannot finish it, write one line explaining why under the item
+  and leave it unticked.
+- No long/heavy commands. Cite files you read by path. Be concrete.
+codex
+I’ll read exactly the three requested context slices, identify the first open queue item, then complete it within the allowed output paths and update the notes and queue.
+exec
+/bin/bash -lc "sed -n '1,240p' CHARTER.md
+printf '\\n--- FIELD NOTES TAIL ---\\n'
+tail -n 150 FIELD-NOTES.md
+printf '\\n--- CODEX QUEUE ---\\n'
+sed -n '1,240p' queues/codex.md" in /workspace/evo-myworld
+ succeeded in 0ms:
+# evo-myworld — Lab Charter
+
+**Home base for the lab's recursive-improvement world.** Fork of
+`evo-hq/evo`, supercharged by all lab AIs together. Nicholas (np-wade)
+owns direction; Claude orchestrates; every AI builds.
+
+## The two-repo rule
+
+- `projects/evo-hq` — **clean upstream clone. Never experiment here.**
+  It is the reference install + the harness we use to TEST changes made in
+  this fork (branches get exercised against evo-hq's working install and
+  the SDK test suite before merging).
+- `projects/evo-myworld` (this repo, `np-wade/evo-myworld`) — where
+  everything new happens.
+
+## Branch & folder ownership
+
+Each AI owns a branch `ai/<name>` and a folder `world/<name>/` (yours to
+structure — experiments, notes, prototypes). Shared code that graduates
+out of a `world/` folder lands via merge to `main` only after it passes the
+evo-hq harness. This avoids merge collisions: **you write inside your own
+folder; cross-cutting edits go through Claude.**
+
+| Branch | Owner | Seat |
+|---|---|---|
+| ai/kimi | Kimi K3 / K2.7-code | front-end, creative, exploratory-random-good-ideas |
+| ai/codex | Codex (GPT) | core coding, plugin/hooks internals |
+| ai/cursor | Cursor agent | coding + refactors |
+| ai/gemini | Gemini 3.x (Antigravity, 2 accts) | analysis, review, architecture reading |
+| ai/hermes | Hermes (glm-5.1/5.2, qwen3-coder via ollama-cloud) | backend coding, tests |
+| ai/poe | Poe (qwen3.7-max, minimax m3-t) | reading, writing, docs, review |
+| ai/feather | Featherless (deepseek-V4-Flash 35k ctx!, step-3.7-Flash) | short-context reading/writing tasks, summaries |
+| ai/claude-backend | Claude (2nd seat) | graph-DB backend: graphify index.db + FalkorDB → evo shared state |
+
+## Program (in order)
+
+1. **Assembly line port** — bring the assembly-office autonomous
+   product-processing pipeline in, upgraded with evo's experiment tree,
+   gates, and recursive/experimental testing (test code, languages,
+   harnesses; keep what earns its place, delete what doesn't).
+2. **Graph backend** — second agent connects the graph DB (9.2M-node
+   index.db, FalkorDB) and the lab's backend code into the app; evo's
+   shared-state/scratchpad becomes graph-fed.
+3. **ML layer** — linear-algebra / neural-net maths over experiment
+   history: predictive frontier strategies, code-culling scores, agent/
+   harness/language comparisons as first-class experiments.
+4. **Then** CLIs and other cool things on top.
+
+## Standing rules
+
+- **GRAPH-FIRST**: before writing code, pull prior art from the graph
+  library (`graphify-app/GRAPH-FIRST.md`; TOPICS.md → slices → source).
+- **Read `FIELD-NOTES.md` first, append what you learn** (dated, signed).
+- Machine limits: WSL2, 12 GB RAM + 24 GB swap. One heavy process at a
+  time; long runs `setsid nohup … & disown`. See FIELD-NOTES gotchas.
+- Your work queue lives in `queues/<name>.md`. Do the top item; append
+  results + a FIELD-NOTES entry; mark it done.
+
+## THE RACE RULE (standing, from Nicholas 2026-07-19)
+
+**Never adopt a pattern or implementation on trust.** As you build:
+1. SEARCH first — graph library (GRAPH-FIRST: TOPICS.md → slices →
+   `world/backend/evo_graph.py find`) plus your own repo searches — and
+   pull **at least 2 candidate implementations** of the thing you need.
+2. RACE them in the base harness (`projects/evo-hq` install + a small
+   evo run like projects/evo-demo): each candidate = one experiment
+   branch, same benchmark, same gates.
+3. ADOPT the winner by score; record winner AND loser scores + source
+   citations in FIELD-NOTES.md. Losers get deleted, not kept "just in
+   case" — that's the culling discipline.
+Proof it works (2026-07-19): demo race — baseline 5.0967 → sorted(set())
+0.0067 beat dict.fromkeys+sort 0.0176; both gated for correctness;
+winner kept. Do this same move with code you FIND, not just code you
+write.
+
+## The standing lab loop (added 2026-07-19 — this is NOT a demo)
+
+`lab-loop.sh` runs forever, detached: refill queues → each seat works its
+next item (sequential) → pending races run (max per cycle in
+`lab-tunables.env`) → commit+push → sleep → repeat. The corpus under
+exploration: 599 repos / ~100GB at `/library/repos` (lanes) —
+seats explore it, pull candidates, and race them on the racetrack
+(`racetrack/RACETRACK.md`). Controls:
+- STOP: `touch STOPLAB` in repo root (honored between steps)
+- tune: `lab-tunables.env` (CYCLE_SLEEP, MAX_RACES, SEATS) — live-reload
+- watch: `tail -f lab-loop.log` / `cat racetrack/STATUS` (1-min heartbeat)
+
+## The Bench (added 2026-07-19)
+
+`bench/BENCH.md` — a small code-experimenter, NOT a judge harness. Run
+two versions of the same thing (`bench/experiment.sh "<A>" "<B>"`) and
+look at the difference: outputs, behaviour, timing. Optionally leave
+`world/<seat>/experiment.env` (BASE_CMD vs NEW_CMD) and the lab loop
+re-runs the comparison each cycle, logging same/different to
+`bench/trail.md`. No pass/fail ceremony — just seeing whether a change
+does anything. Lab program order right now:
+(1) seats build their branch-spaces with real connectivity — NOW;
+(2) show each module's difference on the bench — RUNNING;
+(3) creative variants compared vs baseline — LATER, not yet.
+
+--- FIELD NOTES TAIL ---
+- 2026-07-19 claude-backend: FTS cap in numbers: repos.fts_nodes sums to 5.94M of
+  9.2M nodes (top-50k/repo by degree) — a `find` miss needs a depth-1
+  `nodes.norm_label LIKE` follow-up before concluding absence.
+- 2026-07-19 claude-backend: FTS quirk — docstrings are indexed as first-class
+  nodes (kind=rationale), so prose hits mix into symbol queries; and `kind` is
+  populated in the DB but None in slice-JSON nodes, don't rely on it there.
+- 2026-07-19 claude-backend: safe FTS5 query building = double-quote every token
+  (`"tok"`, escape `"` as `""`) — reused from tencentdb-agent-memory
+  sqlite.ts buildFtsQuery (L198); AND-join with OR fallback beats raw MATCH on
+  user text, which throws OperationalError on `(`/`*`/`NEAR`.
+- 2026-07-19 claude-backend: no pytest on the host python; `uv run --no-project
+  --with pytest python -m pytest …` is a zero-install way to run test files.
+
+## The fork plan (evo-myworld) — where we're going
+
+1. Per-AI branches: each runner gets `ai/<name>` (ai/kimi, ai/codex,
+   ai/cursor, ai/gemini, ai/hermes, ai/poe, ai/featherless) and pushes
+   functionality up; evo-hq (clean base) is the test harness for those
+   branches before merge.
+2. Assembly line port: the assembly-office autonomous product-processing
+   pipeline moves in, gaining evo's experiment/gate structure for recursive
+   + experimental testing of code, languages, harnesses.
+3. Graph-db backend (second agent): connect graphify (index.db 9.2M nodes /
+   FalkorDB) + backend code into the app — feeds evo's shared state and our
+   scoring. GRAPH-FIRST applies.
+4. ML layer: use linear algebra / NN maths on experiment history for
+   predictive branch selection (custom frontier strategy) and code-culling
+   decisions (what earns its place, what gets deleted).
+5. Later: CLIs and tooling on top.
+
+*(sign entries: Claude / Kimi / Codex / Cursor / Gemini / Hermes / Poe / Feather)*
+
+## Vanilla run log (evo-demo, 2026-07-19)
+
+- 2026-07-19 Claude: full vanilla loop verified on toy repo
+  `projects/evo-demo` (naive O(n²) dedup+sort, `bench.py` prints
+  "seconds: X", metric min, correctness assert = gate). Flow used THEIR
+  interfaces exactly: `claude -p '/evo:discover …'` → it created `.evo/`
+  (meta.json, project.md, run_0000, supervisor.pid, dashboard.pid) →
+  dashboard live at http://127.0.0.1:8080 ("evo : autoresearch") → it
+  advanced to `evo run exp_0000` on its own. Seeding the benchmark/metric
+  in the discover prompt skips all interactive questions — good for
+  headless dispatch.
+- 2026-07-19 Claude: supervisor + dashboard are plain detached python
+  procs with pidfiles in `.evo/` — fits our setsid/nohup discipline.
+- 2026-07-19 Claude: lane access map — every compose lane sees repos at
+  /workspace/<name>; kimi container now mounts them at /projects/<name>
+  (kimi-launch.sh updated + container recreated; OAuth survived in
+  kimi-home volume). Host `cursor` binary is the Windows IDE launcher,
+  NOT cursor-agent — use the docker cursor lane. Featherless/opencode
+  lane needs >180s to first token some runs (35k-ctx models are slow
+  spinners); dispatcher allows 1500s.
+- 2026-07-19 Hermes: SDK + gate internals read for the assembly-line
+  port. Full notes at world/hermes/sdk-notes.md. Key contracts every new
+  pipeline must obey: (1) score JSON `{"score","tasks"}` to
+  $EVO_RESULT_PATH (atomic O_EXCL+rename) or stdout — never both; file
+  present means hard-error on empty/malformed (core.py:1063 load_result).
+  (2) Per-task emission is enforced — _assert_tasks_aggregated
+  (cli.py:1899) raises `tasks_missing_from_result` if 2+ task_*.json
+  traces exist but result.json has no `tasks` array. (3) Gate = any
+  command, exit 0 = pass; gates inherit DOWN the experiment tree via
+  collect_gates_from_path (cli.py:2685). (4) Phase split: pre runs
+  BEFORE benchmark (fail = no spend, aborts run), post runs after
+  (default for backward compat). (5) keep = compare_scores(...) AND
+  gate_passed — a failed gate discards the experiment even if score
+  improved (cli.py:3371). (6) gate_env strips all EVO_* vars — gates do
+  NOT see EVO_RESULT_PATH/TRACES_DIR; a budget gate must read a
+  side-channel the benchmark writes. Two instrumentation paths: paste-in
+  inline_instrumentation.py (zero-dep, recommended) or evo_agent.Run/Gate
+  (swappable Backend protocol — hook for the graph-db backend).
+  Three gate designs drafted for the port: correctness (post, golden
+  cases), budget (post, side-channel budget.json), regression (PRE,
+  proxy-bench vs parent's committed score → cheap cull before benchmark
+  spend). Run order guaranteed: regression → benchmark → correctness+
+  budget → keep.
+
+- 2026-07-19 Gemini: Performed top-down architecture review ([arch-review.md](file:///workspace/evo-myworld/world/gemini/arch-review.md)). Identified module boundaries and coupling patterns. Under the 12GB WSL2 RAM constraint, the primary failure risks are stacked local subagent concurrency, massive file checkouts from `git worktree add`, large SQLite index queries, and bulk parsing of trace log batches. Recommend strict limits on local worker concurrency (max 2), memory budget gates, and read-only graph indexing pagination. Only modify files inside `world/gemini/` or backend/strategy protocols.
+- 2026-07-19 Gemini: Reviewed CHARTER.md program order, risks, and sequencing advice ([program-review.md](file:///workspace/evo-myworld/world/gemini/program-review.md)). Confirmed Phase 1 (Assembly Port) -> Phase 2 (Graph Backend) -> Phase 3 (ML Layer) sequencing is correct due to data dependencies. Highlighted major risks: WSL2 resource limits under concurrent agents, FalkorDB/SQLite memory footprints, and heavy ML library imports (PyTorch/TF). Proposed static prior-art injection to keep subagent queries decoupled, a zero-heavy-dependency ML layer using numpy/scipy, and sequential gate execution (regression first to fail fast). Signed, gemini2.
+- 2026-07-19 Cursor: Mapped dashboard/graph/scratchpad. The three `scripts/*.py`
+  files are one-liners; real code is `plugins/evo/src/evo/dashboard.py`,
+  `scratchpad.py`, and `core.py`. Experiment tree = `.evo/<active-run>/graph.json`
+  (parent/children dict, locked atomic writes). UI is Flask + `static/app.js`
+  tidy-tree timeline polling `/api/graph` + `/api/frontier`. CLI `evo tree` /
+  `evo scratchpad` share the same graph + render helpers. Full route/file map:
+  `world/cursor/dashboard-map.md`. Signed, cursor.
+- 2026-07-19 Claude: optimize round 1 on evo-demo — full loop verified:
+  2 experiments raced in parallel worktrees, correctness gate + verifier
+  pre/post (post reproduces scores independently) + benchmark-reviewer
+  per-rep checks all ran. Winner exp_0001 (sorted(set), 760x) over
+  exp_0002 (dict.fromkeys, 290x). Lesson for our benchmarks: score
+  granularity matters — a 0.1ms-rounded score can't rank micro-variants
+  once the big win lands; size CALLS_PER_REP so best-case runtime >> the
+  rounding unit. evo records such issues as "workspace notes" in the run.
+
+
+- 2026-07-19 Kimi: Read `CHARTER.md`, `FIELD-NOTES.md`, and `/projects/evo-hq/README.md`. Front-end seat should build inside `world/kimi/` and keep load tiny until assembly-line port + graph backend land. Existing dashboard is Flask + `static/app.js` with `.evo/<active-run>/graph.json`; the upstream README enumerates frontier strategies and backends. Drafted 5 creative UI directions (campfire room, time-river tree, agent orbit, graph-first lens, lab-bench panel) in `world/kimi/ideas.md`. No code yet. Signed, kimi.
+- 2026-07-19 Codex: Mapped plugin and `evo direct` internals in
+  `world/codex/internals-map.md`. Directives are durable append-only JSONL;
+  per-session marker files only wake drains, offsets make delivery once per
+  session, `delivered/` is the emit receipt, and `evo ack` is the model receipt.
+  Claude Code and Codex share hook envelopes but differ at PreToolUse (Claude
+  needs `permissionDecision: allow`) and installation (Codex needs enabled,
+trusted plugin hooks plus absolute helper paths). Cursor uses native hooks,
+   delivers mid-turn only by rewriting shell input, and otherwise defers to a
+   turn-end `followup_message`. Signed, codex.
+
+## Learning log — Feather (short-context reading/writing)
+
+- 2026-07-19 Feather: evo agents are orchestrator roles (verifier = read-only audit, ideator = proposal generator, benchmark-reviewer = per-task failure analysis); subagent/SKILL.md defines the 4-field brief + iteration loop all subagents follow (objective, parent, boundaries, traces). Key commands: `evo new --parent`, `evo run`, `evo scratchpad`, `evo status`, `evo show/diff/traces/annotations`, `evo discard/annotate`, `evo gate list/check/add`. Remote worktrees require explicit `--exp-id` on workspace-op commands. Pipeline phases: verifier pre-check (static), run benchmark+gates, verifier post (advisory), benchmark-reviewer post-commit (diagnostic annotations). Signed, feather.
+- 2026-07-19 Claude: dispatcher v2 — call shapes matter. Small-context
+  seats (feather 35k, poe) now get LIGHT calls (their one queue item +
+  FIELD-NOTES tail only); everyone else reads only the last 150 lines of
+  this file (it grows every cycle — full reads would eventually choke
+  every seat). A call only counts if the seat ticks its queue item; 2
+  verified no-ops → item auto-escalates to queues/escalations.md instead
+  of being retried forever. Poe gets a model fallback chain; gemini lane
+  print-timeout raised 3m→20m via AGY_PRINT_TIMEOUT (3m truncated long
+  tasks silently — check launch.sh defaults when a lane "succeeds" but
+  work is missing).
+
+- 2026-07-19 Hermes: Track A deliverable A1 DONE — gate library at
+  `world/hermes/gates/` (correctness.py, budget.py, regression.py,
+  held_out.py) + test_gates.py (15/15 green, stdlib, ~1s) + README.md
+  + PRIOR-ART.md. Each gate is one executable script, exit 0 pass / 1
+  fail / 2 misconfig, none read EVO_* env (cli.py:3232 strips them
+  anyway). RACE RULE satisfied by filing 4 race requests at
+  `racetrack/requests/gate-{correctness,budget,regression,held_out}.md`
+  — the lab loop runs them via run-race.sh; results land in
+  racetrack/results/. Prior art per gate (≥2 candidates each, read
+  end-to-end from /library/repos/): auto_harness_demo/gate.py +
+  nocodb helpers.bash (correctness); OmniRoute budgetGate.ts +
+  raven before_iteration_hook.py (budget); adk-rust baseline.rs +
+  repowise kg_checks.py (regression); Lightning-AI overfit_batches +
+  ruvector weight_learning.rs (held_out). Budget YAML parser bug
+  found + fixed: original treated `stages:` wrapper as a no-op and
+  misparsed `intake:` as a key with empty value → "no ceilings"
+  warning → false PASS. Fix supports both flat (top-level stage:) and
+  wrapped (stages:/  intake:) shapes via stage-indent tracking.
+  Run order guaranteed by evo pre/post split: regression(pre) →
+  benchmark → correctness+budget+held_out(post) → keep. Signed, hermes.
+- 2026-07-19 Gemini: Explored corpus repos (neuronbox, HyperMem, MSA) and filed a race request for vector-cosine-similarity benchmarking NumPy manual dot/norm computation against PyTorch pre-normalized matmul. Neuronbox implements hardware GPU status and soft VRAM checks via a Rust NVML wrapper. HyperMem builds a three-level conversation memory hypergraph with BM25 and vector retrieval fused with RRF, while MSA routes query KV caches using chunk-pooled document latent states and distributed GPU matrix multiplication for 100M-token contexts. Written findings to world/gemini/exploration-notes.md. Signed, gemini.
+- 2026-07-19 gemini2: Completed BRANCH BUILD (item 5). Designed and implemented the UCB1 (Upper Confidence Bound) frontier selection strategy to balance exploit (node score) and explore (fewer children/branches). The module logic is defined in `world/gemini/ucb.py` and connected directly to `plugins/evo/src/evo/frontier_strategies.py` under the `"ucb1"` strategy identifier. Verified correctness with a local math/min-max unit test suite in `world/gemini/test_ucb.py` and integrated it into the proving ground via `world/gemini/judge.env` for verification and scoring. Signed, gemini2.
+- 2026-07-19 Cursor: How a second data source (graph backend) can feed the
+  dashboard — do NOT merge into graph.json. Add read-only `/api/library/find`
+  + `/api/library/slice` proxies over `world/backend/evo_graph.py` (sqlite FTS
+  ro, capped limit). UI: one-shot prior-art strip on node-drawer open from
+  hypothesis tokens (not in fetchAll poll). Optional scratchpad "Library
+  hints" appendix (≤5 lines) when GRAPHIFY_DATA set. Keep experiment tree
+  lock path untouched; FalkorDB later. Full note:
+  `world/cursor/graph-dashboard-feed.md`. Signed, cursor.
+
+--- CODEX QUEUE ---
+# Queue — Codex
+1. [x] Map the plugin internals: plugins/evo/hooks/, bin/, src/evo/, and how
+   evo-drain / evo direct deliver messages. Write world/codex/internals-map.md
+   (what fires when, host differences claude-code vs codex vs cursor).
+2. [ ] Identify the 3 cheapest extension points for adding a custom frontier
+   strategy. Append findings to FIELD-NOTES.md.
+3. [ ] PORT-PLAN.md Track A, deliverable A2 — RACE RULE applies (≥2 candidate schemas/patterns from searches, raced in the evo-hq harness before adoption): world/codex/assigner-bridge/ —
+   Planner-JSON → evo run config + subagent briefs. Read
+   /home/npwad/coding/docker-envs/projects/assembly-office/docs/HOW-ASSEMBLY-OFFICE-BUILDS-APPS.md first.
+3. [ ] BRANCH BUILD (priority, from Nicholas 2026-07-19): build your seat's
+   real SPACE in this app — world/codex/ becomes a working MODULE with genuine
+   CONNECTIVITY to evo (a skill, hook, dashboard surface, gate, or CLI the app
+   actually uses), not just documents. Then leave a bench experiment:
+   world/codex/experiment.env (BASE_CMD = behaviour without your module,
+   NEW_CMD = with it) per bench/BENCH.md, so the difference your module makes
+   is visible on the bench each cycle. Exemplar: world/backend/ is a working
+   module. Creative variants come LATER — right now: make it exist, make it
+   run, show its difference on the bench.
+
+codex
+The top open item is a focused architecture finding, not an implementation: identify the three lowest-cost custom-frontier extension points. I’m tracing the strategy registry, configuration handoff, and selection call sites so the recommendation is concrete.
+exec
+/bin/bash -lc 'rg -n "frontier|strategy|select.*node|choose.*node" plugins/evo/src/evo world/codex/internals-map.md | head -n 220' in /workspace/evo-myworld
+ succeeded in 0ms:
+plugins/evo/src/evo/static/index.html:45:          <span id="stat-frontier-value" class="stat-value">0</span>
+plugins/evo/src/evo/static/index.html:140:        <p class="modal-blurb">Removes the node from the frontier so the planner stops branching from it. The commit is preserved.</p>
+plugins/evo/src/evo/backends/gitdir.py:22:Downstream git invocations (``evo run``'s commit strategy, the benchmark
+plugins/evo/src/evo/report.py:17:    frontier_nodes,
+plugins/evo/src/evo/report.py:415:    # strip above the chart already shows best/exps/frontier/active counts.)
+plugins/evo/src/evo/report.py:453:    frontier = len(frontier_nodes(graph))
+plugins/evo/src/evo/report.py:461:        "frontier": frontier,
+plugins/evo/src/evo/report.py:503:        ("FRONTIER",    str(s["frontier"]),                 "open branches"),
+plugins/evo/src/evo/static/style.css:144:   keep rate, frontier, active. Each is a 3-line block (uppercase label,
+plugins/evo/src/evo/static/style.css:1671:   or the frontier-candidate hint. Sits below the meta row, subtler. */
+plugins/evo/src/evo/static/style.css:2502:.strategy-form {
+plugins/evo/src/evo/static/style.css:2507:.strategy-row {
+plugins/evo/src/evo/static/style.css:2518:.strategy-row > span { flex: 1; }
+plugins/evo/src/evo/static/style.css:2519:.strategy-row small {
+plugins/evo/src/evo/static/style.css:2523:.strategy-row select,
+plugins/evo/src/evo/static/style.css:2524:.strategy-row input {
+plugins/evo/src/evo/static/style.css:2534:.strategy-desc {
+plugins/evo/src/evo/static/style.css:2542:.strategy-actions {
+plugins/evo/src/evo/static/style.css:2552:.strategy-status {
+plugins/evo/src/evo/static/style.css:2556:.strategy-empty {
+plugins/evo/src/evo/static/style.css:2605:.strategy-detail {
+plugins/evo/src/evo/static/style.css:2610:.strategy-detail-desc {
+plugins/evo/src/evo/static/style.css:2615:.strategy-detail-params {
+world/codex/internals-map.md:109:  `frontier_strategies.py` selects experiment parents; `scratchpad.py` and
+plugins/evo/src/evo/dashboard.py:25:    frontier_nodes,
+plugins/evo/src/evo/dashboard.py:41:from .frontier_strategies import (
+plugins/evo/src/evo/dashboard.py:44:    pick as frontier_pick,
+plugins/evo/src/evo/dashboard.py:46:    validate_frontier_strategy,
+plugins/evo/src/evo/dashboard.py:627:        "commit_strategy": config.get("commit_strategy", "all"),
+plugins/evo/src/evo/dashboard.py:628:        "frontier_strategy": config.get("frontier_strategy"),
+plugins/evo/src/evo/dashboard.py:697:                "frontier": len(frontier_nodes(graph)),
+plugins/evo/src/evo/dashboard.py:747:        Exhausted pruning removes a committed/evaluated leaf from the frontier
+plugins/evo/src/evo/dashboard.py:749:        excludes the node and descendants from best/frontier/ship selection.
+plugins/evo/src/evo/dashboard.py:1066:    @app.get("/api/frontier-strategy")
+plugins/evo/src/evo/dashboard.py:1067:    def get_frontier_strategy():
+plugins/evo/src/evo/dashboard.py:1075:    @app.post("/api/frontier-strategy")
+plugins/evo/src/evo/dashboard.py:1076:    def set_frontier_strategy():
+plugins/evo/src/evo/dashboard.py:1079:            normalized = validate_frontier_strategy(body)
+plugins/evo/src/evo/dashboard.py:1083:        config["frontier_strategy"] = normalized
+plugins/evo/src/evo/dashboard.py:1087:    @app.get("/api/frontier")
+plugins/evo/src/evo/dashboard.py:1088:    def frontier():
+plugins/evo/src/evo/dashboard.py:1089:        """Strategy-ranked frontier nodes — same logic as `evo frontier`, minus
+plugins/evo/src/evo/dashboard.py:1098:        raw_nodes = frontier_nodes(graph)
+plugins/evo/src/evo/dashboard.py:1108:        strategy = resolve_from_config(config)
+plugins/evo/src/evo/dashboard.py:1111:        if strategy["kind"] == "pareto_per_task":
+plugins/evo/src/evo/dashboard.py:1125:            ranked, seed_used = frontier_pick(
+plugins/evo/src/evo/dashboard.py:1126:                summaries, strategy, metric, outcomes=outcomes, seed=seed_q,
+plugins/evo/src/evo/dashboard.py:1131:            "strategy": strategy,
+plugins/evo/src/evo/dashboard.py:1136:        if strategy["kind"] in {"epsilon_greedy", "softmax", "pareto_per_task"}:
+plugins/evo/src/evo/core.py:284:    from .frontier_strategies import DEFAULT_FRONTIER_STRATEGY
+plugins/evo/src/evo/core.py:297:        "frontier_strategy": DEFAULT_FRONTIER_STRATEGY,
+plugins/evo/src/evo/core.py:567:    commit_strategy: str = "all",
+plugins/evo/src/evo/core.py:572:    if commit_strategy not in ("all", "tracked-only"):
+plugins/evo/src/evo/core.py:574:            f"commit_strategy must be 'all' or 'tracked-only', got {commit_strategy!r}"
+plugins/evo/src/evo/core.py:593:    config["commit_strategy"] = commit_strategy
+plugins/evo/src/evo/core.py:904:    commit_strategy: str = "all",
+plugins/evo/src/evo/core.py:914:    if commit_strategy not in ("all", "tracked-only"):
+plugins/evo/src/evo/core.py:916:            f"commit_strategy must be 'all' or 'tracked-only', got {commit_strategy!r}"
+plugins/evo/src/evo/core.py:934:    add_args = ["-A"] if commit_strategy == "all" else ["-u"]
+plugins/evo/src/evo/core.py:1231:def frontier_nodes(graph: dict[str, Any]) -> list[dict[str, Any]]:
+plugins/evo/src/evo/scratchpad.py:7:from . import frontier_strategies as fs
+plugins/evo/src/evo/scratchpad.py:15:    frontier_nodes,
+plugins/evo/src/evo/scratchpad.py:36:def _format_strategy_label(strategy: dict[str, Any]) -> str:
+plugins/evo/src/evo/scratchpad.py:37:    kind = strategy.get("kind", "?")
+plugins/evo/src/evo/scratchpad.py:38:    params = strategy.get("params") or {}
+plugins/evo/src/evo/scratchpad.py:45:def _rank_frontier(root: Path, raw_frontier: list[dict[str, Any]],
+plugins/evo/src/evo/scratchpad.py:47:    """Rank branchable nodes via the configured strategy.
+plugins/evo/src/evo/scratchpad.py:49:    Returns (ranked_summaries, strategy). On a broken config we fall back to
+plugins/evo/src/evo/scratchpad.py:50:    score-sorted raw frontier with a synthetic 'fallback' strategy so the
+plugins/evo/src/evo/scratchpad.py:60:        for n in raw_frontier
+plugins/evo/src/evo/scratchpad.py:63:        strategy = fs.resolve_from_config(config)
+plugins/evo/src/evo/scratchpad.py:65:        if strategy["kind"] == "pareto_per_task":
+plugins/evo/src/evo/scratchpad.py:66:            for n in raw_frontier:
+plugins/evo/src/evo/scratchpad.py:78:        ranked, _ = fs.pick(summaries, strategy, metric, outcomes=outcomes, seed=0)
+plugins/evo/src/evo/scratchpad.py:79:        return ranked, strategy
+plugins/evo/src/evo/scratchpad.py:98:    """Hypothesis text rendered short for inline use in tree/frontier/awaiting."""
+plugins/evo/src/evo/scratchpad.py:307:    frontier = frontier_nodes(graph)
+plugins/evo/src/evo/scratchpad.py:325:    # we can drop the per-line epoch suffix in the tree and frontier.
+plugins/evo/src/evo/scratchpad.py:360:    # Frontier (strategy-ranked; only render if there's anything to surface)
+plugins/evo/src/evo/scratchpad.py:361:    ranked_frontier, strategy = _rank_frontier(root, frontier, config, metric)
+plugins/evo/src/evo/scratchpad.py:362:    if ranked_frontier:
+plugins/evo/src/evo/scratchpad.py:363:        lines.extend(["", f"## Frontier (strategy: {_format_strategy_label(strategy)})"])
+plugins/evo/src/evo/scratchpad.py:364:        shown = ranked_frontier[:FRONTIER_DISPLAY_CAP]
+plugins/evo/src/evo/scratchpad.py:372:        if len(ranked_frontier) > FRONTIER_DISPLAY_CAP:
+plugins/evo/src/evo/scratchpad.py:374:                f"(+{len(ranked_frontier) - FRONTIER_DISPLAY_CAP} more — see `evo frontier`)"
+plugins/evo/src/evo/scratchpad.py:400:    if root_gates or any(n.get("gates") for n in frontier):
+plugins/evo/src/evo/scratchpad.py:406:        for node in frontier[:10]:
+plugins/evo/src/evo/scratchpad.py:454:            # 0.3.0 frontier events shipped with key "at" and no "message"
+plugins/evo/src/evo/scratchpad.py:494:        "  evo frontier [--strat]  strategy-ranked branchable nodes",
+plugins/evo/src/evo/frontier_strategies.py:3:The `frontier` command returns ranked frontier nodes (committed leaves that the
+plugins/evo/src/evo/frontier_strategies.py:5:active strategy, stored in `.evo/config.json` under `frontier_strategy`.
+plugins/evo/src/evo/frontier_strategies.py:7:Each strategy is a `{kind, params}` pair. The registry below is the single
+plugins/evo/src/evo/frontier_strategies.py:9:function read it. Adding a strategy means one registry entry + one picker.
+plugins/evo/src/evo/frontier_strategies.py:36:        "description": "Return the single highest-scoring frontier node. Pure exploit.",
+plugins/evo/src/evo/frontier_strategies.py:48:        "description": "Top K frontier nodes by score. Ties broken lexicographically by id.",
+plugins/evo/src/evo/frontier_strategies.py:63:        "description": "Argmax with probability 1-ε; a uniform-random frontier node with probability ε. Logs the rng seed.",
+plugins/evo/src/evo/frontier_strategies.py:66:            "with probability ε, return a uniformly-random frontier node.\n\n"
+plugins/evo/src/evo/frontier_strategies.py:75:                       "frontier node instead of the current best."},
+plugins/evo/src/evo/frontier_strategies.py:105:            "1. For each task, find the top score across all frontier candidates.\n"
+plugins/evo/src/evo/frontier_strategies.py:137:        "description": "Select the frontier node that maximizes the UCB1 formula, balancing node score and exploration frequency. Logs the rng seed.",
+plugins/evo/src/evo/frontier_strategies.py:140:            "to select branch nodes.\n\n"
+plugins/evo/src/evo/frontier_strategies.py:165:def validate_frontier_strategy(obj: Any) -> dict[str, Any]:
+plugins/evo/src/evo/frontier_strategies.py:166:    """Normalize + validate a strategy dict. Returns {kind, params} with every
+plugins/evo/src/evo/frontier_strategies.py:169:        raise ValueError(f"frontier_strategy must be a dict, got {type(obj).__name__}")
+plugins/evo/src/evo/frontier_strategies.py:174:        raise ValueError(f"unknown frontier_strategy.kind: {kind!r} (known: {known})")
+plugins/evo/src/evo/frontier_strategies.py:177:        raise ValueError("frontier_strategy.params must be a dict")
+plugins/evo/src/evo/frontier_strategies.py:186:            raise ValueError(f"frontier_strategy.params.{name} is not a {p['type']}")
+plugins/evo/src/evo/frontier_strategies.py:189:            raise ValueError(f"frontier_strategy.params.{name}={val} out of [{lo}, {hi}]")
+plugins/evo/src/evo/frontier_strategies.py:195:    """Read frontier_strategy from config with default fallback. Always validated."""
+plugins/evo/src/evo/frontier_strategies.py:196:    raw = config.get("frontier_strategy") or DEFAULT_FRONTIER_STRATEGY
+plugins/evo/src/evo/frontier_strategies.py:197:    return validate_frontier_strategy(raw)
+plugins/evo/src/evo/frontier_strategies.py:310:    # Only consider tasks every frontier candidate reported (intersection).
+plugins/evo/src/evo/frontier_strategies.py:430:        selected = [item[1] for item in scored_nodes[:k]]
+plugins/evo/src/evo/frontier_strategies.py:448:def pick(nodes: list[dict[str, Any]], strategy: dict[str, Any], metric: str,
+plugins/evo/src/evo/frontier_strategies.py:451:    """Apply `strategy` to `nodes`. Returns (ranked_list, seed_used).
+plugins/evo/src/evo/frontier_strategies.py:455:    strategy = validate_frontier_strategy(strategy)
+plugins/evo/src/evo/frontier_strategies.py:456:    picker = PICKERS[strategy["kind"]]
+plugins/evo/src/evo/frontier_strategies.py:459:    ranked = picker(list(nodes), strategy["params"], metric, outcomes or {}, rng)
+plugins/evo/src/evo/frontier_strategies.py:497:def append_frontier_log(root: Path, strategy: dict[str, Any],
+plugins/evo/src/evo/frontier_strategies.py:499:    """Append a frontier-selection event to .evo/infra_log.json."""
+plugins/evo/src/evo/frontier_strategies.py:503:        "kind": "frontier",
+plugins/evo/src/evo/frontier_strategies.py:505:        "message": f"frontier({strategy.get('kind', '?')}) -> {len(returned_ids)} id(s){seed_str}",
+plugins/evo/src/evo/frontier_strategies.py:506:        "strategy": strategy,
+plugins/evo/src/evo/cli.py:45:    frontier_nodes,
+plugins/evo/src/evo/cli.py:386:    if args.commit_strategy is not None:
+plugins/evo/src/evo/cli.py:387:        commit_strategy = args.commit_strategy
+plugins/evo/src/evo/cli.py:389:        commit_strategy = "all"
+plugins/evo/src/evo/cli.py:398:        commit_strategy=commit_strategy,
+plugins/evo/src/evo/cli.py:418:        f"(host={args.host}, commit_strategy={commit_strategy})"
+plugins/evo/src/evo/cli.py:711:    print(f"commit_strategy: {data.get('commit_strategy', 'all')}")
+plugins/evo/src/evo/cli.py:734:    "commit-strategy": "commit_strategy",
+plugins/evo/src/evo/cli.py:737:    "frontier-strategy": "frontier_strategy",
+plugins/evo/src/evo/cli.py:798:        elif args.field == "commit-strategy":
+plugins/evo/src/evo/cli.py:800:                raise RuntimeError("commit-strategy must be 'all' or 'tracked-only'")
+plugins/evo/src/evo/cli.py:801:            config["commit_strategy"] = args.value
+plugins/evo/src/evo/cli.py:821:        elif args.field == "frontier-strategy":
+plugins/evo/src/evo/cli.py:822:            from . import frontier_strategies as fs
+plugins/evo/src/evo/cli.py:828:                    raise RuntimeError(f"frontier-strategy must be valid JSON: {exc}")
+plugins/evo/src/evo/cli.py:832:                config["frontier_strategy"] = fs.validate_frontier_strategy(parsed)
+plugins/evo/src/evo/cli.py:1108:    commit_strategy = config.get("commit_strategy", "all")
+plugins/evo/src/evo/cli.py:1110:        print(json.dumps({**state, "commit_strategy": commit_strategy}, indent=2))
+plugins/evo/src/evo/cli.py:1113:    print(f"commit_strategy: {commit_strategy}")
+plugins/evo/src/evo/cli.py:2981:    commit_strategy = config.get("commit_strategy", "all")
+plugins/evo/src/evo/cli.py:2982:    if commit_strategy == "tracked-only":
+plugins/evo/src/evo/cli.py:2999:                f"ERROR: {args.exp_id} cannot run: commit_strategy=tracked-only and "
+plugins/evo/src/evo/cli.py:3380:                commit_strategy=commit_strategy,
+plugins/evo/src/evo/cli.py:3755:    pruned → committed: status flip; frontier surfaces it again.
+plugins/evo/src/evo/cli.py:4164:def _format_frontier_help() -> str:
+plugins/evo/src/evo/cli.py:4165:    from . import frontier_strategies as fs
+plugins/evo/src/evo/cli.py:4167:        "evo frontier -- return frontier nodes (committed leaves) ranked by a selection strategy.",
+plugins/evo/src/evo/cli.py:4170:        "  evo frontier                                    # use configured strategy",
+plugins/evo/src/evo/cli.py:4171:        "  evo frontier --strategy <kind>                   # override for this call only",
+plugins/evo/src/evo/cli.py:4172:        "  evo frontier --strategy <kind> --params '<json>' # override with custom params",
+plugins/evo/src/evo/cli.py:4173:        "  evo frontier --seed <int>                        # pin rng for reproducible stochastic picks",
+plugins/evo/src/evo/cli.py:4174:        "  evo frontier --help-strategies                   # this text",
+plugins/evo/src/evo/cli.py:4176:        "Strategy is read from `.evo/config.json` under `frontier_strategy`.",
+plugins/evo/src/evo/cli.py:4177:        "Set it once via the dashboard's strategy panel (top bar) or by editing the config directly.",
+plugins/evo/src/evo/cli.py:4178:        "Every call appends an event to `.evo/infra_log.json` with kind=frontier.",
+plugins/evo/src/evo/cli.py:4196:    lines.append("Output envelope: {\"strategy\": {...}, \"generated_at\": \"...\", \"nodes\": [...], \"seed\": <int>}")
+plugins/evo/src/evo/cli.py:4201:def cmd_frontier(args: argparse.Namespace) -> int:
+plugins/evo/src/evo/cli.py:4202:    from . import frontier_strategies as fs
+plugins/evo/src/evo/cli.py:4204:        print(_format_frontier_help())
+plugins/evo/src/evo/cli.py:4209:    raw_nodes = frontier_nodes(graph)
+plugins/evo/src/evo/cli.py:4221:    # Resolve strategy: CLI overrides > config > default.
+plugins/evo/src/evo/cli.py:4222:    strategy = fs.resolve_from_config(config)
+plugins/evo/src/evo/cli.py:4223:    if getattr(args, "strategy", None):
+plugins/evo/src/evo/cli.py:4224:        params = strategy["params"]
+plugins/evo/src/evo/cli.py:4231:        strategy = fs.validate_frontier_strategy({"kind": args.strategy, "params": params})
+plugins/evo/src/evo/cli.py:4235:    if strategy["kind"] == "pareto_per_task":
+plugins/evo/src/evo/cli.py:4250:            summaries, strategy, metric,
+plugins/evo/src/evo/cli.py:4259:        "strategy": strategy,
+plugins/evo/src/evo/cli.py:4263:    # Seed only included when the strategy is stochastic, to keep deterministic
+plugins/evo/src/evo/cli.py:4265:    if strategy["kind"] in {"epsilon_greedy", "softmax", "pareto_per_task"}:
+plugins/evo/src/evo/cli.py:4268:    fs.append_frontier_log(root, strategy, [n["id"] for n in ranked],
+plugins/evo/src/evo/cli.py:6131:        "--commit-strategy",
+plugins/evo/src/evo/cli.py:6231:            "commit-strategy",
+plugins/evo/src/evo/cli.py:6234:            "frontier-strategy",
+plugins/evo/src/evo/cli.py:6245:            "field value. For frontier-strategy pass the kind (e.g. 'argmax', "
+plugins/evo/src/evo/cli.py:6264:            "commit-strategy",
+plugins/evo/src/evo/cli.py:6267:            "frontier-strategy",
+plugins/evo/src/evo/cli.py:6427:             "untracked, non-gitignored files. No-op in commit_strategy=all.",
+plugins/evo/src/evo/cli.py:6585:             "from best/frontier",
+plugins/evo/src/evo/cli.py:6619:    frontier_p = sub.add_parser(
+plugins/evo/src/evo/cli.py:6620:        "frontier",
+plugins/evo/src/evo/cli.py:6621:        help="list frontier nodes ranked by the configured strategy",
+plugins/evo/src/evo/cli.py:6622:        description="Return frontier nodes ranked by the configured strategy. "
+plugins/evo/src/evo/cli.py:6623:                    "Run `evo frontier --help-strategies` for full descriptions of each strategy and its params.",
+plugins/evo/src/evo/cli.py:6625:    frontier_p.add_argument("--strategy",
+plugins/evo/src/evo/cli.py:6626:                            help="override configured strategy (run --help-strategies for options)")
+plugins/evo/src/evo/cli.py:6627:    frontier_p.add_argument("--params", help="JSON params for the overridden strategy, e.g. '{\"k\": 5}'")
+plugins/evo/src/evo/cli.py:6628:    frontier_p.add_argument("--seed", type=int, help="rng seed for stochastic strategies (default: fresh, logged)")
+plugins/evo/src/evo/cli.py:6629:    frontier_p.add_argument("--help-strategies", dest="help_strategies", action="store_true",
+plugins/evo/src/evo/cli.py:6630:                            help="print detailed description of each strategy and its params, then exit")
+plugins/evo/src/evo/cli.py:6631:    frontier_p.set_defaults(func=cmd_frontier)
+plugins/evo/src/evo/cli.py:6767:        help="record or read infra/strategy events that frame later experiments",
+plugins/evo/src/evo/cli.py:6772:        help="append an infra/strategy event (optionally bumps eval epoch)",
+plugins/evo/src/evo/static/app.js:8:  frontier: null,        // backend-authoritative {strategy, picks, all_ids}
+plugins/evo/src/evo/static/app.js:9:  frontierMeta: null,
+plugins/evo/src/evo/static/app.js:22:  viewMode: 'all',         // 'all' | 'lineage' | 'frontier'
+plugins/evo/src/evo/static/app.js:491:    const [stats, graph, runs, workspace, frontier] = await Promise.all([
+plugins/evo/src/evo/static/app.js:496:      fetch('/api/frontier').then(r => r.json()).catch(() => null),
+plugins/evo/src/evo/static/app.js:502:    state.frontier = frontier;
+plugins/evo/src/evo/static/app.js:541:  const frontier = (state.frontier && state.frontier.all_ids ? state.frontier.all_ids.length : s.frontier) || 0;
+plugins/evo/src/evo/static/app.js:595:  const frontierValEl = document.getElementById('stat-frontier-value');
+plugins/evo/src/evo/static/app.js:596:  if (frontierValEl) frontierValEl.textContent = String(frontier);
+plugins/evo/src/evo/static/app.js:835:// Frontier semantics come from the backend (mirrors `evo frontier`):
+plugins/evo/src/evo/static/app.js:837:// We rely on state.frontier.all_ids rather than recomputing here so the
+plugins/evo/src/evo/static/app.js:841:  const all = state.frontier && state.frontier.all_ids;
+plugins/evo/src/evo/static/app.js:851:function frontierSet() {
+plugins/evo/src/evo/static/app.js:852:  const all = state.frontier && state.frontier.all_ids;
+plugins/evo/src/evo/static/app.js:858:// Layout strategy (tidy-tree):
+plugins/evo/src/evo/static/app.js:877:  const frontIds = state.viewMode === 'frontier' ? frontierSet() : null;
+plugins/evo/src/evo/static/app.js:1133:  state.viewMode = (mode === 'lineage' || mode === 'frontier') ? mode : 'all';
+plugins/evo/src/evo/static/app.js:1307:    const isSelected = state.selectedNode === r.node.id;
+plugins/evo/src/evo/static/app.js:1343:        ${isPrunedKept(r.node) ? `<span class="exp-pruned-badge" title="Committed result preserved; removed from frontier branching.">pruned</span>` : ''}
+plugins/evo/src/evo/static/app.js:1407:  // rowIndex 0 in 'all' and 'lineage' modes; 'frontier' mode filters out
+plugins/evo/src/evo/static/app.js:1408:  // non-frontier nodes, so row 0 is not the spine — skip there.
+plugins/evo/src/evo/static/app.js:1410:  if (state.viewMode !== 'frontier') {
+plugins/evo/src/evo/static/app.js:2166:      ${isPrunable ? `<button class="sidebar-prune-btn" onclick="pruneNode('${esc(node.id)}')" title="Remove this leaf from the frontier so the planner stops branching from it. Preserves the commit.">prune</button>` : ''}
+plugins/evo/src/evo/static/app.js:2198:        ? 'Kept result, pruned from frontier: '
+
+exec
+/bin/bash -lc "sed -n '1,220p' plugins/evo/src/evo/frontier_strategies.py
+sed -n '400,475p' plugins/evo/src/evo/frontier_strategies.py
+sed -n '4160,4275p' plugins/evo/src/evo/cli.py
+sed -n '1050,1145p' plugins/evo/src/evo/dashboard.py
+sed -n '35,90p' plugins/evo/src/evo/scratchpad.py" in /workspace/evo-myworld
+ succeeded in 0ms:
+"""Frontier selection strategies.
+
+The `frontier` command returns ranked frontier nodes (committed leaves that the
+orchestrator can branch from). Which nodes and in what order depends on the
+active strategy, stored in `.evo/config.json` under `frontier_strategy`.
+
+Each strategy is a `{kind, params}` pair. The registry below is the single
+source of truth: the CLI validator, the dashboard picker, and every picker
+function read it. Adding a strategy means one registry entry + one picker.
+"""
+from __future__ import annotations
+
+import json
+import math
+import random
+from pathlib import Path
+from typing import Any, Callable
+
+from .core import (
+    atomic_write_json,
+    infra_path,
+    load_json,
+    lock_file_for,
+    utc_now,
+)
+from .locking import advisory_lock
+
+
+# --------------------------------------------------------------------------- #
+# Registry                                                                    #
+# --------------------------------------------------------------------------- #
+
+FRONTIER_STRATEGIES: dict[str, dict[str, Any]] = {
+    "argmax": {
+        "label": "Argmax (current best)",
+        "description": "Return the single highest-scoring frontier node. Pure exploit.",
+        "detail": (
+            "Always picks the single node with the highest score. No randomness, "
+            "no exploration.\n\n"
+            "Good when you're confident the current best branch is the right one "
+            "to keep pushing. Risk: plateaus fast if that branch hits a local "
+            "optimum, since nothing else gets a turn."
+        ),
+        "params": [],
+    },
+    "top_k": {
+        "label": "Top-K",
+        "description": "Top K frontier nodes by score. Ties broken lexicographically by id.",
+        "detail": (
+            "Returns the K best-scoring nodes, in descending order. Lets a round's "
+            "N subagents branch from K distinct parents instead of piling onto one.\n\n"
+            "Still purely aggregate-score driven -- older high-scoring branches "
+            "dominate newer ones that haven't had a chance to mature."
+        ),
+        "params": [
+            {"name": "k", "type": "int", "min": 1, "max": 50, "default": 5, "label": "K",
+             "detail": "Number of top scorers to return. K=1 is equivalent to argmax. "
+                       "Usually set to match your round's subagent count."},
+        ],
+    },
+    "epsilon_greedy": {
+        "label": "ε-greedy",
+        "description": "Argmax with probability 1-ε; a uniform-random frontier node with probability ε. Logs the rng seed.",
+        "detail": (
+            "Classic bandit exploration. With probability 1-ε, return the argmax; "
+            "with probability ε, return a uniformly-random frontier node.\n\n"
+            "ε = 0 collapses to argmax. ε = 1 is pure random. Typical tuning: "
+            "0.05–0.2. Higher values help escape local optima, lower values "
+            "exploit the current best more aggressively.\n\n"
+            "Stochastic — the rng seed is recorded in infra_log.json for replay."
+        ),
+        "params": [
+            {"name": "epsilon", "type": "float", "min": 0.0, "max": 1.0, "default": 0.1, "label": "ε",
+             "detail": "Exploration rate in [0, 1]. Probability of picking a random "
+                       "frontier node instead of the current best."},
+        ],
+    },
+    "softmax": {
+        "label": "Softmax (temperature)",
+        "description": "Sample without replacement with probability ∝ exp(score / T). Low T = exploit, high T = explore. Logs the rng seed.",
+        "detail": (
+            "Continuous middle-ground between argmax and uniform random. Draws K "
+            "nodes without replacement, each picked with probability proportional "
+            "to exp(score / T).\n\n"
+            "Low T (e.g. 0.05) concentrates probability on the top scorer -- "
+            "near-argmax behavior. High T (e.g. 2.0) flattens the distribution "
+            "toward uniform. T = 0.5 is a reasonable default for moderate "
+            "exploration.\n\n"
+            "Stochastic — seed is logged."
+        ),
+        "params": [
+            {"name": "temperature", "type": "float", "min": 0.01, "max": 10.0, "default": 0.5, "label": "Temperature",
+             "detail": "Sharpness of the sampling distribution. As T → 0 behavior "
+                       "approaches argmax; as T → ∞ it approaches uniform."},
+            {"name": "k", "type": "int", "min": 1, "max": 50, "default": 5, "label": "Samples",
+             "detail": "Number of draws without replacement. Usually match your "
+                       "round's subagent count."},
+        ],
+    },
+    "pareto_per_task": {
+        "label": "Pareto per-task (GEPA-inspired)",
+        "description": "Preserve nodes that are best on at least one task; drop dominated ones; sample with probability proportional to how many tasks each is best at. Honors per-task `direction` (max/min) when the benchmark emits `tasks_meta`. Logs the rng seed.",
+        "detail": (
+            "Preserves specialists the aggregate score would hide. Algorithm:\n\n"
+            "1. For each task, find the top score across all frontier candidates.\n"
+            "2. Collect candidates that tie for best on at least one task.\n"
+            "3. Iteratively drop any candidate whose every winning front is also "
+            "won by another surviving candidate (set-cover dominance, lowest "
+            "aggregate score first).\n"
+            "4. Sample K from the survivors with probability proportional to how "
+            "many tasks each candidate is the best on.\n\n"
+            "Honors `tasks_meta[task_id].direction` when the benchmark emits it "
+            "(so `latency_ms` with direction=\"min\" ranks low-is-better). Falls "
+            "back to the workspace-level `--metric` when a task has no direction.\n\n"
+            "Intersects task keys across outcomes — a task only counts if every "
+            "considered candidate reported it. Handles benchmark drift cleanly.\n\n"
+            "Ports the candidate-selection algorithm from GEPA (Agrawal et al., "
+            "arXiv:2507.19457; gepa-ai/gepa src/gepa/gepa_utils.py). The genetic "
+            "mutation + reflective LLM parts of GEPA live elsewhere in evo's "
+            "tree-search loop."
+        ),
+        "params": [
+            {"name": "k", "type": "int", "min": 1, "max": 50, "default": 5, "label": "Samples",
+             "detail": "Number of candidates to sample from the Pareto front. If "
+                       "the front is smaller than K, returns everyone on it."},
+            {"name": "task_floor", "type": "float", "min": 0.0, "max": 1.0, "default": 0.0,
+             "label": "Ignore max-direction tasks where top score ≤",
+             "detail": "For direction=max tasks, skip a task if no candidate scored "
+                       "above this threshold. Stops 'everyone failed task T' from "
+                       "polluting the front with every candidate tied at 0. "
+                       "Min-direction tasks always count — \"nobody was fast\" is "
+                       "itself Pareto signal."},
+        ],
+    },
+    "ucb1": {
+        "label": "UCB1 (Upper Confidence Bound)",
+        "description": "Select the frontier node that maximizes the UCB1 formula, balancing node score and exploration frequency. Logs the rng seed.",
+        "detail": (
+            "Applies the Upper Confidence Bound (UCB1) multi-armed bandit algorithm "
+            "to select branch nodes.\n\n"
+            "UCB1 score = score + c * sqrt(ln(N) / (n_i + 1))\n"
+            "where N is the total number of evaluated nodes/experiments, n_i is the "
+            "number of children of node i, and c is the exploration weight.\n\n"
+            "Stochastic only for breaking ties among identical UCB1 values."
+        ),
+        "params": [
+            {"name": "c", "type": "float", "min": 0.0, "max": 1000.0, "default": 1.0, "label": "Exploration Weight (c)",
+             "detail": "Weight factor for exploration. Higher values favor nodes with fewer children, while lower values favor higher scores."},
+            {"name": "k", "type": "int", "min": 1, "max": 50, "default": 5, "label": "Samples",
+             "detail": "Number of top UCB1 candidates to return."},
+        ],
+    },
+}
+
+DEFAULT_FRONTIER_STRATEGY: dict[str, Any] = {
+    "kind": "pareto_per_task",
+    "params": {"k": 5, "task_floor": 0.0},
+}
+
+
+# --------------------------------------------------------------------------- #
+# Validation                                                                  #
+# --------------------------------------------------------------------------- #
+
+def validate_frontier_strategy(obj: Any) -> dict[str, Any]:
+    """Normalize + validate a strategy dict. Returns {kind, params} with every
+    param filled from defaults. Raises ValueError on unknown kind or out-of-range params."""
+    if not isinstance(obj, dict):
+        raise ValueError(f"frontier_strategy must be a dict, got {type(obj).__name__}")
+    kind = obj.get("kind")
+    spec = FRONTIER_STRATEGIES.get(kind)
+    if spec is None:
+        known = ", ".join(FRONTIER_STRATEGIES.keys())
+        raise ValueError(f"unknown frontier_strategy.kind: {kind!r} (known: {known})")
+    params_in = obj.get("params") or {}
+    if not isinstance(params_in, dict):
+        raise ValueError("frontier_strategy.params must be a dict")
+    params_out: dict[str, Any] = {}
+    for p in spec["params"]:
+        name = p["name"]
+        raw = params_in.get(name, p["default"])
+        caster = int if p["type"] == "int" else float
+        try:
+            val = caster(raw)
+        except (TypeError, ValueError):
+            raise ValueError(f"frontier_strategy.params.{name} is not a {p['type']}")
+        lo, hi = p["min"], p["max"]
+        if val < lo or val > hi:
+            raise ValueError(f"frontier_strategy.params.{name}={val} out of [{lo}, {hi}]")
+        params_out[name] = val
+    return {"kind": kind, "params": params_out}
+
+
+def resolve_from_config(config: dict[str, Any]) -> dict[str, Any]:
+    """Read frontier_strategy from config with default fallback. Always validated."""
+    raw = config.get("frontier_strategy") or DEFAULT_FRONTIER_STRATEGY
+    return validate_frontier_strategy(raw)
+
+
+# --------------------------------------------------------------------------- #
+# Pickers                                                                     #
+# --------------------------------------------------------------------------- #
+
+def _node_summary(node: dict[str, Any], rank: int) -> dict[str, Any]:
+    return {
+        "id": node["id"],
+        "score": node.get("score"),
+        "epoch": node.get("eval_epoch"),
+        "hypothesis": node.get("hypothesis"),
+        "rank": rank,
+    }
+
+
+def _sign(metric: str) -> int:
+    """Return +1 if higher-is-better, -1 if lower-is-better. Defaults to +1."""
+    return -1 if (metric or "").lower() == "min" else 1
+
+
+def _score_of(node: dict[str, Any], metric: str) -> float:
+    """Directional score: always higher-is-better after this call."""
+    try:
+        from world.gemini.ucb import pick_ucb1
+        return pick_ucb1(nodes, params, metric, outcomes, rng)
+    except (ImportError, ModuleNotFoundError):
+        c = float(params.get("c", 1.0))
+        k = int(params.get("k", 5))
+        try:
+            from .core import repo_root, load_graph
+            root = repo_root()
+            graph = load_graph(root)
+        except Exception:
+            graph = {"nodes": {}}
+        
+        graph_nodes = graph.get("nodes", {})
+        N = max(1, len(graph_nodes) - 1)
+
+        scored_nodes = []
+        for node in nodes:
+            node_id = node["id"]
+            score = _score_of(node, metric)
+            graph_node = graph_nodes.get(node_id, {})
+            children = graph_node.get("children", [])
+            n_i = len(children)
+            if score == float("-inf"):
+                ucb = float("-inf")
+            else:
+                ucb = score + c * math.sqrt(math.log(N) / (n_i + 1))
+            scored_nodes.append((ucb, node))
+
+        scored_nodes.sort(key=lambda x: (-x[0], rng.random()))
+        selected = [item[1] for item in scored_nodes[:k]]
+        return [_node_summary(n, i + 1) for i, n in enumerate(selected)]
+
+
+PICKERS: dict[str, Callable[[list, dict, str, dict, random.Random], list[dict]]] = {
+    "argmax": _pick_argmax,
+    "top_k": _pick_top_k,
+    "epsilon_greedy": _pick_epsilon_greedy,
+    "softmax": _pick_softmax,
+    "pareto_per_task": _pick_pareto_per_task,
+    "ucb1": _pick_ucb1,
+}
+
+
+# --------------------------------------------------------------------------- #
+# Dispatch                                                                    #
+# --------------------------------------------------------------------------- #
+
+def pick(nodes: list[dict[str, Any]], strategy: dict[str, Any], metric: str,
+         outcomes: dict[str, dict] | None = None,
+         seed: int | None = None) -> tuple[list[dict[str, Any]], int]:
+    """Apply `strategy` to `nodes`. Returns (ranked_list, seed_used).
+
+    `seed_used` is returned for logging. If seed is None a fresh one is drawn.
+    """
+    strategy = validate_frontier_strategy(strategy)
+    picker = PICKERS[strategy["kind"]]
+    used_seed = seed if seed is not None else random.SystemRandom().randint(0, 2**31 - 1)
+    rng = random.Random(used_seed)
+    ranked = picker(list(nodes), strategy["params"], metric, outcomes or {}, rng)
+    # Ensure rank field reflects output order.
+    for i, item in enumerate(ranked, 1):
+        item["rank"] = i
+    return ranked, used_seed
+
+
+# --------------------------------------------------------------------------- #
+# Helpers                                                                     #
+# --------------------------------------------------------------------------- #
+
+def _weighted_sample_without_replacement(items: list[dict], weights: list[float],
+                                          k: int, rng: random.Random) -> list[dict]:
+    """Efraimidis-Spirakis reservoir: assign key = rand^(1/weight), pick top k by key.
+
+    Returns items in sampled order, ranked 1..k.
+    """
+    print(ascii_tree(graph, config["metric"]))
+    return 0
+
+
+def _format_frontier_help() -> str:
+    from . import frontier_strategies as fs
+    lines = [
+        "evo frontier -- return frontier nodes (committed leaves) ranked by a selection strategy.",
+        "",
+        "Usage:",
+        "  evo frontier                                    # use configured strategy",
+        "  evo frontier --strategy <kind>                   # override for this call only",
+        "  evo frontier --strategy <kind> --params '<json>' # override with custom params",
+        "  evo frontier --seed <int>                        # pin rng for reproducible stochastic picks",
+        "  evo frontier --help-strategies                   # this text",
+        "",
+        "Strategy is read from `.evo/config.json` under `frontier_strategy`.",
+        "Set it once via the dashboard's strategy panel (top bar) or by editing the config directly.",
+        "Every call appends an event to `.evo/infra_log.json` with kind=frontier.",
+        "",
+        "Available strategies:",
+        "",
+    ]
+    for kind, spec in fs.FRONTIER_STRATEGIES.items():
+        lines.append(f"  {kind}  -- {spec['label']}")
+        lines.append(f"    {spec['description']}")
+        if spec["params"]:
+            lines.append("    params:")
+            for p in spec["params"]:
+                lines.append(
+                    f"      {p['name']} ({p['type']}, {p['min']}..{p['max']}, default {p['default']})"
+                    f"  -- {p['label']}"
+                )
+        else:
+            lines.append("    params: none")
+        lines.append("")
+    lines.append("Output envelope: {\"strategy\": {...}, \"generated_at\": \"...\", \"nodes\": [...], \"seed\": <int>}")
+    lines.append("Each node carries: id, score, eval_epoch (as \"epoch\"), hypothesis, rank.")
+    return "\n".join(lines)
+
+
+def cmd_frontier(args: argparse.Namespace) -> int:
+    from . import frontier_strategies as fs
+    if getattr(args, "help_strategies", False):
+        print(_format_frontier_help())
+        return 0
+    root = repo_root()
+    config, graph = _require_workspace(root)
+
+    raw_nodes = frontier_nodes(graph)
+    # Normalize each node to the minimal shape pickers/logs consume.
+    summaries = [
+        {
+            "id": n["id"],
+            "score": n.get("score"),
+            "eval_epoch": n.get("eval_epoch"),
+            "hypothesis": n.get("hypothesis"),
+        }
+        for n in raw_nodes
+    ]
+
+    # Resolve strategy: CLI overrides > config > default.
+    strategy = fs.resolve_from_config(config)
+    if getattr(args, "strategy", None):
+        params = strategy["params"]
+        if getattr(args, "params", None):
+            try:
+                params = json.loads(args.params)
+            except json.JSONDecodeError as exc:
+                print(f"ERROR: --params must be JSON: {exc}", file=sys.stderr)
+                return 1
+        strategy = fs.validate_frontier_strategy({"kind": args.strategy, "params": params})
+
+    # Load per-experiment outcomes for strategies that need per-task vectors.
+    outcomes: dict[str, dict] = {}
+    if strategy["kind"] == "pareto_per_task":
+        for n in raw_nodes:
+            attempt = n.get("current_attempt")
+            if not attempt:
+                continue
+            path = attempt_outcome_path(root, n["id"], int(attempt))
+            if path.exists():
+                try:
+                    outcomes[n["id"]] = json.loads(path.read_text(encoding="utf-8"))
+                except json.JSONDecodeError:
+                    pass
+
+    metric = config.get("metric", "max")
+    try:
+        ranked, seed_used = fs.pick(
+            summaries, strategy, metric,
+            outcomes=outcomes,
+            seed=args.seed if getattr(args, "seed", None) is not None else None,
+        )
+    except ValueError as exc:
+        print(f"ERROR: {exc}", file=sys.stderr)
+        return 1
+
+    envelope = {
+        "strategy": strategy,
+        "generated_at": utc_now(),
+        "nodes": ranked,
+    }
+    # Seed only included when the strategy is stochastic, to keep deterministic
+    # runs noise-free.
+    if strategy["kind"] in {"epsilon_greedy", "softmax", "pareto_per_task"}:
+        envelope["seed"] = seed_used
+
+    fs.append_frontier_log(root, strategy, [n["id"] for n in ranked],
+                           seed=envelope.get("seed"))
+
+    print(json.dumps(envelope, indent=2))
+    return 0
+
+
+def cmd_scratchpad(args: argparse.Namespace) -> int:
+        return jsonify(load_annotations(_root()))
+
+    @app.get("/api/runs")
+    def runs():
+        return jsonify(list_runs(_root()))
+
+    @app.post("/api/runs/<run_id>/activate")
+    def activate_run(run_id: str):
+        run_dir = evo_dir(_root()) / run_id
+        if not run_dir.exists():
+            return jsonify({"error": f"run {run_id} not found"}), 404
+        meta = _load_meta(_root())
+        meta["active"] = run_id
+        _save_meta(_root(), meta)
+        return jsonify({"active": run_id})
+
+    @app.get("/api/frontier-strategy")
+    def get_frontier_strategy():
+        config = load_config(_root())
+        return jsonify({
+            "registry": FRONTIER_STRATEGIES,
+            "current": resolve_from_config(config),
+            "default": DEFAULT_FRONTIER_STRATEGY,
+        })
+
+    @app.post("/api/frontier-strategy")
+    def set_frontier_strategy():
+        body = request.get_json(silent=True) or {}
+        try:
+            normalized = validate_frontier_strategy(body)
+        except ValueError as exc:
+            return jsonify({"error": str(exc)}), 400
+        config = load_config(_root())
+        config["frontier_strategy"] = normalized
+        save_config(_root(), config)
+        return jsonify(normalized)
+
+    @app.get("/api/frontier")
+    def frontier():
+        """Strategy-ranked frontier nodes — same logic as `evo frontier`, minus
+        the infra_log append. The dashboard polls this on every tick, so we
+        skip the persistence step (the CLI uses it for actual selection events).
+
+        Optional ?seed=N pins stochastic strategies for reproducible polls.
+        Default is seed=0 so the rail doesn't shuffle between refreshes."""
+        root = _root()
+        config = load_config(root)
+        graph = load_graph(root)
+        raw_nodes = frontier_nodes(graph)
+        summaries = [
+            {
+                "id": n["id"],
+                "score": n.get("score"),
+                "eval_epoch": n.get("eval_epoch"),
+                "hypothesis": n.get("hypothesis"),
+            }
+            for n in raw_nodes
+        ]
+        strategy = resolve_from_config(config)
+        # pareto_per_task needs per-attempt outcome files for task-level scores.
+        outcomes: dict[str, dict] = {}
+        if strategy["kind"] == "pareto_per_task":
+            for n in raw_nodes:
+                attempt = n.get("current_attempt")
+                if not attempt:
+                    continue
+                path = attempt_outcome_path(root, n["id"], int(attempt))
+                if path.exists():
+                    try:
+                        outcomes[n["id"]] = json.loads(path.read_text(encoding="utf-8"))
+                    except json.JSONDecodeError:
+                        pass
+        metric = config.get("metric", "max")
+        seed_q = request.args.get("seed", default=0, type=int)
+        try:
+            ranked, seed_used = frontier_pick(
+                summaries, strategy, metric, outcomes=outcomes, seed=seed_q,
+            )
+        except ValueError as exc:
+            return jsonify({"error": str(exc)}), 400
+        payload = {
+            "strategy": strategy,
+            "generated_at": utc_now(),
+            "picks": ranked,
+            "all_ids": [n["id"] for n in raw_nodes],
+        }
+        if strategy["kind"] in {"epsilon_greedy", "softmax", "pareto_per_task"}:
+            payload["seed"] = seed_used
+        return jsonify(payload)
+
+    @app.post("/api/direct")
+    def api_direct():
+        """Queue an `evo direct` directive from the dashboard.
+
+        Body: {"text": str, "from_exp_id"?: str, "exp_id"?: str}
+
+
+def _format_strategy_label(strategy: dict[str, Any]) -> str:
+    kind = strategy.get("kind", "?")
+    params = strategy.get("params") or {}
+    if not params:
+        return kind
+    params_str = " ".join(f"{k}={v}" for k, v in sorted(params.items()))
+    return f"{kind} {params_str}"
+
+
+def _rank_frontier(root: Path, raw_frontier: list[dict[str, Any]],
+                   config: dict[str, Any], metric: str) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    """Rank branchable nodes via the configured strategy.
+
+    Returns (ranked_summaries, strategy). On a broken config we fall back to
+    score-sorted raw frontier with a synthetic 'fallback' strategy so the
+    scratchpad still renders.
+    """
+    summaries = [
+        {
+            "id": n["id"],
+            "score": n.get("score"),
+            "eval_epoch": n.get("eval_epoch"),
+            "hypothesis": n.get("hypothesis"),
+        }
+        for n in raw_frontier
+    ]
+    try:
+        strategy = fs.resolve_from_config(config)
+        outcomes: dict[str, dict] = {}
+        if strategy["kind"] == "pareto_per_task":
+            for n in raw_frontier:
+                attempt = n.get("current_attempt")
+                if not attempt:
+                    continue
+                path = attempt_outcome_path(root, n["id"], int(attempt))
+                if path.exists():
+                    try:
+                        outcomes[n["id"]] = json.loads(path.read_text(encoding="utf-8"))
+                    except json.JSONDecodeError:
+                        pass
+        # seed=0 keeps the scratchpad render deterministic across calls;
+        # actual dispatch uses fresh randomness.
+        ranked, _ = fs.pick(summaries, strategy, metric, outcomes=outcomes, seed=0)
+        return ranked, strategy
+    except (ValueError, KeyError):
+        ranked = sorted(
+            summaries,
+            key=lambda n: (-(n.get("score") if n.get("score") is not None else float("-inf")), n["id"]),
+        )
+        for i, n in enumerate(ranked, 1):
+            n["rank"] = i
+        return ranked, {"kind": "fallback", "params": {}}
+
+
+def _truncate(text: str, limit: int = 240) -> str:
+
+codex
+The shared dispatch boundary is the key: one registry entry and one picker automatically feed the CLI, dashboard, and scratchpad. I’m recording the three cheapest seams, including where a strategy can be configured without adding any new command or UI code.

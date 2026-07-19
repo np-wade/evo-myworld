@@ -1,0 +1,64 @@
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 1.59kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/node:22-bookworm-slim
+#2 DONE 0.2s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [1/8] FROM docker.io/library/node:22-bookworm-slim@sha256:6c74791e557ce11fc957704f6d4fe134a7bc8d6f5ca4403205b2966bd488f6b3
+#4 resolve docker.io/library/node:22-bookworm-slim@sha256:6c74791e557ce11fc957704f6d4fe134a7bc8d6f5ca4403205b2966bd488f6b3 0.0s done
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 51B done
+#5 DONE 0.0s
+
+#6 [2/8] RUN apt-get update && apt-get install -y     git     ripgrep     curl     jq     vim     && rm -rf /var/lib/apt/lists/*
+#6 CACHED
+
+#7 [5/8] RUN npm install -g playwright     && playwright install --with-deps chromium
+#7 CACHED
+
+#8 [7/8] RUN chmod +x /dockerd-entrypoint-wrapper.sh
+#8 CACHED
+
+#9 [3/8] RUN install -m 0755 -d /etc/apt/keyrings     && curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc     && chmod a+r /etc/apt/keyrings/docker.asc     && . /etc/os-release     && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian ${VERSION_CODENAME} stable"        > /etc/apt/sources.list.d/docker.list     && apt-get update     && apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin     && rm -rf /var/lib/apt/lists/*
+#9 CACHED
+
+#10 [6/8] COPY dockerd-entrypoint-wrapper.sh /dockerd-entrypoint-wrapper.sh
+#10 CACHED
+
+#11 [4/8] RUN npm install -g bun
+#11 CACHED
+
+#12 [8/8] WORKDIR /workspace
+#12 CACHED
+
+#13 exporting to image
+#13 exporting layers done
+#13 exporting manifest sha256:614ec1c694a754aef904f9634b06d4ab62013dee460537f2c84febbc3898e084 done
+#13 exporting config sha256:89ea76f9a58095bdbd5f7e3a6b67bac8dcfc1e0fe808e5d2771e31543f453c73 done
+#13 exporting attestation manifest sha256:3708e9287e6da511e58d73f16f3508e570b0db76a302ab4a8555ac392aa09447 0.0s done
+#13 exporting manifest list sha256:27e5c1a0faf908d82035c56bf3d9949bbc3272a23083decdc238d57435518b80
+#13 exporting manifest list sha256:27e5c1a0faf908d82035c56bf3d9949bbc3272a23083decdc238d57435518b80 0.0s done
+#13 naming to docker.io/library/coding-base:latest done
+#13 unpacking to docker.io/library/coding-base:latest 0.0s done
+#13 DONE 0.1s
+ Container docker-envs-cursor-cli-run-8442a6623f98 Creating 
+ Container docker-envs-cursor-cli-run-8442a6623f98 Created 
+Done: queue item 2 ticked.
+
+**Verdict:** Keep the experiment tree and graphify library as separate stores; feed the dashboard via new read-only library routes, not by merging into `graph.json`.
+
+**Wrote**
+- `world/cursor/graph-dashboard-feed.md` — seams: `/api/library/find` + `/api/library/slice` over `evo_graph`, drawer one-shot prior-art strip, optional scratchpad hints
+- `FIELD-NOTES.md` — signed cursor entry
+- `queues/cursor.md` — item 2 `[x]`
+
+**Read:** `CHARTER.md`, `FIELD-NOTES.md` (tail), `queues/cursor.md`, `world/cursor/dashboard-map.md`, `world/backend/evo_graph.py`, `dashboard.py` routes.

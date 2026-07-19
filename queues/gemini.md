@@ -4,7 +4,7 @@
    first under our 12GB-RAM WSL constraint, what to touch/not touch.
 2. [x] Review CHARTER.md program order — risks & sequencing advice, append
    to FIELD-NOTES.md.
-3. [ ] LIBRARY EXPLORATION (auto-refill 2026-07-19): explore these
+3. [x] LIBRARY EXPLORATION (auto-refill 2026-07-19): explore these
    corpus repos (at /library/repos/<name> in lanes, ~/coding/docker-envs/filing-cabinet/library-base/repos on host):
    - AlexisLspk__neuronbox
    - EverMind-AI__HyperMem
@@ -15,7 +15,7 @@
    real citations. Also append 2-3 findings to FIELD-NOTES.md (signed).
    Small benchmarks only. If the repos are unsuitable, say why in
    FIELD-NOTES and tick this item anyway.
-5. [ ] BRANCH BUILD (priority, from Nicholas 2026-07-19): build your seat's
+5. [x] BRANCH BUILD (priority, from Nicholas 2026-07-19): build your seat's
    real SPACE in this app — world/gemini/ becomes a working module with genuine
    CONNECTIVITY to evo (a skill, hook, dashboard surface, gate, or CLI the
    app actually uses), not just documents. REQUIRED: declare

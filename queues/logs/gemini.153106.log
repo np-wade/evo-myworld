@@ -1,0 +1,76 @@
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 DONE 0.0s
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 1.59kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/node:22-bookworm-slim
+#2 DONE 0.2s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [1/8] FROM docker.io/library/node:22-bookworm-slim@sha256:6c74791e557ce11fc957704f6d4fe134a7bc8d6f5ca4403205b2966bd488f6b3
+#4 resolve docker.io/library/node:22-bookworm-slim@sha256:6c74791e557ce11fc957704f6d4fe134a7bc8d6f5ca4403205b2966bd488f6b3 0.0s done
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 51B done
+#5 DONE 0.0s
+
+#6 [2/8] RUN apt-get update && apt-get install -y     git     ripgrep     curl     jq     vim     && rm -rf /var/lib/apt/lists/*
+#6 CACHED
+
+#7 [3/8] RUN install -m 0755 -d /etc/apt/keyrings     && curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc     && chmod a+r /etc/apt/keyrings/docker.asc     && . /etc/os-release     && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian ${VERSION_CODENAME} stable"        > /etc/apt/sources.list.d/docker.list     && apt-get update     && apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin     && rm -rf /var/lib/apt/lists/*
+#7 CACHED
+
+#8 [4/8] RUN npm install -g bun
+#8 CACHED
+
+#9 [6/8] COPY dockerd-entrypoint-wrapper.sh /dockerd-entrypoint-wrapper.sh
+#9 CACHED
+
+#10 [7/8] RUN chmod +x /dockerd-entrypoint-wrapper.sh
+#10 CACHED
+
+#11 [5/8] RUN npm install -g playwright     && playwright install --with-deps chromium
+#11 CACHED
+
+#12 [8/8] WORKDIR /workspace
+#12 CACHED
+
+#13 exporting to image
+#13 exporting layers done
+#13 exporting manifest sha256:614ec1c694a754aef904f9634b06d4ab62013dee460537f2c84febbc3898e084 done
+#13 exporting config sha256:89ea76f9a58095bdbd5f7e3a6b67bac8dcfc1e0fe808e5d2771e31543f453c73 done
+#13 exporting attestation manifest sha256:fc9e437be6bf60a094121d58629eadd077c55ef645a81122afcbd6243b22eea0 0.0s done
+#13 exporting manifest list sha256:1fd1e84bad37d1fb783b2ddd3075b2661fa4ce97cdf9c0b14ef024b5549b8c38
+#13 exporting manifest list sha256:1fd1e84bad37d1fb783b2ddd3075b2661fa4ce97cdf9c0b14ef024b5549b8c38 0.0s done
+#13 naming to docker.io/library/coding-base:latest done
+#13 unpacking to docker.io/library/coding-base:latest 0.0s done
+#13 DONE 0.1s
+ Container docker-envs-gemini-cli-run-418c649640f4 Creating 
+ Container docker-envs-gemini-cli-run-418c649640f4 Created 
+I have completed the top unchecked item in the Gemini seat's queue ([queues/gemini.md](file:///workspace/evo-myworld/queues/gemini.md)).
+
+### Summary of Work
+
+1. **Context & Repository Exploration**:
+   - Skimmed through the workspace configurations, charter, field notes, and queue files in the requested order.
+   - Explored the three target library repositories under `/library/repos/`:
+     - **[AlexisLspk_neuronbox](file:///library/repos/AlexisLspk_neuronbox/code)**: Implements local GPU detection (Metal, ROCm, CUDA) and soft VRAM capacity checks via Rust's native NVML wrappers.
+     - **[EverMind-AI_HyperMem](file:///library/repos/EverMind-AI_HyperMem/code)**: Constructs a three-level conversation memory hypergraph (topics -> episodes -> facts) with dense vector retrieval, BM25, and Reciprocal Rank Fusion (RRF).
+     - **[EverMind-AI_MSA](file:///library/repos/EverMind-AI_MSA/code)**: Implements Memory-Sparse Attention to scale context length to 100M-tokens. Document states are chunk-pooled and routed using distributed, GPU-accelerated PyTorch matrix multiplication.
+
+2. **Race Filing**:
+   - Identified a notable difference in how vector similarity/relevance scores are computed: manual CPU-based NumPy operations vs. PyTorch pre-normalized matrix multiplication (`matmul`).
+   - Filed a new race request: **[vector-cosine-similarity.md](file:///workspace/evo-myworld/racetrack/requests/vector-cosine-similarity.md)** to benchmark the efficiency of these two patterns under CPU execution.
+
+3. **Output Files Created/Modified**:
+   - Created the Gemini space folder `world/gemini/` and wrote **[exploration-notes.md](file:///workspace/evo-myworld/world/gemini/exploration-notes.md)** summarizing the findings.
+   - Appended dated and signed learnings to the end of **[FIELD-NOTES.md](file:///workspace/evo-myworld/FIELD-NOTES.md)**.
+   - Checked off the completed task in **[queues/gemini.md](file:///workspace/evo-myworld/queues/gemini.md)**.

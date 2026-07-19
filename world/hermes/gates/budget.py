@@ -63,21 +63,37 @@ def load_ceilings_yaml(path: Path, stage: str) -> dict:
         print(f"budget: ceilings file not found: {path}", file=sys.stderr)
         sys.exit(2)
     text = path.read_text(encoding="utf-8")
+    # Supported shapes (both grace the user's intuition):
+    #   (A) flat:    intake:\n  tokens: 100000
+    #   (B) wrapped: stages:\n  intake:\n    tokens: 100000
     stages: dict[str, dict[str, float]] = {}
     cur_stage: str | None = None
+    seen_stages_header = False
+    stage_indent = -1
     for raw in text.splitlines():
         line = raw.rstrip()
         if not line or line.lstrip().startswith("#"):
             continue
         indent = len(line) - len(line.lstrip())
         body = line.strip()
-        if indent == 0 and body.endswith(":"):
+        if indent == 0 and body == "stages:":
+            seen_stages_header = True
+            cur_stage = None
+            continue
+        if indent == 0 and body.endswith(":") and not seen_stages_header:
+            # Flat shape (A): top-level key is a stage name.
             cur_stage = body[:-1].strip()
+            stage_indent = 0
             stages[cur_stage] = {}
             continue
-        if indent == 0 and body == "stages:":
+        if seen_stages_header and body.endswith(":"):
+            if cur_stage is None or indent <= stage_indent:
+                cur_stage = body[:-1].strip()
+                stage_indent = indent
+                stages[cur_stage] = {}
+                continue
             continue
-        if indent >= 2 and ":" in body and cur_stage is not None:
+        if ":" in body and cur_stage is not None and indent > stage_indent:
             key, _, val = body.partition(":")
             try:
                 stages[cur_stage][key.strip()] = float(val.strip())

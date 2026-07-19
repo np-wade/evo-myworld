@@ -15,3 +15,25 @@
 [2026-07-19 15:25:49] heartbeat: [2026-07-19 15:15:46] cycle 1: seat hermes working | MemAvail=9.8G SwapFree=23.8G
 [2026-07-19 15:26:49] heartbeat: [2026-07-19 15:15:46] cycle 1: seat hermes working | MemAvail=10.0G SwapFree=23.8G
 --- hermes exit=0 (log: /home/npwad/coding/docker-envs/projects/evo-myworld/queues/logs/hermes.151546.log)
+[2026-07-19 15:26:52] === cycle 1 done (0 races). Sleeping 900s.
+[2026-07-19 15:26:52] STOPLAB present — stopping.
+[2026-07-19 15:27:57] === cycle 1 start (seats: feather hermes gemini gemini2 cursor codex poe kimi, max races: 2)
+=== dispatching feather → /home/npwad/coding/docker-envs/projects/evo-myworld/queues/logs/feather.152758.log
+--- feather SOFT-FAIL (no item ticked, rc=1, attempt 1)
+=== dispatching hermes → /home/npwad/coding/docker-envs/projects/evo-myworld/queues/logs/hermes.152812.log
+[2026-07-19 15:28:57] heartbeat: [2026-07-19 15:28:12] cycle 1: seat hermes working | MemAvail=9.9G SwapFree=23.8G
+[2026-07-19 15:29:57] heartbeat: [2026-07-19 15:28:12] cycle 1: seat hermes working | MemAvail=9.8G SwapFree=23.8G
+[2026-07-19 15:30:58] heartbeat: [2026-07-19 15:28:12] cycle 1: seat hermes working | MemAvail=9.8G SwapFree=23.8G
+--- hermes OK (ticked an item, rc=0)
+=== dispatching gemini → /home/npwad/coding/docker-envs/projects/evo-myworld/queues/logs/gemini.153106.log
+[2026-07-19 15:31:58] heartbeat: [2026-07-19 15:31:06] cycle 1: seat gemini working | MemAvail=9.9G SwapFree=23.8G
+[2026-07-19 15:32:58] heartbeat: [2026-07-19 15:31:06] cycle 1: seat gemini working | MemAvail=9.7G SwapFree=23.8G
+--- gemini OK (ticked an item, rc=0)
+=== dispatching gemini2 → /home/npwad/coding/docker-envs/projects/evo-myworld/queues/logs/gemini2.153303.log
+[2026-07-19 15:33:58] heartbeat: [2026-07-19 15:33:03] cycle 1: seat gemini2 working | MemAvail=9.8G SwapFree=23.8G
+[2026-07-19 15:34:58] heartbeat: [2026-07-19 15:33:03] cycle 1: seat gemini2 working | MemAvail=9.8G SwapFree=23.8G
+--- gemini2 OK (ticked an item, rc=0)
+=== dispatching cursor → /home/npwad/coding/docker-envs/projects/evo-myworld/queues/logs/cursor.153506.log
+[2026-07-19 15:35:58] heartbeat: [2026-07-19 15:35:05] cycle 1: seat cursor working | MemAvail=9.6G SwapFree=23.8G
+--- cursor OK (ticked an item, rc=0)
+=== dispatching codex → /home/npwad/coding/docker-envs/projects/evo-myworld/queues/logs/codex.153603.log

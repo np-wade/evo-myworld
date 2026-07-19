@@ -1,0 +1,71 @@
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 1.59kB 0.0s done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/node:22-bookworm-slim
+#2 DONE 0.3s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [1/8] FROM docker.io/library/node:22-bookworm-slim@sha256:6c74791e557ce11fc957704f6d4fe134a7bc8d6f5ca4403205b2966bd488f6b3
+#4 resolve docker.io/library/node:22-bookworm-slim@sha256:6c74791e557ce11fc957704f6d4fe134a7bc8d6f5ca4403205b2966bd488f6b3 0.0s done
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 51B done
+#5 DONE 0.0s
+
+#6 [3/8] RUN install -m 0755 -d /etc/apt/keyrings     && curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc     && chmod a+r /etc/apt/keyrings/docker.asc     && . /etc/os-release     && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian ${VERSION_CODENAME} stable"        > /etc/apt/sources.list.d/docker.list     && apt-get update     && apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin     && rm -rf /var/lib/apt/lists/*
+#6 CACHED
+
+#7 [6/8] COPY dockerd-entrypoint-wrapper.sh /dockerd-entrypoint-wrapper.sh
+#7 CACHED
+
+#8 [7/8] RUN chmod +x /dockerd-entrypoint-wrapper.sh
+#8 CACHED
+
+#9 [4/8] RUN npm install -g bun
+#9 CACHED
+
+#10 [5/8] RUN npm install -g playwright     && playwright install --with-deps chromium
+#10 CACHED
+
+#11 [2/8] RUN apt-get update && apt-get install -y     git     ripgrep     curl     jq     vim     && rm -rf /var/lib/apt/lists/*
+#11 CACHED
+
+#12 [8/8] WORKDIR /workspace
+#12 CACHED
+
+#13 exporting to image
+#13 exporting layers done
+#13 exporting manifest sha256:614ec1c694a754aef904f9634b06d4ab62013dee460537f2c84febbc3898e084 done
+#13 exporting config sha256:89ea76f9a58095bdbd5f7e3a6b67bac8dcfc1e0fe808e5d2771e31543f453c73 done
+#13 exporting attestation manifest sha256:6b1430ae54acf7e4f3d5518819e6e2e98417f773ce78e5e109fd9796a476d779
+#13 exporting attestation manifest sha256:6b1430ae54acf7e4f3d5518819e6e2e98417f773ce78e5e109fd9796a476d779 0.0s done
+#13 exporting manifest list sha256:8c578d01a31c6d89747f37e097dfa8451b42b7ec6ee7d0253695a520b7df92f6 0.0s done
+#13 naming to docker.io/library/coding-base:latest done
+#13 unpacking to docker.io/library/coding-base:latest 0.0s done
+#13 DONE 0.1s
+ Container docker-envs-opencode-cli-run-406f54c8f550 Creating 
+ Container docker-envs-opencode-cli-run-406f54c8f550 Created 
+[0m
+> build · Qwen/Qwen3-Coder-Next
+[0m
+[0m→ [0mRead evo-myworld/queues/feather.md
+[0m→ [0mRead evo-myworld/FIELD-NOTES.md[90m [offset=0, limit=60][0m
+[0m→ [0mRead evo-myworld/harness/HARNESS.md
+[0m→ [0mRead evo-myworld/racetrack/RACETRACK.md
+[0m
+[0m✗ [0mInvalid Tool
+The arguments provided to the tool are invalid: Model tried to call unavailable tool 'list'. Available tools: bash, edit, glob, grep, invalid, read, skill, task, todowrite, webfetch, write.
+[0m
+[0m✗ [0mInvalid Tool
+The arguments provided to the tool are invalid: Model tried to call unavailable tool 'list'. Available tools: bash, edit, glob, grep, invalid, read, skill, task, todowrite, webfetch, write.
+[0m
+[93m[1m! [0mpermission requested: doom_loop (invalid); auto-rejecting
+[91m[1mError: [0mThe user rejected permission to use this specific tool call.
+

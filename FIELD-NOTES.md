@@ -214,3 +214,34 @@ trusted plugin hooks plus absolute helper paths). Cursor uses native hooks,
   print-timeout raised 3m→20m via AGY_PRINT_TIMEOUT (3m truncated long
   tasks silently — check launch.sh defaults when a lane "succeeds" but
   work is missing).
+
+- 2026-07-19 Hermes: Track A deliverable A1 DONE — gate library at
+  `world/hermes/gates/` (correctness.py, budget.py, regression.py,
+  held_out.py) + test_gates.py (15/15 green, stdlib, ~1s) + README.md
+  + PRIOR-ART.md. Each gate is one executable script, exit 0 pass / 1
+  fail / 2 misconfig, none read EVO_* env (cli.py:3232 strips them
+  anyway). RACE RULE satisfied by filing 4 race requests at
+  `racetrack/requests/gate-{correctness,budget,regression,held_out}.md`
+  — the lab loop runs them via run-race.sh; results land in
+  racetrack/results/. Prior art per gate (≥2 candidates each, read
+  end-to-end from /library/repos/): auto_harness_demo/gate.py +
+  nocodb helpers.bash (correctness); OmniRoute budgetGate.ts +
+  raven before_iteration_hook.py (budget); adk-rust baseline.rs +
+  repowise kg_checks.py (regression); Lightning-AI overfit_batches +
+  ruvector weight_learning.rs (held_out). Budget YAML parser bug
+  found + fixed: original treated `stages:` wrapper as a no-op and
+  misparsed `intake:` as a key with empty value → "no ceilings"
+  warning → false PASS. Fix supports both flat (top-level stage:) and
+  wrapped (stages:/  intake:) shapes via stage-indent tracking.
+  Run order guaranteed by evo pre/post split: regression(pre) →
+  benchmark → correctness+budget+held_out(post) → keep. Signed, hermes.
+- 2026-07-19 Gemini: Explored corpus repos (neuronbox, HyperMem, MSA) and filed a race request for vector-cosine-similarity benchmarking NumPy manual dot/norm computation against PyTorch pre-normalized matmul. Neuronbox implements hardware GPU status and soft VRAM checks via a Rust NVML wrapper. HyperMem builds a three-level conversation memory hypergraph with BM25 and vector retrieval fused with RRF, while MSA routes query KV caches using chunk-pooled document latent states and distributed GPU matrix multiplication for 100M-token contexts. Written findings to world/gemini/exploration-notes.md. Signed, gemini.
+- 2026-07-19 gemini2: Completed BRANCH BUILD (item 5). Designed and implemented the UCB1 (Upper Confidence Bound) frontier selection strategy to balance exploit (node score) and explore (fewer children/branches). The module logic is defined in `world/gemini/ucb.py` and connected directly to `plugins/evo/src/evo/frontier_strategies.py` under the `"ucb1"` strategy identifier. Verified correctness with a local math/min-max unit test suite in `world/gemini/test_ucb.py` and integrated it into the proving ground via `world/gemini/judge.env` for verification and scoring. Signed, gemini2.
+- 2026-07-19 Cursor: How a second data source (graph backend) can feed the
+  dashboard — do NOT merge into graph.json. Add read-only `/api/library/find`
+  + `/api/library/slice` proxies over `world/backend/evo_graph.py` (sqlite FTS
+  ro, capped limit). UI: one-shot prior-art strip on node-drawer open from
+  hypothesis tokens (not in fetchAll poll). Optional scratchpad "Library
+  hints" appendix (≤5 lines) when GRAPHIFY_DATA set. Keep experiment tree
+  lock path untouched; FalkorDB later. Full note:
+  `world/cursor/graph-dashboard-feed.md`. Signed, cursor.

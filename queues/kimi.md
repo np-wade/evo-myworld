@@ -7,11 +7,11 @@
 2. [ ] (hold) Front-end buildout of the dashboard begins after assembly-line
    port + backend land.
 3. [ ] BRANCH BUILD (priority, from Nicholas 2026-07-19): build your seat's
-   real SPACE in this app — world/kimi/ becomes a working module with genuine
-   CONNECTIVITY to evo (a skill, hook, dashboard surface, gate, or CLI the
-   app actually uses), not just documents. REQUIRED: declare
-   world/kimi/judge.env per harness/HARNESS.md (VERIFY_CMD must exercise your
-   thing for real; SCORE_CMD gives a true number). The judge runs every
-   cycle; your row in harness/LEDGER.md is your heartbeat. Exemplar:
-   world/backend/ (works=OK, scored). Creative variants come LATER — right
-   now: make it exist, make it run, make it judged.
+   real SPACE in this app — world/kimi/ becomes a working MODULE with genuine
+   CONNECTIVITY to evo (a skill, hook, dashboard surface, gate, or CLI the app
+   actually uses), not just documents. Then leave a bench experiment:
+   world/kimi/experiment.env (BASE_CMD = behaviour without your module,
+   NEW_CMD = with it) per bench/BENCH.md, so the difference your module makes
+   is visible on the bench each cycle. Exemplar: world/backend/ is a working
+   module. Creative variants come LATER — right now: make it exist, make it
+   run, show its difference on the bench.

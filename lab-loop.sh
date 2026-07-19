@@ -42,8 +42,8 @@ while :; do
     ./queues/dispatch.sh "$SEAT" >>"$LOG" 2>&1
   done
 
-  status "cycle $CYCLE: judging (proving ground)"
-  ./harness/judge.sh >>"$LOG" 2>&1
+  status "cycle $CYCLE: bench (experiment trail)"
+  for d in world/*/experiment.env; do [ -e "$d" ] || continue; ./bench/experiment.sh --loop "$(basename "$(dirname "$d")")" >>"$LOG" 2>&1; done
 
   RACES=0
   for REQ in racetrack/requests/*.md; do
@@ -54,6 +54,8 @@ while :; do
     ./racetrack/run-race.sh "$REQ" >>"$LOG" 2>&1 && RACES=$((RACES+1))
   done
 
+  # self-heal: docker seats write as root on the bind mount
+  docker run --rm -v "$REPO":/w alpine chown -R 1000:1000 /w >/dev/null 2>&1 || true
   status "cycle $CYCLE: committing"
   git add -A >>"$LOG" 2>&1
   git commit -qm "lab-loop cycle $CYCLE: seat outputs, race results" >>"$LOG" 2>&1 && git push -q origin main >>"$LOG" 2>&1

@@ -1,0 +1,79 @@
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 1.59kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/node:22-bookworm-slim
+#2 DONE 0.3s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [1/8] FROM docker.io/library/node:22-bookworm-slim@sha256:6c74791e557ce11fc957704f6d4fe134a7bc8d6f5ca4403205b2966bd488f6b3
+#4 resolve docker.io/library/node:22-bookworm-slim@sha256:6c74791e557ce11fc957704f6d4fe134a7bc8d6f5ca4403205b2966bd488f6b3 0.0s done
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 51B done
+#5 DONE 0.0s
+
+#6 [3/8] RUN install -m 0755 -d /etc/apt/keyrings     && curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc     && chmod a+r /etc/apt/keyrings/docker.asc     && . /etc/os-release     && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian ${VERSION_CODENAME} stable"        > /etc/apt/sources.list.d/docker.list     && apt-get update     && apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin     && rm -rf /var/lib/apt/lists/*
+#6 CACHED
+
+#7 [5/8] RUN npm install -g playwright     && playwright install --with-deps chromium
+#7 CACHED
+
+#8 [6/8] COPY dockerd-entrypoint-wrapper.sh /dockerd-entrypoint-wrapper.sh
+#8 CACHED
+
+#9 [7/8] RUN chmod +x /dockerd-entrypoint-wrapper.sh
+#9 CACHED
+
+#10 [2/8] RUN apt-get update && apt-get install -y     git     ripgrep     curl     jq     vim     && rm -rf /var/lib/apt/lists/*
+#10 CACHED
+
+#11 [4/8] RUN npm install -g bun
+#11 CACHED
+
+#12 [8/8] WORKDIR /workspace
+#12 CACHED
+
+#13 exporting to image
+#13 exporting layers done
+#13 exporting manifest sha256:614ec1c694a754aef904f9634b06d4ab62013dee460537f2c84febbc3898e084 done
+#13 exporting config sha256:89ea76f9a58095bdbd5f7e3a6b67bac8dcfc1e0fe808e5d2771e31543f453c73 done
+#13 exporting attestation manifest sha256:193dd33704a80d90ce7551211976a04cbc37760c4457c174df2f25dfddc97c78
+#13 exporting attestation manifest sha256:193dd33704a80d90ce7551211976a04cbc37760c4457c174df2f25dfddc97c78 0.0s done
+#13 exporting manifest list sha256:f4e83f5b91807d88505f28b17d055321274b59461a0e9ce8b47eb6aa8c82647c 0.0s done
+#13 naming to docker.io/library/coding-base:latest done
+#13 unpacking to docker.io/library/coding-base:latest 0.0s done
+#13 DONE 0.1s
+ Container docker-envs-gemini-cli-2-run-f1ba17e9f4a9 Creating 
+ Container docker-envs-gemini-cli-2-run-f1ba17e9f4a9 Created 
+I have completed the top unchecked item (item 5, **BRANCH BUILD**) in the `gemini2` seat's queue.
+
+### Summary of Work
+
+1. **Context & Repository Exploration**:
+   - Read the following files in the requested order:
+     - [CHARTER.md](file:///workspace/evo-myworld/CHARTER.md) to understand repo guidelines, branch ownership, and the ML layer program plan.
+     - The tail of [FIELD-NOTES.md](file:///workspace/evo-myworld/FIELD-NOTES.md) for context on recent seat tasks, FTS query building, and `pytest` execution constraints.
+     - [queues/gemini.md](file:///workspace/evo-myworld/queues/gemini.md) to locate the top priority task.
+     - [HARNESS.md](file:///workspace/evo-myworld/harness/HARNESS.md) to understand the proving-ground spec and `judge.env` requirements.
+
+2. **Core App Connectivity**:
+   - Registered a new `"ucb1"` selection strategy in [frontier_strategies.py](file:///workspace/evo-myworld/plugins/evo/src/evo/frontier_strategies.py) under the `FRONTIER_STRATEGIES` registry and mapped it inside the `PICKERS` dictionary.
+   - Built dynamic loader logic in `_pick_ucb1` to import the core selection math directly from our seat's custom module if available, with a robust local fallback to support downstream workflows.
+
+3. **Seat Module & Testing**:
+   - Created the Python package initialization [__init__.py](file:///workspace/evo-myworld/world/gemini/__init__.py) and the selection module [ucb.py](file:///workspace/evo-myworld/world/gemini/ucb.py).
+   - The UCB1 strategy balances exploit (node score) and explore (prioritizing nodes with fewer children/sub-branches) using the formula:
+     $$\text{UCB1} = \text{score} + c \cdot \sqrt{\frac{\ln(N)}{n_i + 1}}$$
+   - Wrote a unit test suite in [test_ucb.py](file:///workspace/evo-myworld/world/gemini/test_ucb.py) that asserts correct UCB1 mathematical behavior (shifting preference based on the exploration weight parameter $c$), `min`/`max` metric direction handling, and sampling limits.
+   - Declared [judge.env](file:///workspace/evo-myworld/world/gemini/judge.env) to run the unit tests under `pytest` for verification and benchmark the `fs.pick` operation under `ucb1` for scoring.
+
+4. **Status & Queue Updates**:
+   - Appended dated and signed learnings to [FIELD-NOTES.md](file:///workspace/evo-myworld/FIELD-NOTES.md).
+   - Ticked off item 5 in [queues/gemini.md](file:///workspace/evo-myworld/queues/gemini.md).
