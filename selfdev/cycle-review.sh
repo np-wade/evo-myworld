@@ -97,6 +97,11 @@ timeout "$TIMEOUT" claude -p "$PROMPT" \
 RC=$?
 
 # ---- path guard: revert anything touched outside the whitelist --------------
+# NOTE: if another process edits the repo during our window, its edit is
+# indistinguishable from ours and gets reverted too (observed once in the
+# first live test: a concurrent session's run-race.sh edit). Two defenses:
+# wire this script into the loop's SEQUENTIAL slot (nothing else writing),
+# and every revert saves a rescue patch to $STATE/reverted-$STAMP.patch.
 REVERTED=""
 while IFS= read -r P; do
   [ -n "$P" ] || continue
@@ -105,9 +110,11 @@ while IFS= read -r P; do
     queues/*.md|selfdev/*|FIELD-NOTES.md) ;;          # whitelisted
     *)
       if git ls-files --error-unmatch "$P" >/dev/null 2>&1; then
+        git diff -- "$P" >> "$STATE/reverted-$STAMP.patch" 2>/dev/null
         git checkout -- "$P" 2>/dev/null
       else
-        rm -f "$P" 2>/dev/null
+        { echo "=== untracked file moved aside: $P"; } >> "$STATE/reverted-$STAMP.patch"
+        mkdir -p "$STATE/quarantine-$STAMP" && mv -f "$P" "$STATE/quarantine-$STAMP/" 2>/dev/null
       fi
       REVERTED="$REVERTED $P"
       ;;

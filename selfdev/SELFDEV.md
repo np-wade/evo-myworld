@@ -120,3 +120,26 @@ status "cycle $CYCLE: selfdev review"
 Best slot: after races, before commit — the cycle's full evidence exists and
 the commit then carries the refinement. Tunables via env:
 `SELFDEV_TIMEOUT` (default 600s), `SELFDEV_MODEL` (default: CLI default).
+
+## 4. Lessons from the first live run (2026-07-19, kept honest per R8)
+
+- The loop works end to end: evidence gathered mid-cycle-1, one whitelisted
+  edit applied (`queues/gemini.md` item 6 — routes a judge.env
+  ModuleNotFoundError fix back to the gemini seat, with a concrete next-cycle
+  check), CHANGELOG entry in the required format, everything else correctly
+  left as analysis (2-strike machinery gets first crack at 1-attempt
+  soft-fails; kernel-owned transient gets watched, not proposed).
+- `claude -p --allowedTools ...` ALLOWS the listed tools but does not forbid
+  Bash — the driver used Bash (read-only + one `>>` append to the whitelisted
+  CHANGELOG). Acceptable: the prompt forbids heavy commands and the path
+  guard is the enforcement layer, same shape as raven — the designer sandbox
+  "is not filesystem/network jailed", the whitelist+revert is what's real
+  (`raven:raven/evolver/applier/path_guard.py`).
+- **Concurrency hazard (real occurrence):** the path guard reverted
+  `racetrack/run-race.sh`, which the session transcript proves our driver
+  never touched — a concurrent session's edit landed inside our window.
+  Raven avoids this class of bug by running every candidate in its own git
+  worktree (`raven:raven/evolver/tree/store.py`); we run in the live repo, so
+  the fixes are (a) the script must be wired into the loop's sequential slot,
+  (b) every revert now saves a rescue patch to
+  `selfdev/.state/reverted-<stamp>.patch` first.

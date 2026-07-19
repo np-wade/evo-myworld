@@ -307,3 +307,59 @@ trusted plugin hooks plus absolute helper paths). Cursor uses native hooks,
   got an EMPTY brief. Fix: realpath the request first. Lesson for all lab
   scripts: absolutize every path argument before any cd. (Also re-learned:
   never pkill -f a string your own command line contains.)
+
+## BR-Witt scaffold
+
+- Created two standalone git repos: `/projects/bertrand-hussle` and
+  `/projects/witt-brain`, each with `git init` and first commit. BH is the Rust
+  CLI; Witt Brain is the model-holding library + server. The seam is an
+  identical `INTERFACE.md` contract in both repos: crate API plus JSON-RPC over
+  a Unix socket. Signed, kimi.
+
+- BH visual system is code, not config: `src/theme.rs` defines a 3-line header,
+  a `✦` sigil, a 10-frame braille spinner, and `NO_COLOR` respect. The palette
+  is taken from Raven's dark theme (`#fbe23f` gold, `#536878` slate) but the
+  header is intentionally tiny to stay token-cheap at runtime. Signed, kimi.
+
+- Witt-brain keeps the Rust base dependency-only (clap, anyhow, serde, tokio,
+  etc.) and does not depend on the missing local `/library/repos/zeroclaw-labs_zeroclaw`
+  tree. Instead it mirrors the ZeroClaw trait names (`ModelProvider`, `Memory`)
+  as placeholder traits and cites the real upstream files in `DESIGN.md`. This
+  lets the repo stand alone while staying aligned with `/projects/witt`'s
+  existing ZeroClaw path deps. Signed, kimi.
+
+- 2026-07-19 selfdev: read the EverMind raven evolver end-to-end and built
+  selfdev/ (SELFDEV.md design + cycle-review.sh, tested live). The raven
+  mechanisms worth stealing, all in
+  filing-cabinet/library-base/repos/EverMind-AI_raven/code/:
+  (1) the self-improvement loop is a deterministic state machine, NOT prompt
+  discipline — control flow/termination in code, the model answers one small
+  schema-validated question per step (raven/evolver/orchestrator/loop.py,
+  nodes/semantic.py, orchestrator/DESIGN.md "inversion of control");
+  (2) adoption is gated three ways: infra failures never scored 0-and-dropped
+  (denominator = all tasks), credit only where the patch's mechanism actually
+  FIRED (activation_beacon), and paired significance vs a FIXED vanilla
+  baseline (orchestrator/gates/pipeline.py, gates/paired.py,
+  applier/beacon_guard.py; SOP docs/specs/self-evolution-loop-sop.md §0,§2⑥);
+  (3) the designer edits only a path whitelist and everything else it touches
+  is REVERTED — the measurement surface (evolver + scorer) is an immutable
+  kernel a candidate can never edit (applier/path_guard.py, evolver/README.md
+  security notes) — cycle-review.sh copies this exactly;
+  (4) inert candidates are culled at zero cost before any spend
+  (zero-hit preflight, orchestrator/production.py) → our no-op-on-unchanged-
+  evidence fingerprint; test set is physically sealed from decisions
+  (sealed/runner.py score() returns None) → our "adoption is judged by NEXT
+  cycle's evidence, never self-declared";
+  (5) everything is an append-only ledger (nodes/*.json, findings.md,
+  state/journal.py; config fingerprint refuses resume under changed config)
+  → selfdev/CHANGELOG.md. First live cycle-review run applied one refinement
+  (queues/gemini.md item 6: judge.env PYTHONPATH fix routed to gemini).
+  ⚠ collateral: the path guard reverted racetrack/run-race.sh, which our
+  driver never touched — a CONCURRENT session's edit landed in our window
+  (transcript-verified). Whoever owns that edit: re-apply it; future reverts
+  are saved to selfdev/.state/reverted-<stamp>.patch, and the orchestrator
+  should wire cycle-review.sh into the loop's sequential slot (after races,
+  before commit). Signed, selfdev.
+
+- 2026-07-19 Gemini: Verified EverMind Raven's `BeforeIterationHook` and `ToolAuditHook` live in python against toy inputs. Gating conversation turns via fast character-length token estimation (`len(json.dumps(messages)) // 4`) and blocking specific tools via a deterministic denylist successfully halts executions before LLM calls occur, providing a highly lightweight first line of defense against runaway loops and resource waste. Signed, gemini.
+- 2026-07-19 Gemini: Ran Raven's evolver analysis modules (`compute_stability`, `extract_features`, `build_trial_pool`) against mock baseline directories. Confirmed how the evolver stratifies tasks into stability tiers and extracts cheap metadata features (e.g. average text length, docker error counts, exit status ordinals) to build a unified trial pool. This allows a cold-start coverage bandit to run K-means clustering and select a diverse diagnostic subset of tasks, saving significant benchmark run cost. Signed, gemini.

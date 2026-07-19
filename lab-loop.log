@@ -58,3 +58,8 @@ cat: racetrack/requests/backend-query-ranking.md: No such file or directory
 [2026-07-19 15:45:58] heartbeat: [2026-07-19 15:44:41] cycle 1: racing backend-query-ranking | MemAvail=9.4G SwapFree=23.8G
 [2026-07-19 15:46:58] heartbeat: [2026-07-19 15:44:41] cycle 1: racing backend-query-ranking | MemAvail=9.4G SwapFree=23.8G
 race backend-query-ranking FAILED (rc=143) — request left in place, log: /home/npwad/coding/docker-envs/projects/evo-races/backend-query-ranking/steward.log
+[2026-07-19 15:47:58] heartbeat: [2026-07-19 15:47:08] cycle 1: racing best-regression-gate | MemAvail=9.6G SwapFree=23.8G
+[2026-07-19 15:48:58] heartbeat: [2026-07-19 15:47:08] cycle 1: racing best-regression-gate | MemAvail=9.5G SwapFree=23.8G
+[2026-07-19 15:49:58] heartbeat: [2026-07-19 15:47:08] cycle 1: racing best-regression-gate | MemAvail=9.7G SwapFree=23.8G
+[2026-07-19 15:50:58] heartbeat: [2026-07-19 15:47:08] cycle 1: racing best-regression-gate | MemAvail=9.8G SwapFree=23.8G
+race best-regression-gate FAILED (rc=1) — request left in place, log: /home/npwad/coding/docker-envs/projects/evo-races/best-regression-gate/steward.log
