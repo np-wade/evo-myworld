@@ -47,3 +47,19 @@ a try/except) so a missing dep skips the tool, never crashes the race. Handle
 Frozen tiers 0–2 run today with zero deps. Tiers 3 (anti-bot) and 4 (detector
 oracle) are live — add real target URLs to `fixtures/ladder.json` `live_tasks_todo`
 and install the tool deps in a venv. Tier R = Nicholas's real targets.
+
+## Run the REAL race (heavy tools)
+Frozen-tier fetcher/extractor races run today with zero installs. To race the
+browsers/engines for real, install one class's deps into an isolated venv and
+race just that class (heavy — one at a time on a RAM-capped box):
+
+```bash
+./run-real-race.sh class4   # extractors (light: trafilatura, bs4)
+./run-real-race.sh class1   # fetchers   (curl_cffi, scrapling)
+./run-real-race.sh class3   # engines    (crawl4ai, scrapegraphai; set HEADLESSX_URL/BROWSERLESS_URL for those)
+./run-real-race.sh class2   # browsers   (playwright+chromium/firefox, camoufox — heaviest)
+```
+For the live anti-bot / detector tiers, add real target URLs to
+`fixtures/ladder.json` → `live_tasks_todo` (Tier R = your real targets, with what
+"success" means for each), then re-run. The winner of each class feeds the
+grand-final assembly into spider-den.
