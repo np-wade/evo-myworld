@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import shutil
 import subprocess
 from pathlib import Path
@@ -1241,6 +1242,96 @@ def create_app(root: Path | None = None) -> Flask:
             "skipped_subagent": skipped_subagent,
             "from_exp_id": from_exp,
         })
+
+    @app.get("/api/report")
+    def api_report():
+        """JSON progress report for the Reports page. Reuses report.py's stats
+        computation (the /evo:report terminal renderer) but returns raw data so
+        the client can chart it with echarts instead of ASCII."""
+        from .report import _compute_stats
+        from .core import is_valid_result_node
+
+        root = _root()
+        config = load_config(root)
+        graph = load_graph(root)
+        metric = config.get("metric", "max")
+        stats = _compute_stats(graph, metric)
+
+        nodes = graph.get("nodes", {})
+        exps = sorted(
+            (n for nid, n in nodes.items() if nid != "root"),
+            key=lambda n: n.get("created_at") or "",
+        )
+        series = [
+            {
+                "id": n["id"],
+                "score": n.get("score"),
+                "status": effective_status(graph, n),
+                "created_at": n.get("created_at"),
+                "hypothesis": (n.get("hypothesis") or "")[:160],
+            }
+            for n in exps
+        ]
+
+        committed = [n for nid, n in nodes.items()
+                     if nid != "root" and is_valid_result_node(graph, n)]
+        committed.sort(key=lambda n: n["score"], reverse=(metric == "max"))
+        top = [
+            {
+                "id": n["id"],
+                "score": n.get("score"),
+                "parent": n.get("parent"),
+                "hypothesis": (n.get("hypothesis") or "")[:240],
+                "created_at": n.get("created_at"),
+            }
+            for n in committed[:10]
+        ]
+
+        return jsonify({
+            "project": config.get("project_name") or config.get("name"),
+            "metric": metric,
+            "stats": stats,
+            "series": series,
+            "top": top,
+        })
+
+    # ---- Assembly Office bridge (Test Lab) -------------------------------
+    # Same-origin proxy so the Test Lab page can drive the Assembly Office
+    # factory (127.0.0.1:4173) without CORS. Allowlisted paths only; the
+    # optional EVO_OFFICE_TOKEN is forwarded as x-assembly-token when the
+    # office runs under the desktop shell's launch-token gate.
+    _office_base = os.environ.get("EVO_OFFICE_URL", "http://127.0.0.1:4173")
+    _office_ok = re.compile(
+        r"^(api/health|api/runs|api/new-run|api/catalog|api/presets"
+        r"|api/run/[A-Za-z0-9._-]+/(state|file|live|plan|approve|prompt))$"
+    )
+
+    @app.route("/api/office/<path:sub>", methods=["GET", "POST"])
+    def api_office(sub: str):
+        import requests as _rq
+
+        if not _office_ok.match(sub):
+            return jsonify({"error": "path not allowed"}), 400
+        url = f"{_office_base}/{sub}"
+        headers = {}
+        token = os.environ.get("EVO_OFFICE_TOKEN", "")
+        if token:
+            headers["x-assembly-token"] = token
+        try:
+            if request.method == "POST":
+                upstream = _rq.post(url, json=request.get_json(silent=True) or {},
+                                    headers=headers, timeout=30)
+            else:
+                # (connect, read) — fail fast when the office is down so the
+                # nav status chip never hangs the page.
+                upstream = _rq.get(url, params=request.args, headers=headers,
+                                   timeout=(2, 10))
+        except Exception as exc:  # office down — surface cleanly, not a 500
+            return jsonify({"error": f"assembly office unreachable: {exc}",
+                            "office": _office_base}), 502
+        content_type = upstream.headers.get("content-type", "application/json")
+        return Response(upstream.content, status=upstream.status_code,
+                        mimetype=content_type.split(";")[0])
 
     return app
 

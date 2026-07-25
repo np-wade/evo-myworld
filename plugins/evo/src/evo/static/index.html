@@ -5,10 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>evo : autoresearch</title>
   <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Fonts vendored locally (static/vendor/fonts) so the desktop app works offline. -->
+  <link rel="stylesheet" href="/static/vendor/fonts/fonts.css">
   <link rel="stylesheet" href="/static/hljs-theme.css">
   <link rel="stylesheet" href="/static/style.css">
+  <link rel="stylesheet" href="/static/design.css">
 </head>
 <body>
   <!-- Top bar: logo · run · best-score · project · settings.
@@ -66,8 +67,20 @@
     </button>
   </header>
 
+  <!-- Top-level page nav (hash-routed; views.js). Overview is the original UI. -->
+  <nav id="page-nav" class="page-nav" aria-label="Pages">
+    <a href="#overview" data-view="overview" class="page-tab active">Overview</a>
+    <a href="#tree" data-view="tree" class="page-tab">Tree</a>
+    <a href="#river" data-view="river" class="page-tab">River</a>
+    <a href="#reports" data-view="reports" class="page-tab">Reports</a>
+    <a href="#observability" data-view="observability" class="page-tab">Observability</a>
+    <a href="#testlab" data-view="testlab" class="page-tab">Test Lab</a>
+    <span class="page-nav-spacer"></span>
+    <span id="office-status" class="office-status" title="Assembly Office link">office: <b>checking…</b></span>
+  </nav>
+
   <!-- 3-column main area -->
-  <main id="main-area">
+  <main id="main-area" class="app-view" data-view-root="overview">
     <!-- Center: timeline + scatter strip -->
     <section id="center-col">
       <section id="timeline-section">
@@ -102,6 +115,73 @@
       <div class="sidebar-resize" onmousedown="startSidebarResize(event)" title="Drag to resize"></div>
       <div id="sidebar-content"></div>
     </aside>
+  </main>
+
+  <!-- ======== Additional pages (hash-routed; hidden unless active) ======== -->
+  <main id="view-tree" class="app-view alt-view hidden" data-view-root="tree">
+    <div class="view-head">
+      <h2>Experiment tree</h2>
+      <button class="btn-ghost view-refresh" data-refresh="tree">refresh</button>
+    </div>
+    <pre id="tree-pre" class="ascii-panel selectable" data-copy-wrap>loading…</pre>
+  </main>
+
+  <main id="view-river" class="app-view alt-view hidden" data-view-root="river">
+    <div class="view-head">
+      <h2>Time river</h2>
+      <button class="btn-ghost view-refresh" data-refresh="river">refresh</button>
+    </div>
+    <pre id="river-pre" class="ascii-panel selectable" data-copy-wrap>loading…</pre>
+  </main>
+
+  <main id="view-reports" class="app-view alt-view hidden" data-view-root="reports">
+    <div class="view-head">
+      <h2>Progress report</h2>
+      <button class="btn-ghost view-refresh" data-refresh="reports">refresh</button>
+    </div>
+    <section id="report-stats" class="report-stat-grid"></section>
+    <section class="report-charts">
+      <div class="report-chart-card"><h3>Score over experiments</h3><div id="report-score-chart" class="echart"></div></div>
+      <div class="report-chart-card"><h3>Outcomes</h3><div id="report-outcome-chart" class="echart"></div></div>
+    </section>
+    <section class="report-table-card">
+      <h3>Top experiments</h3>
+      <div id="report-top-table" class="report-top-table"></div>
+    </section>
+  </main>
+
+  <main id="view-observability" class="app-view alt-view hidden" data-view-root="observability">
+    <div class="view-head">
+      <h2>Observability</h2>
+      <span id="obs-updated" class="view-sub"></span>
+      <button class="btn-ghost view-refresh" data-refresh="observability">refresh</button>
+    </div>
+    <section id="obs-panels" class="obs-grid"></section>
+    <section class="obs-tail-card">
+      <h3>Live log tail <span id="obs-tail-target" class="mono"></span></h3>
+      <pre id="obs-tail" class="ascii-panel selectable" data-copy-wrap>select an active experiment above…</pre>
+    </section>
+  </main>
+
+  <main id="view-testlab" class="app-view alt-view hidden" data-view-root="testlab">
+    <div class="view-head">
+      <h2>Test Lab</h2>
+      <span class="view-sub">describe what you want tested — an Assembly Office AI lane builds the test / environment and returns the output</span>
+    </div>
+    <section class="testlab-compose">
+      <textarea id="testlab-desc" rows="5" placeholder="e.g. Build a benchmark that measures how well the dedup function handles 1M near-duplicate strings, with a pass gate at <2s runtime…"></textarea>
+      <div class="testlab-actions">
+        <input id="testlab-name" type="text" placeholder="run name (auto if empty)" spellcheck="false">
+        <button id="testlab-submit" class="btn-spawn">Create test run</button>
+      </div>
+      <div id="testlab-error" class="modal-error hidden"></div>
+    </section>
+    <section class="view-head"><h3>Runs</h3><button class="btn-ghost view-refresh" data-refresh="testlab">refresh</button></section>
+    <section id="testlab-runs" class="testlab-runs"></section>
+    <section class="obs-tail-card">
+      <h3>Run output <span id="testlab-run-label" class="mono"></span></h3>
+      <pre id="testlab-output" class="ascii-panel selectable" data-copy-wrap>select a run…</pre>
+    </section>
   </main>
 
   <!-- Info popover (shared) -->
@@ -189,6 +269,10 @@
 
   <script src="/static/highlight.min.js"></script>
   <script src="/static/highlight-langs-extra.min.js"></script>
+  <script src="/static/vendor/echarts.common.min.js"></script>
   <script src="/static/app.js"></script>
+  <script src="/static/copy.js"></script>
+  <script src="/static/split.js"></script>
+  <script src="/static/views.js"></script>
 </body>
 </html>

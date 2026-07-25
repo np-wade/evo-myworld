@@ -1,0 +1,332 @@
+/* design.css — styles for the page nav + the new hash-routed views
+   (Tree / River / Reports / Observability / Test Lab), copy buttons, and
+   split-pane handles. Uses the design tokens defined in style.css :root.
+   Additive on purpose: style.css is untouched except where noted. */
+
+/* ---- Page nav ---------------------------------------------------------- */
+.page-nav {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 0 14px;
+  background: var(--bg-panel);
+  border-bottom: 1px solid var(--border-subtle);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  user-select: none;
+}
+.page-tab {
+  padding: 7px 12px 6px;
+  color: var(--text-3);
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  letter-spacing: 0.02em;
+  transition: color .12s;
+}
+.page-tab:hover { color: var(--text-1); }
+.page-tab.active {
+  color: var(--text-1);
+  border-bottom-color: var(--orange);
+}
+.page-nav-spacer { flex: 1; }
+.office-status { color: var(--text-4); font-size: 11px; }
+.office-status b { color: var(--text-3); font-weight: 500; }
+.office-status.up b { color: var(--green); }
+.office-status.down b { color: var(--red); }
+
+/* ---- Generic view scaffolding ----------------------------------------- */
+.alt-view {
+  padding: 18px 22px 40px;
+  overflow-y: auto;
+  height: calc(100vh - 96px);   /* topbar + nav */
+  background: var(--bg-canvas);
+}
+.alt-view h2 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-1);
+  letter-spacing: 0.01em;
+}
+.alt-view h3 {
+  margin: 0 0 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-2);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.view-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 4px 0 14px;
+}
+.view-sub { color: var(--text-4); font-size: 12px; }
+.view-refresh { margin-left: auto; }
+
+/* ASCII panels (tree, river, tails) — always selectable, monospace. */
+.ascii-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text-2);
+  overflow-x: auto;
+  white-space: pre;
+  min-height: 120px;
+}
+.selectable, .selectable * { user-select: text !important; }
+
+/* ---- Reports ----------------------------------------------------------- */
+.report-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.report-stat {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+}
+.report-stat .label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-4);
+}
+.report-stat .value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-1);
+  margin-top: 4px;
+}
+.report-stat .sub { font-size: 11px; color: var(--text-4); margin-top: 2px; }
+.report-charts {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+@media (max-width: 900px) { .report-charts { grid-template-columns: 1fr; } }
+.report-chart-card, .report-table-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+}
+.echart { width: 100%; height: 300px; }
+.report-top-table table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.report-top-table th {
+  text-align: left;
+  color: var(--text-4);
+  font-weight: 500;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.report-top-table td {
+  padding: 7px 10px;
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--text-2);
+  vertical-align: top;
+}
+.report-top-table tr:hover td { background: var(--surface); }
+.report-top-table .mono { font-family: 'JetBrains Mono', monospace; }
+.report-top-table .score { color: var(--green); font-weight: 600; }
+
+/* ---- Observability ----------------------------------------------------- */
+.obs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.obs-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  cursor: pointer;
+  transition: border-color .12s;
+}
+.obs-card:hover { border-color: var(--border); }
+.obs-card.selected { border-color: var(--orange); }
+.obs-card .obs-id {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--text-1);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.obs-card .obs-hyp { font-size: 11px; color: var(--text-3); margin-top: 6px; line-height: 1.45; }
+.obs-card .obs-meta { font-size: 10px; color: var(--text-5); margin-top: 8px; font-family: 'JetBrains Mono', monospace; }
+.obs-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.obs-dot.active { background: var(--purple); box-shadow: 0 0 6px var(--purple); animation: obs-pulse 1.6s infinite; }
+.obs-dot.committed { background: var(--green); }
+.obs-dot.failed { background: var(--red); }
+.obs-dot.pending { background: var(--amber); }
+.obs-dot.discarded, .obs-dot.pruned { background: var(--text-5); }
+@keyframes obs-pulse { 50% { opacity: 0.45; } }
+.obs-spark { height: 44px; margin-top: 8px; }
+.obs-tail-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+}
+.obs-tail-card .ascii-panel { border: none; padding: 8px 0 0; background: transparent; max-height: 420px; overflow-y: auto; }
+
+/* ---- Test Lab ----------------------------------------------------------- */
+.testlab-compose {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  margin-bottom: 18px;
+}
+.testlab-compose textarea {
+  width: 100%;
+  background: var(--inset);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text-1);
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  line-height: 1.5;
+  padding: 10px 12px;
+  resize: vertical;
+}
+.testlab-compose textarea:focus { outline: none; border-color: var(--orange); }
+.testlab-actions { display: flex; gap: 10px; margin-top: 10px; align-items: center; }
+.testlab-actions input {
+  background: var(--inset);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-2);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  padding: 8px 10px;
+  width: 260px;
+}
+.testlab-actions input:focus { outline: none; border-color: var(--orange); }
+.testlab-runs { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+.testlab-run {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  cursor: pointer;
+  font-size: 12px;
+}
+.testlab-run:hover { border-color: var(--border); }
+.testlab-run.selected { border-color: var(--orange); }
+.testlab-run .mono { font-family: 'JetBrains Mono', monospace; color: var(--text-1); }
+.testlab-run .stage { color: var(--text-3); }
+.testlab-run .when { margin-left: auto; color: var(--text-5); font-size: 11px; }
+.testlab-empty { color: var(--text-4); font-size: 12px; padding: 8px 2px; }
+
+/* ---- Copy buttons ------------------------------------------------------ */
+[data-copy-wrap] { position: relative; }
+.copy-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: var(--surface-2);
+  color: var(--text-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  padding: 3px 8px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity .12s, color .12s;
+  z-index: 5;
+}
+[data-copy-wrap]:hover .copy-btn, .copy-btn:focus { opacity: 1; }
+.copy-btn:hover { color: var(--text-1); }
+.copy-btn.copied { color: var(--green); border-color: var(--green); opacity: 1; }
+.copy-chip {
+  display: inline-flex;
+  align-items: center;
+  cursor: copy;
+  border-radius: var(--radius-sm);
+}
+.copy-chip:hover { background: var(--surface-2); }
+.copy-toast {
+  position: fixed;
+  bottom: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--surface-2);
+  border: 1px solid var(--green);
+  color: var(--text-1);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  padding: 6px 14px;
+  border-radius: var(--radius-md);
+  z-index: 400;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .15s;
+}
+.copy-toast.show { opacity: 1; }
+
+/* ---- Split panes ------------------------------------------------------- */
+.split-handle-v {
+  width: 5px;
+  cursor: col-resize;
+  background: transparent;
+  position: relative;
+  flex-shrink: 0;
+  z-index: 10;
+}
+.split-handle-v::after {
+  content: '';
+  position: absolute;
+  inset: 0 2px;
+  background: var(--border-subtle);
+  transition: background .12s;
+}
+.split-handle-v:hover::after, .split-handle-v.dragging::after { background: var(--orange); }
+
+/* Horizontal split bar under resizable panels (split.js) */
+.split-bar-h {
+  height: 6px;
+  cursor: row-resize;
+  position: relative;
+  margin: 1px 0 8px;
+}
+.split-bar-h::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; top: 2px;
+  height: 2px;
+  background: var(--border-subtle);
+  border-radius: 2px;
+  transition: background .12s;
+}
+.split-bar-h:hover::after, .split-bar-h.dragging::after { background: var(--orange); }
+
+/* Glass treatment (liquid-glass-inspired, CSS-only to stay true to the
+   terminal-console identity): frosted modals + nav. */
+.modal-overlay { backdrop-filter: blur(6px) saturate(1.1); }
+.modal { box-shadow: 0 24px 80px -24px rgba(0,0,0,0.9), inset 0 1px 0 rgba(255,255,255,0.04); }
+.page-nav { backdrop-filter: blur(8px); }
+.tip-popover, .workspace-popover {
+  backdrop-filter: blur(10px) saturate(1.2);
+  box-shadow: 0 16px 48px -16px rgba(0,0,0,0.85);
+}
