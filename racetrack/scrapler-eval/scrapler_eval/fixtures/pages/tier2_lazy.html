@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><title>Gallery</title></head>
+<body>
+<h1>Field Notes</h1>
+<div class="feed">
+<article data-lazy="1"><h2>Note one</h2><p>Above the fold, loads immediately.</p></article>
+<template id="below-fold"><!-- lazy content revealed on scroll -->
+<article><h2>Note two</h2><p>Only a scrolling browser reveals this second note.</p></article>
+<article><h2>Note three</h2><p>And the third, further down the infinite feed.</p></article>
+</template>
+</div>
+<script>/* IntersectionObserver would clone #below-fold into .feed on scroll */</script>
+</body></html>

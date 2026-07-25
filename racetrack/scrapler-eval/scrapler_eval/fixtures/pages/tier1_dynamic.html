@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><title>Product — Loading…</title></head>
+<body>
+<div id="app"><!-- content rendered by JS from the JSON below --></div>
+<noscript>Enable JavaScript to view this product.</noscript>
+<script id="__DATA__" type="application/json">
+{"product":{"name":"Anti-Detect Browser Pro","price":"$0.00","currency":"USD",
+"description":"A hardened browser that renders JavaScript and evades fingerprint checks.",
+"in_stock":true,"rating":4.8}}
+</script>
+<script>
+/* A real browser would run this and fill #app. A no-JS fetch sees only the
+   JSON blob above; a JS-capable engine sees the rendered text. */
+const d = JSON.parse(document.getElementById('__DATA__').textContent);
+document.getElementById('app').innerHTML =
+  '<h1>'+d.product.name+'</h1><p class="price">'+d.product.price+'</p>'+
+  '<p class="desc">'+d.product.description+'</p>';
+</script>
+</body></html>

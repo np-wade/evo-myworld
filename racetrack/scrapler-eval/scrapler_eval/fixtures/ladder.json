@@ -1,0 +1,59 @@
+{
+  "_doc": "The scrapler benchmark ladder. Frozen tiers (0-2) point at file:// fixtures with answer keys and are deterministic. Live tiers (3-4, R) carry no answer_key and are scored by an external oracle; the harness skips them when offline. field_stats gives per-tier latency/cost normalization bounds. Weights are per-class overridable.",
+  "field_stats": {
+    "latency_ms": {"min": 5, "max": 30000},
+    "cost": {"max": 500000000}
+  },
+  "weights": {
+    "default": {"w1": 0.45, "w2": 0.30, "w3": 0.10, "w4": 0.05, "w5": 0.10}
+  },
+  "tasks": [
+    {
+      "id": "t0-article",
+      "tier": "tier0_static",
+      "url": "file://pages/tier0_article.html",
+      "answer_key": {
+        "expected_chars": 620,
+        "must_contain": ["The Marathon Continues", "Ada Lovelace", "Ownership is the throughline", "do not pay for a browser you do not need"]
+      }
+    },
+    {
+      "id": "t1-product",
+      "tier": "tier1_dynamic",
+      "url": "file://pages/tier1_dynamic.html",
+      "answer_key": {
+        "expected_chars": 130,
+        "must_contain": ["Anti-Detect Browser Pro", "hardened browser that renders JavaScript"],
+        "js_required": true
+      }
+    },
+    {
+      "id": "t2-lazyfeed",
+      "tier": "tier2_lazy",
+      "url": "file://pages/tier2_lazy.html",
+      "answer_key": {
+        "expected_chars": 200,
+        "must_contain": ["Note one", "Note two", "Note three"],
+        "scroll_required": true
+      }
+    },
+    {
+      "id": "x-product-fields",
+      "tier": "tier1_dynamic",
+      "url": "file://pages/tier1_dynamic.html",
+      "schema": {"fields": ["name", "price", "description"]},
+      "answer_key": {
+        "fields": {
+          "name": "Anti-Detect Browser Pro",
+          "price": "$0.00",
+          "description": "A hardened browser that renders JavaScript and evades fingerprint checks."
+        }
+      },
+      "meta": {"class": 4, "note": "extractor task: same HTML in, structured fields out"}
+    }
+  ],
+  "live_tasks_todo": [
+    {"id": "t3-cloudflare", "tier": "tier3_antibot", "url": "LIVE — Nicholas Tier-R target", "oracle": "block-vs-content"},
+    {"id": "t4-sannysoft", "tier": "tier4_detector", "url": "https://bot.sannysoft.com/", "oracle": "detector_pass_fraction"}
+  ]
+}
