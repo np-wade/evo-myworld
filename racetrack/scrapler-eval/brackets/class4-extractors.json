@@ -1,0 +1,7 @@
+{
+  "name": "class4-extractors",
+  "candidates": ["json-blob-extractor", "regex-article-extractor", "trafilatura-article", "css-json", "adaptive-selfheal", "llm-extract"],
+  "gates": {"field_presence": {"required_fields": ["name"]}},
+  "weights": {"quality": 0.6, "evasion": 0.0, "latency": 0.2, "cost": 0.2, "robustness": 0.0},
+  "retries": 1
+}

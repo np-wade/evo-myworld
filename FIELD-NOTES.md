@@ -363,3 +363,24 @@ trusted plugin hooks plus absolute helper paths). Cursor uses native hooks,
 
 - 2026-07-19 Gemini: Verified EverMind Raven's `BeforeIterationHook` and `ToolAuditHook` live in python against toy inputs. Gating conversation turns via fast character-length token estimation (`len(json.dumps(messages)) // 4`) and blocking specific tools via a deterministic denylist successfully halts executions before LLM calls occur, providing a highly lightweight first line of defense against runaway loops and resource waste. Signed, gemini.
 - 2026-07-19 Gemini: Ran Raven's evolver analysis modules (`compute_stability`, `extract_features`, `build_trial_pool`) against mock baseline directories. Confirmed how the evolver stratifies tasks into stability tiers and extracts cheap metadata features (e.g. average text length, docker error counts, exit status ordinals) to build a unified trial pool. This allows a cold-start coverage bandit to run K-means clustering and select a diverse diagnostic subset of tasks, saving significant benchmark run cost. Signed, gemini.
+- 2026-07-25 claude: Built the **Scrapler Eval Harness** (`racetrack/scrapler-eval/`)
+  — turns the scraper-search-lab specs into a REAL reproducible benchmark, so
+  "which scraper tool is best" is decided by score, not by the generic steward
+  improvising an arena each run. Six pure-stdlib core modules, each ported from
+  one of the 15 evo donor repos (cited in-file): metrics (roboflow/supervision +
+  EverMemBench), gates (NeMo-Guardrails rails), leaderboard (FastChat Elo),
+  store (opik run-log + exca content-addressed cache + kairosdb-lite history),
+  failure (latitude-llm event→incident clustering), provenance (vergen git/run
+  stamp + heartbeat). Plus harness.py (pytorch-lightning callback loop +
+  haystack composable stages), cli.py (`python -m scrapler_eval race|list|
+  selftest`), ladder.py + frozen tier0-2 fixtures with answer keys, and a
+  baseline adapter set. 184 stdlib tests green (no network, no heavy deps);
+  selftest race runs end-to-end producing overall + per-class leaderboards +
+  Elo + gate pass-rate + a "why candidates lost" failure-cluster table + a
+  reproducible provenance header. Committed 26c9a16. Real-tool adapters
+  (curl-impersonate, Scrapling, playwright/camofox/cloakbrowser/invisible-pw,
+  crawl4ai/HeadlessX/browserless/scrapegraph-ai, trafilatura/css-json/adaptive/
+  llm-extract) built by 4 parallel subagents, auto-discovered via a CANDIDATES
+  list + available()-gating so a missing dep skips the tool instead of crashing
+  the race. Per-class bracket files in brackets/. Next: install tool deps in a
+  venv + add Nicholas's Tier-R live targets to run the real race. Signed, claude.

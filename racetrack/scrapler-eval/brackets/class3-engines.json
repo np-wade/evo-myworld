@@ -1,0 +1,7 @@
+{
+  "name": "class3-engines",
+  "candidates": ["crawl4ai", "headlessx", "browserless", "scrapegraph-ai"],
+  "gates": {"retrieved_content": {"min_chars": 200}, "budget": {"max_latency_ms": 60000, "max_rss_mb": 4000}},
+  "weights": {"quality": 0.45, "evasion": 0.2, "latency": 0.15, "cost": 0.15, "robustness": 0.05},
+  "retries": 1
+}

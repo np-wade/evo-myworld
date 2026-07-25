@@ -1,0 +1,7 @@
+{
+  "name": "class2-browsers",
+  "candidates": ["playwright-baseline", "invisible-playwright", "camofox", "cloakbrowser", "scrapling-patchright"],
+  "gates": {"retrieved_content": {"min_chars": 200}, "not_blocked": true, "budget": {"max_latency_ms": 45000, "max_rss_mb": 4000}},
+  "weights": {"quality": 0.4, "evasion": 0.35, "latency": 0.1, "cost": 0.05, "robustness": 0.1},
+  "retries": 1
+}

@@ -44,8 +44,14 @@ class TestHarness(unittest.TestCase):
         res = run_bracket(all_candidates(), self.tasks, self.gate_spec, self.cfg,
                           ts_fn=_fixed_ts)
         cls4 = res["per_class"][4]
-        names = [r.candidate for r in cls4]
-        self.assertEqual(names[0], "json-blob-extractor")  # strong extractor wins its class
+        by = {r.candidate: r for r in cls4}
+        # A JSON-aware extractor must win class 4 (they recover the product fields);
+        # any of the tied JSON extractors may take the top slot on tie-break.
+        json_aware = {"json-blob-extractor", "css-json", "adaptive-selfheal"}
+        self.assertIn(cls4[0].candidate, json_aware)
+        # and it must beat the article-style extractor that can't get structured fields
+        self.assertGreater(by["json-blob-extractor"].normalized,
+                           by["regex-article-extractor"].normalized)
 
     def test_exception_is_recorded_not_raised(self):
         res = run_bracket([_Boom()], self.tasks, self.gate_spec, self.cfg, ts_fn=_fixed_ts)
