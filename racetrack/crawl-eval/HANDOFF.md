@@ -4,6 +4,11 @@
 the "unraced field" from `../scraper-search-lab/HANDOFF-integration-and-T5.md`:
 full crawlers, browser/stealth engines, and the search-index bracket.
 
+**Committed:** `c0fff1d` on branch `ai/claude-dashboard-design` in repo
+`~/coding/docker-envs/projects/evo-myworld` (remote github np-wade/evo-myworld,
+default main). 106 files, +5532. `.venv/`, `node_modules/`, `out/`, `__pycache__/`,
+`fixtures/hardened/` are gitignored (rebuild via this file). Not yet pushed / no PR.
+
 ## Cleanup status (containers/ports/disk)
 - **No containers or ports left running.** The site server binds an ephemeral
   localhost port only during a race (torn down in `finally`). The `meili-crawleval`
@@ -31,6 +36,9 @@ cd racetrack/crawl-eval
 .venv/bin/python -m crawl_eval extract-race
 .venv/bin/python -m crawl_eval index-race
 .venv/bin/python -m crawl_eval pipeline          # E2E seed task + scorecard
+# --- evo integration (optimize the escalation policy) ---
+.venv/bin/python evo/gate.py      --agent evo/agent/policy.py   # exit 0/1
+.venv/bin/python evo/benchmark.py --agent evo/agent/policy.py   # {"score":...}
 ```
 `build` re-renders fixtures from `crawl_eval/site_spec.py` (idempotent). Host
 python (3.14, no pip) runs the stdlib-only subset; the `.venv` (3.12) runs the
@@ -123,14 +131,63 @@ uv pip install --python .venv/bin/python playwright crawl4ai selenium \
 .venv/bin/python -m playwright install chromium
 ```
 
-## Next (evo frontier)
-1. **Routing policy** = the top optimization surface: static fetch by default,
-   detect a JS-nav gap (empty container + injector script), escalate *that URL
-   only* to a browser. Wins both races at once.
-2. Stand up meili/qdrant for the full search bracket; add crawl4ai/selenium.
-3. A **Tier-R hardened target** with a real anti-bot wall so the stealth
-   fetchers' extra cost finally pays off (an owned site has no wall to beat).
-4. Wire into `/evo:optimize` reusing scrapler-eval metrics/gates/leaderboard.
+## evo integration — /evo:optimize  (DONE, in `evo/`)
+T5 is wired into evo as an optimizable benchmark following the repo's own
+contract (`tests/fixtures/*/benchmark.py`). The optimizable unit is a
+**fetch-escalation routing policy**; the benchmark scores it against the REAL
+servers/tools (plain page, JA3 wall, JS-nav, JS-challenge).
+- Target file evo edits: `evo/agent/policy.py` — `solve(signals) -> tier`
+  (tier ∈ static | impersonate | browser).
+- Benchmark: `evo/benchmark.py --agent <policy>` → `{"score", "tasks"}`, writes
+  `$EVO_TRACES_DIR/task_<id>.json`. Gate: `evo/gate.py --agent <policy>`.
+- Gradient (verified): naive baseline (always static) = **0.25**; optimal
+  escalation ladder = **1.0**. Interpreter MUST be `crawl-eval/.venv/bin/python`.
+- To register: point `/evo:optimize` at target `evo/agent/policy.py`, benchmark
+  `evo/benchmark.py`, gate `evo/gate.py`. Details: `evo/README.md`.
+
+## Status — done vs remaining
+DONE: all crawl/browser/stealth/search candidates raced; both races hardened so
+nothing ties; full stealth ladder (JA3 → HTTP/2 full-Akamai → JS challenge);
+evo wiring with a live gradient; committed.
+REMAINING (frontier): push branch / open PR; run `/evo:optimize` to actually
+search the policy; HTTP/2 fingerprint currently omits… nothing (pseudo-header
+order added); a real behavioral/CAPTCHA layer beyond the JS challenge; wire the
+policy back into `spider-den` as the production escalation logic.
+
+## Locations — everything, by path
+Repo root: `~/coding/docker-envs/projects/evo-myworld` (branch
+`ai/claude-dashboard-design`). All paths below are under it.
+| what | path |
+|---|---|
+| **This package** | `racetrack/crawl-eval/` |
+| Python modules (17) | `racetrack/crawl-eval/crawl_eval/*.py` + `render_jsdom.js` |
+| Authored site + gold | `racetrack/crawl-eval/fixtures/site1/` (pages/, gold/, routes.json, robots.txt, catalog.js, store.js) |
+| JA3 cert (gitignored, regenerated) | `racetrack/crawl-eval/fixtures/hardened/{cert,key}.pem` |
+| Race results (JSON) | `racetrack/crawl-eval/results-*.json`, `pipeline-*.json` (run3 = latest; run1/2 = pre-hardening) |
+| E2E deliverable (gitignored) | `racetrack/crawl-eval/out/site1/{report.json,pages/}` |
+| Python venv (gitignored) | `racetrack/crawl-eval/.venv/` (3.12; rebuild cmd below) |
+| jsdom (gitignored) | `racetrack/crawl-eval/node_modules/jsdom` |
+| **evo wiring** | `racetrack/crawl-eval/evo/{benchmark.py,gate.py,README.md,agent/policy.py}` |
+| This handoff | `racetrack/crawl-eval/HANDOFF.md` |
+| Result card (dashboard) | `racetrack/results/crawl-suite.md` |
+| Suite index (T1–T6) | `racetrack/results/INDEX.md` (T5 row = ✅ green) |
+| Dashboard reader | `plugins/evo/src/evo/racetrack.py` (renders `/api/racetrack`) |
+| Original T5 spec | `racetrack/scraper-search-lab/HANDOFF-integration-and-T5.md` |
+| Candidate pools | `racetrack/scraper-search-lab/candidates-{scraping,search,expanded}.md` |
+| Reusable eval core | `racetrack/scrapler-eval/scrapler_eval/` (metrics/gates/leaderboard/store) |
+| Bench-factory skill | `~/.claude/skills/bench-factory/SKILL.md` (`/bench-factory`) |
+| Corpus donors | `~/coding/docker-envs/filing-cabinet/library-base/repos/` |
+
+Rebuild the venv from scratch:
+```
+cd racetrack/crawl-eval
+uv venv .venv --python 3.12
+uv pip install --python .venv/bin/python playwright crawl4ai selenium \
+  qdrant-client fastembed tantivy curl_cffi scrapling trafilatura browserforge
+.venv/bin/python -m playwright install chromium
+sudo .venv/bin/python -m playwright install-deps chromium   # system libs (once)
+npm install jsdom
+```
 
 Relevant memories: `scraper-search-lab`, `spider-den-app`, `evo-lab-home-base`,
 `graph-first-protocol`.
