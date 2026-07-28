@@ -1,0 +1,24 @@
+{
+  "next_id": 0,
+  "nodes": {
+    "root": {
+      "branch": null,
+      "children": [],
+      "commit": null,
+      "created_at": "2026-07-28T17:02:14+00:00",
+      "eval_epoch": null,
+      "gates": [],
+      "hypothesis": "synthetic root",
+      "id": "root",
+      "parent": null,
+      "prune_kind": null,
+      "pruned_reason": null,
+      "score": null,
+      "status": "root",
+      "updated_at": "2026-07-28T17:02:14+00:00",
+      "worktree": null
+    }
+  },
+  "root": "root",
+  "workspace_notes": []
+}

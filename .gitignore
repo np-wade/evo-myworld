@@ -11,6 +11,12 @@ _ref/
 .evo/dashboard.pid
 .evo/dashboard.port
 .evo_archive/
+# evo workspace: secret + transient runtime state (durable config IS committed)
+.evo/keyfile
+.evo/*.log
+.evo/*.pid
+.evo/run_*/infra_log.json
+.evo/run_*/inject/
 
 # Build artifacts
 dist/

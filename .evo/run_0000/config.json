@@ -1,0 +1,28 @@
+{
+  "benchmark": "evo/benchmark.py",
+  "commit_strategy": "tracked-only",
+  "comparison_blocked": false,
+  "current_eval_epoch": 1,
+  "execution_backend": "worktree",
+  "frontier_strategy": {
+    "kind": "pareto_per_task",
+    "params": {
+      "k": 5,
+      "task_floor": 0.0
+    }
+  },
+  "gate": "evo/gate.py",
+  "initialized_at": "2026-07-28T17:02:14+00:00",
+  "max_attempts": 3,
+  "metric": "max",
+  "per_exp_timeout": 900,
+  "project_name": "T5 crawl-eval (fetch-escalation policy)",
+  "repo_root": "/home/npwad/coding/docker-envs/projects/evo-myworld",
+  "runtime_env": {
+    "dotenv": [],
+    "inherit_shell": true
+  },
+  "target": "evo/agent/policy.py",
+  "workspace_dir": ".evo",
+  "worktrees_dir": "worktrees"
+}
