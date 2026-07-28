@@ -9,6 +9,42 @@ full crawlers, browser/stealth engines, and the search-index bracket.
 default main). 106 files, +5532. `.venv/`, `node_modules/`, `out/`, `__pycache__/`,
 `fixtures/hardened/` are gitignored (rebuild via this file). Not yet pushed / no PR.
 
+## NEXT STEPS — the two open actions (exact commands)
+
+### 1. Push the branch + open a PR
+```
+cd ~/coding/docker-envs/projects/evo-myworld
+git push -u origin ai/claude-dashboard-design
+gh pr create --base main --head ai/claude-dashboard-design \
+  --title "T5 crawl-eval: internal crawl+search + full stealth ladder + evo wiring" \
+  --body "T5 races the unraced field (crawlers/browsers/stealth/search) on an authored
+internal site with planted traps; full stealth ladder (JA3 -> HTTP/2 full-Akamai ->
+JS challenge); wired into /evo:optimize (evo/, baseline 0.25 -> optimal 1.0). See
+racetrack/crawl-eval/HANDOFF.md."
+```
+Caveat: this branch also carries the earlier dashboard commit (`5a0e5fd`), so the
+PR spans both. To ship T5 alone, first `git branch ai/claude-crawl-eval-t5 c0fff1d`
+off a clean base and cherry-pick `c0fff1d 73a90b4`.
+
+### 2. Run /evo:optimize on the T5 policy
+The benchmark is already contract-compliant. Register/point `/evo:optimize` at:
+- target (evo edits this): `racetrack/crawl-eval/evo/agent/policy.py`
+- benchmark: `racetrack/crawl-eval/evo/benchmark.py`
+- gate: `racetrack/crawl-eval/evo/gate.py`
+- interpreter (REQUIRED): `racetrack/crawl-eval/.venv/bin/python`
+
+Smoke-test before launching the loop:
+```
+cd ~/coding/docker-envs/projects/evo-myworld/racetrack/crawl-eval
+.venv/bin/python evo/gate.py      --agent evo/agent/policy.py   # -> exit 0
+.venv/bin/python evo/benchmark.py --agent evo/agent/policy.py   # -> {"score":0.25,...}
+```
+Then invoke `/evo:optimize` (it drives `evo run`, spawns candidate edits to
+policy.py, and scores each with benchmark.py). Optimal target score = **1.0**
+(the escalation ladder). Full detail: `evo/README.md`.
+
+---
+
 ## Cleanup status (containers/ports/disk)
 - **No containers or ports left running.** The site server binds an ephemeral
   localhost port only during a race (torn down in `finally`). The `meili-crawleval`
