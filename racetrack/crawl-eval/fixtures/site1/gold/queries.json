@@ -1,0 +1,65 @@
+[
+  {
+    "q": "enterprise plan pricing sso",
+    "answers": [
+      "/products"
+    ],
+    "tier": "lexical"
+  },
+  {
+    "q": "buried treasure depth four",
+    "answers": [
+      "/depth/deep"
+    ],
+    "tier": "lexical"
+  },
+  {
+    "q": "splitting tables across many servers for write throughput",
+    "answers": [
+      "/blog/post/1"
+    ],
+    "tier": "semantic"
+  },
+  {
+    "q": "portable device repair staff bring to job sites",
+    "answers": [
+      "/item/4"
+    ],
+    "tier": "semantic"
+  },
+  {
+    "q": "spending less money on hosting infrastructure",
+    "answers": [
+      "/blog/post/6"
+    ],
+    "tier": "semantic"
+  },
+  {
+    "q": "kafna streeming pipilines",
+    "answers": [
+      "/blog/post/2"
+    ],
+    "tier": "typo"
+  },
+  {
+    "q": "titaniom widgit speccifications",
+    "answers": [
+      "/item/3"
+    ],
+    "tier": "typo"
+  },
+  {
+    "q": "titanium widget housing specifications",
+    "answers": [
+      "/item/3"
+    ],
+    "tier": "precision"
+  },
+  {
+    "q": "postgres sharding for scaling not backups",
+    "answers": [
+      "/blog/post/1"
+    ],
+    "tier": "precision"
+  }
+]

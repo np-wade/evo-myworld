@@ -1,0 +1,9 @@
+{
+  "path": "/products",
+  "title": "Acme Products Overview",
+  "body_text": "acme offers three product lines. the enterprise plan pricing includes priority support, sso, and audit logging.",
+  "links": [
+    "/",
+    "/catalog"
+  ]
+}

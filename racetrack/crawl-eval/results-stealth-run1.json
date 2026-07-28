@@ -1,0 +1,71 @@
+{
+  "stage": "stealth",
+  "runs": 5,
+  "server_stats": {
+    "requests": 25,
+    "blocks": 10
+  },
+  "leaderboard": [
+    {
+      "strategy": "curl_cffi-chrome",
+      "runs": 5,
+      "resolve_rate": 1.0,
+      "block_rate": 0.0,
+      "err_rate": 0.0,
+      "grease": 1,
+      "alpn_h2": 1,
+      "ja3_hash": "50293bf3b59d54bacaf13ae96449afec",
+      "p50_ms": 3.6,
+      "error": ""
+    },
+    {
+      "strategy": "curl_cffi-safari",
+      "runs": 5,
+      "resolve_rate": 1.0,
+      "block_rate": 0.0,
+      "err_rate": 0.0,
+      "grease": 1,
+      "alpn_h2": 1,
+      "ja3_hash": "0ca3c3ef30e6e88f75aeb1fb33433d14",
+      "p50_ms": 3.6,
+      "error": ""
+    },
+    {
+      "strategy": "scrapling",
+      "runs": 5,
+      "resolve_rate": 1.0,
+      "block_rate": 0.0,
+      "err_rate": 0.0,
+      "grease": 1,
+      "alpn_h2": 1,
+      "ja3_hash": "06a5c880afc5864ef0a3b14cb9d18745",
+      "p50_ms": 4.7,
+      "error": ""
+    },
+    {
+      "strategy": "curl_cffi-plain",
+      "runs": 5,
+      "resolve_rate": 0.0,
+      "block_rate": 1.0,
+      "err_rate": 0.0,
+      "grease": 0,
+      "alpn_h2": 1,
+      "ja3_hash": "53d062055abcb79cfa97eb3d64a0695e",
+      "p50_ms": 4.2,
+      "error": ""
+    },
+    {
+      "strategy": "urllib",
+      "runs": 5,
+      "resolve_rate": 0.0,
+      "block_rate": 1.0,
+      "err_rate": 0.0,
+      "grease": 0,
+      "alpn_h2": 0,
+      "ja3_hash": "8a9d5d0f12f7d43ee3af1c51d2998d99",
+      "p50_ms": 4.8,
+      "error": ""
+    }
+  ],
+  "candidates_skipped": []
+}

@@ -1,0 +1,8 @@
+{
+  "path": "/blog/post/5",
+  "title": "Blog: Feature Flags",
+  "body_text": "progressive delivery with feature flags and gradual rollouts.",
+  "links": [
+    "/blog"
+  ]
+}

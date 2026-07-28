@@ -1,0 +1,8 @@
+{
+  "path": "/about",
+  "title": "About Acme",
+  "body_text": "acme was founded 2019 with a mission to build reliable internal tooling for distributed engineering teams.",
+  "links": [
+    "/"
+  ]
+}

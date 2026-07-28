@@ -1,0 +1,69 @@
+{
+  "stage": "index",
+  "k": 3,
+  "corpus_pages": 25,
+  "queries": 9,
+  "leaderboard": [
+    {
+      "name": "qdrant",
+      "recall": 1.0,
+      "p_at_k": 0.3333,
+      "mrr": 0.8333,
+      "by_tier": {
+        "lexical": 1.0,
+        "semantic": 1.0,
+        "typo": 1.0,
+        "precision": 1.0
+      },
+      "build_ms": 729.4,
+      "q_ms": 165.2,
+      "error": ""
+    },
+    {
+      "name": "meilisearch",
+      "recall": 0.6667,
+      "p_at_k": 0.2222,
+      "mrr": 0.6111,
+      "by_tier": {
+        "lexical": 1.0,
+        "semantic": 0.0,
+        "typo": 1.0,
+        "precision": 1.0
+      },
+      "build_ms": 125.8,
+      "q_ms": 37.9,
+      "error": ""
+    },
+    {
+      "name": "stdlib-bm25",
+      "recall": 0.4444,
+      "p_at_k": 0.1481,
+      "mrr": 0.3889,
+      "by_tier": {
+        "lexical": 1.0,
+        "semantic": 0.0,
+        "typo": 0.0,
+        "precision": 1.0
+      },
+      "build_ms": 0.1,
+      "q_ms": 0.1,
+      "error": ""
+    },
+    {
+      "name": "tantivy",
+      "recall": 0.4444,
+      "p_at_k": 0.1481,
+      "mrr": 0.3889,
+      "by_tier": {
+        "lexical": 1.0,
+        "semantic": 0.0,
+        "typo": 0.0,
+        "precision": 1.0
+      },
+      "build_ms": 145.8,
+      "q_ms": 0.5,
+      "error": ""
+    }
+  ],
+  "candidates_skipped": []
+}

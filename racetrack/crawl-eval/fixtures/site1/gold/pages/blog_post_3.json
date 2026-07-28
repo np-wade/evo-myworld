@@ -1,0 +1,8 @@
+{
+  "path": "/blog/post/3",
+  "title": "Blog: The Rust Rewrite",
+  "body_text": "why we did the rust rewrite of the ingestion service.",
+  "links": [
+    "/blog"
+  ]
+}

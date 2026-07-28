@@ -1,0 +1,23 @@
+{
+  "outdir": "/home/npwad/coding/docker-envs/projects/evo-myworld/racetrack/crawl-eval/out/site1",
+  "crawler": "crawl4ai-crawl",
+  "crawler_kind": "browser",
+  "index": "qdrant",
+  "wall_s": 10.6,
+  "requests": 33,
+  "crawl_f1": 1.0,
+  "crawl_recall": 1.0,
+  "js_recall": 1.0,
+  "robots_violations": 0,
+  "extract_title_acc": 1.0,
+  "extract_body_f1": 0.8542,
+  "search_recall": 0.8889,
+  "search_mrr": 0.8889,
+  "gates": {
+    "report_saved": true,
+    "robots_respected": true,
+    "crawl_recall_ok": true,
+    "search_recall_ok": true
+  },
+  "all_gates_pass": true
+}

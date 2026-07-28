@@ -1,0 +1,8 @@
+{
+  "path": "/depth/b",
+  "title": "Depth B",
+  "body_text": "depth level b. continue deeper.",
+  "links": [
+    "/depth/c"
+  ]
+}

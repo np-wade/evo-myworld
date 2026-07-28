@@ -1,0 +1,8 @@
+{
+  "path": "/blog/post/2",
+  "title": "Blog: Kafka Pipelines",
+  "body_text": "building resilient kafka streaming pipelines for event data.",
+  "links": [
+    "/blog"
+  ]
+}

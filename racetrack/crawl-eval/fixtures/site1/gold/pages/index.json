@@ -1,0 +1,15 @@
+{
+  "path": "/",
+  "title": "Acme Internal Knowledge Base",
+  "body_text": "welcome to the acme internal knowledge base. browse products, the engineering blog, and the product catalog.",
+  "links": [
+    "/about",
+    "/products",
+    "/blog",
+    "/catalog",
+    "/store",
+    "/depth/a",
+    "/products?ref=home",
+    "/private/secret"
+  ]
+}

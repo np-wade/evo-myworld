@@ -1,0 +1,83 @@
+{
+  "stage": "endurance",
+  "budget_s": 10.0,
+  "max_pages": 200000,
+  "leaderboard": [
+    {
+      "name": "urllib-bfs",
+      "kind": "static",
+      "turns": 4793,
+      "pages_per_s": 479.2,
+      "depth": 8,
+      "requests": 4794,
+      "wall_s": 10.0,
+      "stop": "timeout",
+      "stable": true,
+      "error": ""
+    },
+    {
+      "name": "stdlib-greedy",
+      "kind": "static",
+      "turns": 4454,
+      "pages_per_s": 445.4,
+      "depth": 8,
+      "requests": 4455,
+      "wall_s": 10.0,
+      "stop": "timeout",
+      "stable": true,
+      "error": ""
+    },
+    {
+      "name": "curl_cffi-bfs",
+      "kind": "static",
+      "turns": 4162,
+      "pages_per_s": 416.2,
+      "depth": 8,
+      "requests": 4163,
+      "wall_s": 10.0,
+      "stop": "timeout",
+      "stable": true,
+      "error": ""
+    },
+    {
+      "name": "scrapling-bfs",
+      "kind": "static",
+      "turns": 3686,
+      "pages_per_s": 368.6,
+      "depth": 8,
+      "requests": 3687,
+      "wall_s": 10.0,
+      "stop": "timeout",
+      "stable": true,
+      "error": ""
+    },
+    {
+      "name": "playwright-crawl",
+      "kind": "browser",
+      "turns": 19,
+      "pages_per_s": 1.8,
+      "depth": 3,
+      "requests": 20,
+      "wall_s": 10.5,
+      "stop": "timeout",
+      "stable": true,
+      "error": ""
+    },
+    {
+      "name": "jsdom-crawl",
+      "kind": "browser",
+      "turns": 12,
+      "pages_per_s": 1.2,
+      "depth": 2,
+      "requests": 13,
+      "wall_s": 10.1,
+      "stop": "timeout",
+      "stable": true,
+      "error": ""
+    }
+  ],
+  "candidates_skipped": [
+    "crawl4ai-crawl",
+    "selenium-crawl"
+  ]
+}

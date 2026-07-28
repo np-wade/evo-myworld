@@ -1,0 +1,8 @@
+{
+  "path": "/blog/post/1",
+  "title": "Blog: Scaling Postgres",
+  "body_text": "how we handled scaling postgres database sharding under load.",
+  "links": [
+    "/blog"
+  ]
+}

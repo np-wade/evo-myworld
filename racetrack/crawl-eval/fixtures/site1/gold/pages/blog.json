@@ -1,0 +1,10 @@
+{
+  "path": "/blog",
+  "title": "Engineering Blog",
+  "body_text": "notes from the acme engineering team.",
+  "links": [
+    "/blog/post/1",
+    "/blog/post/2",
+    "/blog/page/2"
+  ]
+}

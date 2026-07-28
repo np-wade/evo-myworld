@@ -1,0 +1,8 @@
+{
+  "path": "/store",
+  "title": "Product Store",
+  "body_text": "loading store products...",
+  "links": [
+    "/"
+  ]
+}

@@ -1,0 +1,80 @@
+{
+  "stage": "http2",
+  "leaderboard": [
+    {
+      "strategy": "curl_cffi-chrome",
+      "h2": true,
+      "alpn": "h2",
+      "fp": "1:65536;2:0;4:6291456;6:262144|15663105|0|m,a,s,p",
+      "n_settings": 4,
+      "resolved": true,
+      "ms": 3.9,
+      "error": ""
+    },
+    {
+      "strategy": "curl_cffi-firefox",
+      "h2": true,
+      "alpn": "h2",
+      "fp": "1:65536;2:0;4:131072;5:16384|12517377|0|m,p,a,s",
+      "n_settings": 4,
+      "resolved": true,
+      "ms": 2.9,
+      "error": ""
+    },
+    {
+      "strategy": "curl_cffi-plain",
+      "h2": true,
+      "alpn": "h2",
+      "fp": "1:65536;2:0;4:6291456;6:262144|15663105|0|m,a,s,p",
+      "n_settings": 4,
+      "resolved": true,
+      "ms": 4.9,
+      "error": ""
+    },
+    {
+      "strategy": "curl_cffi-safari",
+      "h2": true,
+      "alpn": "h2",
+      "fp": "2:0;3:100;4:2097152;9:1|10420225|0|m,s,a,p",
+      "n_settings": 4,
+      "resolved": true,
+      "ms": 3.3,
+      "error": ""
+    },
+    {
+      "strategy": "scrapling",
+      "h2": true,
+      "alpn": "h2",
+      "fp": "1:65536;2:0;4:6291456;6:262144|15663105|0|m,a,s,p",
+      "n_settings": 4,
+      "resolved": true,
+      "ms": 74.7,
+      "error": ""
+    },
+    {
+      "strategy": "urllib",
+      "h2": false,
+      "alpn": "http/1.1",
+      "fp": "(no h2)",
+      "n_settings": 0,
+      "resolved": true,
+      "ms": 6.3,
+      "error": ""
+    }
+  ],
+  "distinct_h2_fingerprints": 3,
+  "fingerprint_groups": {
+    "1:65536;2:0;4:6291456;6:262144|15663105|0|m,a,s,p": [
+      "curl_cffi-plain",
+      "curl_cffi-chrome",
+      "scrapling"
+    ],
+    "2:0;3:100;4:2097152;9:1|10420225|0|m,s,a,p": [
+      "curl_cffi-safari"
+    ],
+    "1:65536;2:0;4:131072;5:16384|12517377|0|m,p,a,s": [
+      "curl_cffi-firefox"
+    ]
+  },
+  "candidates_skipped": []
+}

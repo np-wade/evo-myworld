@@ -1,0 +1,60 @@
+{
+  "stage": "challenge",
+  "runs": 3,
+  "server_stats": {
+    "requests": 14,
+    "blocks": 4
+  },
+  "leaderboard": [
+    {
+      "strategy": "crawl4ai",
+      "kind": "browser",
+      "outcome": "solved",
+      "solve_rate": 1.0,
+      "p50_ms": 776.2
+    },
+    {
+      "strategy": "playwright",
+      "kind": "browser",
+      "outcome": "solved",
+      "solve_rate": 1.0,
+      "p50_ms": 1046.2
+    },
+    {
+      "strategy": "selenium",
+      "kind": "browser",
+      "outcome": "solved",
+      "solve_rate": 1.0,
+      "p50_ms": 1115.7
+    },
+    {
+      "strategy": "curl_cffi-chrome",
+      "kind": "fetcher",
+      "outcome": "challenged",
+      "solve_rate": 0.0,
+      "p50_ms": 3.7
+    },
+    {
+      "strategy": "scrapling",
+      "kind": "fetcher",
+      "outcome": "challenged",
+      "solve_rate": 0.0,
+      "p50_ms": 3.9
+    },
+    {
+      "strategy": "urllib",
+      "kind": "fetcher",
+      "outcome": "blocked",
+      "solve_rate": 0.0,
+      "p50_ms": 5.0
+    },
+    {
+      "strategy": "jsdom",
+      "kind": "browser",
+      "outcome": "blocked",
+      "solve_rate": 0.0,
+      "p50_ms": 544.5
+    }
+  ],
+  "candidates_skipped": []
+}

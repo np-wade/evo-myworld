@@ -1,0 +1,53 @@
+{
+  "crawlable": [
+    "/",
+    "/about",
+    "/blog",
+    "/blog/page/2",
+    "/blog/page/3",
+    "/blog/post/1",
+    "/blog/post/2",
+    "/blog/post/3",
+    "/blog/post/4",
+    "/blog/post/5",
+    "/blog/post/6",
+    "/blog/post/7",
+    "/catalog",
+    "/depth/a",
+    "/depth/b",
+    "/depth/c",
+    "/depth/deep",
+    "/item/1",
+    "/item/2",
+    "/item/3",
+    "/item/4",
+    "/item/5",
+    "/item/6",
+    "/product/1",
+    "/product/2",
+    "/product/3",
+    "/products",
+    "/store"
+  ],
+  "js_only": [
+    "/item/1",
+    "/item/2",
+    "/item/3",
+    "/item/4",
+    "/item/5",
+    "/item/6",
+    "/product/1",
+    "/product/2",
+    "/product/3"
+  ],
+  "forbidden": [
+    "/private/secret"
+  ],
+  "duplicates": {
+    "/products?ref=home": "/products"
+  },
+  "robots_disallow": [
+    "/private/"
+  ],
+  "max_depth": 4
+}

@@ -1,0 +1,31 @@
+{
+  "stage": "extract",
+  "corpus_pages": 23,
+  "leaderboard": [
+    {
+      "name": "css-json",
+      "pages": 23,
+      "title_acc": 1.0,
+      "body_f1": 0.9364,
+      "ms": 0.9,
+      "error": ""
+    },
+    {
+      "name": "trafilatura",
+      "pages": 23,
+      "title_acc": 1.0,
+      "body_f1": 0.8965,
+      "ms": 191.2,
+      "error": ""
+    },
+    {
+      "name": "rule",
+      "pages": 23,
+      "title_acc": 1.0,
+      "body_f1": 0.8827,
+      "ms": 0.1,
+      "error": ""
+    }
+  ],
+  "candidates_skipped": []
+}

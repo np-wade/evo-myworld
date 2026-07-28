@@ -1,0 +1,8 @@
+{
+  "path": "/catalog",
+  "title": "Product Catalog",
+  "body_text": "loading catalog items...",
+  "links": [
+    "/"
+  ]
+}

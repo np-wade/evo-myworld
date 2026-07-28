@@ -1,0 +1,8 @@
+{
+  "path": "/item/1",
+  "title": "Item: Widget Basic",
+  "body_text": "the widget basic is our entry-level widget for small teams.",
+  "links": [
+    "/catalog"
+  ]
+}
