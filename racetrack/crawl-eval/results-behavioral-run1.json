@@ -1,0 +1,68 @@
+{
+  "stage": "behavioral",
+  "runs": 3,
+  "server_stats": {
+    "requests": 19,
+    "blocks": 4,
+    "solved": 1
+  },
+  "leaderboard": [
+    {
+      "strategy": "playwright-stealth",
+      "kind": "browser",
+      "outcome": "solved",
+      "solve_rate": 1.0,
+      "p50_ms": 1849.6
+    },
+    {
+      "strategy": "curl_cffi-chrome",
+      "kind": "fetcher",
+      "outcome": "detected",
+      "solve_rate": 0.0,
+      "p50_ms": 5.8
+    },
+    {
+      "strategy": "scrapling",
+      "kind": "fetcher",
+      "outcome": "detected",
+      "solve_rate": 0.0,
+      "p50_ms": 32.0
+    },
+    {
+      "strategy": "crawl4ai",
+      "kind": "browser",
+      "outcome": "detected",
+      "solve_rate": 0.0,
+      "p50_ms": 1322.4
+    },
+    {
+      "strategy": "selenium",
+      "kind": "browser",
+      "outcome": "detected",
+      "solve_rate": 0.0,
+      "p50_ms": 1875.5
+    },
+    {
+      "strategy": "playwright",
+      "kind": "browser",
+      "outcome": "detected",
+      "solve_rate": 0.0,
+      "p50_ms": 1881.9
+    },
+    {
+      "strategy": "urllib",
+      "kind": "fetcher",
+      "outcome": "blocked",
+      "solve_rate": 0.0,
+      "p50_ms": 8.5
+    },
+    {
+      "strategy": "jsdom",
+      "kind": "browser",
+      "outcome": "blocked",
+      "solve_rate": 0.0,
+      "p50_ms": 966.3
+    }
+  ],
+  "candidates_skipped": []
+}

@@ -26,8 +26,9 @@ OUT = Path(__file__).parent.parent / "out" / "site1"
 # crawl4ai first: fastest COMPLETE browser (6.1s vs playwright 13s) in the race.
 CRAWLER_PREF = ["crawl4ai-crawl", "playwright-crawl", "selenium-crawl",
                 "jsdom-crawl", "scrapling-bfs", "curl_cffi-bfs", "stdlib-bfs"]
-# qdrant first: the only engine that clears the HARD (semantic+typo) query set.
-INDEX_PREF = ["qdrant", "meilisearch", "tantivy", "stdlib-bm25"]
+# qdrant first: dense-vector engines are the only ones that clear the HARD
+# (semantic+typo) query set; lance is the same-embedding vector alternative.
+INDEX_PREF = ["qdrant", "lance", "meilisearch", "tantivy", "stdlib-bm25"]
 
 
 def _pick_crawler(name=None):

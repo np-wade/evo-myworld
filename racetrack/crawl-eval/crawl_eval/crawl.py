@@ -232,6 +232,320 @@ class SeleniumRenderer:
             return FetchLike(False, "", str(e))
 
 
+# ======================================================================
+# STEALTH BROWSERS — extension point for the JS-fingerprint / behavioral wall
+# ======================================================================
+# The behavioral race (behavioral.py) needs candidates that beat a JS-fingerprint
+# wall, not just any JS engine. A VANILLA headless browser (above) LEAKS the
+# classic headless tells (navigator.webdriver===true, no window.chrome, 0
+# plugins, a SwiftShader/llvmpipe WebGL renderer) and gets DETECTED. A stealth
+# browser masks those tells and passes.
+#
+# `StealthPlaywrightRenderer` is the reference stealth candidate: a normal
+# Playwright Chromium whose context runs `_STEALTH_INIT` before any page script,
+# patching exactly the six tells the wall probes. It's deterministic and needs
+# no extra system libs (chromium is already installed for PlaywrightRenderer).
+#
+# ---- LATER-AGENT EXTENSION POINT --------------------------------------------
+# Append heavier real stealth browsers (camofox, cloakbrowser,
+# invisible_playwright, puppeteer-stealth, browserless, ...) as additional
+# renderer classes below, each following the same interface as
+# PlaywrightRenderer (available()/open()/close()/fetch() + .name/.kind) and
+# available()-gated so a missing dep SKIPS. Then add the class to
+# STEALTH_BROWSERS so both build_candidates() and behavioral.py pick it up. Do
+# NOT modify the vanilla renderers above — they must stay DETECTED to prove the
+# plain-vs-stealth separation.
+# -----------------------------------------------------------------------------
+
+# Injected into the page context BEFORE any page script runs. Masks the six
+# headless tells behavioral.py's probe measures.
+_STEALTH_INIT = r"""
+Object.defineProperty(navigator, 'webdriver', {get: () => false});
+if (!window.chrome) {
+  window.chrome = { runtime: {}, app: {}, csi: function(){}, loadTimes: function(){} };
+}
+Object.defineProperty(navigator, 'plugins', {get: () => {
+  const a = [{name:'Chrome PDF Plugin'}, {name:'Chrome PDF Viewer'},
+             {name:'Native Client'}];
+  try { a.__proto__ = PluginArray.prototype; } catch(e){}
+  return a;
+}});
+Object.defineProperty(navigator, 'languages', {get: () => ['en-US','en']});
+(function(){
+  function patch(proto){
+    if (!proto) return;
+    const gp = proto.getParameter;
+    proto.getParameter = function(p){
+      if (p === 37445) return 'Intel Inc.';                 // UNMASKED_VENDOR
+      if (p === 37446) return 'Intel Iris OpenGL Engine';   // UNMASKED_RENDERER
+      return gp.apply(this, arguments);
+    };
+  }
+  try { patch(window.WebGLRenderingContext && WebGLRenderingContext.prototype); } catch(e){}
+  try { patch(window.WebGL2RenderingContext && WebGL2RenderingContext.prototype); } catch(e){}
+})();
+"""
+
+
+class StealthPlaywrightRenderer(PlaywrightRenderer):
+    """Playwright Chromium + a stealth init-script that masks the headless
+    tells. Beats the JS-fingerprint wall the vanilla PlaywrightRenderer trips.
+    If `playwright-stealth` is installed we also apply its evasions for realism,
+    but the hand-rolled init script alone is enough to pass (deterministic)."""
+    name = "playwright-stealth"
+
+    def open(self):
+        from playwright.sync_api import sync_playwright
+        self._pw = sync_playwright().start()
+        self._browser = self._pw.chromium.launch(headless=True)
+        self._ctx = self._browser.new_context(ignore_https_errors=True)
+        self._ctx.add_init_script(_STEALTH_INIT)
+        try:                                    # optional extra realism, if present
+            from playwright_stealth import Stealth
+            Stealth().apply_stealth_sync(self._ctx)
+        except Exception:
+            pass
+        self._page = self._ctx.new_page()
+
+
+# ---- DEDICATED stealth browsers (the real engines, not a patched vanilla) ----
+# Firefox structural gap: `window.chrome` is a Chrome-family global that NO
+# Firefox exposes. camoufox / invisible_playwright are Firefox engines, so they
+# beat the other five headless tells at the C++/engine level but structurally
+# cannot present `window.chrome`. This one-line shim closes exactly that gap so a
+# Firefox stealth engine gets a fair pass on a Chrome-oriented probe — everything
+# else (webdriver/plugins/languages/WebGL/canvas) is handled NATIVELY by the
+# engine, not by JS getter-patching. (Empirically camoufox's native mask is 61 =
+# 5/6; only bit1 needs this.)
+_CHROME_SHIM = r"""
+if (!window.chrome) {
+  window.chrome = { runtime: {}, app: {}, csi: function(){}, loadTimes: function(){} };
+}
+"""
+
+
+class CamoufoxRenderer:
+    """camoufox — a Firefox fork with fingerprint spoofing at the C++
+    implementation level (navigator.webdriver, WebGL renderer, canvas,
+    hardwareConcurrency, audio, screen — all masked before any JS sees them).
+    Downloaded via `python -m camoufox fetch` (its own patched Firefox, separate
+    from Playwright's Chromium). Drives the standard Playwright sync API.
+
+    TWO-LAYER RESULT (measured, not asserted — see behavioral-race):
+    · JS-fingerprint layer: with `_CHROME_SHIM` applied camoufox passes ALL SIX
+      tells (mask 0b111111 == FULL_MASK) — five natively (its WebGL reports a real
+      "ANGLE (AMD Radeon …)" renderer, not SwiftShader, a genuine engine-level pass
+      where playwright-stealth only fakes it with a JS getter patch) plus the lone
+      `window.chrome` shim a Firefox engine can't grow on its own.
+    · TLS/JA3 layer: camoufox spoofs the *browser* fingerprint, NOT a specific
+      browser's *TLS* JA3. Against the combined Tier-R++ wall (require_grease=True)
+      its patched-Firefox ClientHello is 403'd at the JA3 gate — so on the combined
+      target it comes back ⛔ BLOCKED and its perfect JS mask never gets measured.
+    Net: camoufox SOLVES the behavioral layer in isolation but is BLOCKED end-to-end
+    on JA3+behavioral. Only a stealth engine that ALSO carries a GREASE JA3 (the
+    Chromium/Playwright path) passes both layers. Honest finding, kept as-is — we do
+    NOT fake a JA3 for it."""
+    kind = "browser"
+    name = "camoufox"
+
+    def __init__(self):
+        self._cf = self._browser = self._ctx = self._page = None
+
+    def available(self) -> bool:
+        try:
+            import camoufox  # noqa: F401
+            from camoufox.sync_api import Camoufox  # noqa: F401
+        except Exception:
+            return False
+        # the patched-Firefox binary must have been fetched (`camoufox fetch`)
+        import os
+        from pathlib import Path
+        cache = Path(os.path.expanduser("~/.cache/camoufox/browsers"))
+        try:
+            return any(cache.rglob("camoufox*")) or any(cache.rglob("firefox*"))
+        except Exception:
+            return False
+
+    def open(self):
+        from camoufox.sync_api import Camoufox
+        self._cf = Camoufox(headless=True)
+        self._browser = self._cf.__enter__()
+        self._ctx = self._browser.new_context(ignore_https_errors=True)
+        self._ctx.add_init_script(_CHROME_SHIM)   # only the Chrome-only bit
+        self._page = self._ctx.new_page()
+
+    def close(self):
+        try:
+            if self._cf:
+                self._cf.__exit__(None, None, None)
+        except Exception:
+            pass
+
+    def fetch(self, url: str) -> FetchLike:
+        try:
+            self._page.goto(url, wait_until="networkidle", timeout=20000)
+            return FetchLike(True, self._page.content())
+        except Exception as e:
+            return FetchLike(False, "", str(e))
+
+
+class InvisiblePlaywrightRenderer:
+    """invisible_playwright — another patched-Firefox stealth engine (C++-level
+    fingerprint set inside the engine + humanized driver). Same Firefox structural
+    gap as camoufox, so it would race identically.
+
+    available()-SKIPPED here: its distribution hard-pins `playwright>=1.55,<1.56`
+    (pyproject), which conflicts with the playwright 1.61 that the rest of this
+    suite's browser candidates (chromium/camoufox/crawl4ai/playwright-stealth)
+    require. Installing it would downgrade Playwright and — on Ubuntu 26.04, whose
+    only downloadable Chromium is the 1.61/1228 build — break every other browser
+    entrant. Same patched-Firefox tier is already covered by camoufox above."""
+    kind = "browser"
+    name = "invisible_playwright"
+
+    def available(self) -> bool:
+        try:
+            import invisible_playwright  # noqa: F401
+            return True
+        except Exception:
+            return False
+
+    def open(self):
+        from invisible_playwright import InvisiblePlaywright
+        self._ip = InvisiblePlaywright()
+        self._browser = self._ip.__enter__()
+        self._ctx = self._browser.new_context(ignore_https_errors=True)
+        self._ctx.add_init_script(_CHROME_SHIM)
+        self._page = self._ctx.new_page()
+
+    def close(self):
+        try:
+            if getattr(self, "_ip", None):
+                self._ip.__exit__(None, None, None)
+        except Exception:
+            pass
+
+    def fetch(self, url: str) -> FetchLike:
+        try:
+            self._page.goto(url, wait_until="networkidle", timeout=20000)
+            return FetchLike(True, self._page.content())
+        except Exception as e:
+            return FetchLike(False, "", str(e))
+
+
+class PuppeteerStealthRenderer:
+    """puppeteer + puppeteer-extra-plugin-stealth — a dedicated CHROMIUM stealth
+    engine (Node). Unlike the Firefox engines it has `window.chrome` natively, so
+    it can reach the full mask with no shim; the stealth plugin masks webdriver,
+    WebGL vendor/renderer, plugins and languages. Driven out-of-process via a Node
+    bridge (render_puppeteer.js), mirroring JsdomRenderer. available()-gated on the
+    node_modules install + the bridge script; SKIPS cleanly if `npm install`
+    didn't bring puppeteer up."""
+    kind = "browser"
+    name = "puppeteer-stealth"
+    _script = Path(__file__).parent / "render_puppeteer.js"
+    _root = Path(__file__).parent.parent          # holds node_modules/
+
+    def available(self) -> bool:
+        return bool(shutil.which("node")) and self._script.exists() and \
+            (self._root / "node_modules" / "puppeteer-extra-plugin-stealth").exists() and \
+            (self._root / "node_modules" / "puppeteer").exists()
+
+    def open(self): pass
+    def close(self): pass
+
+    def fetch(self, url: str) -> FetchLike:
+        try:
+            import os
+            env = {**os.environ, "NODE_TLS_REJECT_UNAUTHORIZED": "0"}
+            p = subprocess.run(["node", "--no-warnings", str(self._script), url],
+                               cwd=str(self._root), capture_output=True,
+                               timeout=45, env=env)
+            if p.returncode != 0:
+                return FetchLike(False, "", p.stderr.decode()[:200])
+            return FetchLike(True, p.stdout.decode("utf-8", "replace"))
+        except Exception as e:
+            return FetchLike(False, "", str(e))
+
+
+class CloakBrowserRenderer:
+    """cloakbrowser (cloakhq) — donor read: it's a C#/.NET application, not a
+    Python- or Node-importable library and not a drop-in stealth engine we can
+    drive through this interface. available()-SKIPPED: no C# runtime path wired,
+    and standing one up is out of scope for this pip/node-based track. Kept here
+    so the skip is explicit in the race output, not silent."""
+    kind = "browser"
+    name = "cloakbrowser"
+    def available(self) -> bool: return False
+    def open(self): pass
+    def close(self): pass
+    def fetch(self, url: str) -> FetchLike:
+        return FetchLike(False, "", "cloakbrowser: C# service, not wired")
+
+
+class BrowserlessRenderer:
+    """browserless — a headless-Chrome SERVICE (WebSocket/CDP endpoint), not an
+    in-process engine. Gated behind a live-service check: it connects over CDP to
+    a browserless container at $BROWSERLESS_WS (default ws://127.0.0.1:3000). With
+    no container running it available()-SKIPS. Documented, not silent."""
+    kind = "browser"
+    name = "browserless"
+
+    def __init__(self):
+        import os
+        self._ws = os.environ.get("BROWSERLESS_WS", "ws://127.0.0.1:3000")
+        self._pw = self._browser = self._ctx = self._page = None
+
+    def available(self) -> bool:
+        # only claim available if a browserless endpoint actually answers
+        try:
+            from playwright.sync_api import sync_playwright  # noqa: F401
+        except Exception:
+            return False
+        import socket
+        from urllib.parse import urlsplit
+        try:
+            u = urlsplit(self._ws)
+            host, port = u.hostname or "127.0.0.1", u.port or 3000
+            s = socket.socket(); s.settimeout(0.5)
+            ok = s.connect_ex((host, port)) == 0
+            s.close()
+            return ok
+        except Exception:
+            return False
+
+    def open(self):
+        from playwright.sync_api import sync_playwright
+        self._pw = sync_playwright().start()
+        self._browser = self._pw.chromium.connect_over_cdp(self._ws)
+        self._ctx = self._browser.new_context(ignore_https_errors=True)
+        self._ctx.add_init_script(_STEALTH_INIT)
+        self._page = self._ctx.new_page()
+
+    def close(self):
+        try:
+            if self._browser: self._browser.close()
+            if self._pw: self._pw.stop()
+        except Exception:
+            pass
+
+    def fetch(self, url: str) -> FetchLike:
+        try:
+            self._page.goto(url, wait_until="networkidle", timeout=20000)
+            return FetchLike(True, self._page.content())
+        except Exception as e:
+            return FetchLike(False, "", str(e))
+
+
+# Registry the behavioral race (and any future stealth-aware race) reads.
+# StealthPlaywrightRenderer = the reference (patched-vanilla Chromium). The rest
+# are DEDICATED stealth engines; each is available()-gated so a missing
+# dep/binary/service SKIPS instead of crashing the race.
+STEALTH_BROWSERS = [StealthPlaywrightRenderer, CamoufoxRenderer,
+                    InvisiblePlaywrightRenderer, PuppeteerStealthRenderer,
+                    CloakBrowserRenderer, BrowserlessRenderer]
+
+
 # ---------- candidate = fetcher + crawl policy ----------
 @dataclass
 class CrawlCandidate:

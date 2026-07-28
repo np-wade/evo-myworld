@@ -12,6 +12,11 @@ Candidates:
   tantivy      : Rust full-text engine via the `tantivy` wheel (keyword)
   meilisearch  : HTTP to a local meilisearch container (keyword, typo-tolerant)
   qdrant       : qdrant local-mode + fastembed vectors (semantic)   [gated]
+  lance        : lancedb embedded + the SAME fastembed model (semantic) [gated]
+
+The two vector engines (qdrant, lance) embed with the identical fastembed model
+(BAAI/bge-small-en, cosine) via the shared `_embed_text()` builder, so their race
+is a fair head-to-head of the index, not of the embedding.
 """
 from __future__ import annotations
 
@@ -28,6 +33,32 @@ _WORD = re.compile(r"[a-z0-9]+")
 
 def _tok(text: str) -> list[str]:
     return _WORD.findall((text or "").lower())
+
+
+# Fastembed model shared by every dense-vector candidate (qdrant's own default,
+# so lance vs qdrant is a fair head-to-head of the index rather than the model).
+DENSE_MODEL = "BAAI/bge-small-en"
+
+
+def _embed_text(title: str, body: str) -> str:
+    """Build the document text fed to a dense embedder, cleaning crawl noise so a
+    slightly-degraded CRAWLED body embeds as well as the clean gold body:
+      * drop nav path fragments (tokens starting with '/', e.g. '/blog') — pure
+        noise to a semantic model that crowds real content on short pages;
+      * collapse a title the HTML extractor echoed into the head of the body
+        (crawl4ai repeats the <h1>), so the title isn't double/triple counted.
+    On the clean gold corpus (no path tokens, no echoed title) this is a no-op,
+    so the standalone index race is unchanged — it only repairs the crawled
+    pipeline corpus, where these two artifacts tip a razor-thin ranking."""
+    toks = [t for t in (body or "").split() if not t.startswith("/")]
+    body2 = " ".join(toks)
+    tl = (title or "").strip().lower()
+    if tl:
+        low = body2.lower()
+        while low.startswith(tl):
+            body2 = body2[len(tl):].lstrip(" .:-")
+            low = body2.lower()
+    return f"{title}. {body2}".strip()
 
 
 class BaseIndex:
@@ -161,9 +192,9 @@ class QdrantIndex(BaseIndex):
         self.paths, texts, ids = [], [], []
         for i, (p, d) in enumerate(docs.items()):
             self.paths.append(p)
-            texts.append(d.get("title", "") + ". " + d.get("body_text", ""))
+            texts.append(_embed_text(d.get("title", ""), d.get("body_text", "")))
             ids.append(i)
-        # qdrant-client's .add() uses fastembed under the hood
+        # qdrant-client's .add() uses fastembed (DENSE_MODEL) under the hood
         self.client.add(collection_name=self.COLL, documents=texts, ids=ids,
                         metadata=[{"path": p} for p in self.paths])
     def search(self, q: str, k: int = 5) -> list[str]:
@@ -176,7 +207,49 @@ class QdrantIndex(BaseIndex):
             pass
 
 
-ALL_INDEXES = [StdlibBM25(), TantivyIndex(), MeiliIndex(), QdrantIndex()]
+class LanceIndex(BaseIndex):
+    """lancedb embedded (no server) + fastembed. Same DENSE_MODEL and cosine
+    metric as qdrant, same _embed_text builder → a fair vector head-to-head. The
+    table lives in a throwaway temp dir; close() removes it."""
+    name = "lance"
+    TABLE = "crawl_eval"
+    _model = None
+    def available(self) -> bool:
+        try:
+            import lancedb        # noqa: F401
+            import pyarrow        # noqa: F401
+            import fastembed      # noqa: F401
+            return True
+        except Exception:
+            return False
+    def _embed(self, texts: list[str]) -> list[list[float]]:
+        from fastembed import TextEmbedding
+        if LanceIndex._model is None:
+            LanceIndex._model = TextEmbedding(model_name=DENSE_MODEL)
+        return [v.tolist() for v in LanceIndex._model.embed(list(texts))]
+    def build(self, docs: dict):
+        import tempfile
+        import lancedb
+        self._dir = tempfile.mkdtemp(prefix="lance_ce_")
+        self.paths, texts = [], []
+        for p, d in docs.items():
+            self.paths.append(p)
+            texts.append(_embed_text(d.get("title", ""), d.get("body_text", "")))
+        vecs = self._embed(texts)
+        rows = [{"path": p, "vector": v} for p, v in zip(self.paths, vecs)]
+        db = lancedb.connect(self._dir)
+        self.tbl = db.create_table(self.TABLE, data=rows, mode="overwrite")
+    def search(self, q: str, k: int = 5) -> list[str]:
+        qv = self._embed([q])[0]
+        res = self.tbl.search(qv).metric("cosine").limit(k).to_list()
+        return [r["path"] for r in res]
+    def close(self):
+        import shutil
+        shutil.rmtree(getattr(self, "_dir", "") or ".", ignore_errors=True)
+
+
+ALL_INDEXES = [StdlibBM25(), TantivyIndex(), MeiliIndex(), QdrantIndex(),
+               LanceIndex()]
 
 
 def available_indexes() -> list[BaseIndex]:

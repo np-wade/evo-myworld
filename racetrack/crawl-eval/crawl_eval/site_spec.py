@@ -200,9 +200,25 @@ QUERIES = [
      "answers": ["/item/4"], "tier": "semantic"},
     {"q": "spending less money on hosting infrastructure",
      "answers": ["/blog/post/6"], "tier": "semantic"},
-    # typo (misspelled)
+    # semantic — pure paraphrase, ZERO content-word overlap with the target body
+    #            (verified: dense-vector engines hit these, bm25/tantivy miss).
+    {"q": "fault-tolerant real-time message queue over continuous records",
+     "answers": ["/blog/post/2"], "tier": "semantic"},
+    {"q": "rebuilding the data intake layer in a compiled memory-safe language",
+     "answers": ["/blog/post/3"], "tier": "semantic"},
+    {"q": "psychological safety for responders after production incidents",
+     "answers": ["/blog/post/4"], "tier": "semantic"},
+    {"q": "releasing a change to a tiny fraction of users before everyone",
+     "answers": ["/blog/post/5"], "tier": "semantic"},
+    {"q": "the top-tier unit engineered for the highest processing rate",
+     "answers": ["/item/5"], "tier": "semantic"},
+    # typo (misspelled — every salient token mangled so exact-match keyword
+    #       engines get no hit; typo-tolerant meili + dense vectors recover)
     {"q": "kafna streeming pipilines", "answers": ["/blog/post/2"], "tier": "typo"},
     {"q": "titaniom widgit speccifications", "answers": ["/item/3"], "tier": "typo"},
+    {"q": "gadjet maxx throuhgput flagshp", "answers": ["/item/5"], "tier": "typo"},
+    {"q": "progresive feture flaggs graduel rolouts",
+     "answers": ["/blog/post/5"], "tier": "typo"},
     # precision (distractor pages share the keywords)
     {"q": "titanium widget housing specifications", "answers": ["/item/3"],
      "tier": "precision"},

@@ -183,12 +183,25 @@ servers/tools (plain page, JA3 wall, JS-nav, JS-challenge).
 
 ## Status — done vs remaining
 DONE: all crawl/browser/stealth/search candidates raced; both races hardened so
-nothing ties; full stealth ladder (JA3 → HTTP/2 full-Akamai → JS challenge);
-evo wiring with a live gradient; committed.
-REMAINING (frontier): push branch / open PR; run `/evo:optimize` to actually
-search the policy; HTTP/2 fingerprint currently omits… nothing (pseudo-header
-order added); a real behavioral/CAPTCHA layer beyond the JS challenge; wire the
-policy back into `spider-den` as the production escalation logic.
+nothing ties; full stealth ladder (JA3 → HTTP/2 full-Akamai → JS challenge →
+**behavioral/JS-fingerprint Tier-R++**); **search deepened** (2nd vector engine
+`lance`, query set 9→16, 0.889 pipeline miss root-caused + fixed → pipeline
+search_recall 1.0, all gates pass); **dedicated stealth-browser tier raced**
+(camoufox installed & raced; invisible_playwright/puppeteer/cloakbrowser/browserless
+honestly `available()`-skip-gated with documented reasons); evo wiring with a live
+gradient; committed (through `c0fff1d`; the post-handoff #2/#3/#4 work is uncommitted
+in the working tree).
+
+Behavioral-wall headline: **playwright-stealth SOLVES** the combined JA3+JS-fp wall;
+**camoufox** passes all 6 JS tells but is **⛔ blocked at JA3** (spoofs browser fp,
+not TLS JA3) — the honest two-layer finding, kept, not faked. See
+`../results/crawl-suite.md` behavioral section + `results-behavioral-run2.json`.
+
+REMAINING (frontier): run `/evo:optimize` to actually search the policy (smoke-green:
+gate exit 0, benchmark 0.25 baseline → 1.0 optimal); push branch / open PR; a real
+CAPTCHA layer beyond the JS/behavioral challenge; wire the winning policy back into
+`spider-den` as the production escalation logic (must satisfy JA3 **and** behavioral
+layers together — camoufox shows they're independent).
 
 ## Locations — everything, by path
 Repo root: `~/coding/docker-envs/projects/evo-myworld` (branch

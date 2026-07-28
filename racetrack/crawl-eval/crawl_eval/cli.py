@@ -101,6 +101,12 @@ def cmd_challenge_race(a):
     print(json.dumps(res, indent=2) if a.json else format_challenge(res))
 
 
+def cmd_behavioral_race(a):
+    from .behavioral import behavioral_race, format_behavioral
+    res = behavioral_race(runs=a.runs)
+    print(json.dumps(res, indent=2) if a.json else format_behavioral(res))
+
+
 def cmd_endurance_race(a):
     from .race import endurance_race, format_endurance
     res = endurance_race(seconds=a.seconds, max_pages=a.max_pages)
@@ -146,6 +152,10 @@ def main(argv=None):
     ch.add_argument("--runs", type=int, default=3)
     ch.add_argument("--json", action="store_true")
     ch.set_defaults(fn=cmd_challenge_race)
+    bh = sub.add_parser("behavioral-race")
+    bh.add_argument("--runs", type=int, default=3)
+    bh.add_argument("--json", action="store_true")
+    bh.set_defaults(fn=cmd_behavioral_race)
     en = sub.add_parser("endurance-race")
     en.add_argument("--seconds", type=float, default=12.0)
     en.add_argument("--max-pages", dest="max_pages", type=int, default=200_000)

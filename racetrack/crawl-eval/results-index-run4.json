@@ -1,0 +1,84 @@
+{
+  "stage": "index",
+  "k": 3,
+  "corpus_pages": 29,
+  "queries": 16,
+  "leaderboard": [
+    {
+      "name": "lance",
+      "recall": 1.0,
+      "p_at_k": 0.3333,
+      "mrr": 0.7917,
+      "by_tier": {
+        "lexical": 1.0,
+        "semantic": 1.0,
+        "typo": 1.0,
+        "precision": 1.0
+      },
+      "build_ms": 855.1,
+      "q_ms": 367.0,
+      "error": ""
+    },
+    {
+      "name": "qdrant",
+      "recall": 1.0,
+      "p_at_k": 0.3333,
+      "mrr": 0.7917,
+      "by_tier": {
+        "lexical": 1.0,
+        "semantic": 1.0,
+        "typo": 1.0,
+        "precision": 1.0
+      },
+      "build_ms": 810.2,
+      "q_ms": 373.8,
+      "error": ""
+    },
+    {
+      "name": "meilisearch",
+      "recall": 0.5,
+      "p_at_k": 0.1667,
+      "mrr": 0.4375,
+      "by_tier": {
+        "lexical": 1.0,
+        "semantic": 0.0,
+        "typo": 1.0,
+        "precision": 1.0
+      },
+      "build_ms": 155.7,
+      "q_ms": 120.3,
+      "error": ""
+    },
+    {
+      "name": "tantivy",
+      "recall": 0.3125,
+      "p_at_k": 0.1042,
+      "mrr": 0.25,
+      "by_tier": {
+        "lexical": 1.0,
+        "semantic": 0.125,
+        "typo": 0.0,
+        "precision": 1.0
+      },
+      "build_ms": 78.9,
+      "q_ms": 4.4,
+      "error": ""
+    },
+    {
+      "name": "stdlib-bm25",
+      "recall": 0.25,
+      "p_at_k": 0.0833,
+      "mrr": 0.2188,
+      "by_tier": {
+        "lexical": 1.0,
+        "semantic": 0.0,
+        "typo": 0.0,
+        "precision": 1.0
+      },
+      "build_ms": 0.5,
+      "q_ms": 0.6,
+      "error": ""
+    }
+  ],
+  "candidates_skipped": []
+}

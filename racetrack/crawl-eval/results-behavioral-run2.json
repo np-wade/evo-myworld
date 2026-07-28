@@ -1,0 +1,80 @@
+{
+  "stage": "behavioral",
+  "runs": 3,
+  "server_stats": {
+    "requests": 21,
+    "blocks": 6,
+    "solved": 1
+  },
+  "leaderboard": [
+    {
+      "strategy": "playwright-stealth",
+      "kind": "browser",
+      "outcome": "solved",
+      "solve_rate": 1.0,
+      "p50_ms": 1856.1
+    },
+    {
+      "strategy": "curl_cffi-chrome",
+      "kind": "fetcher",
+      "outcome": "detected",
+      "solve_rate": 0.0,
+      "p50_ms": 7.7
+    },
+    {
+      "strategy": "scrapling",
+      "kind": "fetcher",
+      "outcome": "detected",
+      "solve_rate": 0.0,
+      "p50_ms": 8.5
+    },
+    {
+      "strategy": "crawl4ai",
+      "kind": "browser",
+      "outcome": "detected",
+      "solve_rate": 0.0,
+      "p50_ms": 1618.6
+    },
+    {
+      "strategy": "selenium",
+      "kind": "browser",
+      "outcome": "detected",
+      "solve_rate": 0.0,
+      "p50_ms": 1716.8
+    },
+    {
+      "strategy": "playwright",
+      "kind": "browser",
+      "outcome": "detected",
+      "solve_rate": 0.0,
+      "p50_ms": 2054.4
+    },
+    {
+      "strategy": "urllib",
+      "kind": "fetcher",
+      "outcome": "blocked",
+      "solve_rate": 0.0,
+      "p50_ms": 10.7
+    },
+    {
+      "strategy": "jsdom",
+      "kind": "browser",
+      "outcome": "blocked",
+      "solve_rate": 0.0,
+      "p50_ms": 1136.0
+    },
+    {
+      "strategy": "camoufox",
+      "kind": "browser",
+      "outcome": "blocked",
+      "solve_rate": 0.0,
+      "p50_ms": 6248.8
+    }
+  ],
+  "candidates_skipped": [
+    "invisible_playwright",
+    "puppeteer-stealth",
+    "cloakbrowser",
+    "browserless"
+  ]
+}
