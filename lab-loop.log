@@ -63,3 +63,6 @@ race backend-query-ranking FAILED (rc=143) — request left in place, log: /home
 [2026-07-19 15:49:58] heartbeat: [2026-07-19 15:47:08] cycle 1: racing best-regression-gate | MemAvail=9.7G SwapFree=23.8G
 [2026-07-19 15:50:58] heartbeat: [2026-07-19 15:47:08] cycle 1: racing best-regression-gate | MemAvail=9.8G SwapFree=23.8G
 race best-regression-gate FAILED (rc=1) — request left in place, log: /home/npwad/coding/docker-envs/projects/evo-races/best-regression-gate/steward.log
+[2026-07-19 15:51:38] === cycle 1 done (0 races). Sleeping 900s.
+[2026-07-19 15:51:38] STOPLAB present — stopping.
+[2026-07-19 15:51:38] === cycle 2 done (0 races). Sleeping 900s.

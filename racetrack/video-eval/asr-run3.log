@@ -1,0 +1,12 @@
+ASR race (OFFLINE) — 5 frozen audio fixtures (youtube/UF8uR6Z6KLc, youtube/8jPQjjsBbIc, youtube/aircAruvnKk, twitch/twitch-demo, arbitrary/self-hosted-demo)
+
+candidate              gold     WER     CER  drift_s  cost/min   wall_s  fail
+-----------------------------------------------------------------------------
+faster-whisper-small      4   0.042   0.029     0.64     19.79    39.57     0
+faster-whisper-tiny       4   0.051   0.037     0.38      1.88     3.75     0
+whisper-streaming-tiny    4   0.052   0.039     8.85     31.25    62.49     0
+faster-whisper-base       4   0.053   0.037     1.17      9.84    19.67     0
+openai-whisper-base       4   0.053   0.037     3.17     10.18    20.36     0
+openai-whisper-tiny       4   0.058   0.041     0.61      7.53    15.05     0
+
+saved -> results-asr-run2.json

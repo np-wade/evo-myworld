@@ -1,0 +1,76 @@
+{
+  "mode": "S8 v2 DOCX: validity 0.35 + footnotes 0.15 + styles 0.10 + heading styles 0.15 + text fidelity 0.25 (gate: valid)",
+  "n_entries": 4,
+  "candidates_unavailable": [
+    {
+      "candidate": "doxx-export",
+      "reason": "doxx is a DOCX reader/renderer: its export surface is markdown/text/csv/json/ansi only; it cannot write DOCX"
+    },
+    {
+      "candidate": "mdxjs-rs",
+      "reason": "mdxjs-rs compiles MDX to JSX, cannot emit DOCX"
+    },
+    {
+      "candidate": "mdx-rs",
+      "reason": "mdx-rs compiles MDX to JSX, cannot emit DOCX"
+    }
+  ],
+  "leaderboard": [
+    {
+      "candidate": "ip-incumbent",
+      "fails": 0,
+      "error": "",
+      "docx_score": 1.0,
+      "footnote_entries": 2,
+      "heading_styles": 1,
+      "text_fidelity": 1.0,
+      "latency_ms_p50": 136.0,
+      "latency_ms_p95": 152.3,
+      "deterministic": -1,
+      "gate": "PASS",
+      "score": 1.0
+    },
+    {
+      "candidate": "pandoc-docx",
+      "fails": 0,
+      "error": "",
+      "docx_score": 0.9937,
+      "footnote_entries": 2,
+      "heading_styles": 1,
+      "text_fidelity": 0.9748,
+      "latency_ms_p50": 895.6,
+      "latency_ms_p95": 1098.7,
+      "deterministic": -1,
+      "gate": "PASS",
+      "score": 0.9937
+    },
+    {
+      "candidate": "python-docx",
+      "fails": 0,
+      "error": "",
+      "docx_score": 0.8458,
+      "footnote_entries": 0,
+      "heading_styles": 1,
+      "text_fidelity": 0.9833,
+      "latency_ms_p50": 389.9,
+      "latency_ms_p95": 505.5,
+      "deterministic": -1,
+      "gate": "PASS",
+      "score": 0.8458
+    },
+    {
+      "candidate": "docxtpl-minimal",
+      "fails": 0,
+      "error": "",
+      "docx_score": 0.8436,
+      "footnote_entries": 0,
+      "heading_styles": 1,
+      "text_fidelity": 0.9742,
+      "latency_ms_p50": 674.4,
+      "latency_ms_p95": 880.6,
+      "deterministic": -1,
+      "gate": "PASS",
+      "score": 0.8436
+    }
+  ]
+}

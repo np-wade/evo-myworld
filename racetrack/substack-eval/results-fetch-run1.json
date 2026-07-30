@@ -1,0 +1,50 @@
+{
+  "pubs": [
+    "thezvi",
+    "astralcodexten",
+    "noahpinion"
+  ],
+  "sample": [
+    "thezvi/more-on-an-internal-openai-model",
+    "thezvi/claude-opus-5-the-system-card",
+    "astralcodexten/breakdown-in-pakistan",
+    "astralcodexten/six-slightly-skew-boogeymen",
+    "noahpinion/what-will-more-intelligence-actually",
+    "noahpinion/we-asked-too-much-of-the-american"
+  ],
+  "leaderboard": [
+    {
+      "backend": "curl_cffi",
+      "posts": 6,
+      "post_ok": 1.0,
+      "fields_ok": 1.0,
+      "paywall_ok": 1.0,
+      "block_rate": 0.0,
+      "p50_ms": 113.5,
+      "p95_ms": 117.4,
+      "error": ""
+    },
+    {
+      "backend": "scrapling",
+      "posts": 6,
+      "post_ok": 1.0,
+      "fields_ok": 1.0,
+      "paywall_ok": 1.0,
+      "block_rate": 0.0,
+      "p50_ms": 115.3,
+      "p95_ms": 123.7,
+      "error": ""
+    },
+    {
+      "backend": "urllib",
+      "posts": 6,
+      "post_ok": 1.0,
+      "fields_ok": 1.0,
+      "paywall_ok": 1.0,
+      "block_rate": 0.0,
+      "p50_ms": 145.5,
+      "p95_ms": 180.2,
+      "error": ""
+    }
+  ]
+}

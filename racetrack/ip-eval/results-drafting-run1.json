@@ -1,0 +1,35 @@
+{
+  "mode": "S6 grounded drafting: coverage/binding/fidelity/completeness (gate: zero fabricated metrics)",
+  "n_entries": 2,
+  "candidates_unavailable": [],
+  "leaderboard": [
+    {
+      "candidate": "ip-incumbent",
+      "fails": 0,
+      "error": "",
+      "draft_score": 0.9077,
+      "concept_coverage": 1.0,
+      "citation_binding": 0.6923,
+      "metric_fidelity": 1.0,
+      "latency_ms_p50": 40.2,
+      "latency_ms_p95": 44.9,
+      "deterministic": 1,
+      "gate": "PASS",
+      "score": 0.9077
+    },
+    {
+      "candidate": "naive-baseline",
+      "fails": 0,
+      "error": "",
+      "draft_score": 0.7,
+      "concept_coverage": 1.0,
+      "citation_binding": 0.0,
+      "metric_fidelity": 1.0,
+      "latency_ms_p50": 0.0,
+      "latency_ms_p95": 0.1,
+      "deterministic": 1,
+      "gate": "PASS",
+      "score": 0.7
+    }
+  ]
+}

@@ -1,0 +1,876 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Racetrack Repository Catalog</title>
+<style>body{max-width:960px;margin:2rem auto;padding:0 1rem;font:16px/1.55 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#1f2937}table{border-collapse:collapse;width:100%;overflow:auto;display:block}th,td{border:1px solid #d1d5db;padding:.5rem;text-align:left;vertical-align:top}th{background:#f3f4f6}pre{padding:1rem;background:#f3f4f6;overflow:auto}code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace}a{color:#2563eb}img{max-width:100%;height:auto}</style>
+</head>
+<body>
+<h1 id="racetrack-repository-codebase-testing-catalog-exhaustive-cross-category-pass">Racetrack Repository &amp; Codebase Testing Catalog (Exhaustive Cross-Category Pass)</h1>
+<p>This comprehensive document categorizes all <strong>616 repositories</strong> located in <code>library-base/repos</code> (<code>~/coding/docker-envs/filing-cabinet/library-base/repos</code>) and the standing <strong>Racetrack evaluation harnesses</strong> located in <code>racetrack</code> (<code>~/coding/docker-envs/projects/evo-myworld/racetrack</code>).</p>
+<p>In this multi-pass catalog, repositories are <strong>exhaustively cross-listed</strong> into all categories where they provide testable implementations, techniques, or interfaces.</p>
+<hr />
+<h2 id="1-search-retrieval-systems-multiple-paradigms">1. SEARCH &amp; RETRIEVAL SYSTEMS (Multiple Paradigms)</h2>
+<p>Repositories covering hybrid search, RAG pipelines, neural retrieval, multi-paradigm search engines, vector retrieval, and MCP search servers.</p>
+<ul>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/meilisearch_meilisearch">meilisearch_meilisearch</a></strong> — Fast, open-source hybrid search engine.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/searxng_searxng">searxng_searxng</a></strong> — Privacy-respecting metasearch engine.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/quickwit-oss_tantivy">quickwit-oss_tantivy</a></strong> — Full-text BM25 search engine library written in Rust.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/qdrant_qdrant">qdrant_qdrant</a></strong> — High-performance vector + payload hybrid search engine.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/facebookresearch_faiss">facebookresearch_faiss</a></strong> — Dense vector retrieval and ANN similarity search.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/stanford-oval_suql">stanford-oval_suql</a></strong> — Structured and Unstructured Query Language for conversational retrieval.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/openags_paper-search-mcp">openags_paper-search-mcp</a></strong> — Academic paper search Model Context Protocol (MCP) server.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/langchain-ai_openwiki">langchain-ai_openwiki</a></strong> — Open Wikipedia retrieval and indexing engine.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Johell1NS_browser-search">Johell1NS_browser-search</a></strong> — In-browser local search retrieval system.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/kiryano_Scout">kiryano_Scout</a></strong> — Autonomous deep search and discovery tool.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/StarTrail-org_PixelRAG">StarTrail-org_PixelRAG</a></strong> — Multimodal visual RAG and retrieval framework.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/StarTrail-org_LEANN">StarTrail-org_LEANN</a></strong> — Lightweight Efficient Approximate Nearest Neighbor search engine.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/deepsense-ai_ragbits">deepsense-ai_ragbits</a></strong> — Modular building blocks for production RAG pipelines.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/deepsense-ai_create-ragbits-app">deepsense-ai_create-ragbits-app</a></strong> — Scaffolding tool for RAG applications.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/deepset-ai_haystack">deepset-ai_haystack</a></strong> — End-to-end LLM orchestration and search framework.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/deepset-ai_haystack-cookbook">deepset-ai_haystack-cookbook</a></strong> — Search and RAG recipes.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/deepset-ai_haystack-experimental">deepset-ai_haystack-experimental</a></strong> — Cutting-edge research search paradigms.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/deepset-ai_hayhooks">deepset-ai_hayhooks</a></strong> — REST interface for Haystack retrieval pipelines.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/langchain-ai_local-deep-researcher">langchain-ai_local-deep-researcher</a></strong> — Local agentic web research and retrieval system.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/harveyai_deep-research-starter">harveyai_deep-research-starter</a></strong> — Deep domain retrieval and synthesis starter.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/stanford-oval_storm">stanford-oval_storm</a></strong> — Knowledge curation search engine from web sources.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/stanford-oval_WikiChat">stanford-oval_WikiChat</a></strong> — Real-time grounded retrieval system over Wikipedia.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/PJDude_librer">PJDude_librer</a></strong> — Open-source document search and library indexer.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Shubhamsaboo_awesome-llm-apps">Shubhamsaboo_awesome-llm-apps</a></strong> — RAG and search application designs.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/secbear_neuron">secbear_neuron</a></strong> — Neural indexer and search subsystem.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/lissy93_web-check">lissy93_web-check</a></strong> — Open-source OSINT &amp; web retrieval suite.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/unclecode_crawl4ai">unclecode_crawl4ai</a></strong> — Crawling-retrieval pipeline for LLM apps.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/ScrapeGraphAI_Scrapegraph-ai">ScrapeGraphAI_Scrapegraph-ai</a></strong> — Graph-retrieval web scraping engine.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/supermemoryai_supermemory">supermemoryai_supermemory</a></strong> — Agent memory search and retrieval.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/DeusData_codebase-memory-mcp">DeusData_codebase-memory-mcp</a></strong> — Codebase semantic retrieval MCP server.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Graphify-Labs_graphify">Graphify-Labs_graphify</a></strong> — Code graph retrieval system.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/projects/evo-myworld/racetrack/scraper-search-lab">racetrack/scraper-search-lab</a></strong> <em>(Racetrack Eval)</em> — Standing benchmark harness for web search &amp; scraping pipeline races.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/projects/evo-myworld/racetrack/arxiv-eval">racetrack/arxiv-eval</a></strong> <em>(Racetrack Eval)</em> — Standing benchmark harness for academic paper retrieval &amp; parsing.</li>
+</ul>
+<hr />
+<h2 id="2-knowledge-graph-systems">2. KNOWLEDGE / GRAPH SYSTEMS</h2>
+<p>Knowledge graphs, graph representations, hypergraphs, ontologies, and graph-based reasoning engines.</p>
+<ul>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Graphify-Labs_graphify">Graphify-Labs_graphify</a></strong> — Codebase knowledge graph extraction and AST representation engine.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/growgraph_ontocast">growgraph_ontocast</a></strong> — Ontology casting and knowledge graph alignment.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/tirth8205_code-review-graph">tirth8205_code-review-graph</a></strong> — Knowledge graph generator for code reviews.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/CatalaLang_catala">CatalaLang_catala</a></strong> — Formal specification language for domain logic and legislative graphs.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Egonex-AI_Understand-Anything">Egonex-AI_Understand-Anything</a></strong> — Graph representation learning engine for codebases.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/likec4_likec4">likec4_likec4</a></strong> — Architecture-as-code diagramming and component graph engine.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/freeplane_freeplane">freeplane_freeplane</a></strong> — Mind mapping and hierarchical knowledge representation app.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/papers-we-love_papers-we-love">papers-we-love_papers-we-love</a></strong> — CS paper knowledge graph and repository.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/SapienzaNLP_ewiser">SapienzaNLP_ewiser</a></strong> — Entity and Word Sense Disambiguation using knowledge graphs.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/jpwahle_21-word-sense-disambiguation">jpwahle_21-word-sense-disambiguation</a></strong> — Semantic sense graph disambiguation engine.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/imoscovitz_wittgenstein">imoscovitz_wittgenstein</a></strong> — Inductive rule learning and knowledge classification engine.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/synthetic-sciences_openscience">synthetic-sciences_openscience</a></strong> — Open scientific knowledge graph engine.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/iyulab_undoc">iyulab_undoc</a></strong> — Knowledge extraction from unstructured documents.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/supermemoryai_supermemory">supermemoryai_supermemory</a></strong> — Knowledge graph second brain for AI agents.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/EverMind-AI_HyperMem">EverMind-AI_HyperMem</a></strong> — Hypergraph-based agent memory system.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/deepcausality_deep_causality">deepcausality_deep_causality</a></strong> — Hypergraph causal reasoning engine.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/repowise-dev_repowise">repowise-dev_repowise</a></strong> — Repository structural dependency graph.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/bytedance_flow-builder">bytedance_flow-builder</a></strong> — Visual node graph layout component.</li>
+</ul>
+<hr />
+<h2 id="3-memory-systems">3. MEMORY SYSTEMS</h2>
+<p>Agent memory architectures, episodic memory, semantic memory stores, long-term memory, working memory, and state persistence.</p>
+<ul>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/supermemoryai_supermemory">supermemoryai_supermemory</a></strong> — Personal AI second brain and universal agent memory layer.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/TencentCloud_tencentdb-agent-memory">TencentCloud_tencentdb-agent-memory</a></strong> — Agent memory infrastructure on database storage.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Wassimyounes01_memory">Wassimyounes01_memory</a></strong> — Persistent semantic agent memory module.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/EverMind-AI_HyperMem">EverMind-AI_HyperMem</a></strong> — Hypergraph-based memory system for AI agents.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/EverMind-AI_EverMemBench">EverMind-AI_EverMemBench</a></strong> — Benchmark suite for long-term agent memory engines.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/EverMind-AI_MSA">EverMind-AI_MSA</a></strong> — Memory architecture and state alignment for multi-agent systems.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/EverMind-AI_EverMe">EverMind-AI_EverMe</a></strong> — Personal agent memory profile manager.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/EverMind-AI_raven">EverMind-AI_raven</a></strong> — Memory retrieval and continuous consolidation engine.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/DeusData_codebase-memory-mcp">DeusData_codebase-memory-mcp</a></strong> — Codebase semantic memory MCP server.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/raiyanyahya_recall">raiyanyahya_recall</a></strong> — Lightweight persistent memory module for agents.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/redis_redis">redis_redis</a></strong> — Working memory key-value state store.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/moka-rs_mini-moka">moka-rs_mini-moka</a></strong> — Episodic concurrent memory cache.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/LMCache_LMCache">LMCache_LMCache</a></strong> — LLM KV prompt memory reuse layer.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/ruvnet_ruvector">ruvnet_ruvector</a></strong> — Embedded agent vector memory store.</li>
+</ul>
+<hr />
+<h2 id="4-data-streaming-batch-olap-data-engineering">4. DATA (Streaming, Batch, OLAP &amp; Data Engineering)</h2>
+<p>Distributed compute engines, stream processors, data processing frameworks, and analytical engines.</p>
+<ul>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_spark">apache_spark</a></strong> — Unified analytics engine for large-scale data processing.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_flink">apache_flink</a></strong> — Stateful stream processing engine over data streams.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/twitter_scalding">twitter_scalding</a></strong> — Scala API for Cascading Hadoop map-reduce batch data jobs.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_druid">apache_druid</a></strong> — High-performance real-time analytical (OLAP) database.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_paimon">apache_paimon</a></strong> — Streaming data lake storage format.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/spotify_scio">spotify_scio</a></strong> — Scala API for Apache Beam &amp; Google Cloud Dataflow.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_seatunnel">apache_seatunnel</a></strong> — Very high-performance distributed data integration system.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_sedona-db">apache_sedona-db</a></strong> — Spatial data processing engine.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/microsoft_SynapseML">microsoft_SynapseML</a></strong> — Massive scale machine learning pipeline framework on Spark.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_datasketches">apache_datasketches</a></strong> — Java streaming approximate algorithms / sketch algorithms.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_datasketches-rust">apache_datasketches-rust</a></strong> — Rust implementation of Apache DataSketches.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/twitter_algebird">twitter_algebird</a></strong> — Abstract algebra for data aggregation and streaming.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/floci-io_floci">floci-io_floci</a></strong> — Local emulator for AWS data/streaming infrastructure.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/google-research_tabfm">google-research_tabfm</a></strong> — Tabular data foundation modeling engine.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/spotify_chartify">spotify_chartify</a></strong> — Python library for easy data visualization creation.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_superset">apache_superset</a></strong> — Enterprise data exploration and visualization platform.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/polynote_polynote">polynote_polynote</a></strong> — Polyglot notebook for data science (Scala/Python/SQL).</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/cicirello_Chips-n-Salsa">cicirello_Chips-n-Salsa</a></strong> — Custom data structures and stochastic local search algorithms.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/adilkhash_Data-Engineering-HowTo">adilkhash_Data-Engineering-HowTo</a></strong> — Reference data engineering architecture patterns.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_kafka">apache_kafka</a></strong> — Real-time event data streaming platform.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/lance-format_lance">lance-format_lance</a></strong> — Columnar data lake format for AI.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_iceberg">apache_iceberg</a></strong> — Analytics data lake table format.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_datafusion">apache_datafusion</a></strong> — In-memory OLAP SQL query engine in Rust.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/projects/evo-myworld/racetrack/video-eval">racetrack/video-eval</a></strong> <em>(Racetrack Eval)</em> — Standing benchmark harness for streaming video data processing.</li>
+</ul>
+<hr />
+<h2 id="5-message-event-systems">5. MESSAGE / EVENT SYSTEMS</h2>
+<p>Event streaming, pub/sub brokers, message queues, and event sourcing frameworks.</p>
+<ul>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_kafka">apache_kafka</a></strong> — Distributed event streaming platform.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/spotify_docker-kafka">spotify_docker-kafka</a></strong> — Dockerized Kafka &amp; ZooKeeper event cluster.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/leandrocp_awesome-cqrs-event-sourcing">leandrocp_awesome-cqrs-event-sourcing</a></strong> — CQRS and event sourcing architecture library.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/pyeventsourcing_eventsourcing">pyeventsourcing_eventsourcing</a></strong> — Python framework for event-sourced systems.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_dubbo">apache_dubbo</a></strong> — High-performance RPC and messaging framework.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/socketio_socket.io">socketio_socket.io</a></strong> — Real-time bi-directional event-based communication engine.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/mrasu_echoed">mrasu_echoed</a></strong> — Event recording and replay message subsystem.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_openwhisk">apache_openwhisk</a></strong> — Serverless event-driven execution platform.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_openwhisk-cli">apache_openwhisk-cli</a></strong> — CLI for Apache OpenWhisk event triggers.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_camel-kamelets">apache_camel-kamelets</a></strong> — Reusable event source and sink connectors.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/quinn-rs_quinn">quinn-rs_quinn</a></strong> — Async QUIC event transport.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/PipeWire_pipewire">PipeWire_pipewire</a></strong> — Low-latency audio/video event daemon.</li>
+</ul>
+<hr />
+<h2 id="6-vector-databases">6. VECTOR DATABASES</h2>
+<p>ANN similarity search engines, high-dimensional vector indexers, and vector storage engines.</p>
+<ul>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/qdrant_qdrant">qdrant_qdrant</a></strong> — High-performance Rust vector search engine with payload filtering.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/facebookresearch_faiss">facebookresearch_faiss</a></strong> — Library for efficient similarity search and clustering of dense vectors.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/ruvnet_ruvector">ruvnet_ruvector</a></strong> — Embedded vector database engine in Rust.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/spotify_annoy">spotify_annoy</a></strong> — Approximate Nearest Neighbors Oh Yeah in C++/Python.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/schlegelp_aann">schlegelp_aann</a></strong> — Adaptive Approximate Nearest Neighbors library.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/NVIDIA_nv-embedding-cache">NVIDIA_nv-embedding-cache</a></strong> — GPU-accelerated vector embedding cache.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/StarTrail-org_LEANN">StarTrail-org_LEANN</a></strong> — Lightweight ANN vector search engine.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/deepsense-ai_ragbits">deepsense-ai_ragbits</a></strong> — Vector storage wrappers for RAG pipelines.</li>
+</ul>
+<hr />
+<h2 id="7-full-text-search">7. FULL-TEXT SEARCH</h2>
+<p>Inverted index implementations, BM25 ranking engines, and full-text search indexing engines.</p>
+<ul>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/quickwit-oss_tantivy">quickwit-oss_tantivy</a></strong> — Full-text search engine library inspired by Lucene, built in Rust.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/meilisearch_meilisearch">meilisearch_meilisearch</a></strong> — Ultra-fast full-text search engine with typo tolerance.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/elastic_elasticsearch">elastic_elasticsearch</a></strong> — Distributed RESTful full-text search and analytics engine.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/searxng_searxng">searxng_searxng</a></strong> — Full-text metasearch aggregator.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/PJDude_librer">PJDude_librer</a></strong> — Document full-text indexer.</li>
+</ul>
+<hr />
+<h2 id="8-document-databases">8. DOCUMENT DATABASES</h2>
+<p>Document store engines, JSON/BSON document databases, and peer-to-peer offline-first stores.</p>
+<ul>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_couchdb">apache_couchdb</a></strong> — Seamless multi-master syncing JSON document database.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/pouchdb_pouchdb">pouchdb_pouchdb</a></strong> — In-browser JavaScript document database that syncs with CouchDB.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_couchdb-docker">apache_couchdb-docker</a></strong> — Official Docker repository for Apache CouchDB.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/postgres_postgres">postgres_postgres</a></strong> — PostgreSQL JSONB document storage.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/tursodatabase_turso">tursodatabase_turso</a></strong> — SQLite-edge document JSON engine.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/karakeep-app_karakeep">karakeep-app_karakeep</a></strong> — Document archive store.</li>
+</ul>
+<hr />
+<h2 id="9-relational-databases">9. RELATIONAL DATABASES</h2>
+<p>SQL databases, embedded SQL engines, distributed SQL, and database management interfaces.</p>
+<ul>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/postgres_postgres">postgres_postgres</a></strong> — World's most advanced open-source relational SQL database.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/cockroachdb_cockroach">cockroachdb_cockroach</a></strong> — Cloud-native distributed SQL database engine.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/tursodatabase_turso">tursodatabase_turso</a></strong> — SQLite-compatible edge relational database engine.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/OtterMind_Chat2DB">OtterMind_Chat2DB</a></strong> — AI-driven relational database client and SQL generator.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/deepsense-ai_db-ally">deepsense-ai_db-ally</a></strong> — Natural language interface to relational databases.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/nocodb_nocodb">nocodb_nocodb</a></strong> — Open-source Airtable alternative connecting to SQL databases.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Canner_WrenAI">Canner_WrenAI</a></strong> — Text-to-SQL engine for relational databases.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/hasura_graphql-engine">hasura_graphql-engine</a></strong> — Instant GraphQL APIs over SQL relational databases.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/dbeaver_dbeaver">dbeaver_dbeaver</a></strong> — Free universal database tool and SQL editor.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/twentyhq_twenty">twentyhq_twenty</a></strong> — Open-source relational CRM database system.</li>
+</ul>
+<hr />
+<h2 id="10-time-series-databases">10. TIME-SERIES DATABASES</h2>
+<p>Metric storage, time-series data handling, and monitoring time-series metrics.</p>
+<ul>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/spotify_kairosdb">spotify_kairosdb</a></strong> — Fast distributed time-series database.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/spotify_heroic">spotify_heroic</a></strong> — Scalable time-series database for metrics aggregation.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/netdata_netdata">netdata_netdata</a></strong> — Real-time time-series metric collector daemon.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/zeroclaw-labs_zeroclaw-metrics">zeroclaw-labs_zeroclaw-metrics</a></strong> — Agent time-series telemetry exporter.</li>
+</ul>
+<hr />
+<h2 id="11-key-value-stores">11. KEY-VALUE STORES</h2>
+<p>In-memory KV caches, embedded key-value engines, and data structure servers.</p>
+<ul>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/redis_redis">redis_redis</a></strong> — In-memory data structure store used as a database, cache, and message broker.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/redis-rs_redis-rs">redis-rs_redis-rs</a></strong> — High-performance Rust client and embedded driver for Redis.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/arthurprs_quick-cache">arthurprs_quick-cache</a></strong> — Ultra-fast lock-free in-memory KV cache.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/moka-rs_mini-moka">moka-rs_mini-moka</a></strong> — Concurrent KV cache library.</li>
+</ul>
+<hr />
+<h2 id="12-columnar-stores">12. COLUMNAR STORES</h2>
+<p>Column-oriented storage formats, Parquet engines, and analytical query execution engines.</p>
+<ul>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_datafusion">apache_datafusion</a></strong> — Extensible columnar query engine written in Rust using Apache Arrow.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/lance-format_lance">lance-format_lance</a></strong> — Modern columnar data format for AI and multimodal vectors.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_arrow-rs">apache_arrow-rs</a></strong> — In-memory columnar data structure standard.</li>
+</ul>
+<hr />
+<h2 id="13-schema-data-layer">13. SCHEMA / DATA LAYER</h2>
+<p>Table formats, zero-copy memory layouts, multi-format data abstractions, and unified data APIs.</p>
+<ul>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_iceberg">apache_iceberg</a></strong> — Open table format for huge analytic datasets in Java.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_iceberg-rust">apache_iceberg-rust</a></strong> — Rust implementation of the Apache Iceberg spec.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/lance-format_lance">lance-format_lance</a></strong> — High-performance columnar schema format.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_arrow-rs">apache_arrow-rs</a></strong> — Rust implementation of Apache Arrow columnar memory format.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_opendal">apache_opendal</a></strong> — Unified data access layer accessing underlying data stores seamlessly.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_thrift">apache_thrift</a></strong> — RPC IDL schema definition layer.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_fory">apache_fory</a></strong> — Zero-copy binary schema encoder.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/BoundaryML_baml">BoundaryML_baml</a></strong> — Agent tool structured output schema domain language.</li>
+</ul>
+<hr />
+<h2 id="14-agent-frameworks">14. AGENT FRAMEWORKS</h2>
+<p>Autonomous agent orchestration, multi-agent frameworks, tool use, prompt execution, and agent runtimes.</p>
+<ul>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/crewAIInc_crewAI">crewAIInc_crewAI</a></strong> — Framework for orchestrating role-playing autonomous AI agents.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/deepset-ai_haystack">deepset-ai_haystack</a></strong> — End-to-end framework for building agentic AI pipelines.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/livekit_agents">livekit_agents</a></strong> — Real-time multimodal voice and video AI agent framework.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/NirDiamant_GenAI_Agents">NirDiamant_GenAI_Agents</a></strong> — Comprehensive collection of AI agent design patterns.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Wassimyounes01_agent-os">Wassimyounes01_agent-os</a></strong> — Operating system kernel and workspace for AI agents.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/EverMind-AI_EverOS">EverMind-AI_EverOS</a></strong> — Agent operating system with memory, tools, and execution loop.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/EverMind-AI_EvoAgentBench">EverMind-AI_EvoAgentBench</a></strong> — Benchmark for evaluating evolutionary agent architectures.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/msitarzewski_agency-agents">msitarzewski_agency-agents</a></strong> — Ready-to-use specialized AI agents for agency workflows.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/superagent-ai_superagent">superagent-ai_superagent</a></strong> — Open-source AI agent framework with API management.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/FlowiseAI_Flowise">FlowiseAI_Flowise</a></strong> — Drag-and-drop UI to build customized LLM agent workflows.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/CoWork-OS_CoWork-OS">CoWork-OS_CoWork-OS</a></strong> — Collaborative multi-agent operating workspace.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/liquidos-ai_AutoAgents">liquidos-ai_AutoAgents</a></strong> — Autonomous generation of multi-agent teams.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/agentscope-ai_QwenPaw">agentscope-ai_QwenPaw</a></strong> — Agent Scope tool integration runtime.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/agentset-ai_agentset">agentset-ai_agentset</a></strong> — Production agent routing and tool calling framework.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/harishkotra_agent-office">harishkotra_agent-office</a></strong> — Visual simulated office environment for autonomous agents.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Moh4696_build-ai-agents-free">Moh4696_build-ai-agents-free</a></strong> — Hands-on collection of open-source agent implementations.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/cuga-project_cuga-agent">cuga-project_cuga-agent</a></strong> — CUDA-accelerated GPU agent runtime environment.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/agentcontrol_agent-control">agentcontrol_agent-control</a></strong> — Control plane and policy layer for agent tool execution.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/ashishpatel26_500-AI-Agents-Projects">ashishpatel26_500-AI-Agents-Projects</a></strong> — Repository of 500+ practical agent designs and implementations.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Wassimyounes01_sentience-loop">Wassimyounes01_sentience-loop</a></strong> — Continuous agent perception and action loop.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Wassimyounes01_flywheel">Wassimyounes01_flywheel</a></strong> — Agent self-improvement flywheel execution harness.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Wassimyounes01_megacycle">Wassimyounes01_megacycle</a></strong> — Multi-turn macro execution loop for agents.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Wassimyounes01_myriad">Wassimyounes01_myriad</a></strong> — Parallel subagent dispatcher and swarm supervisor.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Wassimyounes01_prompt-engineer">Wassimyounes01_prompt-engineer</a></strong> — Automated prompt optimizer for agent tools.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/NoFxAiOS_nofx">NoFxAiOS_nofx</a></strong> — Zero-framework agent engine for complex tasks.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/AgentTankOS_tankwork">AgentTankOS_tankwork</a></strong> — Sandboxed execution environment for agent workloads.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/kagent-dev_kagent">kagent-dev_kagent</a></strong> — Kubernetes-native autonomous agent framework.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/openinterpreter_openinterpreter">openinterpreter_openinterpreter</a></strong> — Open-source natural language code execution agent.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/bytedance_flow-builder">bytedance_flow-builder</a></strong> — Flow-based visual agent creation system.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/microsoft_RD-Agent">microsoft_RD-Agent</a></strong> — Autonomous R&amp;D agent for data science and ML research.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/stanford-oval_genie-worksheets">stanford-oval_genie-worksheets</a></strong> — Agent formal state-sheet specification engine.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/stanford-oval_Churro">stanford-oval_Churro</a></strong> — Agent dialogue state tracking engine.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/stablyai_orca">stablyai_orca</a></strong> — Multimodal agent workflow engine.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Dallionking_claude-orca-workflow">Dallionking_claude-orca-workflow</a></strong> — Claude + Orca agent workflow pipeline.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/zeroclaw-labs_zeroclaw">zeroclaw-labs_zeroclaw</a></strong> — Ultra-lightweight agent framework in Rust.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/zeroclaw-labs_zeroclaw-skills">zeroclaw-labs_zeroclaw-skills</a></strong> — Modular skill library for ZeroClaw agents.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/zeroclaw-labs_zeroclaw-plugins">zeroclaw-labs_zeroclaw-plugins</a></strong> — Extension plugins for ZeroClaw agent framework.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/zeroclaw-labs_crabfleet">zeroclaw-labs_crabfleet</a></strong> — Distributed fleet management for Rust AI agents.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/zeroclaw-labs_clawsweeper">zeroclaw-labs_clawsweeper</a></strong> — Security audit tool for agent action spaces.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/zeroclaw-labs_zeroclaw-paperclip-adapter">zeroclaw-labs_zeroclaw-paperclip-adapter</a></strong> — Paperclip adapter interface for ZeroClaw.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/zeroclaw-labs_claw-standards">zeroclaw-labs_claw-standards</a></strong> — Open agent specification and protocol standard.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/zeroclaw-labs_clawpatch">zeroclaw-labs_clawpatch</a></strong> — Hot-patching library for active agent runtimes.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/PleasePrompto_google-ai-mode-skill">PleasePrompto_google-ai-mode-skill</a></strong> — Agent skill module for Google AI models.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/InsForge_insforge-skills">InsForge_insforge-skills</a></strong> — Curated skills for InsForge agents.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Leonxlnx_taste-skill">Leonxlnx_taste-skill</a></strong> — Taste and preference skill module for agents.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/mvanhorn_last30days-skill">mvanhorn_last30days-skill</a></strong> — Recent trend retrieval skill for agent intelligence.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Dallionking_fable-prompting">Dallionking_fable-prompting</a></strong> — Fable narrative prompting library for agent planning.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Nutlope_hallmark">Nutlope_hallmark</a></strong> — AI hallmark detection and verification module.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/OhadAssulin_headless-coder-sdk">OhadAssulin_headless-coder-sdk</a></strong> — Headless SDK for automated coding agents.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/poe-platform_poe-code">poe-platform_poe-code</a></strong> — Poe API integration for developer agents.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/BoundaryML_baml">BoundaryML_baml</a></strong> — Structured output domain language and agent tool typing engine.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/goat-sdk_goat">goat-sdk_goat</a></strong> — Great Onchain Agent Toolkit for Web3/Blockchain agent tools.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/sigoden_aichat">sigoden_aichat</a></strong> — All-in-one CLI agent tool with multi-provider execution.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/off-grid-ai_console">off-grid-ai_console</a></strong> — Offline agent management console.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/zavora-ai_adk-rust">zavora-ai_adk-rust</a></strong> — Agent Development Kit in Rust.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/bradygaster_squad">bradygaster_squad</a></strong> — Multi-agent squad orchestration framework.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/obsei_obsei">obsei_obsei</a></strong> — Low-code AI observer and automated workflow engine.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/rohitg00_ai-engineering-from-scratch">rohitg00_ai-engineering-from-scratch</a></strong> — Core implementation of AI agents from first principles.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/featherless-ai_featherless-cookbook">featherless-ai_featherless-cookbook</a></strong> — Lightweight serverless LLM agent patterns.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/xai-org_xai-cookbook">xai-org_xai-cookbook</a></strong> — Grok/xAI tool calling and agent recipes.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/harveyai_teams-ai">harveyai_teams-ai</a></strong> — Collaborative agent team orchestration.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/openclaw_crabbox">openclaw_crabbox</a></strong> — Sandboxed execution environment for untrusted agent code.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/NVIDIA_OpenShell">NVIDIA_OpenShell</a></strong> — NVIDIA open agent shell execution container.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/cursor_cookbook">cursor_cookbook</a></strong> — Code agent prompt engineering and tool recipes.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/delibae_claude-prism">delibae_claude-prism</a></strong> — Visual prism interface for Claude agents.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/osisdie_claude-code-channels">osisdie_claude-code-channels</a></strong> — Channel multiplexing for Claude agent execution.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/HKUDS_DeepTutor">HKUDS_DeepTutor</a></strong> — Deep reasoning tutoring agent framework.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/unclecode_crawl4ai">unclecode_crawl4ai</a></strong> — Agentic crawler &amp; scraper framework.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/ScrapeGraphAI_Scrapegraph-ai">ScrapeGraphAI_Scrapegraph-ai</a></strong> — Agentic web scraping graph pipeline.</li>
+</ul>
+<hr />
+<h2 id="15-ml-training-frameworks">15. ML TRAINING FRAMEWORKS</h2>
+<p>Deep learning frameworks, training loops, gradient computation engines, and model training toolkits.</p>
+<ul>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/pytorch_pytorch">pytorch_pytorch</a></strong> — Tensors and Dynamic neural networks in Python with strong GPU acceleration.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Lightning-AI_pytorch-lightning">Lightning-AI_pytorch-lightning</a></strong> — Lightweight PyTorch wrapper for high-performance ML research.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/tinygrad_tinygrad">tinygrad_tinygrad</a></strong> — Extremely simple deep learning framework for training and inference.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/NVIDIA_JAX-Toolbox">NVIDIA_JAX-Toolbox</a></strong> — Accelerated containerized training tools for JAX on GPUs.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Tracel-AI_burn">Tracel-AI_burn</a></strong> — Flexible and ultra-fast Rust Deep Learning Framework.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/LaurentMazare_tch-rs">LaurentMazare_tch-rs</a></strong> — Rust bindings for C++ LibTorch.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/keras-team_keras">keras-team_keras</a></strong> — Multi-backend high-level neural networks API (JAX/PyTorch/TensorFlow).</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/deeplearning4j_deeplearning4j">deeplearning4j_deeplearning4j</a></strong> — Open-source, distributed deep learning framework for Java/Scala.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/pymc-devs_pymc">pymc-devs_pymc</a></strong> — Probabilistic programming framework in Python.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/pymc-devs_pytensor">pymc-devs_pytensor</a></strong> — Symbolic tensor computation engine for PyMC.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/hiyouga_LlamaFactory">hiyouga_LlamaFactory</a></strong> — Unified fine-tuning framework for 100+ LLMs.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/rust-ml_linfa">rust-ml_linfa</a></strong> — Comprehensive toolkit for classical Machine Learning in Rust.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Doriandarko_texts-to-transformer">Doriandarko_texts-to-transformer</a></strong> — Custom Transformer training script generator.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Angel-ML_angel">Angel-ML_angel</a></strong> — High-performance distributed machine learning platform.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/hallvardnmbu_neurons">hallvardnmbu_neurons</a></strong> — Minimalist neural network simulation library.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/huggingface_candle">huggingface_candle</a></strong> — Minimalist ML training and inference framework in Rust.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/facebookresearch_fastText">facebookresearch_fastText</a></strong> — Library for fast text representation and classification.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/facebookresearch_multicalibration_for_matching">facebookresearch_multicalibration_for_matching</a></strong> — Statistical multicalibration ML algorithms.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/AlexisLspk_neuronbox">AlexisLspk_neuronbox</a></strong> — Neural network architecture sandbox.</li>
+</ul>
+<hr />
+<h2 id="16-ml-inference-engines">16. ML INFERENCE ENGINES</h2>
+<p>Local LLM inference, ONNX runtimes, TVM compilers, quantization engines, and low-latency serving.</p>
+<ul>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/ggml-org_llama.cpp">ggml-org_llama.cpp</a></strong> — LLM inference in C/C++ with GGML quantization.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/microsoft_onnxruntime">microsoft_onnxruntime</a></strong> — Cross-platform, high performance ML inferencing engine.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/onnx_onnx">onnx_onnx</a></strong> — Open standard for machine learning interoperability.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_tvm">apache_tvm</a></strong> — End-to-end deep learning compiler stack for CPUs, GPUs, and accelerators.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/tracel-ai_burn-onnx">tracel-ai_burn-onnx</a></strong> — ONNX model compiler for the Burn runtime.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/lyogavin_airllm">lyogavin_airllm</a></strong> — 70B+ LLM inference on single 4GB consumer GPUs.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/lm-sys_FastChat">lm-sys_FastChat</a></strong> — Open platform for training, serving, and evaluating LLM chatbots.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Chen-zexi_vllm-cli">Chen-zexi_vllm-cli</a></strong> — CLI runner for high-throughput vLLM inference engine.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/deepsense-ai_edge-slm">deepsense-ai_edge-slm</a></strong> — Edge deployment framework for Small Language Models (SLMs).</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/a-ghorbani_pocketpal-ai">a-ghorbani_pocketpal-ai</a></strong> — On-device local AI inference engine for mobile.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/mudler_LocalAI">mudler_LocalAI</a></strong> — Self-hosted, drop-in REST API replacement for OpenAI.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/latitude-dev_latitude-llm">latitude-dev_latitude-llm</a></strong> — Production LLM deployment and inference gateway.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/onnx_models">onnx_models</a></strong> — Official open-source ONNX model zoo repository.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/OEvortex_llm4free">OEvortex_llm4free</a></strong> — Unified local inference provider router.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/graniet_llm">graniet_llm</a></strong> — Rust-native LLM inference binary.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/shubham0204_SmolChat-Android">shubham0204_SmolChat-Android</a></strong> — Local LLM inference engine running natively on Android.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Tako-Research_TakoVM">Tako-Research_TakoVM</a></strong> — Specialized virtual machine for tensor &amp; LLM inference workloads.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/allenai_olmocr">allenai_olmocr</a></strong> — Vision-based OCR inference model runner.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/facebookresearch_faiss">facebookresearch_faiss</a></strong> — Vector index inference engine.</li>
+</ul>
+<hr />
+<h2 id="17-gpu-kernel-systems">17. GPU KERNEL SYSTEMS</h2>
+<p>CUDA C/C++ libraries, WGPU/WGSL compilers, GPU memory kernel abstractions, and low-level compute kernels.</p>
+<ul>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/NVIDIA_cutlass">NVIDIA_cutlass</a></strong> — CUDA C++ template abstractions for high-performance matrix multiplication.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/tracel-ai_cubecl">tracel-ai_cubecl</a></strong> — Modern Rust multi-platform GPU kernel language (CUDA/ROCm/WebGPU).</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/tracel-ai_cubek">tracel-ai_cubek</a></strong> — High-level GPU kernel operator library.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/NVIDIA_NV-Kernels">NVIDIA_NV-Kernels</a></strong> — High-efficiency custom NVIDIA GPU compute kernels.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/NVIDIA_open-gpu-kernel-modules">NVIDIA_open-gpu-kernel-modules</a></strong> — Official Linux kernel GPU driver modules from NVIDIA.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/cupy_cupy">cupy_cupy</a></strong> — NumPy-compatible array library accelerated with CUDA.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/vickiegpt_nvidia_greenboost">vickiegpt_nvidia_greenboost</a></strong> — Energy-efficient GPU kernel optimization framework.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/cuga-project_cuga-agent">cuga-project_cuga-agent</a></strong> — CUDA GPU agent execution kernels.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/ggml-org_llama.cpp">ggml-org_llama.cpp</a></strong> — CUDA/ROCm GPU matrix multiplication kernels.</li>
+</ul>
+<hr />
+<h2 id="18-causal">18. CAUSAL</h2>
+<p>Causal inference, structural causal models (SCMs), causal discovery, and deep causal reasoning engines.</p>
+<ul>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/deepcausality_deep_causality">deepcausality_deep_causality</a></strong> — Hypergraph-based computational causal reasoning engine in Rust.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/imoscovitz_wittgenstein">imoscovitz_wittgenstein</a></strong> — Inductive rule learning and causal classification engine.</li>
+</ul>
+<hr />
+<h2 id="19-code-analysis-graph-based-ast-understanding">19. CODE ANALYSIS (Graph-Based &amp; AST Understanding)</h2>
+<p>AST parsers, compiler macro inspection, code structure understanding, symbol dependency graphs, and static analyzers.</p>
+<ul>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/tirth8205_code-review-graph">tirth8205_code-review-graph</a></strong> — Automated code dependency graph analyzer for PRs.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Egonex-AI_Understand-Anything">Egonex-AI_Understand-Anything</a></strong> — Structural AST &amp; semantics analyzer for polyglot codebases.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/yvgude_lean-ctx">yvgude_lean-ctx</a></strong> — Lean context extraction engine for LLM coding tasks.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/dtolnay_syn">dtolnay_syn</a></strong> — Nominal syntax tree parser for Rust code analysis.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/PyO3_pyo3">PyO3_pyo3</a></strong> — Foreign Function Interface AST bridge between Python and Rust.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/XAMPPRocky_tokei">XAMPPRocky_tokei</a></strong> — Ultra-fast code statistics and AST line counter.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/bergercookie_asm-lsp">bergercookie_asm-lsp</a></strong> — Language Server Protocol for x86/ARM Assembly language analysis.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/repowise-dev_repowise">repowise-dev_repowise</a></strong> — Repository code metrics and structural analysis engine.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/dtolnay_unicode-ident">dtolnay_unicode-ident</a></strong> — Unicode identifier syntax analyzer for compilers.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Peternator7_strum">Peternator7_strum</a></strong> — Enum AST macro analysis and generation for Rust.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/JelteF_derive_more">JelteF_derive_more</a></strong> — Proc-macro derive analysis library.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/bkchr_proc-macro-crate">bkchr_proc-macro-crate</a></strong> — Macro crate name resolution inside procedural macros.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/dtolnay_inventory">dtolnay_inventory</a></strong> — Typed plugin registration via static code inspection.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/dtolnay_linkme">dtolnay_linkme</a></strong> — Distributed slice linking for binary reflection.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/dtolnay_rustversion">dtolnay_rustversion</a></strong> — Compiler version conditional macro evaluator.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/gregorygaines_bitfields-rs">gregorygaines_bitfields-rs</a></strong> — Bitfield macro generation and layout validator.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/cuviper_autocfg">cuviper_autocfg</a></strong> — Build script probe for checking compiler capabilities.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/katharostech_cfg_aliases">katharostech_cfg_aliases</a></strong> — Short-hand conditional compilation alias engine.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/nvzqz_static-assertions-rs">nvzqz_static-assertions-rs</a></strong> — Compile-time assertions for type correctness.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/altsysrq_rusty-fork">altsysrq_rusty-fork</a></strong> — Subprocess test execution isolation engine.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/la10736_rstest">la10736_rstest</a></strong> — Fixture-based test generator for Rust AST.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/proptest-rs_proptest">proptest-rs_proptest</a></strong> — Property-based testing framework.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/rust-fuzz_arbitrary">rust-fuzz_arbitrary</a></strong> — Fuzz testing input generation for structured types.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/palfrey_serial_test">palfrey_serial_test</a></strong> — Serialized test execution attribute runner.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/hyhmrright_brooks-lint">hyhmrright_brooks-lint</a></strong> — Code quality static linter engine.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/rust-lang_rust-clippy">rust-lang_rust-clippy</a></strong> — Official static analysis linter for Rust codebase idiom safety.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/codecrafters-io_build-your-own-x">codecrafters-io_build-your-own-x</a></strong> — Step-by-step programming language &amp; engine implementation guides.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/facebook_astryx">facebook_astryx</a></strong> — AST manipulation and transform tool.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/facebookresearch_exca">facebookresearch_exca</a></strong> — Exact Code Analysis tool suite.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/x64dbg_x64dbg">x64dbg_x64dbg</a></strong> — Open-source x64/x32 binary disassembler &amp; debugger engine.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/filiksyos_gitreverse">filiksyos_gitreverse</a></strong> — Git commit history analysis and reverse engineering tool.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/pkivolowitz_asm_book">pkivolowitz_asm_book</a></strong> — Low-level x86_64 assembly analysis textbook code.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Dman95_SASM">Dman95_SASM</a></strong> — Simple Assembler IDE &amp; static analysis environment.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/milessabin_shapeless">milessabin_shapeless</a></strong> — Generic type-class and AST compile-time engine for Scala.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/diffplug_spotless">diffplug_spotless</a></strong> — Polyglot code formatting &amp; syntax enforcement build plugin.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/zkat_is_ci">zkat_is_ci</a></strong> — CI environment detection library for build scripts.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/raimannma_rust-optimizer">raimannma_rust-optimizer</a></strong> — Rust WebAssembly binary size and bytecode optimizer.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/jbaublitz_getset">jbaublitz_getset</a></strong> — Automatic struct getter/setter AST generation.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/danielhenrymantilla_lending-iterator">danielhenrymantilla_lending-iterator</a></strong> — Advanced lifetime lending iterator macro engine.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Graphify-Labs_graphify">Graphify-Labs_graphify</a></strong> — Codebase AST dependency graph analyzer.</li>
+</ul>
+<hr />
+<h2 id="20-crawling-scraping-data-collection-browser-automation">20. CRAWLING / SCRAPING (Data Collection &amp; Browser Automation)</h2>
+<p>Web crawlers, headless browser automation, anti-bot bypass frameworks, and web data extraction engines.</p>
+<ul>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/unclecode_crawl4ai">unclecode_crawl4ai</a></strong> — LLM-friendly web crawler &amp; scraper built for AI pipelines.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/ScrapeGraphAI_Scrapegraph-ai">ScrapeGraphAI_Scrapegraph-ai</a></strong> — Graph-based web scraping pipeline using LLMs.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/D4Vinci_Scrapling">D4Vinci_Scrapling</a></strong> — High-speed, undetectable web scraping &amp; parsing framework.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Mahanaicoach_google-maps-scraper-kit">Mahanaicoach_google-maps-scraper-kit</a></strong> — Specialized Google Maps data collection toolkit.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/oxylabs_how-to-scrape-google-scholar">oxylabs_how-to-scrape-google-scholar</a></strong> — Academic publication scraping pipeline.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/ythx-101_x-tweet-fetcher">ythx-101_x-tweet-fetcher</a></strong> — Automated social media data collection engine.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/saifyxpro_HeadlessX">saifyxpro_HeadlessX</a></strong> — High-concurrency headless browser proxy fleet.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/jo-inc_camofox-browser">jo-inc_camofox-browser</a></strong> — Anti-fingerprinting stealth scraping browser engine.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/cloakhq_cloakbrowser">cloakhq_cloakbrowser</a></strong> — Stealth browser automation for data collection.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/feder-cr_invisible_playwright">feder-cr_invisible_playwright</a></strong> — Undetectable Playwright extension for scraping.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/microsoft_playwright">microsoft_playwright</a></strong> — Node.js/Python library for reliable end-to-end browser automation.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/puppeteer_puppeteer">puppeteer_puppeteer</a></strong> — Headless Chrome Node.js API for crawling.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/SeleniumHQ_selenium">SeleniumHQ_selenium</a></strong> — Classic cross-browser automation framework.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/remorses_playwriter">remorses_playwriter</a></strong> — Extension for controlling Playwright via natural language.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Panniantong_Agent-Reach">Panniantong_Agent-Reach</a></strong> — Multi-channel web reachability &amp; scraping agent.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/browserless_browserless">browserless_browserless</a></strong> — Scalable headless Chrome service for web scraping.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/alibaba_page-agent">alibaba_page-agent</a></strong> — Autonomous in-browser DOM scraping agent.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/openkylin_beautifulsoup4">openkylin_beautifulsoup4</a></strong> — HTML/XML parser library for web scraping.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/appium_appium">appium_appium</a></strong> — Cross-platform mobile automation framework for scraping mobile apps.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/codeceptjs_CodeceptJS">codeceptjs_CodeceptJS</a></strong> — High-level browser interaction test &amp; crawling scenario engine.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Tallyb_cucumber-playwright">Tallyb_cucumber-playwright</a></strong> — BDD browser automation driver.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/projectdiscovery_nuclei">projectdiscovery_nuclei</a></strong> — Security crawling scanner engine.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/projects/evo-myworld/racetrack/scrapler-eval">racetrack/scrapler-eval</a></strong> <em>(Racetrack Eval)</em> — Standing benchmark harness for scraping speed and stealth.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/projects/evo-myworld/racetrack/scraper-search-lab">racetrack/scraper-search-lab</a></strong> <em>(Racetrack Eval)</em> — Standing benchmark harness for combined crawling + search pipelines.</li>
+</ul>
+<hr />
+<h2 id="21-observability-monitoring-tracing-apm">21. OBSERVABILITY (Monitoring, Tracing &amp; APM)</h2>
+<p>Application performance monitoring (APM), tracing systems, telemetry metrics, and agent activity loggers.</p>
+<ul>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_skywalking">apache_skywalking</a></strong> — Application Performance Monitor (APM) and observability mesh.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_hertzbeat">apache_hertzbeat</a></strong> — Real-time monitoring system with user-friendly alerting.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/netdata_netdata">netdata_netdata</a></strong> — Distributed real-time performance and health monitoring agent.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/netxms_netxms">netxms_netxms</a></strong> — Enterprise network and infrastructure monitoring system.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/comet-ml_opik">comet-ml_opik</a></strong> — Open-source LLM application evaluation, tracking, and observability.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/cursor_agent-trace">cursor_agent-trace</a></strong> — Execution step tracer and logger for AI agents.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Roy3838_Observer">Roy3838_Observer</a></strong> — Lightweight system resource monitoring daemon.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/CSIRT-MU_Stream4Flow">CSIRT-MU_Stream4Flow</a></strong> — Real-time IP flow monitoring and network traffic analysis.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/zeroclaw-labs_zeroclaw-metrics">zeroclaw-labs_zeroclaw-metrics</a></strong> — Telemetry exporter for ZeroClaw agents.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/PostHog_posthog">PostHog_posthog</a></strong> — Open-source product analytics, session recording, and feature flags platform.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/amir20_dtop">amir20_dtop</a></strong> — Terminal-based Docker container metric monitor.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/NVIDIA_SkillSpector">NVIDIA_SkillSpector</a></strong> — Skill execution profiling and observability inspector.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/deepsense-ai_seahorse">deepsense-ai_seahorse</a></strong> — Visual spark workflow monitoring and lineage inspector.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/koala73_worldmonitor">koala73_worldmonitor</a></strong> — System and network global state monitor.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/HalFrgrd_flyline">HalFrgrd_flyline</a></strong> — Real-time telemetry pipeline logger.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/aquasecurity_trivy">aquasecurity_trivy</a></strong> — Security vulnerability observability daemon.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/projects/evo-myworld/racetrack/watchdog-eval">racetrack/watchdog-eval</a></strong> <em>(Racetrack Eval)</em> — Standing benchmark harness for system monitoring &amp; alerting latency.</li>
+</ul>
+<hr />
+<h2 id="22-caching-lru-ttl-kv-cache-engines">22. CACHING (LRU, TTL &amp; KV Cache Engines)</h2>
+<p>In-memory caching algorithms, LRU/LFU cache implementations, KV eviction buffers, and LLM KV caches.</p>
+<ul>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/arthurprs_quick-cache">arthurprs_quick-cache</a></strong> — Ultra-fast lock-free LRU cache for Rust.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/moka-rs_mini-moka">moka-rs_mini-moka</a></strong> — Fast, concurrent, bounded in-memory cache inspired by Java Caffeine.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/behzadnouri_lazy-lru">behzadnouri_lazy-lru</a></strong> — Lazy evaluation LRU cache in JavaScript.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/jaemk_cached">jaemk_cached</a></strong> — Simple macro-based function caching for Rust.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/LMCache_LMCache">LMCache_LMCache</a></strong> — Context cache layer for long LLM prompt reuse.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/NVIDIA_nv-embedding-cache">NVIDIA_nv-embedding-cache</a></strong> — GPU-accelerated vector embedding cache.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/lance0_ttl">lance0_ttl</a></strong> — Time-To-Live expiration cache manager.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/gdt050579_filecache">gdt050579_filecache</a></strong> — High-throughput file-backed cache buffer.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/spotify_SPTPersistentCache">spotify_SPTPersistentCache</a></strong> — Objective-C persistent disk cache framework.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/david-soto-m_sliding_window_alt">david-soto-m_sliding_window_alt</a></strong> — Sliding window cache eviction algorithm.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/magiclen_sliding-window-counter">magiclen_sliding-window-counter</a></strong> — High-concurrency sliding window rate limiter cache.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/flo-l_rust-sliding_windows">flo-l_rust-sliding_windows</a></strong> — Sliding window cache iterator in Rust.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/greenhat616_bolt-load">greenhat616_bolt-load</a></strong> — Cache warming and load generator framework.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/pmcgleenon_heavykeeper-rs">pmcgleenon_heavykeeper-rs</a></strong> — HeavyKeeper top-k cache tracking algorithm in Rust.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/cloudflare_pingora">cloudflare_pingora</a></strong> — In-memory proxy caching engine.</li>
+</ul>
+<hr />
+<h2 id="23-serialization-protobuf-rpc-data-encoding">23. SERIALIZATION (Protobuf, RPC &amp; Data Encoding)</h2>
+<p>Binary formats, protocol buffers, IDL compilers, zero-copy serialization, and TOML/JSON parsers.</p>
+<ul>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_thrift">apache_thrift</a></strong> — Cross-language RPC and binary serialization framework.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_fory">apache_fory</a></strong> — Ultra-fast cross-language serialization framework.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Aleph-Alpha_ts-rs">Aleph-Alpha_ts-rs</a></strong> — Rust structure to TypeScript type serialization compiler.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/cool-japan_oxiarc">cool-japan_oxiarc</a></strong> — Pure Rust implementation of archive and decompression formats.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/toml-rs_toml">toml-rs_toml</a></strong> — Serde-based TOML serialization library for Rust.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/LukasKalbertodt_litrs">LukasKalbertodt_litrs</a></strong> — Literal parsing and string escaping library.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_incubator-seata">apache_incubator-seata</a></strong> — Distributed transaction data protocol serializer.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/transmute-app_transmute">transmute-app_transmute</a></strong> — Data format transmuter and schema converter.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/wooorm_mdxjs-rs">wooorm_mdxjs-rs</a></strong> — MDX AST serialization library in Rust.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/web-infra-dev_mdx-rs">web-infra-dev_mdx-rs</a></strong> — Fast MDX markup serializer compiler.</li>
+</ul>
+<hr />
+<h2 id="24-audio-voice-stt-tts-audio-processing">24. AUDIO / VOICE (STT, TTS &amp; Audio Processing)</h2>
+<p>Speech-to-text (STT), text-to-speech (TTS), audio streaming, DSP synthesis, and audio effect pipelines.</p>
+<ul>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/ufal_whisper_streaming">ufal_whisper_streaming</a></strong> — Real-time low-latency Whisper speech recognition streaming.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/ShayneP_local-voice-ai">ShayneP_local-voice-ai</a></strong> — Local offline voice interaction pipeline (STT + LLM + TTS).</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/microsoft_VibeVoice">microsoft_VibeVoice</a></strong> — Conversational zero-shot text-to-speech synthesis engine.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/PipeWire_pipewire">PipeWire_pipewire</a></strong> — Low-latency audio and video processing daemon.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/SamiPerttu_fundsp">SamiPerttu_fundsp</a></strong> — Audio DSP signal processing graph engine in Rust.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/spotify_pedalboard">spotify_pedalboard</a></strong> — Spotify's Python library for audio effects and DSP processing.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/klebz_surge-rs">klebz_surge-rs</a></strong> — Surge audio synthesizer DSP port in Rust.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/livekit_agents">livekit_agents</a></strong> — Multimodal voice agent framework.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/projects/evo-myworld/racetrack/video-eval">racetrack/video-eval</a></strong> <em>(Racetrack Eval)</em> — Standing benchmark harness for video and audio stream parsing.</li>
+</ul>
+<hr />
+<h2 id="25-ocr-document-parsing">25. OCR / DOCUMENT PARSING</h2>
+<p>Optical Character Recognition (OCR), layout understanding, PDF document parsing, and vision document models.</p>
+<ul>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/allenai_olmocr">allenai_olmocr</a></strong> — Toolkit for training and evaluating vision-based document OCR models.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/PaddlePaddle_PaddleOCR">PaddlePaddle_PaddleOCR</a></strong> — Ultra-lightweight OCR system supporting 80+ languages.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/opendatalab_MinerU">opendatalab_MinerU</a></strong> — High-precision PDF layout extraction and markdown converter.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/greatv_oar-ocr">greatv_oar-ocr</a></strong> — Optical character recognition pipeline wrapper.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/zibo-chen_rust-paddle-ocr">zibo-chen_rust-paddle-ocr</a></strong> — Rust bindings for PaddleOCR engine.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/tesseract-ocr_tesseract">tesseract-ocr_tesseract</a></strong> — World famous open-source OCR engine.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/ShayHill_docx2python">ShayHill_docx2python</a></strong> — Extract text, images, and tables from DOCX files into Python dicts.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/SheetJS_sheetjs">SheetJS_sheetjs</a></strong> — Spreadsheet (XLSX/CSV) data extraction &amp; parsing engine.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Automattic_harper">Automattic_harper</a></strong> — High-performance text grammar parser engine in Rust.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/facebookresearch_segment-anything">facebookresearch_segment-anything</a></strong> — SAM vision segmentation model for document region masking.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/roboflow_supervision">roboflow_supervision</a></strong> — Computer vision utilities for document region detection.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/strawlab_convert-image">strawlab_convert-image</a></strong> — High-speed image format transformation for document pipelines.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/projects/evo-myworld/racetrack/arxiv-eval">racetrack/arxiv-eval</a></strong> <em>(Racetrack Eval)</em> — Standing benchmark harness for LaTeX/PDF academic paper extraction.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/projects/evo-myworld/racetrack/substack-eval">racetrack/substack-eval</a></strong> <em>(Racetrack Eval)</em> — Standing benchmark harness for HTML newsletter &amp; document parsing.</li>
+</ul>
+<hr />
+<h2 id="26-auth-security">26. AUTH / SECURITY</h2>
+<p>Security scanners, fuzzers, input validation, encryption tools, access control, and vulnerability checkers.</p>
+<ul>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/FiloSottile_mkcert">FiloSottile_mkcert</a></strong> — Zero-config tool for making locally-trusted TLS development certificates.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/aquasecurity_trivy">aquasecurity_trivy</a></strong> — Comprehensive vulnerability and misconfiguration scanner for containers &amp; repos.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/pennersr_django-allauth">pennersr_django-allauth</a></strong> — Integrated set of Django apps for authentication &amp; social auth.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/projectdiscovery_nuclei">projectdiscovery_nuclei</a></strong> — Fast and customizable vulnerability scanner based on simple YAML DSL.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Gallopsled_pwntools">Gallopsled_pwntools</a></strong> — CTF framework and exploit development library in Python.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/OWASP_CheatSheetSeries">OWASP_CheatSheetSeries</a></strong> — Official OWASP Application Security Cheat Sheets.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_directory-fortress-commander">apache_directory-fortress-commander</a></strong> — Web interface for RBAC authorization &amp; identity management.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_infrastructure-otp">apache_infrastructure-otp</a></strong> — One-time password authentication server.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/fortra_impacket">fortra_impacket</a></strong> — Network protocol security testing suite.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/ErickShepherd_excubitor">ErickShepherd_excubitor</a></strong> — Security sentinel and execution sandbox validator.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/ErickShepherd_pydlock">ErickShepherd_pydlock</a></strong> — Cryptographic dependency locking engine.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/NVIDIA_NeMo-Guardrails">NVIDIA_NeMo-Guardrails</a></strong> — Toolkit for adding guardrails &amp; safety policies to LLMs.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/NVIDIA-NeMo_Guardrails">NVIDIA-NeMo_Guardrails</a></strong> — Secondary mirror of NeMo Guardrails safety framework.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/guardrails-ai_guardrails">guardrails-ai_guardrails</a></strong> — Framework for adding input/output validation &amp; security guards to LLM calls.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/data-privacy-stack_presidio">data-privacy-stack_presidio</a></strong> — Context aware PII anonymization &amp; privacy guard module.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/jumpserver_jumpserver">jumpserver_jumpserver</a></strong> — Open-source bastion host and PAM privileged access security system.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/bgreenwell_xleak">bgreenwell_xleak</a></strong> — Cross-origin side-channel vulnerability scanner.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/elder-plinius_G0DM0D3">elder-plinius_G0DM0D3</a></strong> — AI red-teaming and jailbreak evaluation suite.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/elder-plinius_GLOSSOPETRAE">elder-plinius_GLOSSOPETRAE</a></strong> — Red-teaming security payload generator.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/AFLplusplus_LibAFL">AFLplusplus_LibAFL</a></strong> — Advanced fuzzing framework built in Rust for security auditing.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/usestrix_strix">usestrix_strix</a></strong> — Open-source security analysis and vulnerability detection engine.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/00-team_shah">00-team_shah</a></strong> — Internal security exploit testing repository.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/ErickShepherd_shields">ErickShepherd_shields</a></strong> — Security policy enforcer daemon.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/StevenBlack_hosts">StevenBlack_hosts</a></strong> — Unified malware and ad-blocking security hosts file generator.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/hardikpandya_stop-slop">hardikpandya_stop-slop</a></strong> — AI content filter and safety guard extension.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/google_gvisor">google_gvisor</a></strong> — Container security sandbox boundaries.</li>
+</ul>
+<hr />
+<h2 id="27-developer-tools-cli-build-systems-utilities">27. DEVELOPER TOOLS (CLI, Build Systems &amp; Utilities)</h2>
+<p>Command-line utilities, build systems, package managers, terminal viewers, and shell automation tools.</p>
+<ul>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/BurntSushi_ripgrep">BurntSushi_ripgrep</a></strong> — Ultra-fast recursive line-oriented search tool.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Canop_broot">Canop_broot</a></strong> — Interactive tree view terminal directory navigator.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/sharkdp_bat">sharkdp_bat</a></strong> — A <code>cat</code> clone with syntax highlighting and Git integration.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/sxyazi_yazi">sxyazi_yazi</a></strong> — Blazing fast terminal file manager in Rust.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/yorukot_superfile">yorukot_superfile</a></strong> — Fancy and modern terminal file manager.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/clap-rs_clap">clap-rs_clap</a></strong> — Command Line Argument Parser for Rust.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/fastapi_typer">fastapi_typer</a></strong> — Python library for building CLI applications with type hints.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/pallets_click">pallets_click</a></strong> — Python composable command line interface toolkit.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/tj_commander.js">tj_commander.js</a></strong> — Complete solution for Node.js command-line interfaces.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/bashly-framework_bashly">bashly-framework_bashly</a></strong> — Bash script generator and CLI framework.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/rust-lang_cc-rs">rust-lang_cc-rs</a></strong> — Rust build script library for invoking C/C++ compilers.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/rust-lang_cmake-rs">rust-lang_cmake-rs</a></strong> — Rust build script library for driving CMake builds.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/pantsbuild_pants">pantsbuild_pants</a></strong> — Fast, scalable polyglot build system for Python/Java/Go/Rust.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_maven">apache_maven</a></strong> — Apache Maven build automation tool for Java.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/pnpm_pnpm">pnpm_pnpm</a></strong> — Fast, disk space efficient package manager for JavaScript.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/direnv_direnv">direnv_direnv</a></strong> — Shell extension that loads/unloads environment variables per directory.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/NixOS_nix">NixOS_nix</a></strong> — Purely functional package manager and build environment system.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/jetify-com__devbox">jetify-com__devbox</a></strong> — Instant, reproducible dev environments using Nix.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/google_zx">google_zx</a></strong> — Tool for writing shell scripts in JavaScript.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/jlevy_the-art-of-command-line">jlevy_the-art-of-command-line</a></strong> — Command line reference guide repository.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/onceupon_Bash-Oneliner">onceupon_Bash-Oneliner</a></strong> — Collection of bash one-liners for terminal productivity.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/trimstray_the-book-of-secret-knowledge">trimstray_the-book-of-secret-knowledge</a></strong> — CLI and sysadmin command handbook.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/InsForge_CLI">InsForge_CLI</a></strong> — Command line tool for InsForge development stack.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/ReviewStage_stage-cli">ReviewStage_stage-cli</a></strong> — CLI runner for preview stages.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/autohandai_code-cli">autohandai_code-cli</a></strong> — Autonomous CLI execution agent tool.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/iOfficeAI_OfficeCLI">iOfficeAI_OfficeCLI</a></strong> — CLI tool suite for AI office automation.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/iOfficeAI_OfficeCli">iOfficeAI_OfficeCli</a></strong> — Secondary mirror of OfficeCLI tool.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/forgejo-contrib_forgejo-cli">forgejo-contrib_forgejo-cli</a></strong> — CLI client for Forgejo git hosting platform.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/tracel-ai_tracel-cli">tracel-ai_tracel-cli</a></strong> — CLI tool for Tracel AI benchmark tooling.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/tracel-ai_xtask">tracel-ai_xtask</a></strong> — Cargo xtask build helper automation.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/dalance_procs">dalance_procs</a></strong> — Modern replacement for <code>ps</code> written in Rust.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/bootandy_dust">bootandy_dust</a></strong> — Intuitive disk usage analyzer (<code>du</code> alternative) in Rust.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/XAMPPRocky_tokei">XAMPPRocky_tokei</a></strong> — Fast line counter CLI tool.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/tldr-pages_tldr">tldr-pages_tldr</a></strong> — Collaborative simplified man pages.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/shshemi_tabiew">shshemi_tabiew</a></strong> — Terminal TUI viewer for CSV/TSV files.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/ynqa_jnv">ynqa_jnv</a></strong> — Interactive JSON filter and viewer CLI using jq syntax.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/ynqa_ynqa">ynqa_ynqa</a></strong> — Interactive TUI filter library.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/julien-cpsn_ATAC">julien-cpsn_ATAC</a></strong> — Terminal-based API client (Postman alternative in TUI).</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/pacak_bpaf">pacak_bpaf</a></strong> — Lightweight command line argument parser for Rust.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/harryfei_which-rs">harryfei_which-rs</a></strong> — Rust implementation of executable lookup utility <code>which</code>.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/bircni_get-size2">bircni_get-size2</a></strong> — In-memory struct size calculator in Rust.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/ardaku_whoami">ardaku_whoami</a></strong> — OS user and environment details retriever library.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/manishearth_elsa">manishearth_elsa</a></strong> — Append-only vector data structure for stable memory pointers.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/orlp_slotmap">orlp_slotmap</a></strong> — High-performance slot map data structure for Rust.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/tafia_nested">tafia_nested</a></strong> — Nested vector data structure helper.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/anderslanglands_ustr">anderslanglands_ustr</a></strong> — Fast string interning library for compilers.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/matklad_xshell">matklad_xshell</a></strong> — Ergonomic bash-like scripting utilities in Rust.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/rustyhorde_vergen">rustyhorde_vergen</a></strong> — Build script generator for embedding git/compiler status flags into binaries.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/mcgoo_vcpkg-rs">mcgoo_vcpkg-rs</a></strong> — Cargo build helper for finding C/C++ libraries installed via vcpkg.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/sbt_sbt">sbt_sbt</a></strong> — The interactive build tool for Scala.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/scala_scala">scala_scala</a></strong> — Scala 2 compiler and core standard library.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/scala_scala3">scala_scala3</a></strong> — Next-generation Scala 3 compiler and Dotty language system.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/ziglang_zig">ziglang_zig</a></strong> — General-purpose programming language and toolchain for robust software.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/bytecodealliance_rustix">bytecodealliance_rustix</a></strong> — Safe, efficient Rust bindings to POSIX/Linux syscalls.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/bytecodealliance_wasi-rs">bytecodealliance_wasi-rs</a></strong> — WebAssembly System Interface (WASI) API bindings.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/nvm-sh_nvm">nvm-sh_nvm</a></strong> — Node Version Manager for POSIX-compliant bash shells.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/oven-sh_bun">oven-sh_bun</a></strong> — Incredibly fast JavaScript all-in-one runtime, bundler, and package manager.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/cookiecutter_cookiecutter-django">cookiecutter_cookiecutter-django</a></strong> — Cookiecutter template for production-ready Django projects.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Raphire_Win11Debloat">Raphire_Win11Debloat</a></strong> — PowerShell script utility for Windows system customization.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/coreybutler_node-windows">coreybutler_node-windows</a></strong> — Run Node.js scripts as native Windows background services.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/dustinkirkland_byobu">dustinkirkland_byobu</a></strong> — Text-based window manager and terminal multiplexer.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/kovidgoyal_kitty">kovidgoyal_kitty</a></strong> — Fast, feature-rich GPU-accelerated terminal emulator.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/uxabix_FileTree">uxabix_FileTree</a></strong> — File system tree visualizer component.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/jtutor26_file-structure-generator">jtutor26_file-structure-generator</a></strong> — Project directory structure generator tool.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/architecture-decision-record_architecture-decision-record">architecture-decision-record_architecture-decision-record</a></strong> — Command line tool for ADR decision logging.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/LeCoupa_awesome-cheatsheets">LeCoupa_awesome-cheatsheets</a></strong> — Comprehensive cheatsheets for developer tools.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/practical-tutorials_project-based-learning">practical-tutorials_project-based-learning</a></strong> — Build-your-own software project tutorials repo.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/engineering-management_awesome-engineering-management">engineering-management_awesome-engineering-management</a></strong> — Engineering management frameworks and tools reference.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/goldbergyoni_nodebestpractices">goldbergyoni_nodebestpractices</a></strong> — Production Node.js best practices guide.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/sindresorhus_awesome-nodejs">sindresorhus_awesome-nodejs</a></strong> — Curated catalog of Node.js libraries.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/shadawck_awesome-cli-frameworks">shadawck_awesome-cli-frameworks</a></strong> — CLI construction frameworks directory.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/zeroclaw-labs_scoop-zeroclaw">zeroclaw-labs_scoop-zeroclaw</a></strong> — Scoop package installer manifest for ZeroClaw binaries.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/zeroclaw-labs_homebrew-tap">zeroclaw-labs_homebrew-tap</a></strong> — Homebrew tap installer formula for ZeroClaw.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/PowerShell_PowerShell">PowerShell_PowerShell</a></strong> — Cross-platform PowerShell automation and scripting engine.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/BurntSushi_walkdir">BurntSushi_walkdir</a></strong> — High-performance recursive directory iterator in Rust.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/rust-random_rand">rust-random_rand</a></strong> — Random number generators and sampling algorithms in Rust.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/fulmicoton_fastdivide">fulmicoton_fastdivide</a></strong> — Fast integer division by constants using multiplication tricks.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/dylni_os_str_bytes">dylni_os_str_bytes</a></strong> — Lossless conversions between OS strings and raw byte sequences.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_ossie">apache_ossie</a></strong> — Open source infrastructure management utilities.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/automazeio_ccpm">automazeio_ccpm</a></strong> — Codebase project management CLI tool.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/k1tbyte_Wand-Enhancer">k1tbyte_Wand-Enhancer</a></strong> — Developer productivity enhancer toolkit.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/kanaka_mal">kanaka_mal</a></strong> — Make a Lisp: step-by-step Lisp interpreter implementation in 80+ languages.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/tock_tock">tock_tock</a></strong> — Embedded operating system kernel for microcontrollers in Rust.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/farion1231_cc-switch">farion1231_cc-switch</a></strong> — Context switcher CLI utility.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/FiloSottile_mkcert">FiloSottile_mkcert</a></strong> — Dev SSL certificate CLI tool.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/jgm_pandoc">jgm_pandoc</a></strong> — CLI document compiler binary.</li>
+</ul>
+<hr />
+<h2 id="28-ui-component-libraries-core-frameworks">28. UI / COMPONENT LIBRARIES &amp; CORE FRAMEWORKS</h2>
+<p>Modern Web UI frameworks, core component primitives, unstyled UI suites, and design system foundations.</p>
+<ul>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/angular_angular">angular_angular</a></strong> — Modern Angular component-based web framework.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/sveltejs_svelte">sveltejs_svelte</a></strong> — Cybernetically enhanced web apps with compile-time UI rendering.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/solidjs_solid">solidjs_solid</a></strong> — Reactive, lightweight UI library for building web interfaces.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/twbs_bootstrap">twbs_bootstrap</a></strong> — Classic CSS layout and component toolkit.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/unovue_reka-ui">unovue_reka-ui</a></strong> — Unstyled, accessible UI primitive components for Vue/JavaScript.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/ibelick_ui-skills">ibelick_ui-skills</a></strong> — Crafted UI components and micro-animation primitives.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/knockout_knockout">knockout_knockout</a></strong> — MVVM web UI binding component framework.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/refinedev_refine">refinedev_refine</a></strong> — React framework for enterprise internal tools and CRUD UI components.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_wicket">apache_wicket</a></strong> — Component-oriented web application UI framework for Java.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/codemirror_dev">codemirror_dev</a></strong> — Code mirror web UI component.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/pmndrs_react-three-fiber">pmndrs_react-three-fiber</a></strong> — React 3D fiber UI component renderer.</li>
+</ul>
+<hr />
+<h2 id="29-financial-systems">29. FINANCIAL SYSTEMS</h2>
+<p>Algorithmic trading engines, financial modeling, cryptocurrency protocols, and DeFi platforms.</p>
+<ul>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/HKUDS_Vibe-Trading">HKUDS_Vibe-Trading</a></strong> — Multi-agent market simulation &amp; quantitative trading framework.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/TraderAlice_OpenAlice">TraderAlice_OpenAlice</a></strong> — Autonomous AI trading execution agent.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/bitcoin-s_bitcoin-s">bitcoin-s_bitcoin-s</a></strong> — Scala implementation of Bitcoin protocol &amp; cryptographic primitives.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/EverMind-AI_EverAlgo">EverMind-AI_EverAlgo</a></strong> — Algorithmic trading backtesting and execution engine.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/harry0703_MoneyPrinterTurbo">harry0703_MoneyPrinterTurbo</a></strong> — Automated short video content generation monetization tool.</li>
+</ul>
+<hr />
+<h2 id="30-networking">30. NETWORKING</h2>
+<p>Proxy servers, service mesh proxies, QUIC/UDP protocols, API gateways, and encrypted messaging.</p>
+<ul>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/cloudflare_pingora">cloudflare_pingora</a></strong> — Rust framework for building programmable network proxies.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/istio_istio">istio_istio</a></strong> — Open-source service mesh for managing microservice network traffic.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/cilium_cilium">cilium_cilium</a></strong> — eBPF-based networking, security, and observability for Kubernetes.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/nginx_nginx">nginx_nginx</a></strong> — High-performance HTTP server and reverse proxy.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_dubbo">apache_dubbo</a></strong> — High-performance RPC and microservice network communication.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_shenyu">apache_shenyu</a></strong> — Asynchronous Java microservices API gateway.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/mitmproxy_mitmproxy">mitmproxy_mitmproxy</a></strong> — Interactive HTTPS proxy tool for network inspection.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/quinn-rs_quinn">quinn-rs_quinn</a></strong> — Async QUIC protocol implementation in Rust.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/clash-verge-rev_clash-verge-rev">clash-verge-rev_clash-verge-rev</a></strong> — GUI client for Clash network proxy rule core.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/juanfont_headscale">juanfont_headscale</a></strong> — Open-source implementation of Tailscale control server.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/GyulyVGC_sniffnet">GyulyVGC_sniffnet</a></strong> — Cross-platform application to monitor network traffic.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/simplex-chat_simplex-chat">simplex-chat_simplex-chat</a></strong> — Privacy-first end-to-end encrypted messaging protocol without user IDs.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/quantumsheep_sshs">quantumsheep_sshs</a></strong> — Graphical terminal SSH server manager.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/lwthiker_curl-impersonate">lwthiker_curl-impersonate</a></strong> — Special build of curl that impersonates browser TLS/HTTP fingerprints.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/relumetech_Domain-Connect-Templates">relumetech_Domain-Connect-Templates</a></strong> — Domain Connect DNS template specification.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/octelium_octelium">octelium_octelium</a></strong> — Distributed peer-to-peer overlay network node.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/aksheyd_WhatsUp">aksheyd_WhatsUp</a></strong> — Real-time peer network ping status checker.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/iptv-org_iptv">iptv-org_iptv</a></strong> — Open collection of publicly available IPTV channels streams.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/spotify_mobius">spotify_mobius</a></strong> — Functional reactive network state management framework.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/spotify_SPTDataLoader">spotify_SPTDataLoader</a></strong> — Objective-C network HTTP data loading framework.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/diegosouzapw_OmniRoute">diegosouzapw_OmniRoute</a></strong> — Dynamic multipath network packet router.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/5c0_metropolis">5c0_metropolis</a></strong> — Peer-to-peer mesh node protocol implementation.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/ogulcancelik_herdr">ogulcancelik_herdr</a></strong> — Cluster discovery network daemon.</li>
+</ul>
+<hr />
+<h2 id="31-containerization-docker-k8s-isolation-runtimes">31. CONTAINERIZATION (Docker, K8s &amp; Isolation Runtimes)</h2>
+<p>Container runtimes, sandboxes, Kubernetes operators, self-hosted container platforms, and Android containerization.</p>
+<ul>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/google_gvisor">google_gvisor</a></strong> — Application kernel for container isolation providing secure sandbox boundaries.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/NVIDIA_nvidia-container-toolkit">NVIDIA_nvidia-container-toolkit</a></strong> — Build and run GPU-accelerated Docker containers.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/budtmo_docker-android">budtmo_docker-android</a></strong> — Android emulator in Docker with web UI &amp; no-VNC streaming.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/HQarroum_docker-android">HQarroum_docker-android</a></strong> — Secondary mirror of docker-android container environment.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/netbox-community_netbox-operator">netbox-community_netbox-operator</a></strong> — Kubernetes Operator for deploying NetBox on K8s clusters.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/coollabsio_coolify">coollabsio_coolify</a></strong> — Self-hosted Heroku/Netlify alternative for Docker &amp; Kubernetes.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/1Panel-dev_1Panel">1Panel-dev_1Panel</a></strong> — Modern open-source Docker container management panel.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/IceWhaleTech_CasaOS">IceWhaleTech_CasaOS</a></strong> — Simple, easy-to-use home server OS around Docker containers.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/stagex_stagex">stagex_stagex</a></strong> — Immutable Linux distribution built from scratch for reproducible container images.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/NVIDIA_infra-controller">NVIDIA_infra-controller</a></strong> — Kubernetes GPU infrastructure controller.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/alexei-led_pi-fusion">alexei-led_pi-fusion</a></strong> — Multi-arch container image builder for ARM/Raspberry Pi.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/floci-io_floci">floci-io_floci</a></strong> — Containerized cloud infrastructure emulator.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/vyuh-labs_create-devstack">vyuh-labs_create-devstack</a></strong> — Dev container stack bootstrapper.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/vyuh-labs_dxkit">vyuh-labs_dxkit</a></strong> — Docker-based developer experience toolkit.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/ventoy_Ventoy">ventoy_Ventoy</a></strong> — Bootable USB drive creator for ISO/WIM/IMG containerized operating system images.</li>
+</ul>
+<hr />
+<h2 id="32-document-pandoc-pdf-tools-publication-suites">32. DOCUMENT (Pandoc, PDF Tools &amp; Publication Suites)</h2>
+<p>Document convertors, PDF manipulation tools, academic paper generators, citation indexers, and publishing suites.</p>
+<ul>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/jgm_pandoc">jgm_pandoc</a></strong> — Universal document converter (Markdown, HTML, PDF, LaTeX, DOCX, EPUB).</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Stirling-Tools_Stirling-PDF">Stirling-Tools_Stirling-PDF</a></strong> — Robust local web-based PDF editing &amp; manipulation suite.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/harveyai_react-doc-viewer">harveyai_react-doc-viewer</a></strong> — Document viewing component for PDF/DOCX/XLSX.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apilayer_html2pdf.it">apilayer_html2pdf.it</a></strong> — HTML to PDF conversion microservice engine.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/bgreenwell_doxx">bgreenwell_doxx</a></strong> — Automated documentation generator.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/bgreenwell_lstr">bgreenwell_lstr</a></strong> — Structured document string layout engine.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/hmemcpy_milewski-ctfp-pdf">hmemcpy_milewski-ctfp-pdf</a></strong> — PDF publishing compilation pipeline.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/WUBING2023_PaperSpine">WUBING2023_PaperSpine</a></strong> — Academic paper structural spine extractor.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/dwzhu-pku_PaperBanana">dwzhu-pku_PaperBanana</a></strong> — Automated paper diagram &amp; layout publishing tool.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/PaperDebugger_paperdebugger">PaperDebugger_paperdebugger</a></strong> — Academic document LaTeX syntax debugger.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/JabRef_jabref">JabRef_jabref</a></strong> — Open-source graphical BibTeX reference &amp; document manager.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/ChenLiu-1996_CitationMap">ChenLiu-1996_CitationMap</a></strong> — Academic citation document mapping engine.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/suitenumerique_docs">suitenumerique_docs</a></strong> — Collaborative document editing suite.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/a1akris_page-turner">a1akris_page-turner</a></strong> — EPUB/PDF digital book reader engine.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/eudoxia0_hashcards">eudoxia0_hashcards</a></strong> — Markdown-based flashcard document system.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/jkudish_librarium">jkudish_librarium</a></strong> — Digital library and document management system.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/bugzmanov_bookokrat">bugzmanov_bookokrat</a></strong> — E-book parser and document indexer.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/karakeep-app_karakeep">karakeep-app_karakeep</a></strong> — Personal bookmark and document archiving suite.</li>
+</ul>
+<hr />
+<h2 id="33-ui-desktop-cross-platform-containers">33. UI / DESKTOP &amp; CROSS-PLATFORM CONTAINERS</h2>
+<p>Native desktop shell wrappers, Web View wrappers, Electron containers, and mobile cross-platform UI shells.</p>
+<ul>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/electron_electron">electron_electron</a></strong> — Build cross-platform desktop applications with JS/HTML/CSS.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/nwjs_nw.js">nwjs_nw.js</a></strong> — Direct Node.js call runtime inside DOM windows.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/tw93_Pake">tw93_Pake</a></strong> — Lightweight Tauri Rust desktop app packaging tool.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/nativefier_nativefier">nativefier_nativefier</a></strong> — Convert web apps instantly into desktop Electron apps.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/flutter_flutter">flutter_flutter</a></strong> — Google UI engine for compiling native mobile &amp; desktop screens.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/shubham0204_SmolChat-Android">shubham0204_SmolChat-Android</a></strong> — Native Android local AI UI wrapper.</li>
+</ul>
+<hr />
+<h2 id="34-ui-code-text-editors">34. UI / CODE &amp; TEXT EDITORS</h2>
+<p>Web-based code editors, rich-text WYSIWYG surfaces, AST viewports, and collaborative text editors.</p>
+<ul>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/codemirror_dev">codemirror_dev</a></strong> — Extensible code editor component for the web.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/harveyai_react-doc-viewer">harveyai_react-doc-viewer</a></strong> — Document viewing &amp; editing viewport component.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/suitenumerique_docs">suitenumerique_docs</a></strong> — Collaborative rich text document editor surface.</li>
+</ul>
+<hr />
+<h2 id="35-ui-3d-graphics-shaders-canvas">35. UI / 3D GRAPHICS, SHADERS &amp; CANVAS</h2>
+<p>Three.js React renderers, WebGL fluid shaders, generative canvas components, and animated background graphics.</p>
+<ul>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/pmndrs_react-three-fiber">pmndrs_react-three-fiber</a></strong> — React renderer for Three.js 3D web graphics.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/ruucm_shadergradient">ruucm_shadergradient</a></strong> — Animated WebGL fluid shader gradient component.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/collidingScopes_liquid-logo">collidingScopes_liquid-logo</a></strong> — Generative canvas and SVG liquid UI animation component.</li>
+</ul>
+<hr />
+<h2 id="36-ui-data-visualization-charts">36. UI / DATA VISUALIZATION &amp; CHARTS</h2>
+<p>Interactive charting engines, multi-dimensional graph renderers, 2D sprite generators, and plotting components.</p>
+<ul>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_echarts">apache_echarts</a></strong> — Enterprise interactive data visualization and charting engine.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/spotify_chartify">spotify_chartify</a></strong> — High-level plotting and chart generation component.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/NO6KIKO_gorest-2d-animation-spritesheet-generator">NO6KIKO_gorest-2d-animation-spritesheet-generator</a></strong> — 2D graphic animation sprite sheet generator UI.</li>
+</ul>
+<hr />
+<h2 id="37-ui-glassmorphism-styling-design-tokens">37. UI / GLASSMORPHISM, STYLING &amp; DESIGN TOKENS</h2>
+<p>Glassmorphism CSS visual effect primitives, design system tokens, vector design tools, and styling SDKs.</p>
+<ul>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/dashersw_liquid-glass-js">dashersw_liquid-glass-js</a></strong> — Glassmorphism visual distortion &amp; glass UI component.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/zanwei_design-dna">zanwei_design-dna</a></strong> — Design tokens and UI design DNA component library.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/nexu-io_open-design">nexu-io_open-design</a></strong> — Web vector design editor component.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/relumetech_webflowpy">relumetech_webflowpy</a></strong> — Webflow styling component SDK.</li>
+</ul>
+<hr />
+<h2 id="38-ui-terminal-tui-interfaces">38. UI / TERMINAL &amp; TUI INTERFACES</h2>
+<p>Console User Interfaces (TUI), terminal dashboards, interactive CLI viewports, and TUI widgets.</p>
+<ul>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/gyscos_Cursive">gyscos_Cursive</a></strong> — Rust terminal user interface (TUI) widget library.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/shshemi_tabiew">shshemi_tabiew</a></strong> — Terminal tabular data viewer TUI interface.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/ynqa_jnv">ynqa_jnv</a></strong> — Interactive JSON viewer and filter TUI.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/ynqa_ynqa">ynqa_ynqa</a></strong> — Interactive TUI filter selection component.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/julien-cpsn_ATAC">julien-cpsn_ATAC</a></strong> — Full API client interface running entirely in the terminal.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/amir20_dtop">amir20_dtop</a></strong> — Terminal container monitoring dashboard TUI.</li>
+</ul>
+<hr />
+<h2 id="39-ui-media-video-editors">39. UI / MEDIA &amp; VIDEO EDITORS</h2>
+<p>In-browser timeline video editors, video synthesis interfaces, and automated media generator frontends.</p>
+<ul>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/OpenCut-app_OpenCut">OpenCut-app_OpenCut</a></strong> — Open-source web video editing UI application.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/bradautomates_claude-video">bradautomates_claude-video</a></strong> — Automated video rendering frontend.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/harry0703_MoneyPrinterTurbo">harry0703_MoneyPrinterTurbo</a></strong> — Short-form video editing UI automation pipeline.</li>
+</ul>
+<hr />
+<h2 id="40-ui-page-builders-templates-flow-graphs">40. UI / PAGE BUILDERS, TEMPLATES &amp; FLOW GRAPHS</h2>
+<p>Drag-and-drop web page builders, static site generators, node graph flow builders, and website clones.</p>
+<ul>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/gatsbyjs_gatsby">gatsbyjs_gatsby</a></strong> — React static site generator framework.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/JCodesMore_ai-website-cloner-template">JCodesMore_ai-website-cloner-template</a></strong> — AI-generated website UI cloner template.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/CoreBunch_Instatic">CoreBunch_Instatic</a></strong> — Modern static page generator template.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/bytedance_flow-builder">bytedance_flow-builder</a></strong> — Flowchart and node-graph workflow builder UI component.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/FlowiseAI_Flowise">FlowiseAI_Flowise</a></strong> — Visual drag-and-drop flow interface for LLM pipelines.</li>
+</ul>
+<hr />
+<h2 id="41-ui-document-previewers-readers">41. UI / DOCUMENT PREVIEWERS &amp; READERS</h2>
+<p>PDF preview components, EPUB readers, digital card decks, and HTML-to-PDF rendering viewports.</p>
+<ul>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/a1akris_page-turner">a1akris_page-turner</a></strong> — EPUB and PDF digital reader UI interface.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/eudoxia0_hashcards">eudoxia0_hashcards</a></strong> — Flashcard document study surface.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Stirling-Tools_Stirling-PDF">Stirling-Tools_Stirling-PDF</a></strong> — Full-featured local PDF manipulation web UI.</li>
+</ul>
+<hr />
+<h2 id="42-ui-database-data-guis">42. UI / DATABASE &amp; DATA GUIS</h2>
+<p>Visual SQL query editors, admin dashboards, database client GUIs, and spreadsheet grid components.</p>
+<ul>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/OtterMind_Chat2DB">OtterMind_Chat2DB</a></strong> — Visual SQL client and AI database management frontend.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/nocodb_nocodb">nocodb_nocodb</a></strong> — Smart spreadsheet and relational database GUI surface.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/dbeaver_dbeaver">dbeaver_dbeaver</a></strong> — Universal desktop SQL GUI workspace.</li>
+</ul>
+<hr />
+<h2 id="43-ui-agent-llm-chat-surfaces">43. UI / AGENT &amp; LLM CHAT SURFACES</h2>
+<p>Conversational agent chat windows, multi-agent virtual office spaces, agent inspection prisms, and smart watch UIs.</p>
+<ul>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/delibae_claude-prism">delibae_claude-prism</a></strong> — Visual prism debug frontend for Claude AI.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/harishkotra_agent-office">harishkotra_agent-office</a></strong> — 2D simulated office environment for agent swarms.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/CoWork-OS_CoWork-OS">CoWork-OS_CoWork-OS</a></strong> — Visual multi-agent team workspace UI.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/off-grid-ai_console">off-grid-ai_console</a></strong> — Local agent management console UI.</li>
+<li><strong><a href="file:///wsl.localhost/Ubuntu/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/brianharms_reminder-watch">brianharms_reminder-watch</a></strong> — Smart watch UI app interface.</li>
+</ul>
+<hr />
+<h2 id="benchmark-racetrack-filing-execution-instructions">Benchmark Racetrack Filing &amp; Execution Instructions</h2>
+<p>To launch candidate implementations against each other in the Racetrack evaluation runner:</p>
+<ol>
+<li>Drop a race request in <code>racetrack/requests/&lt;slug&gt;.md</code> matching the spec format:
+   ```markdown
+   # race: <slug>
+   seat: <seat-name>
+   question: <what capability or UI element are we benchmarking?>
+   metric: min <seconds|fps|memory|render-latency>
+   gate: <correctness assertion test></li>
+</ol>
+<p>## candidate: <impl-1>
+   source: <repo-name>/<path>
+   approach: <brief description></p>
+<p>## candidate: <impl-2>
+   source: <repo-name>/<path>
+   approach: <brief description>
+   ```</p>
+<ol start="2">
+<li>Execute <code>./run-race.sh requests/&lt;slug&gt;.md</code> inside <code>~/coding/docker-envs/projects/evo-myworld/racetrack</code>.</li>
+<li>Results will auto-publish to <code>racetrack/results/&lt;slug&gt;.md</code> and candidate scores will graduate to the winner slot.</li>
+</ol>
+</body>
+</html>

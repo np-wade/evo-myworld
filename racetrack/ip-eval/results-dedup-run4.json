@@ -1,0 +1,53 @@
+{
+  "mode": "S7 v2: required merges (punct variant) AND forbidden merges (number/entity swaps) (gate: unique+swaps kept)",
+  "n_entries": 4,
+  "candidates_unavailable": [],
+  "leaderboard": [
+    {
+      "candidate": "naive-baseline",
+      "fails": 0,
+      "error": "",
+      "dedup_score": 0.6667,
+      "unique_and_swaps_kept": 1,
+      "punct_variant_merged": 0,
+      "latency_ms_p50": 0.0,
+      "latency_ms_p95": 0.0,
+      "deterministic": 1,
+      "gate": "PASS",
+      "score": 0.6667
+    },
+    {
+      "candidate": "graphify-dedup",
+      "fails": 1,
+      "error": "JSONDecodeError: Expecting value: line 1 column 2 (char 1)",
+      "gate": "FAIL",
+      "score": 0.0
+    },
+    {
+      "candidate": "ip-incumbent",
+      "fails": 0,
+      "error": "",
+      "dedup_score": 0.6667,
+      "unique_and_swaps_kept": 0,
+      "punct_variant_merged": 1,
+      "latency_ms_p50": 42.0,
+      "latency_ms_p95": 44.3,
+      "deterministic": 1,
+      "gate": "FAIL",
+      "score": 0.0
+    },
+    {
+      "candidate": "last30days-dedupe",
+      "fails": 0,
+      "error": "",
+      "dedup_score": 0.6667,
+      "unique_and_swaps_kept": 0,
+      "punct_variant_merged": 1,
+      "latency_ms_p50": 0.3,
+      "latency_ms_p95": 0.4,
+      "deterministic": 1,
+      "gate": "FAIL",
+      "score": 0.0
+    }
+  ]
+}

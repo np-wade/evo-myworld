@@ -1,0 +1,686 @@
+<title>Racetrack — Document-Processing App Test Suite</title>
+<style>
+  :root {
+    --bg: #e9edf1; --surface: #ffffff; --surface-2: #f3f6f9; --surface-3: #eaeef2;
+    --ink: #141b25; --ink-soft: #4c5867; --ink-faint: #7c8895;
+    --line: #d3dae2; --line-soft: #e2e7ed;
+    --accent: #a8620f; --accent-soft: #c8791a;
+    --win: #1c8f5a; --win-bg: #e2f2ea;
+    --lost: #b8483a; --lost-bg: #f6e6e3;
+    --defer: #5a6b7d; --defer-bg: #e9edf1;
+    --advisory: #9a6a12; --advisory-bg: #f4ecdc;
+    --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0c131c; --surface: #131c27; --surface-2: #17212d; --surface-3: #1c2733;
+      --ink: #e9eff5; --ink-soft: #9aa9b8; --ink-faint: #6a7887;
+      --line: #263340; --line-soft: #1f2a36;
+      --accent: #f0b545; --accent-soft: #e0a133;
+      --win: #46c489; --win-bg: #10241b;
+      --lost: #e8785f; --lost-bg: #27150f;
+      --defer: #8395a6; --defer-bg: #1a242f;
+      --advisory: #e0a94a; --advisory-bg: #241c0e;
+    }
+  }
+  :root[data-theme="light"] {
+    --bg: #e9edf1; --surface: #ffffff; --surface-2: #f3f6f9; --surface-3: #eaeef2;
+    --ink: #141b25; --ink-soft: #4c5867; --ink-faint: #7c8895;
+    --line: #d3dae2; --line-soft: #e2e7ed;
+    --accent: #a8620f; --accent-soft: #c8791a;
+    --win: #1c8f5a; --win-bg: #e2f2ea; --lost: #b8483a; --lost-bg: #f6e6e3;
+    --defer: #5a6b7d; --defer-bg: #e9edf1; --advisory: #9a6a12; --advisory-bg: #f4ecdc;
+  }
+  :root[data-theme="dark"] {
+    --bg: #0c131c; --surface: #131c27; --surface-2: #17212d; --surface-3: #1c2733;
+    --ink: #e9eff5; --ink-soft: #9aa9b8; --ink-faint: #6a7887;
+    --line: #263340; --line-soft: #1f2a36;
+    --accent: #f0b545; --accent-soft: #e0a133;
+    --win: #46c489; --win-bg: #10241b; --lost: #e8785f; --lost-bg: #27150f;
+    --defer: #8395a6; --defer-bg: #1a242f; --advisory: #e0a94a; --advisory-bg: #241c0e;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: var(--sans); line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 1060px; margin: 0 auto; padding: 0 22px 96px; }
+
+  /* ---- checkered motif ---- */
+  .checker {
+    height: 10px;
+    background-image:
+      linear-gradient(45deg, var(--ink) 25%, transparent 25%, transparent 75%, var(--ink) 75%),
+      linear-gradient(45deg, var(--ink) 25%, transparent 25%, transparent 75%, var(--ink) 75%);
+    background-size: 10px 10px;
+    background-position: 0 0, 5px 5px;
+    opacity: 0.10;
+  }
+
+  /* ---- header ---- */
+  header { padding: 46px 0 30px; }
+  .eyebrow {
+    font-family: var(--mono); font-size: 12px; letter-spacing: 0.22em;
+    text-transform: uppercase; color: var(--accent); font-weight: 600;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .eyebrow::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+  h1 {
+    font-family: var(--mono); font-weight: 700; letter-spacing: -0.01em;
+    font-size: clamp(30px, 5vw, 46px); line-height: 1.08; margin: 18px 0 14px;
+    text-wrap: balance;
+  }
+  .lede { font-size: 17px; color: var(--ink-soft); max-width: 64ch; margin: 0; }
+  .meta-row {
+    display: flex; flex-wrap: wrap; gap: 8px 20px; margin-top: 22px;
+    font-family: var(--mono); font-size: 12.5px; color: var(--ink-faint);
+  }
+  .meta-row b { color: var(--ink-soft); font-weight: 600; }
+
+  /* ---- standings ---- */
+  .section-label {
+    font-family: var(--mono); font-size: 12px; letter-spacing: 0.2em;
+    text-transform: uppercase; color: var(--ink-faint); font-weight: 600;
+    margin: 54px 0 16px; display: flex; align-items: center; gap: 12px;
+  }
+  .section-label::after { content: ""; flex: 1; height: 1px; background: var(--line-soft); }
+
+  .standings { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  @media (max-width: 780px) { .standings { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 460px) { .standings { grid-template-columns: 1fr; } }
+  .stand {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 10px; padding: 16px 16px 15px; position: relative; overflow: hidden;
+    text-decoration: none; color: inherit; display: block;
+    transition: border-color .15s ease, transform .15s ease;
+  }
+  .stand:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .stand::before {
+    content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+    background: var(--accent);
+  }
+  .stand .tno {
+    font-family: var(--mono); font-size: 11px; letter-spacing: 0.14em;
+    color: var(--accent); font-weight: 700; text-transform: uppercase;
+  }
+  .stand .tname { font-family: var(--mono); font-weight: 700; font-size: 17px; margin: 4px 0 3px; }
+  .stand .tsit { font-size: 12.5px; color: var(--ink-soft); line-height: 1.4; min-height: 34px; }
+  .stand .tmetric {
+    font-family: var(--mono); font-size: 12px; color: var(--ink-faint);
+    margin-top: 11px; padding-top: 10px; border-top: 1px solid var(--line-soft);
+    font-variant-numeric: tabular-nums;
+  }
+  .stand .tmetric b { color: var(--win); font-weight: 700; }
+
+  /* ---- methodology ---- */
+  .method {
+    background: var(--surface-2); border: 1px solid var(--line-soft);
+    border-radius: 12px; padding: 22px 24px; margin-top: 18px;
+  }
+  .method h3 { font-family: var(--mono); font-size: 14px; margin: 0 0 12px; letter-spacing: 0.02em; }
+  .method-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px 26px; }
+  @media (max-width: 720px) { .method-grid { grid-template-columns: 1fr; } }
+  .method-grid dt {
+    font-family: var(--mono); font-size: 12px; color: var(--accent);
+    font-weight: 600; letter-spacing: 0.04em; margin-bottom: 3px;
+  }
+  .method-grid dd { margin: 0; font-size: 13.5px; color: var(--ink-soft); }
+
+  /* ---- test section ---- */
+  .test { margin-top: 20px; }
+  .test-head {
+    display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap;
+    padding-bottom: 6px;
+  }
+  .test-head .badge {
+    font-family: var(--mono); font-weight: 700; font-size: 13px;
+    color: var(--surface); background: var(--accent); border-radius: 6px;
+    padding: 3px 9px; letter-spacing: 0.06em;
+  }
+  .test-head h2 { font-family: var(--mono); font-size: 24px; margin: 0; font-weight: 700; letter-spacing: -0.01em; }
+  .test-head .sit { font-size: 14px; color: var(--ink-faint); font-style: italic; }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 12px; padding: 22px 24px; margin-top: 14px;
+  }
+
+  .brief { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px 24px; }
+  @media (max-width: 720px) { .brief { grid-template-columns: 1fr; } }
+  .brief dt {
+    font-family: var(--mono); font-size: 11px; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--ink-faint); font-weight: 600; margin-bottom: 4px;
+  }
+  .brief dd { margin: 0; font-size: 14px; color: var(--ink); }
+  .brief dd .tag { color: var(--ink-soft); }
+  .prompt-line {
+    grid-column: 1 / -1; font-family: var(--mono); font-size: 13px;
+    background: var(--surface-2); border-left: 3px solid var(--accent);
+    padding: 11px 14px; border-radius: 0 6px 6px 0; color: var(--ink-soft);
+  }
+  .prompt-line b { color: var(--ink); font-weight: 600; }
+
+  /* ---- scorecard tiles ---- */
+  .scorecard-label {
+    font-family: var(--mono); font-size: 12px; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--ink-faint); font-weight: 600;
+    margin: 4px 0 12px; display: flex; align-items: center; gap: 10px;
+  }
+  .scorecard-label .pass {
+    color: var(--win); border: 1px solid var(--win); border-radius: 20px;
+    padding: 1px 9px; font-size: 11px; letter-spacing: 0.08em;
+  }
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(108px, 1fr)); gap: 10px; }
+  .tile {
+    background: var(--surface-2); border: 1px solid var(--line-soft);
+    border-radius: 9px; padding: 12px 13px;
+  }
+  .tile .v {
+    font-family: var(--mono); font-size: 21px; font-weight: 700; line-height: 1;
+    font-variant-numeric: tabular-nums; color: var(--ink);
+  }
+  .tile .v.good { color: var(--win); }
+  .tile .k {
+    font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.06em;
+    text-transform: uppercase; color: var(--ink-faint); margin-top: 6px;
+  }
+
+  /* ---- race tables ---- */
+  .stage-title {
+    font-family: var(--mono); font-size: 13.5px; font-weight: 700;
+    margin: 24px 0 3px; color: var(--ink);
+  }
+  .stage-title .n { color: var(--accent); }
+  .stage-note { font-size: 13px; color: var(--ink-soft); margin: 0 0 11px; }
+  .tbl-scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 9px; }
+  table { border-collapse: collapse; width: 100%; font-family: var(--mono); font-size: 12.5px; }
+  th {
+    text-align: left; font-weight: 600; color: var(--ink-faint);
+    font-size: 10.5px; letter-spacing: 0.07em; text-transform: uppercase;
+    padding: 9px 12px; background: var(--surface-2); border-bottom: 1px solid var(--line);
+    white-space: nowrap;
+  }
+  td {
+    padding: 9px 12px; border-bottom: 1px solid var(--line-soft);
+    font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--ink);
+  }
+  tr:last-child td { border-bottom: none; }
+  td.name { color: var(--ink); font-weight: 600; }
+  td.num { text-align: right; }
+  tr.win td { background: var(--win-bg); }
+  tr.win td.name { position: relative; }
+  tr.win td:first-child { box-shadow: inset 3px 0 0 var(--win); }
+  tr.lost td:first-child { box-shadow: inset 3px 0 0 var(--lost); }
+  tr.defer td { color: var(--ink-faint); }
+  tr.defer td:first-child { box-shadow: inset 3px 0 0 var(--defer); }
+  tr.defer td.name { color: var(--ink-soft); font-weight: 500; }
+
+  .pill {
+    display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 0.06em;
+    padding: 2px 7px; border-radius: 5px; text-transform: uppercase; white-space: nowrap;
+  }
+  .pill.won { color: var(--win); background: var(--win-bg); border: 1px solid var(--win); }
+  .pill.lost { color: var(--lost); background: var(--lost-bg); border: 1px solid var(--lost); }
+  .pill.defer { color: var(--defer); background: var(--defer-bg); border: 1px dashed var(--defer); }
+
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; margin: 4px 0 0; font-size: 12px; color: var(--ink-soft); }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; font-family: var(--mono); }
+  .swatch { width: 11px; height: 11px; border-radius: 3px; }
+
+  /* ---- files ---- */
+  details.files { margin-top: 18px; border-top: 1px solid var(--line-soft); padding-top: 6px; }
+  details.files summary {
+    font-family: var(--mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--ink-faint); font-weight: 600; cursor: pointer; padding: 8px 0; list-style: none;
+  }
+  details.files summary::-webkit-details-marker { display: none; }
+  details.files summary::before { content: "▸ "; color: var(--accent); }
+  details.files[open] summary::before { content: "▾ "; }
+  .paths { font-family: var(--mono); font-size: 12px; line-height: 1.9; color: var(--ink-soft); }
+  .paths .row { display: flex; gap: 12px; flex-wrap: wrap; }
+  .paths .lbl { color: var(--ink-faint); min-width: 96px; }
+  .paths code { color: var(--accent-soft); word-break: break-all; }
+
+  .insight {
+    font-size: 13.5px; color: var(--ink-soft); margin-top: 16px;
+    background: var(--surface-2); border-radius: 8px; padding: 12px 15px;
+    border-left: 3px solid var(--advisory);
+  }
+  .insight b { color: var(--ink); }
+
+  footer {
+    margin-top: 60px; padding-top: 22px; border-top: 1px solid var(--line);
+    font-family: var(--mono); font-size: 12px; color: var(--ink-faint); line-height: 1.8;
+  }
+  footer code { color: var(--accent-soft); }
+  a { color: var(--accent); }
+
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="checker"></div>
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">The Racetrack &middot; evo&nbsp;HQ</div>
+    <h1>Document-Processing App — Test Suite</h1>
+    <p class="lede">Four benchmarks that race real scraping &amp; processing tools head-to-head.
+      Each takes <b>one prompt</b> and returns <b>one report</b> using normal scraping only — then
+      scores the result against a privileged answer key the app itself is forbidden to touch.</p>
+    <div class="meta-row">
+      <div><b>Status</b> · 4/4 green</div>
+      <div><b>Built</b> · 2026-07-25 → 07-26</div>
+      <div><b>Host</b> · evo-myworld/racetrack</div>
+      <div><b>App path</b> · normal scraping only</div>
+    </div>
+  </header>
+
+  <div class="section-label">Standings</div>
+  <div class="standings">
+    <a class="stand" href="#t1">
+      <div class="tno">T1 · arXiv</div>
+      <div class="tname">Full-day pull</div>
+      <div class="tsit">Exhaustive discovery vs throttling; long-doc PDF parse</div>
+      <div class="tmetric">discovery F1 <b>0.900</b> · parse 5/5</div>
+    </a>
+    <a class="stand" href="#t2">
+      <div class="tno">T2 · Substack</div>
+      <div class="tname">Archive crawl</div>
+      <div class="tsit">Lazy-load pagination; paywall honesty; HTML→markdown</div>
+      <div class="tmetric">recall <b>1.000</b> · gate PASS</div>
+    </a>
+    <a class="stand" href="#t3">
+      <div class="tno">T3 · Video</div>
+      <div class="tname">Transcript + stealth</div>
+      <div class="tsit">Media→text ASR across YouTube, Twitch &amp; arbitrary sites</div>
+      <div class="tmetric">WER <b>0.031</b> · block 0.00</div>
+    </a>
+    <a class="stand" href="#t4">
+      <div class="tno">T4 · Watchdog</div>
+      <div class="tname">Change monitor</div>
+      <div class="tsit">Recurring diff; real change vs cosmetic churn</div>
+      <div class="tmetric">false-alarm <b>0.000</b></div>
+    </a>
+  </div>
+
+  <div class="section-label">How to read this</div>
+  <div class="method">
+    <h3>Every test shares one shape</h3>
+    <div class="method-grid">
+      <div>
+        <dt>Prompt → Report</dt>
+        <dd>One natural request in; a table of matches + saved files + a delivery manifest out.
+          The whole assembly line is raced stage by stage.</dd>
+      </div>
+      <div>
+        <dt>The oracle trick</dt>
+        <dd>A privileged truth channel (an API, RSS, creator captions, or a self-authored answer key)
+          grades the run — but the app is <em>forbidden</em> to use it. It must reach the data the
+          normal web way.</dd>
+      </div>
+      <div>
+        <dt>Two-track scoring</dt>
+        <dd>The <em>machinery</em> is hard-scored against gold — that's what the optimizer chases.
+          Judgment calls (picks, summaries) are advisory only, never in the leaderboard.</dd>
+      </div>
+    </div>
+    <div class="legend" style="margin-top:18px">
+      <span><span class="swatch" style="background:var(--win)"></span>WON — raced &amp; won its category</span>
+      <span><span class="swatch" style="background:var(--lost)"></span>LOST — ran but beaten</span>
+      <span><span class="swatch" style="background:var(--defer);border:1px dashed var(--defer)"></span>DEFERRED — eligible, not yet raced</span>
+    </div>
+  </div>
+
+  <!-- ============ T1 ARXIV ============ -->
+  <div class="section-label" id="t1">Test 1 — arXiv</div>
+  <div class="test">
+    <div class="test-head">
+      <span class="badge">T1</span>
+      <h2>Full-day arXiv pull</h2>
+      <span class="sit">"find everything, by scraping — then read the winners"</span>
+    </div>
+
+    <div class="card">
+      <dl class="brief">
+        <div class="prompt-line">
+          <b>Prompt:</b> List all arXiv papers published 2026-07-14; pick the 5 most beneficial to
+          building a local AI system; save the PDFs and deliver them.
+        </div>
+        <div>
+          <dt>What it proves</dt>
+          <dd>Can the app find an <span class="tag">entire day</span> of a throttled site completely,
+            then parse dense PDFs faithfully?</dd>
+        </div>
+        <div>
+          <dt>How it works</dt>
+          <dd>Scrape the month listing → binary-search down to the day → fetch PDFs → parse → report.</dd>
+        </div>
+        <div>
+          <dt>Oracle (grader-only)</dt>
+          <dd>arXiv API for the true listing; LaTeX e-print sources for per-paper gold.</dd>
+        </div>
+      </dl>
+
+      <div class="scorecard-label" style="margin-top:22px">End-to-end pipeline <span class="pass">verified</span></div>
+      <div class="tiles">
+        <div class="tile"><div class="v good">0.900</div><div class="k">discovery F1</div></div>
+        <div class="tile"><div class="v">0.926</div><div class="k">recall</div></div>
+        <div class="tile"><div class="v">0.991</div><div class="k">title acc</div></div>
+        <div class="tile"><div class="v good">5/5</div><div class="k">PDFs saved</div></div>
+        <div class="tile"><div class="v good">5/5</div><div class="k">parsed</div></div>
+        <div class="tile"><div class="v">34</div><div class="k">requests</div></div>
+        <div class="tile"><div class="v">55s</div><div class="k">wall</div></div>
+        <div class="tile"><div class="v">4/5</div><div class="k">pick-5 (adv)</div></div>
+      </div>
+
+      <div class="stage-title"><span class="n">Stage 1</span> · Discover — prompt to paper IDs</div>
+      <p class="stage-note">Which normal-scraping path pulls the complete day? Search engines collapsed; only listing-scrape found everything.</p>
+      <div class="tbl-scroll"><table>
+        <thead><tr><th>candidate</th><th>bracket</th><th class="num">recall</th><th class="num">prec</th><th class="num">F1</th><th class="num">found</th><th>status</th></tr></thead>
+        <tbody>
+          <tr class="win"><td class="name">list-month</td><td>listing</td><td class="num">1.000</td><td class="num">—</td><td class="num">—</td><td class="num">243</td><td><span class="pill won">Won</span></td></tr>
+          <tr class="lost"><td class="name">searxng</td><td>serp</td><td class="num">0.000</td><td class="num">0.000</td><td class="num">0.000</td><td class="num">11</td><td><span class="pill lost">Lost</span></td></tr>
+          <tr class="lost"><td class="name">ddg-serp</td><td>serp</td><td class="num">0.000</td><td class="num">0.000</td><td class="num">0.000</td><td class="num">3</td><td><span class="pill lost">Lost</span></td></tr>
+          <tr class="defer"><td class="name">google-serp</td><td>serp</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td><span class="pill defer">Deferred · risky-flag</span></td></tr>
+          <tr class="defer"><td class="name">bing-serp</td><td>serp</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td><span class="pill defer">Deferred · risky-flag</span></td></tr>
+          <tr class="defer"><td class="name">browser-search / HeadlessX</td><td>browser</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td><span class="pill defer">Deferred · unbuilt</span></td></tr>
+        </tbody>
+      </table></div>
+
+      <div class="stage-title"><span class="n">Stage 2</span> · Filter — narrow to the exact day</div>
+      <p class="stage-note">The new arXiv UI dropped per-day headings, so date set-ops can't fire. The winner exploits that arXiv IDs are submission-sequential.</p>
+      <div class="tbl-scroll"><table>
+        <thead><tr><th>candidate</th><th class="num">recall</th><th class="num">prec</th><th class="num">F1</th><th class="num">fetches</th><th>status</th></tr></thead>
+        <tbody>
+          <tr class="win"><td class="name">abs-bisect</td><td class="num">0.926</td><td class="num">0.876</td><td class="num">0.900</td><td class="num">22</td><td><span class="pill won">Won</span></td></tr>
+          <tr class="lost"><td class="name">passthrough</td><td class="num">1.000</td><td class="num">0.042</td><td class="num">0.080</td><td class="num">0</td><td><span class="pill lost">Lost</span></td></tr>
+          <tr class="lost"><td class="name">annc-d0 / d1 / d1d2</td><td class="num">1.000</td><td class="num">0.042</td><td class="num">0.080</td><td class="num">0</td><td><span class="pill lost">Lost · no day headings</span></td></tr>
+        </tbody>
+      </table></div>
+
+      <div class="stage-title"><span class="n">Stage 3</span> · Fetch — download abstract + PDF</div>
+      <p class="stage-note">All three fetch backends were flawless (5/5 byte-exact, zero blocks); the race was pure speed.</p>
+      <div class="tbl-scroll"><table>
+        <thead><tr><th>candidate</th><th class="num">abs ok</th><th class="num">pdf exact</th><th class="num">block</th><th class="num">p50 ms</th><th>status</th></tr></thead>
+        <tbody>
+          <tr class="win"><td class="name">scrapling</td><td class="num">1.00</td><td class="num">1.00</td><td class="num">0.00</td><td class="num">129</td><td><span class="pill won">Won · fastest</span></td></tr>
+          <tr class="lost"><td class="name">curl_cffi</td><td class="num">1.00</td><td class="num">1.00</td><td class="num">0.00</td><td class="num">142</td><td><span class="pill lost">Lost · tie on quality</span></td></tr>
+          <tr class="lost"><td class="name">urllib</td><td class="num">1.00</td><td class="num">1.00</td><td class="num">0.00</td><td class="num">246</td><td><span class="pill lost">Lost · slowest</span></td></tr>
+        </tbody>
+      </table></div>
+
+      <div class="stage-title"><span class="n">Stage 4</span> · Parse — PDF to clean text</div>
+      <p class="stage-note">Scored on section-heading recall vs the LaTeX gold. pymupdf ties on accuracy and wins on speed by 13×.</p>
+      <div class="tbl-scroll"><table>
+        <thead><tr><th>candidate</th><th class="num">heading recall</th><th class="num">p50 ms</th><th>status</th></tr></thead>
+        <tbody>
+          <tr class="win"><td class="name">pymupdf</td><td class="num">0.972</td><td class="num">46</td><td><span class="pill won">Won</span></td></tr>
+          <tr class="lost"><td class="name">pdfminer</td><td class="num">0.972</td><td class="num">623</td><td><span class="pill lost">Lost · 13× slower</span></td></tr>
+          <tr class="lost"><td class="name">pypdf</td><td class="num">0.931</td><td class="num">311</td><td><span class="pill lost">Lost</span></td></tr>
+          <tr class="defer"><td class="name">olmocr / MinerU / rust-paddle-ocr</td><td class="num">—</td><td class="num">—</td><td><span class="pill defer">Deferred · GPU/OCR tier</span></td></tr>
+        </tbody>
+      </table></div>
+
+      <div class="insight"><b>Headline:</b> the anti-bot wall this test was built around never appeared — arXiv served plain <code>urllib</code> as readily as the stealth fetchers. The real battles were <b>completeness</b> (pagination took recall 0.64 → 1.00) and <b>the day-boundary</b> (abs-bisect's F1 0.90 vs 0.08 for naive filtering).</div>
+
+      <details class="files"><summary>Files &amp; paths</summary>
+        <div class="paths">
+          <div class="row"><span class="lbl">package</span><code>arxiv-eval/arxiv_eval/*.py</code></div>
+          <div class="row"><span class="lbl">results</span><code>arxiv-eval/results-{run1,filter-run1,fetch-run1,parse-run1}.json</code>, <code>pipeline-run1.json</code></div>
+          <div class="row"><span class="lbl">deliverable</span><code>arxiv-eval/out/2026-07-14/{report.json,report.md,pdf/,md/}</code></div>
+          <div class="row"><span class="lbl">fixtures</span><code>arxiv-eval/fixtures/2026-07-14/ (243-paper gold + 18 pool, PDFs+LaTeX)</code></div>
+          <div class="row"><span class="lbl">handoff</span><code>arxiv-eval/HANDOFF.md</code></div>
+        </div>
+      </details>
+    </div>
+  </div>
+
+  <!-- ============ T2 SUBSTACK ============ -->
+  <div class="section-label" id="t2">Test 2 — Substack</div>
+  <div class="test">
+    <div class="test-head">
+      <span class="badge">T2</span>
+      <h2>Newsletter archive crawl</h2>
+      <span class="sit">"crawl a lazy-loaded archive — and never fake a paywalled post"</span>
+    </div>
+
+    <div class="card">
+      <dl class="brief">
+        <div class="prompt-line">
+          <b>Prompt:</b> Find every post from &lt;newsletter&gt;.substack.com in the last 60 days; save
+          the 10 most recent as clean markdown; deliver a table + files.
+        </div>
+        <div>
+          <dt>What it proves</dt>
+          <dd>Can the app crawl an <span class="tag">infinite-scroll archive</span> completely, convert
+            HTML to clean markdown, and stay <span class="tag">honest about paywalls</span>?</dd>
+        </div>
+        <div>
+          <dt>How it works</dt>
+          <dd>Discover via sitemap / archive HTML → filter to the date window → fetch → HTML-to-markdown → report.</dd>
+        </div>
+        <div>
+          <dt>Oracle (grader-only)</dt>
+          <dd>Substack RSS feed + the JSON archive API give the definitive post list &amp; paywall flags.</dd>
+        </div>
+      </dl>
+
+      <div class="scorecard-label" style="margin-top:22px">End-to-end pipeline · 3 newsletters <span class="pass">gate PASS</span></div>
+      <div class="tbl-scroll"><table>
+        <thead><tr><th>newsletter</th><th class="num">disc F1</th><th class="num">recall</th><th class="num">recent-10</th><th class="num">fidelity</th><th>paywall gate</th><th class="num">paid handling</th></tr></thead>
+        <tbody>
+          <tr><td class="name">thezvi</td><td class="num">1.000</td><td class="num">1.000</td><td class="num">10/10</td><td class="num">0.944</td><td><span class="pill won">Pass</span></td><td class="num">0 paid</td></tr>
+          <tr><td class="name">astralcodexten</td><td class="num">0.957</td><td class="num">1.000</td><td class="num">8/10</td><td class="num">0.975</td><td><span class="pill won">Pass</span></td><td class="num">5 → 1 sent</td></tr>
+          <tr><td class="name">noahpinion</td><td class="num">0.810</td><td class="num">1.000</td><td class="num">7/10</td><td class="num">0.973</td><td><span class="pill won">Pass</span></td><td class="num">10 → 2 sent</td></tr>
+        </tbody>
+      </table></div>
+      <p class="stage-note" style="margin-top:10px">Date / author / URL accuracy 1.000 across all three; 10 markdown files + sha256 manifest saved per newsletter.</p>
+
+      <div class="stage-title"><span class="n">Stage 1</span> · Discover — find the archive</div>
+      <p class="stage-note">This is the lazy-load test: the static archive page renders only its first ~12 posts. Sitemap sidesteps it entirely.</p>
+      <div class="tbl-scroll"><table>
+        <thead><tr><th>candidate</th><th>bracket</th><th class="num">recall</th><th class="num">prec</th><th class="num">F1</th><th class="num">p50 ms</th><th>status</th></tr></thead>
+        <tbody>
+          <tr class="win"><td class="name">sitemap</td><td>sitemap</td><td class="num">1.000</td><td class="num">0.874</td><td class="num">0.927</td><td class="num">100</td><td><span class="pill won">Won</span></td></tr>
+          <tr class="lost"><td class="name">archive-html</td><td>archive</td><td class="num">0.318</td><td class="num">0.972</td><td class="num">0.477</td><td class="num">118</td><td><span class="pill lost">Lost · lazy-load caps recall</span></td></tr>
+          <tr class="lost"><td class="name">ddg-serp</td><td>serp</td><td class="num">0.000</td><td class="num">0.000</td><td class="num">0.000</td><td class="num">652</td><td><span class="pill lost">Lost · no dates to filter</span></td></tr>
+          <tr class="defer"><td class="name">headless-scroll</td><td>browser</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td><span class="pill defer">Deferred · next candidate</span></td></tr>
+          <tr class="defer"><td class="name">bing-serp</td><td>serp</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td><span class="pill defer">Deferred · risky-flag</span></td></tr>
+        </tbody>
+      </table></div>
+
+      <div class="stage-title"><span class="n">Stage 2</span> · Extract — HTML to markdown</div>
+      <p class="stage-note">Scored on text fidelity vs the RSS full-content, over 51 posts.</p>
+      <div class="tbl-scroll"><table>
+        <thead><tr><th>candidate</th><th class="num">fidelity</th><th class="num">title acc</th><th class="num">p50 ms</th><th>status</th></tr></thead>
+        <tbody>
+          <tr class="win"><td class="name">trafilatura</td><td class="num">0.968</td><td class="num">0.980</td><td class="num">38</td><td><span class="pill won">Won</span></td></tr>
+          <tr class="lost"><td class="name">readability</td><td class="num">0.919</td><td class="num">0.902</td><td class="num">34</td><td><span class="pill lost">Lost</span></td></tr>
+          <tr class="lost"><td class="name">css-rules</td><td class="num">0.881</td><td class="num">0.980</td><td class="num">7</td><td><span class="pill lost">Lost · fast floor</span></td></tr>
+        </tbody>
+      </table></div>
+
+      <div class="stage-title"><span class="n">Stage 3</span> · Fetch — backend race</div>
+      <div class="tbl-scroll"><table>
+        <thead><tr><th>candidate</th><th class="num">post ok</th><th class="num">paywall detect</th><th class="num">block</th><th class="num">p50 ms</th><th>status</th></tr></thead>
+        <tbody>
+          <tr class="win"><td class="name">curl_cffi</td><td class="num">1.00</td><td class="num">1.00</td><td class="num">0.00</td><td class="num">113</td><td><span class="pill won">Won</span></td></tr>
+          <tr class="lost"><td class="name">scrapling</td><td class="num">1.00</td><td class="num">1.00</td><td class="num">0.00</td><td class="num">115</td><td><span class="pill lost">Lost · near tie</span></td></tr>
+          <tr class="lost"><td class="name">urllib</td><td class="num">1.00</td><td class="num">1.00</td><td class="num">0.00</td><td class="num">146</td><td><span class="pill lost">Lost</span></td></tr>
+        </tbody>
+      </table></div>
+
+      <div class="insight"><b>The gate that matters:</b> a paywalled post must be flagged <code>truncated</code>, never padded or fabricated. The selftest hard-fails both a faked-full-content and a padded delivery, and passes only honest truncation — so no candidate can win by inventing text it couldn't reach.</div>
+
+      <details class="files"><summary>Files &amp; paths</summary>
+        <div class="paths">
+          <div class="row"><span class="lbl">package</span><code>substack-eval/substack_eval/*.py</code></div>
+          <div class="row"><span class="lbl">results</span><code>substack-eval/results-{discover,extract,fetch}-run1.json</code>, <code>pipeline-run1.json</code></div>
+          <div class="row"><span class="lbl">deliverable</span><code>substack-eval/out/{thezvi,astralcodexten,noahpinion}/</code></div>
+          <div class="row"><span class="lbl">fixtures</span><code>substack-eval/fixtures/&lt;pub&gt;/ (gold.json + RSS + 30 post HTMLs each)</code></div>
+          <div class="row"><span class="lbl">handoff</span><code>substack-eval/HANDOFF.md</code></div>
+        </div>
+      </details>
+    </div>
+  </div>
+
+  <!-- ============ T3 VIDEO ============ -->
+  <div class="section-label" id="t3">Test 3 — Video</div>
+  <div class="test">
+    <div class="test-head">
+      <span class="badge">T3</span>
+      <h2>Video → transcript, under stealth</h2>
+      <span class="sit">"get through the door, then transcribe on a local box"</span>
+    </div>
+
+    <div class="card">
+      <dl class="brief">
+        <div class="prompt-line">
+          <b>Prompt:</b> Get me the transcript of &lt;media URL&gt;; produce a clean timestamped
+          transcript + a table of sections/topics; save transcript.md. &nbsp;— across YouTube, Twitch &amp; an arbitrary site.
+        </div>
+        <div>
+          <dt>What it proves</dt>
+          <dd>Can the app <span class="tag">reach media past bot-detection</span> and turn it into
+            text — ideally with a <span class="tag">local ASR model</span>, not a cloud API?</dd>
+        </div>
+        <div>
+          <dt>How it works</dt>
+          <dd>Resolve &amp; fetch media (stealth-raced) → transcribe (caption-scrape or local Whisper) → segment → report.</dd>
+        </div>
+        <div>
+          <dt>Oracle (grader-only)</dt>
+          <dd>Creator-uploaded captions / on-page transcripts are the gold; the app makes its own.</dd>
+        </div>
+      </dl>
+
+      <div class="scorecard-label" style="margin-top:22px">End-to-end pipeline · 1 YouTube source <span class="pass">verified</span></div>
+      <div class="tiles">
+        <div class="tile"><div class="v good">0.031</div><div class="k">WER</div></div>
+        <div class="tile"><div class="v">0.032</div><div class="k">CER</div></div>
+        <div class="tile"><div class="v good">0.0s</div><div class="k">time drift</div></div>
+        <div class="tile"><div class="v good">0.00</div><div class="k">block rate</div></div>
+        <div class="tile"><div class="v">8</div><div class="k">sections (adv)</div></div>
+        <div class="tile"><div class="v">3.7s</div><div class="k">wall</div></div>
+      </div>
+
+      <div class="stage-title"><span class="n">Stage 1</span> · Stealth — get the media without a block</div>
+      <p class="stage-note">The headline dimension. No bot wall tripped this session — every strategy resolved clean. Impersonation (TLS/JA3) edged out on speed.</p>
+      <div class="tbl-scroll"><table>
+        <thead><tr><th>strategy</th><th>source</th><th class="num">resolve</th><th class="num">block</th><th class="num">captions</th><th class="num">p50 ms</th><th>status</th></tr></thead>
+        <tbody>
+          <tr class="win"><td class="name">ytdlp-impersonate</td><td>youtube</td><td class="num">1.00</td><td class="num">0.00</td><td class="num">1.0</td><td class="num">1179</td><td><span class="pill won">Won · fastest</span></td></tr>
+          <tr class="lost"><td class="name">ytdlp-plain</td><td>youtube</td><td class="num">1.00</td><td class="num">0.00</td><td class="num">1.0</td><td class="num">1208</td><td><span class="pill lost">Lost</span></td></tr>
+          <tr class="lost"><td class="name">ytdlp-stealth-ua</td><td>youtube</td><td class="num">1.00</td><td class="num">0.00</td><td class="num">1.0</td><td class="num">1603</td><td><span class="pill lost">Lost · slowest</span></td></tr>
+          <tr><td class="name">ytdlp (all 3)</td><td>twitch</td><td class="num">1.00</td><td class="num">0.00</td><td class="num">0.0</td><td class="num">~1170</td><td><span class="pill won">Resolved · no captions → ASR</span></td></tr>
+          <tr class="win"><td class="name">curl_cffi-page</td><td>arbitrary</td><td class="num">1.00</td><td class="num">0.00</td><td class="num">—</td><td class="num">local</td><td><span class="pill won">Won · fits file source</span></td></tr>
+          <tr class="lost"><td class="name">ytdlp-*</td><td>arbitrary</td><td class="num">0.00</td><td class="num">0.00</td><td class="num">—</td><td class="num">~30</td><td><span class="pill lost">Lost · can't do file://</span></td></tr>
+        </tbody>
+      </table></div>
+
+      <div class="stage-title"><span class="n">Stage 2</span> · ASR — transcribe locally <span style="color:var(--ink-faint);font-weight:400">(offline, 5×120s clips)</span></div>
+      <p class="stage-note">The local-feasibility question: tiny matches base on accuracy at a quarter of the compute.</p>
+      <div class="tbl-scroll"><table>
+        <thead><tr><th>candidate</th><th class="num">WER</th><th class="num">CER</th><th class="num">drift s</th><th class="num">compute / min</th><th>status</th></tr></thead>
+        <tbody>
+          <tr class="win"><td class="name">faster-whisper-tiny</td><td class="num">0.051</td><td class="num">0.037</td><td class="num">0.38</td><td class="num">1.39 s</td><td><span class="pill won">Won · 4× cheaper</span></td></tr>
+          <tr class="lost"><td class="name">faster-whisper-base</td><td class="num">0.053</td><td class="num">0.037</td><td class="num">1.17</td><td class="num">5.67 s</td><td><span class="pill lost">Lost · no accuracy gain</span></td></tr>
+          <tr class="defer"><td class="name">whisper small / medium</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td><span class="pill defer">Deferred · GPU tier</span></td></tr>
+          <tr class="defer"><td class="name">whisper_streaming (corpus)</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td><span class="pill defer">Deferred</span></td></tr>
+        </tbody>
+      </table></div>
+
+      <div class="insight"><b>Live vs deferred:</b> the stealth race (3 sources), the ASR race, and one full YouTube pipeline all ran live. Twitch has no caption gold so it's scored on consistency + latency only; larger ASR models were cut for speed on this CPU box, not because they failed. <b>ffmpeg was absent</b> — worked around with PyAV.</div>
+
+      <details class="files"><summary>Files &amp; paths</summary>
+        <div class="paths">
+          <div class="row"><span class="lbl">package</span><code>video-eval/video_eval/*.py (14 modules)</code></div>
+          <div class="row"><span class="lbl">results</span><code>video-eval/results-stealth-run1.json</code>, <code>results-asr-run1.json</code>, <code>pipeline-run1.json</code></div>
+          <div class="row"><span class="lbl">deliverable</span><code>video-eval/out/youtube/UF8uR6Z6KLc/{transcript.md,report.json}</code></div>
+          <div class="row"><span class="lbl">fixtures</span><code>video-eval/fixtures/{youtube,twitch,arbitrary}/&lt;id&gt;/ (~19M, 5 clips)</code></div>
+          <div class="row"><span class="lbl">handoff</span><code>video-eval/HANDOFF.md</code></div>
+        </div>
+      </details>
+    </div>
+  </div>
+
+  <!-- ============ T4 WATCHDOG ============ -->
+  <div class="section-label" id="t4">Test 4 — Watchdog</div>
+  <div class="test">
+    <div class="test-head">
+      <span class="badge">T4</span>
+      <h2>Page-change watchdog</h2>
+      <span class="sit">"catch the real edit, shrug off the churn"</span>
+    </div>
+
+    <div class="card">
+      <dl class="brief">
+        <div class="prompt-line">
+          <b>Prompt:</b> Watch these 12 pages; each run, report what changed since last run — what's new,
+          what's gone, what moved.
+        </div>
+        <div>
+          <dt>What it proves</dt>
+          <dd>Can a <span class="tag">stateful</span> monitor tell a real change from cosmetic
+            <span class="tag">churn</span> — timestamps, rotating ads, reordered lists?</dd>
+        </div>
+        <div>
+          <dt>How it works</dt>
+          <dd>Snapshot &amp; normalize → diff (raced) → classify real-vs-churn → report. Run 1 sets the baseline; run 2 diffs it.</dd>
+        </div>
+        <div>
+          <dt>Oracle (self-authored)</dt>
+          <dd>We inject known changes + churn traps into v2; the injection manifest <em>is</em> the answer key. 100% offline.</dd>
+        </div>
+      </dl>
+
+      <div class="scorecard-label" style="margin-top:22px">End-to-end pipeline · 12 pages <span class="pass">verified</span></div>
+      <div class="tiles">
+        <div class="tile"><div class="v good">1.000</div><div class="k">change F1</div></div>
+        <div class="tile"><div class="v good">0.000</div><div class="k">false-alarm</div></div>
+        <div class="tile"><div class="v good">1.000</div><div class="k">localization</div></div>
+        <div class="tile"><div class="v good">10/10</div><div class="k">real caught</div></div>
+        <div class="tile"><div class="v">20</div><div class="k">churn suppressed</div></div>
+        <div class="tile"><div class="v">0.46ms</div><div class="k">per page</div></div>
+      </div>
+
+      <div class="stage-title"><span class="n">Diff race</span> · 10 real changes + 23 churn traps</div>
+      <p class="stage-note">Score = F1 × (1 − false-alarm-rate). Every differ catches the real changes; the separator is <em>which ones also fire on churn</em>, and whether they point at the exact element.</p>
+      <div class="tbl-scroll"><table>
+        <thead><tr><th>candidate</th><th class="num">score</th><th class="num">F1</th><th class="num">false-alarm</th><th class="num">localization</th><th>status</th></tr></thead>
+        <tbody>
+          <tr class="win"><td class="name">dom-diff</td><td class="num">1.000</td><td class="num">1.000</td><td class="num">0.000</td><td class="num">1.000</td><td><span class="pill won">Won</span></td></tr>
+          <tr class="lost"><td class="name">css-scope</td><td class="num">1.000</td><td class="num">1.000</td><td class="num">0.000</td><td class="num">0.000</td><td><span class="pill lost">Lost · no localization</span></td></tr>
+          <tr class="lost"><td class="name">line-diff</td><td class="num">1.000</td><td class="num">1.000</td><td class="num">0.000</td><td class="num">0.000</td><td><span class="pill lost">Lost · no localization</span></td></tr>
+          <tr class="lost"><td class="name">soup-diff</td><td class="num">0.783</td><td class="num">1.000</td><td class="num">0.217</td><td class="num">1.000</td><td><span class="pill lost">Lost · churn leaks in</span></td></tr>
+          <tr class="lost"><td class="name">content-hash</td><td class="num">0.000</td><td class="num">0.000</td><td class="num">0.348</td><td class="num">0.000</td><td><span class="pill lost">Lost · trips on any byte</span></td></tr>
+          <tr class="defer"><td class="name">css-selector per-site config</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td><span class="pill defer">Deferred · next</span></td></tr>
+        </tbody>
+      </table></div>
+
+      <div class="insight"><b>The toy-vs-tool gap, on purpose:</b> content-hash — the naive "did the page change?" approach — fires on 8 of 23 churn traps and catches zero real changes usefully. dom-diff suppresses all 23 while pointing at the exact element. Three combos already hit the ceiling of this fixture set, so the next move is a harder set that breaks them apart.</div>
+
+      <details class="files"><summary>Files &amp; paths</summary>
+        <div class="paths">
+          <div class="row"><span class="lbl">package</span><code>watchdog-eval/watchdog_eval/*.py</code></div>
+          <div class="row"><span class="lbl">results</span><code>watchdog-eval/results-diff-run1.json</code>, <code>pipeline-run1.json</code></div>
+          <div class="row"><span class="lbl">deliverable</span><code>watchdog-eval/out/set1/{report.json,report.md,changes.json,state/}</code></div>
+          <div class="row"><span class="lbl">fixtures</span><code>watchdog-eval/fixtures/set1/{v1,v2,manifest.json} (12 page pairs)</code></div>
+          <div class="row"><span class="lbl">handoff</span><code>watchdog-eval/HANDOFF.md</code></div>
+        </div>
+      </details>
+    </div>
+  </div>
+
+  <div class="checker" style="margin-top:56px"></div>
+  <footer>
+    <div>All four suites live under <code>~/coding/docker-envs/projects/evo-myworld/racetrack/</code></div>
+    <div>evo-HQ visibility · <code>racetrack/results/INDEX.md</code> + one <code>&lt;suite&gt;-suite.md</code> card each (lab-loop + dashboard readable)</div>
+    <div>Design docs · <code>racetrack/scraper-search-lab/test-suite-plan.md</code> · Factory · <code>/bench-factory</code></div>
+    <div style="margin-top:8px;color:var(--ink-soft)">Winner chain per suite graduates into the app; the DEFERRED field is the optimizer's first search frontier.</div>
+  </footer>
+
+</div>

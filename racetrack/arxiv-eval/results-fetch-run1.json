@@ -1,0 +1,45 @@
+{
+  "date": "2026-07-14",
+  "sample_ids": [
+    "2607.13093",
+    "2607.12550",
+    "2607.12792",
+    "2607.13115",
+    "2607.12599"
+  ],
+  "leaderboard": [
+    {
+      "backend": "scrapling",
+      "papers": 5,
+      "abs_ok": 1.0,
+      "pdf_valid": 1.0,
+      "pdf_exact": 1.0,
+      "block_rate": 0.0,
+      "p50_ms": 129.4,
+      "p95_ms": 450.1,
+      "error": ""
+    },
+    {
+      "backend": "curl_cffi",
+      "papers": 5,
+      "abs_ok": 1.0,
+      "pdf_valid": 1.0,
+      "pdf_exact": 1.0,
+      "block_rate": 0.0,
+      "p50_ms": 141.6,
+      "p95_ms": 416.6,
+      "error": ""
+    },
+    {
+      "backend": "urllib",
+      "papers": 5,
+      "abs_ok": 1.0,
+      "pdf_valid": 1.0,
+      "pdf_exact": 1.0,
+      "block_rate": 0.0,
+      "p50_ms": 245.9,
+      "p95_ms": 804.7,
+      "error": ""
+    }
+  ]
+}

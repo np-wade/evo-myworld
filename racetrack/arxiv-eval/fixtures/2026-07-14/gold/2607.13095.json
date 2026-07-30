@@ -1,0 +1,61 @@
+{
+  "id": "2607.13095",
+  "title": "Full-Pipeline Inference Optimization for MiMo-V2.5 Series: Pushing Hybrid SWA Efficiency to the Limit",
+  "authors": [
+    " Xiaomi MiMo Team",
+    "Anqi Liu",
+    "Aoxin Ma",
+    "Bo Chen",
+    "Bo Yang",
+    "Chen Wang",
+    "Chen Zhang",
+    "Chengda Tang",
+    "Chengwei Wang",
+    "Chiheng Lou",
+    "Depeng Yan",
+    "Fuli Luo",
+    "Gang Wang",
+    "Hailin Zhang",
+    "Jiale Sun",
+    "Kang Zhou",
+    "Rui Huang",
+    "Shaohui Liu",
+    "Shen Huang",
+    "Shijie Cao",
+    "Shuaishuai Fan",
+    "Tianling Zhou",
+    "Xiangwei Deng",
+    "Xueyang Xie",
+    "Xuli Wang",
+    "Yingchun Lai",
+    "Yu Yang",
+    "Yuan Zhang",
+    "Zhen Tang",
+    "Zhonghua Deng",
+    "Zihan Jiang"
+  ],
+  "published": "2026-07-14T03:38:06Z",
+  "primary_category": "cs.AR",
+  "categories": [
+    "cs.AR",
+    "cs.AI"
+  ],
+  "abstract": "We present a full-pipeline inference optimization for the MiMo-V2.5 model family, which combines Hybrid Sliding Window Attention (Hybrid SWA), sparse Mixture-of-Experts (MoE), and multimodal encoders. While Hybrid SWA can ideally reduce both attention compute and KVCache storage significantly compared to Full Attention, realizing these gains in production requires substantial engineering effort. We systematically optimize the KVCache system with layerwise prefetch, SWA-aware prefix cache trees, and specialized placement strategies, achieving strict $O(W)$ SWA storage and high cache hit rates. We further build GCache, a high-performance distributed cache infrastructure with RDMA-optimized networking, and develop a KVCache-affinity router to reduce computation while preserving load balancing. We also optimize for multimodal inputs, including GPU image preprocessing, parallel video decoding, and multimodal cache sharing. Together, these optimizations constitute the first large-scale LLM serving system in production that efficiently covers the Hybrid SWA + MoE + multimodal composite architecture.",
+  "gold_from_latex": {
+    "section_headings": [
+      "Contributions and Acknowledgments",
+      "Scheduling Optimization",
+      "Prefill Optimization",
+      "Multimodal Inference Optimization",
+      "KVCache System Refactor",
+      "Introduction",
+      "Decode Optimization",
+      "Afterword",
+      "Background"
+    ],
+    "n_sections": 9,
+    "n_equations": 1,
+    "n_tables": 2,
+    "has_source": true
+  }
+}

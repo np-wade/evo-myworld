@@ -1295,6 +1295,13 @@ def create_app(root: Path | None = None) -> Flask:
             "top": top,
         })
 
+    @app.get("/api/racetrack")
+    def api_racetrack():
+        """Scraper/search benchmark suite (racetrack/) surfaced natively:
+        suite cards + each package's results-*.json leaderboards. Read-only."""
+        from .racetrack import build_racetrack
+        return jsonify(build_racetrack(_root()))
+
     # ---- Assembly Office bridge (Test Lab) -------------------------------
     # Same-origin proxy so the Test Lab page can drive the Assembly Office
     # factory (127.0.0.1:4173) without CORS. Allowlisted paths only; the

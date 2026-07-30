@@ -1,0 +1,18 @@
+{
+  "set": "set1",
+  "normalizer": "strip",
+  "sha256": {
+    "blog": "0a1d6efae2d82642391582530ab103b98e9393e04bdd3520fe805567f34ba9fb",
+    "changelog": "0d1f8e60408fae112ae737868fdb0278a204fc66ab8993fc3d013d3aa6370cec",
+    "docs": "32070f1a6e31ec2b9750fe4c7cbef741792e0578c86aa62ff4faeb54dc4df93b",
+    "faq": "9ba11b70f3c4a942c4769b3574d5863f48b5608db1fcc2dff813a4020cdbd3b8",
+    "jobs": "fdb8cce6e310f8d6aa6cffddc6b5adf761dcd3fae74642b9a67d7c5e039290eb",
+    "landing": "63325d8cb45ff51bbb2b1abae61a8e3e7008c374daedac95bbb9896fb3c7d577",
+    "news": "0a0edb0238a8a21b9e06f0b9dac9e8310a858b6da11b7eb51085ce2a86b44a8d",
+    "pricing": "cd7cc4a3e32f85f5bfc61c84d18134d280dcc8ea990941e8177c22b80051d871",
+    "products": "222f77b6b1d1a9b74a95e394cb0888c974b10298cc97c36d623aabdbf932d391",
+    "status": "4a9f4731eb1ddbb4157306048528645fe0f924a1947a34f3bef12dbf1fff5ec2",
+    "team": "d7f0e401445ec078381cfd73c96ee66edaceb9ae6cea2170be51a386626f8b53",
+    "terms": "a970a56c2fbad88190e0bed02100f91f4a715413314b0c9b34b706768df097f9"
+  }
+}

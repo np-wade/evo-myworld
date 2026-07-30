@@ -1,0 +1,55 @@
+{
+  "mode": "A10: live HTTP probes \u2014 404s, malformed JSON 4xx, type errors, 60MB oversize, CORS, error leakage (gate: malformed => 4xx)",
+  "n_entries": 3,
+  "candidates_unavailable": [],
+  "leaderboard": [
+    {
+      "candidate": "ip-incumbent",
+      "fails": 0,
+      "error": "",
+      "api_pass": 5,
+      "api_total": 8,
+      "pass_rate": 0.625,
+      "chk_root_200": 1,
+      "chk_unknown_route_404": 0,
+      "chk_malformed_json_4xx": 1,
+      "chk_wrong_types_no_500": 0,
+      "chk_oversize_rejected": 0,
+      "chk_error_no_leak": 1,
+      "chk_deep_link_200": 1,
+      "chk_cors_restrictive": 1,
+      "latency_ms_p50": 11.8,
+      "latency_ms_p95": 11.8,
+      "deterministic": -1,
+      "gate": "PASS",
+      "score": 0.625
+    },
+    {
+      "candidate": "fastapi-naive",
+      "fails": 0,
+      "error": "",
+      "api_pass": 5,
+      "api_total": 7,
+      "pass_rate": 0.7143,
+      "chk_root_200": 1,
+      "chk_unknown_route_404": 1,
+      "chk_malformed_json_4xx": 0,
+      "chk_wrong_types_no_500": 1,
+      "chk_oversize_rejected": 0,
+      "chk_error_no_leak": 1,
+      "chk_cors_restrictive": 1,
+      "latency_ms_p50": 7.0,
+      "latency_ms_p95": 7.0,
+      "deterministic": -1,
+      "gate": "FAIL",
+      "score": 0.0
+    },
+    {
+      "candidate": "hayhooks-api",
+      "fails": 1,
+      "error": "RuntimeError: hayhooks-api did not come up on 8973",
+      "gate": "FAIL",
+      "score": 0.0
+    }
+  ]
+}

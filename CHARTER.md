@@ -4,6 +4,11 @@
 `evo-hq/evo`, supercharged by all lab AIs together. Nicholas (np-wade)
 owns direction; Claude orchestrates; every AI builds.
 
+**Current project objective:** follow `GRAPHIFY-FIRST-HANDOFF.md`. Graphify
+discovers multiple source-backed candidate paths; Evo tests and selects them;
+promoted results and losing evidence feed the graph-guided next cycle. Do not
+build major functionality before completing the Graphify lookup and comparison.
+
 ## The two-repo rule
 
 - `projects/evo-hq` — **clean upstream clone. Never experiment here.**
@@ -107,3 +112,12 @@ into your notes. "It should work" doesn't count; "here's what it printed"
 does. Use your own basic environment (cursor/gemini/codex lanes have
 python + the repos at /workspace) — install a small dep in-container if
 needed.
+
+## Development program
+
+`DEVELOPMENT-ROADMAP.md` is the implementation source of truth for evolving
+code, harnesses, agent instructions, guidelines, guardrails, apps,
+environments, backend processing, and knowledge. It defines high-throughput UI
+interaction simulation tiers and makes Graphify plus the experiment/application
+databases the evidence backbone for retrieval, selection, diagnosis, and
+learning across cycles.

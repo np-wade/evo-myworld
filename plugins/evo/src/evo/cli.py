@@ -1934,6 +1934,52 @@ def _finalize_result(root: Path, exp_id: str, node: dict, score: float | None, s
     atomic_write_json(experiment_result_path(root, exp_id), payload)
 
 
+def _judge_brief_for(root: Path, exp_id: str, node: dict) -> str | None:
+    """Best context for judging a committed diff: the owning mission's brief if
+    this experiment owns one, else the node's own hypothesis."""
+    try:
+        from . import missions
+        for mission in missions.list_missions(root):
+            if mission.get("owner_exp_id") == exp_id and (mission.get("brief") or "").strip():
+                return str(mission["brief"])
+    except Exception:  # noqa: BLE001
+        pass
+    hyp = node.get("hypothesis")
+    return str(hyp) if hyp else None
+
+
+def _maybe_judge_commit(
+    root: Path, exp_id: str, node: dict, config: dict, attempt: int
+) -> dict | None:
+    """Optionally LLM-as-judge the committed diff. Opt-in via
+    ``EVO_JUDGE_ON_COMMIT`` or ``config['judge_on_commit']`` set to a preset
+    name (e.g. ``minimal_change`` / ``diff_matches_brief``). Best-effort: any
+    failure returns None and never blocks the commit. Returns the judge dict."""
+    preset = (
+        os.environ.get("EVO_JUDGE_ON_COMMIT")
+        or (config.get("judge_on_commit") if isinstance(config, dict) else None)
+        or ""
+    ).strip()
+    if not preset or attempt <= 0:
+        return None
+    try:
+        from . import judges
+        from .core import experiments_path
+        patch = experiments_path(root) / exp_id / "attempts" / f"{attempt:03d}" / "diff.patch"
+        if not patch.exists():
+            return None
+        diff_text = patch.read_text(encoding="utf-8")
+        if not diff_text.strip():
+            return None
+        brief = _judge_brief_for(root, exp_id, node)
+        result = judges.g_eval_preset(diff_text, preset=preset, context=brief)
+        print(f"JUDGE {exp_id} {result.name}={result.value:.3f}")
+        return result.to_dict()
+    except Exception as exc:  # noqa: BLE001
+        print(f"NOTE: on-commit judge skipped for {exp_id}: {exc}", file=sys.stderr)
+        return None
+
+
 def _safe_artifact_name(label: str, source: Path) -> str:
     cleaned = re.sub(r"[^A-Za-z0-9._-]+", "-", label.strip()).strip("-._")
     if not cleaned:
@@ -3440,6 +3486,10 @@ def _cmd_run_impl(
                     run_id = meta.get("active", "run_0000")
                     _anchor_commit_ref(root, run_id, args.exp_id, commit)
 
+            # Run the optional LLM-as-judge on the diff BEFORE taking the graph
+            # lock, so a (slow) model call never widens the lock window.
+            judge_result = _maybe_judge_commit(root, args.exp_id, node, config, attempt_n)
+
             def _mark_committed(current_node: dict, _graph: dict) -> None:
                 current_node["status"] = "committed"
                 current_node["score"] = score
@@ -3447,11 +3497,16 @@ def _cmd_run_impl(
                 current_node["benchmark_result"] = parsed
                 current_node["gate_result"] = gate_passed
                 current_node["gate_failures"] = gate_failures
+                if judge_result is not None:
+                    current_node["judge"] = judge_result
 
             update_node(root, args.exp_id, _mark_committed)
             if config.get("comparison_blocked") and node["parent"] == "root":
                 mark_comparison_blocked(root, False)
-            _finalize_result(root, args.exp_id, node, score, "committed", {"commit": commit})
+            _finalize_result(
+                root, args.exp_id, node, score, "committed",
+                {"commit": commit, **({"judge": judge_result} if judge_result else {})},
+            )
             _write_attempt_state(
                 root, args.exp_id, attempt_n,
                 phase="complete", status="committed", started_at=started_at,
@@ -6102,6 +6157,195 @@ def cmd_direct_status(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_mission(args: argparse.Namespace) -> int:
+    """Operate the durable mission DAG that guides recursive agent work."""
+    from . import missions
+
+    root = repo_root()
+    _require_workspace(root)
+    action = args.mission_action
+    if action in {"create", "expand"}:
+        record = missions.create_mission(
+            root,
+            title=args.title,
+            kind=args.kind,
+            brief=args.brief,
+            parent_id=args.parent,
+            depends_on=list(args.depends_on or []),
+            acceptance=list(args.acceptance or []),
+            max_depth=args.max_depth,
+            max_children=args.max_children,
+        )
+        print(json.dumps(record, indent=2))
+        return 0
+    if action == "list":
+        print(json.dumps(missions.list_missions(root, status=args.status), indent=2))
+        return 0
+    if action == "claim":
+        print(json.dumps(missions.claim_mission(root, args.mission_id, owner_exp_id=args.owner_exp), indent=2))
+        return 0
+    if action == "complete":
+        print(json.dumps(missions.finish_mission(root, args.mission_id, status=args.status, summary=args.summary), indent=2))
+        return 0
+    if action == "cancel":
+        print(json.dumps({"cancelled": missions.cancel_mission(root, args.mission_id, cascade=not args.no_cascade)}, indent=2))
+        return 0
+    if action == "evidence":
+        print(json.dumps(missions.add_evidence(root, args.mission_id, uri=args.uri, sha256=args.sha256, summary=args.summary), indent=2))
+        return 0
+    raise RuntimeError(f"unknown mission action: {action}")
+
+
+def cmd_agent(args: argparse.Namespace) -> int:
+    """Stable CLI control surface over existing dispatch and directive state.
+
+    This intentionally delegates to the canonical handlers: dispatch remains
+    the sole owner of jobs, and inject queues remain the sole owner of agent
+    messages/receipts.  It is therefore safe to use from scripts and agents
+    without introducing a second scheduler.
+    """
+    action = args.agent_action
+    if action == "start":
+        return cmd_dispatch(argparse.Namespace(
+            dispatch_action="run", parent=args.parent, message=args.message,
+            budget=args.budget, explore_context=args.explore_context,
+            refresh_explorer=args.refresh_explorer, background=args.background,
+        ))
+    if action == "list":
+        return cmd_dispatch(argparse.Namespace(dispatch_action="list", running=args.running, recent=args.recent))
+    if action == "status":
+        return cmd_dispatch(argparse.Namespace(dispatch_action="status", job_id=args.job_id))
+    if action == "wait":
+        return cmd_dispatch(argparse.Namespace(dispatch_action="wait", job_ids=args.job_ids, quiet=args.quiet))
+    if action == "stop":
+        return cmd_dispatch(argparse.Namespace(dispatch_action="kill", job_id=args.job_id))
+    if action == "steer":
+        parts = ([args.exp_id] if args.exp_id else []) + list(args.text)
+        return cmd_direct(argparse.Namespace(args=parts, wait=args.wait, wait_timeout=args.wait_timeout))
+    if action == "receipt":
+        return cmd_ack(argparse.Namespace(event_id=args.event_id))
+    if action == "message-status":
+        return cmd_direct_status(argparse.Namespace(event_id=args.event_id))
+    if action == "watch":
+        return cmd_wait(argparse.Namespace(
+            wait_for=args.wait_for, timeout=args.timeout,
+            stall_threshold=args.stall_threshold, poll_interval=args.poll_interval,
+            count=args.count, json_out=args.json_out,
+        ))
+    raise RuntimeError(f"unknown agent action: {action}")
+
+
+def cmd_judge(args: argparse.Namespace) -> int:
+    """Score an output against a rubric with an LLM-as-judge (G-Eval).
+
+    Reads the output to evaluate from --output, --output-file, or stdin, scores
+    it with a named --preset or an explicit --task/--criteria rubric, and prints
+    the JudgeResult as JSON (value normalized to [0, 1]).
+    """
+    from . import judges
+
+    if args.list_presets:
+        print(json.dumps(
+            {name: {"task_introduction": p.task_introduction,
+                    "evaluation_criteria": p.evaluation_criteria}
+             for name, p in sorted(judges.GEVAL_PRESETS.items())},
+            indent=2,
+        ))
+        return 0
+
+    if args.output is not None:
+        output = args.output
+    elif args.output_file:
+        output = Path(args.output_file).read_text(encoding="utf-8")
+    else:
+        output = sys.stdin.read()
+    if not output.strip():
+        raise RuntimeError("no output to judge (pass --output, --output-file, or pipe via stdin)")
+
+    context = Path(args.context_file).read_text(encoding="utf-8") if args.context_file else args.context
+
+    if args.preset:
+        result = judges.g_eval_preset(
+            output, preset=args.preset, context=context, input=args.input,
+            model=args.model, timeout=args.timeout,
+        )
+    else:
+        if not (args.task and args.criteria):
+            raise RuntimeError("provide --preset, or both --task and --criteria")
+        result = judges.g_eval(
+            output, task_introduction=args.task, evaluation_criteria=args.criteria,
+            context=context, input=args.input, name=args.name,
+            scale_max=args.scale_max, model=args.model, timeout=args.timeout,
+        )
+    print(json.dumps(result.to_dict(), indent=2))
+    return 0
+
+
+def cmd_tune(args: argparse.Namespace) -> int:
+    """Search a parameter space against the benchmark (Bayesian/random).
+
+    The benchmark receives each trial's params via EVO_PARAMS (JSON) and
+    EVO_PARAMS_FILE; its score is read the same way `evo run` reads it.
+    """
+    from . import tuning
+
+    root = repo_root()
+    config, _ = _require_workspace(root)
+    benchmark = args.benchmark or config.get("benchmark")
+    if not benchmark:
+        raise RuntimeError("no benchmark: pass --benchmark or set one at `evo init`")
+    metric = args.metric or str(config.get("metric", "max"))
+
+    space_raw = json.loads(Path(args.params).read_text(encoding="utf-8"))
+    space = tuning.parse_param_space(space_raw)
+
+    if args.out:
+        out_dir = Path(args.out)
+    else:
+        out_dir = workspace_path(root) / "tuning" / utc_now().replace(":", "").replace("-", "")
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    evaluator = tuning.make_benchmark_evaluator(
+        benchmark, cwd=root, timeout=args.timeout, params_dir=out_dir,
+    )
+
+    def _progress(trial: tuning.Trial) -> None:
+        mark = f"{trial.score:.4f}" if trial.ok and trial.score is not None else f"FAIL ({trial.error[:60]})"
+        print(f"  trial {trial.number}: {mark}  {json.dumps(trial.params)}", file=sys.stderr)
+
+    result = tuning.run_tuning(
+        space, evaluator, metric=metric, n_trials=args.trials,
+        sampler=args.sampler, seed=args.seed, on_trial=_progress,
+    )
+
+    (out_dir / "result.json").write_text(json.dumps(result.to_dict(), indent=2), encoding="utf-8")
+    with (out_dir / "trials.jsonl").open("w", encoding="utf-8") as fh:
+        for trial in result.trials:
+            fh.write(json.dumps(trial.to_dict()) + "\n")
+
+    print(json.dumps({
+        "metric": result.metric,
+        "sampler": result.sampler,
+        "best_score": result.best_score,
+        "best_params": result.best_params,
+        "completed_trials": sum(1 for t in result.trials if t.ok),
+        "n_trials": result.n_trials,
+        "out_dir": str(out_dir),
+    }, indent=2))
+    return 0
+
+
+def cmd_graph(args: argparse.Namespace) -> int:
+    """Graphify<->Evo bridge: retrieval, candidate contract, and evidence write-back.
+
+    All subactions are handled in ``evo.graph.commands`` so the (large) graph
+    surface stays out of this module.  Retrieval is read-only over the immutable
+    library index; write-back lives in the workspace's own evidence.db.
+    """
+    from .graph import commands
+    return commands.dispatch(args)
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="evo")
     # Format includes the distribution name so skill checks can distinguish
@@ -6875,6 +7119,222 @@ def build_parser() -> argparse.ArgumentParser:
     dispatch_kill_p = dispatch_sub.add_parser("kill", help="SIGTERM a running job")
     dispatch_kill_p.add_argument("job_id")
     dispatch_kill_p.set_defaults(func=cmd_dispatch)
+
+    mission_p = sub.add_parser(
+        "mission",
+        help="durable recursive mission DAG (intent/dependencies, separate from Git lineage)",
+    )
+    mission_sub = mission_p.add_subparsers(dest="mission_action", required=True)
+
+    def add_mission_shape(parser_: argparse.ArgumentParser, *, needs_parent: bool = False) -> None:
+        parser_.add_argument("--title", required=True, help="short durable mission title")
+        parser_.add_argument("--kind", required=True, choices=sorted(("research", "build", "verify", "integrate")))
+        parser_.add_argument("--brief", required=True, help="bounded agent objective")
+        parser_.add_argument("--parent", required=needs_parent, help="parent mission id for recursive expansion")
+        parser_.add_argument("--depends-on", action="append", default=[], help="mission id that must succeed first (repeatable)")
+        parser_.add_argument("--acceptance", action="append", default=[], help="explicit acceptance condition (repeatable)")
+        parser_.add_argument("--max-depth", type=int, default=4, help="maximum recursive depth from root (default 4)")
+        parser_.add_argument("--max-children", type=int, default=8, help="maximum children per mission (default 8)")
+
+    mission_create_p = mission_sub.add_parser("create", help="create a root or nested mission")
+    add_mission_shape(mission_create_p)
+    mission_create_p.set_defaults(func=cmd_mission)
+    mission_expand_p = mission_sub.add_parser("expand", help="create a bounded child mission")
+    add_mission_shape(mission_expand_p, needs_parent=True)
+    mission_expand_p.set_defaults(func=cmd_mission)
+    mission_list_p = mission_sub.add_parser("list", help="list mission state (ready work is dependency-unlocked)")
+    mission_list_p.add_argument("--status", choices=["planned", "ready", "running", "blocked", "succeeded", "failed", "cancelled"])
+    mission_list_p.set_defaults(func=cmd_mission)
+    mission_claim_p = mission_sub.add_parser("claim", help="atomically lease a ready mission to an agent/experiment")
+    mission_claim_p.add_argument("mission_id")
+    mission_claim_p.add_argument("--owner-exp", help="optional Evo experiment id that owns the lease")
+    mission_claim_p.set_defaults(func=cmd_mission)
+    mission_complete_p = mission_sub.add_parser("complete", help="record mission outcome; succeeding work unlocks dependents")
+    mission_complete_p.add_argument("mission_id")
+    mission_complete_p.add_argument("--status", required=True, choices=["succeeded", "failed", "blocked"])
+    mission_complete_p.add_argument("--summary", default="")
+    mission_complete_p.set_defaults(func=cmd_mission)
+    mission_cancel_p = mission_sub.add_parser("cancel", help="cancel a mission and, by default, its child subtree")
+    mission_cancel_p.add_argument("mission_id")
+    mission_cancel_p.add_argument("--no-cascade", action="store_true")
+    mission_cancel_p.set_defaults(func=cmd_mission)
+    mission_evidence_p = mission_sub.add_parser("evidence", help="attach immutable evidence to a mission")
+    mission_evidence_p.add_argument("mission_id")
+    mission_evidence_p.add_argument("--uri", required=True)
+    mission_evidence_p.add_argument("--sha256", required=True)
+    mission_evidence_p.add_argument("--summary", required=True)
+    mission_evidence_p.set_defaults(func=cmd_mission)
+
+    judge_p = sub.add_parser(
+        "judge",
+        help="LLM-as-judge (G-Eval) scoring of an output against a rubric; value in [0,1]",
+    )
+    judge_p.add_argument("--preset", help="named rubric (see --list-presets)")
+    judge_p.add_argument("--list-presets", action="store_true", help="print built-in rubrics and exit")
+    judge_p.add_argument("--task", help="task introduction (with --criteria, instead of --preset)")
+    judge_p.add_argument("--criteria", help="evaluation criteria / rubric text")
+    judge_p.add_argument("--output", help="the output text to judge (else --output-file or stdin)")
+    judge_p.add_argument("--output-file", help="read the output to judge from this file")
+    judge_p.add_argument("--context", help="optional supporting context")
+    judge_p.add_argument("--context-file", help="read supporting context from this file")
+    judge_p.add_argument("--input", help="optional input/question the output responds to")
+    judge_p.add_argument("--name", default="g_eval", help="metric name for custom rubrics")
+    judge_p.add_argument("--scale-max", type=int, default=10, help="integer score scale ceiling (default 10)")
+    judge_p.add_argument("--model", help="override judge model (default EVO_JUDGE_MODEL / claude default)")
+    judge_p.add_argument("--timeout", type=int, default=180, help="judge call timeout seconds (default 180)")
+    judge_p.set_defaults(func=cmd_judge)
+
+    tune_p = sub.add_parser(
+        "tune",
+        help="search a parameter space against the benchmark (Optuna TPE / random)",
+    )
+    tune_p.add_argument("--params", required=True,
+                        help="JSON file: {name: {type: float|int|categorical|bool, min, max, choices, scale, step}}")
+    tune_p.add_argument("--benchmark", help="benchmark command (default: workspace benchmark)")
+    tune_p.add_argument("--metric", choices=["max", "min"], help="optimize direction (default: workspace metric)")
+    tune_p.add_argument("--trials", type=int, default=20, help="number of trials (default 20)")
+    tune_p.add_argument("--sampler", choices=["tpe", "random"], default="tpe",
+                        help="tpe (Optuna; falls back to random if optuna absent) or random")
+    tune_p.add_argument("--seed", type=int, help="sampler seed for reproducibility")
+    tune_p.add_argument("--timeout", type=int, default=1800, help="per-trial benchmark timeout seconds")
+    tune_p.add_argument("--out", help="output dir for result.json + trials.jsonl (default: <run>/tuning/<ts>)")
+    tune_p.set_defaults(func=cmd_tune)
+
+    # ── graph: the Graphify<->Evo bridge (retrieval + evidence write-back) ──
+    graph_p = sub.add_parser(
+        "graph",
+        help="Graphify bridge: retrieve source-backed prior art and write experiment evidence back",
+    )
+    graph_p.add_argument("--data-root", help="graphify data dir (default: $GRAPHIFY_DATA or lab default)")
+    graph_sub = graph_p.add_subparsers(dest="graph_action", required=True)
+
+    def _add_json(p_: argparse.ArgumentParser) -> None:
+        p_.add_argument("--json", action="store_true", help="emit JSON instead of text")
+
+    g_find = graph_sub.add_parser("find", help="ranked FTS search over the library index")
+    g_find.add_argument("query")
+    g_find.add_argument("--repo", help="filter by repo_id substring")
+    g_find.add_argument("--kind", action="append", default=[], help="filter by node kind (repeatable)")
+    g_find.add_argument("--limit", type=int, default=10)
+    _add_json(g_find)
+    g_find.set_defaults(func=cmd_graph)
+
+    g_neigh = graph_sub.add_parser("neighbors", help="1-hop neighbors of a node over edges")
+    g_neigh.add_argument("repo_id")
+    g_neigh.add_argument("node_id")
+    g_neigh.add_argument("--direction", choices=["out", "in", "both"], default="both")
+    g_neigh.add_argument("--relation", action="append", default=[], help="filter by edge relation (repeatable)")
+    g_neigh.add_argument("--limit", type=int, default=40)
+    _add_json(g_neigh)
+    g_neigh.set_defaults(func=cmd_graph)
+
+    g_sub = graph_sub.add_parser("subgraph", help="bounded 1-2 hop BFS from a seed node")
+    g_sub.add_argument("repo_id")
+    g_sub.add_argument("node_id", nargs="+", help="one or more seed node_ids")
+    g_sub.add_argument("--hops", type=int, default=1, help="1 or 2 (SQLite-safe ceiling)")
+    g_sub.add_argument("--direction", choices=["out", "in", "both"], default="both")
+    g_sub.add_argument("--relation", action="append", default=[])
+    g_sub.add_argument("--limit", type=int, default=120)
+    _add_json(g_sub)
+    g_sub.set_defaults(func=cmd_graph)
+
+    g_slice = graph_sub.add_parser("slice", help="locate + summarize a repo's topic slices")
+    g_slice.add_argument("repo", help="graph-dir substring")
+    g_slice.add_argument("--topic", help="slice-name substring")
+    _add_json(g_slice)
+    g_slice.set_defaults(func=cmd_graph)
+
+    g_cand = graph_sub.add_parser("candidates", help="build a ranked graph-candidates set for a need")
+    g_cand.add_argument("need", help="the capability/need to find source-backed options for")
+    g_cand.add_argument("--query", action="append", default=[], help="explicit query (repeatable; default: derived from need)")
+    g_cand.add_argument("--repo", help="filter by repo_id substring")
+    g_cand.add_argument("--kind", action="append", default=[])
+    g_cand.add_argument("--limit", type=int, default=6, help="hits per query")
+    g_cand.add_argument("--total", type=int, default=12, help="max candidates in the set")
+    g_cand.add_argument("--out", help="also write the CandidateSet JSON to this path")
+    _add_json(g_cand)
+    g_cand.set_defaults(func=cmd_graph)
+
+    g_inject = graph_sub.add_parser("inject", help="append retrieved prior art to a brief (explicit invocation always injects)")
+    g_inject.add_argument("--brief", help="the brief text (else --brief-file or stdin)")
+    g_inject.add_argument("--brief-file", help="read the brief from this file")
+    g_inject.add_argument("--need", help="retrieval need (default: brief's first line)")
+    g_inject.add_argument("--repo", help="filter by repo_id substring")
+    g_inject.add_argument("--limit", type=int, default=6)
+    g_inject.set_defaults(func=cmd_graph)
+
+    g_record = graph_sub.add_parser("record", help="write an Evo experiment node (JSON) into evidence.db")
+    g_record.add_argument("--root", default=".", help="workspace root (default: cwd)")
+    g_record.add_argument("--node-file", help="experiment node JSON (else stdin)")
+    g_record.add_argument("--agent")
+    g_record.add_argument("--model")
+    g_record.add_argument("--environment")
+    g_record.add_argument("--harness")
+    _add_json(g_record)
+    g_record.set_defaults(func=cmd_graph)
+
+    g_lineage = graph_sub.add_parser("lineage", help="DERIVED_FROM ancestry + BEAT edges for an experiment")
+    g_lineage.add_argument("exp_id")
+    g_lineage.add_argument("--root", default=".", help="workspace root (default: cwd)")
+    _add_json(g_lineage)
+    g_lineage.set_defaults(func=cmd_graph)
+
+    g_stats = graph_sub.add_parser("stats", help="summary of the evidence graph (node/edge/artifact counts)")
+    g_stats.add_argument("--root", default=".", help="workspace root (default: cwd)")
+    g_stats.set_defaults(func=cmd_graph)
+
+    g_export = graph_sub.add_parser("export", help="dump the evidence graph as JSON (dashboard/FalkorDB feed)")
+    g_export.add_argument("--root", default=".", help="workspace root (default: cwd)")
+    g_export.add_argument("--out", help="write to this path (else stdout)")
+    g_export.set_defaults(func=cmd_graph)
+
+    agent_p = sub.add_parser(
+        "agent",
+        help="agent control-plane aliases over dispatch, steering, receipts, and waits",
+    )
+    agent_sub = agent_p.add_subparsers(dest="agent_action", required=True)
+    agent_start_p = agent_sub.add_parser("start", help="start one agent job (dispatch host support still applies)")
+    agent_start_p.add_argument("--parent", required=True)
+    agent_start_p.add_argument("-m", "--message", required=True)
+    agent_start_p.add_argument("--budget", type=int, default=3)
+    agent_start_p.add_argument("--explore-context", default=None)
+    agent_start_p.add_argument("--refresh-explorer", action="store_true")
+    agent_start_p.add_argument("--background", action="store_true")
+    agent_start_p.set_defaults(func=cmd_agent)
+    agent_list_p = agent_sub.add_parser("list", help="list active or recent agent jobs")
+    agent_list_p.add_argument("--running", action="store_true")
+    agent_list_p.add_argument("--recent", type=int, default=None)
+    agent_list_p.set_defaults(func=cmd_agent)
+    agent_status_p = agent_sub.add_parser("status", help="show one agent job")
+    agent_status_p.add_argument("job_id")
+    agent_status_p.set_defaults(func=cmd_agent)
+    agent_wait_p = agent_sub.add_parser("wait", help="wait for one or all running agent jobs")
+    agent_wait_p.add_argument("job_ids", nargs="*")
+    agent_wait_p.add_argument("--quiet", action="store_true")
+    agent_wait_p.set_defaults(func=cmd_agent)
+    agent_stop_p = agent_sub.add_parser("stop", help="stop one dispatched agent job")
+    agent_stop_p.add_argument("job_id")
+    agent_stop_p.set_defaults(func=cmd_agent)
+    agent_steer_p = agent_sub.add_parser("steer", help="send an auditable directive to a worker or orchestrator")
+    agent_steer_p.add_argument("text", nargs="+")
+    agent_steer_p.add_argument("--exp-id", help="target one experiment; omit to steer the orchestrator")
+    agent_steer_p.add_argument("--wait", action="store_true")
+    agent_steer_p.add_argument("--wait-timeout", type=float, default=60.0)
+    agent_steer_p.set_defaults(func=cmd_agent)
+    agent_receipt_p = agent_sub.add_parser("receipt", help="acknowledge a received steering directive")
+    agent_receipt_p.add_argument("event_id")
+    agent_receipt_p.set_defaults(func=cmd_agent)
+    agent_message_p = agent_sub.add_parser("message-status", help="show queued/delivered/acknowledged directive state")
+    agent_message_p.add_argument("event_id")
+    agent_message_p.set_defaults(func=cmd_agent)
+    agent_watch_p = agent_sub.add_parser("watch", help="wait on Evo/host conditions with structured JSON support")
+    agent_watch_p.add_argument("--for", dest="wait_for", action="append", default=[])
+    agent_watch_p.add_argument("--timeout", default="1h")
+    agent_watch_p.add_argument("--stall-threshold", default="2m")
+    agent_watch_p.add_argument("--poll-interval", default="5s")
+    agent_watch_p.add_argument("--count", type=int, default=None)
+    agent_watch_p.add_argument("--json", dest="json_out", action="store_true")
+    agent_watch_p.set_defaults(func=cmd_agent)
 
     from . import host_install
 

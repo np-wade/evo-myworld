@@ -1,0 +1,107 @@
+{
+  "mode": "S6 grounded drafting: coverage/binding/fidelity/completeness (gate: zero fabricated metrics)",
+  "n_entries": 7,
+  "candidates_unavailable": [
+    {
+      "candidate": "storm-draft",
+      "reason": "STORM outline/article generation (knowledge_storm storm_wiki/modules/{outline,article}_generation.py) are dspy LLM modules (WriteOutline / ConvToSection) requiring an LLM backend; no honest deterministic extractive adapter exists"
+    },
+    {
+      "candidate": "wikichat-draft",
+      "reason": "WikiChat chatbot (pipelines/chatbot.py) is a chainlite/langgraph LLM pipeline requiring an LLM engine and a live retriever API endpoint; no honest extractive adapter exists"
+    }
+  ],
+  "leaderboard": [
+    {
+      "candidate": "wikichat-draft",
+      "fails": 0,
+      "error": "",
+      "draft_score": 1.0,
+      "concept_coverage": 1.0,
+      "citation_binding": 1.0,
+      "metric_fidelity": 1.0,
+      "latency_ms_p50": 78536.3,
+      "latency_ms_p95": 86132.8,
+      "deterministic": 0,
+      "gate": "PASS",
+      "score": 1.0
+    },
+    {
+      "candidate": "paperspine-draft",
+      "fails": 0,
+      "error": "",
+      "draft_score": 0.9325,
+      "concept_coverage": 1.0,
+      "citation_binding": 0.775,
+      "metric_fidelity": 1.0,
+      "latency_ms_p50": 0.2,
+      "latency_ms_p95": 0.2,
+      "deterministic": 1,
+      "gate": "PASS",
+      "score": 0.9325
+    },
+    {
+      "candidate": "ip-incumbent",
+      "fails": 0,
+      "error": "",
+      "draft_score": 0.9077,
+      "concept_coverage": 1.0,
+      "citation_binding": 0.6923,
+      "metric_fidelity": 1.0,
+      "latency_ms_p50": 104.8,
+      "latency_ms_p95": 230.7,
+      "deterministic": 1,
+      "gate": "PASS",
+      "score": 0.9077
+    },
+    {
+      "candidate": "sumy-textrank-citepost",
+      "fails": 0,
+      "error": "",
+      "draft_score": 0.8328,
+      "concept_coverage": 1.0,
+      "citation_binding": 0.4428,
+      "metric_fidelity": 1.0,
+      "latency_ms_p50": 1322.1,
+      "latency_ms_p95": 1647.7,
+      "deterministic": 1,
+      "gate": "PASS",
+      "score": 0.8328
+    },
+    {
+      "candidate": "naive-baseline",
+      "fails": 0,
+      "error": "",
+      "draft_score": 0.7,
+      "concept_coverage": 1.0,
+      "citation_binding": 0.0,
+      "metric_fidelity": 1.0,
+      "latency_ms_p50": 0.1,
+      "latency_ms_p95": 0.1,
+      "deterministic": 1,
+      "gate": "PASS",
+      "score": 0.7
+    },
+    {
+      "candidate": "sumy-lsa-citepost",
+      "fails": 0,
+      "error": "",
+      "draft_score": 0.7,
+      "concept_coverage": 1.0,
+      "citation_binding": 0.0,
+      "metric_fidelity": 1.0,
+      "latency_ms_p50": 1278.5,
+      "latency_ms_p95": 1520.7,
+      "deterministic": 0,
+      "gate": "PASS",
+      "score": 0.7
+    },
+    {
+      "candidate": "storm-draft",
+      "fails": 1,
+      "error": "RuntimeError: storm subprocess: ntion \"We pair the Evidence Graph Transformer with the Citation Verifier Pipeline to keep attribution exact.\" Also mention \"The Evidence Graph Transformer reuses spans emitted by the Adaptive Chunking Algorithm without re-parsing'} \n\nExpected to find output fields in ",
+      "gate": "FAIL",
+      "score": 0.0
+    }
+  ]
+}

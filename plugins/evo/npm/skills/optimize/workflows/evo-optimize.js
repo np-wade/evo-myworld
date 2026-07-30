@@ -401,7 +401,7 @@ function briefPrompt(state, findings, patterns, parents, ideated, metaHints) {
     '\nStructural patterns (incl. intersections, improvers, and any axis-warning):', JSON.stringify(patterns),
     '\nSelected parent nodes:', JSON.stringify(parents.map((p) => p.id)),
     ideated
-      ? '\nFRESH IDEATOR PROPOSALS may be available — read `.evo/run_*/ideator/proposals.jsonl` and reconcile BEFORE writing: skip any whose technique was already tried (`evo discards --like "<keyword>"`); score the rest by expected_score_uplift x confidence (frontier_extrapolation > failure_analysis > literature, all else equal); let the top 1-2 become brief objectives, citing the proposal\'s hypothesis/technique. Proposals are advisory — if none beat the in-graph scan findings, ignore them.'
+      ? '\nFRESH IDEATOR PROPOSALS may be available — read `.evo/run_*/ideator/proposals.jsonl` and reconcile BEFORE writing: skip any whose technique was already tried (`evo discards --like "<keyword>"`); score the rest by expected_score_uplift x confidence (frontier_extrapolation > failure_analysis > metaprompt > literature, all else equal); let the top 1-2 become brief objectives, citing the proposal\'s hypothesis/technique. Proposals are advisory — if none beat the in-graph scan findings, ignore them.'
       : '',
     '\nIf the patterns include an "axis-warning", the current axis is saturated — target the ORTHOGONAL axis it names rather than iterating the plateaued one.',
     (metaHints && metaHints.length)
@@ -498,7 +498,7 @@ function discardPrompt(expId, findings) {
   ].join(' ')
 }
 
-// One ideator brief (failure_analysis | literature | frontier_extrapolation). Dispatched via
+// One ideator brief (failure_analysis | literature | frontier_extrapolation | metaprompt). Dispatched via
 // agentType 'evo:ideator' so the agent gets the ideator system prompt + its tool set (incl.
 // WebSearch/WebFetch for literature). It appends proposals to .evo/run_*/ideator/proposals.jsonl.
 function ideatorPrompt(brief) {
@@ -769,7 +769,7 @@ async function optimizeLoop() {
     let ideated = false
     if (harness.phases.ideate && (stalledTrigger || periodicTrigger)) {
       phase('Ideate')
-      await parallel(['frontier_extrapolation', 'failure_analysis', 'literature'].map((b) => () =>
+      await parallel(['frontier_extrapolation', 'failure_analysis', 'metaprompt', 'literature'].map((b) => () =>
         agent(withHarnessPrompt('ideator', ideatorPrompt(b)), { agentType: 'evo:ideator', phase: 'Ideate', label: `ideate:${b}` })))
       lastIdeatedCommit = commits
       if (stalledTrigger) ideatedThisStall = true

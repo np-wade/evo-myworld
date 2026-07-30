@@ -1,0 +1,11 @@
+{
+  "source": "youtube",
+  "vid": "aircAruvnKk",
+  "url": "https://www.youtube.com/watch?v=aircAruvnKk",
+  "title": "But what is a neural network? | Deep learning chapter 1",
+  "orig_duration_s": 1120,
+  "caption_lang": "en",
+  "has_gold": true,
+  "audio_file": "audio.wav",
+  "duration_s": 120.0
+}

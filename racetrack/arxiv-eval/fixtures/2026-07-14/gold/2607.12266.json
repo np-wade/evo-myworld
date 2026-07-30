@@ -1,0 +1,39 @@
+{
+  "id": "2607.12266",
+  "title": "Saturation Makes Quantization Error Additive: A Coverage Model with a Certificate",
+  "authors": [
+    "Joshua Hill"
+  ],
+  "published": "2026-07-14T02:08:33Z",
+  "primary_category": "cs.LG",
+  "categories": [
+    "cs.LG"
+  ],
+  "abstract": "Mixed-precision quantization must decide which parts of a model to keep at higher precision. A common premise, shared by sensitivity-based methods such as HAWQ and CoopQ, is that the loss from quantizing a set of layers can be reconstructed from per-layer or pairwise sensitivities measured in isolation. We test this premise at the 4-bit weight-and-activation precisions now being deployed, treating the change in loss $f(S)$ from quantizing a layer set $S$ as a set function on the Boolean cube and analyzing it through two classical changes of basis. This analysis yields two findings. First, across configurations drawn from the deployment distribution, 85--93\\% of the variance of $f$ is explained by per-layer effects alone. Second, a monotone transform of a sum of per-layer terms reproduces $f$'s ranking of configurations, misordering at most 2\\% of pairs. We propose the coverage model $f(S)=c\\bigl(1-\\prod_{i\\in S}(1-a_i)\\bigr)$, which reproduces the measured variance profile of $f$ to within a few percent from its $L$ fitted break-rates. This structure supports two predictors of a configuration's loss, each with $L+1$ parameters. The additive model is the optimal first-order predictor. By Parseval's identity its mean-squared error equals the variance of $f$ left unexplained by per-layer effects, which we measure on full lattices, estimate out of sample at full-network scale, and report with every result as a certificate of how well any additive model can do. The coverage model itself is the second predictor. As allocators at matched memory, they attain the lowest KL divergence among the compared allocators on models from 30B to 355B parameters. Below four bits, the resulting allocations continue to solve code and reasoning tasks at budgets where allocations from gradient sensitivities no longer produce terminating generations.",
+  "gold_from_latex": {
+    "section_headings": [
+      "The assembled evidence for the coverage model",
+      "The model class $g\\bigl(\\sum_i b_i\\bigr)$: canonicity, and details for the ordinal analysis",
+      "Experimental setup",
+      "Interpretability of the fitted parameters",
+      "Aumann--Shapley recovers the in-context coefficient at an effective density (proof under coverage)",
+      "Proofs (Theorems 3 and 4, Proposition 5, the two anchors, kernel eigenvalues)",
+      "The log-headroom knapsack, and the generator the data selects",
+      "Extended related work",
+      "Conclusion",
+      "An interpretable predictor, in and out of distribution",
+      "Future work",
+      "The measured structure of quantization damage",
+      "Why isolated sensitivity mis-prices a configuration: the wrong anchor",
+      "Allocation at matched memory",
+      "The reconciling theory: saturation generates both views",
+      "Scope",
+      "Related work",
+      "Introduction"
+    ],
+    "n_sections": 18,
+    "n_equations": 15,
+    "n_tables": 36,
+    "has_source": true
+  }
+}

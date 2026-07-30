@@ -1,0 +1,91 @@
+{
+  "pubs": [
+    "thezvi",
+    "astralcodexten",
+    "noahpinion"
+  ],
+  "gate_all": "PASS",
+  "runs": [
+    {
+      "outdir": "out/thezvi",
+      "pub": "thezvi",
+      "hard": {
+        "discovery_f1": 1.0,
+        "recall": 1.0,
+        "precision": 1.0,
+        "found": 45,
+        "gold": 45,
+        "recent10_hit": "10/10",
+        "saved_ok": "10/10",
+        "title_acc": 1.0,
+        "date_acc": 1.0,
+        "author_acc": 1.0,
+        "url_acc": 1.0,
+        "content_fidelity": 0.9442,
+        "fidelity_posts": 10,
+        "paywall_gate": "PASS",
+        "paywall_violations": [],
+        "paid_delivered": 0,
+        "requests": 12,
+        "wall_s": 20.0
+      },
+      "advisory": {
+        "pick3_pool_overlap": "3/3"
+      }
+    },
+    {
+      "outdir": "out/astralcodexten",
+      "pub": "astralcodexten",
+      "hard": {
+        "discovery_f1": 0.9565,
+        "recall": 1.0,
+        "precision": 0.9167,
+        "found": 36,
+        "gold": 33,
+        "recent10_hit": "8/10",
+        "saved_ok": "10/10",
+        "title_acc": 0.875,
+        "date_acc": 1.0,
+        "author_acc": 1.0,
+        "url_acc": 1.0,
+        "content_fidelity": 0.975,
+        "fidelity_posts": 7,
+        "paywall_gate": "PASS",
+        "paywall_violations": [],
+        "paid_delivered": 1,
+        "requests": 12,
+        "wall_s": 19.2
+      },
+      "advisory": {
+        "pick3_pool_overlap": "3/3"
+      }
+    },
+    {
+      "outdir": "out/noahpinion",
+      "pub": "noahpinion",
+      "hard": {
+        "discovery_f1": 0.8095,
+        "recall": 1.0,
+        "precision": 0.68,
+        "found": 50,
+        "gold": 34,
+        "recent10_hit": "7/10",
+        "saved_ok": "10/10",
+        "title_acc": 1.0,
+        "date_acc": 1.0,
+        "author_acc": 1.0,
+        "url_acc": 1.0,
+        "content_fidelity": 0.9732,
+        "fidelity_posts": 5,
+        "paywall_gate": "PASS",
+        "paywall_violations": [],
+        "paid_delivered": 2,
+        "requests": 12,
+        "wall_s": 19.1
+      },
+      "advisory": {
+        "pick3_pool_overlap": "3/3"
+      }
+    }
+  ]
+}

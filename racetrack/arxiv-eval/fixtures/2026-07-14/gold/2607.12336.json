@@ -1,0 +1,39 @@
+{
+  "id": "2607.12336",
+  "title": "Evaluating Health Misinformation in Low-Resource Languages: Integrating Small Language Models with a Culturally-Sensitive Responsible NLP Framework (Bangla as a Case Study)",
+  "authors": [
+    "Farnaz Farid",
+    "Raihan Alam",
+    "Al Al-Areqi",
+    "Farhad Ahamed",
+    "Muhammad Hassan Khan",
+    "Sadia Hossain",
+    "Irena Veljanova",
+    "Anika Tabassum Binte Hossain"
+  ],
+  "published": "2026-07-14T04:34:05Z",
+  "primary_category": "cs.CL",
+  "categories": [
+    "cs.CL",
+    "cs.AI",
+    "cs.CY",
+    "cs.ET",
+    "cs.HC"
+  ],
+  "abstract": "Artificial Intelligence (AI) technologies, while serving as a foundational enabler for modern social media and digital health services, exert a bivalent effect by simultaneously acting as a combatant against and a spread vector for misinformation. A prevalent challenge in mitigating this issue arises in non-English contexts and low socioeconomic classes, where limited data hinders the training of AI models for effective detection. Consequently, culturally and linguistically diverse (CALD) communities struggle to access trustworthy health information through AI-driven tools. Current AI tools underperform due to a lack of training data and are largely unable to consider language nuances and traditions in non-English contexts. This research addresses these gaps by proposing a CALD-friendly AI-based health misinformation detector and providing a dashboard for medical professionals to analyse this misinformation, a critical step toward mitigating a growing concern among CALD populations. To this end, we conduct a series of experiments using a Bangla-translated health misinformation dataset to evaluate the performance of various Small Language Models (SLMs). SLMs are particularly relevant in this context given the frequent underperformance of Large Language Models (LLMs), which often stems from insufficient domain-specific knowledge and the prohibitive costs of resource-intensive fine-tuning. The results demonstrate that Phi-4 is the superior model, achieving an ideal balance between precision and recall in claim extraction. Then, to mitigate the limitations of SLMs, we design and test a novel health misinformation detection framework grounded in Responsible Natural Language Processing (NLP), which incorporates cultural sensitivity, potential for harm, and communication quality, thereby providing a holistic lens for evaluating misinformation in low-resource languages.",
+  "gold_from_latex": {
+    "section_headings": [
+      "Introduction",
+      "Literature Review",
+      "Methodology",
+      "Results",
+      "Discussion",
+      "A Responsible NLP Approach to Evaluating Health Misinformation in Non-English Low-Resource Languages",
+      "Conclusions"
+    ],
+    "n_sections": 7,
+    "n_equations": 17,
+    "n_tables": 1,
+    "has_source": true
+  }
+}

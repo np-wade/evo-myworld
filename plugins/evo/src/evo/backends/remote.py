@@ -10,16 +10,56 @@ tear-down. State persists in `<run>/remote_state.json` (see
 """
 from __future__ import annotations
 
+import json
 import os
 import secrets
 import shutil
+import socket
 import time
 import uuid
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
 from ..core import utc_now, workspace_path
 from . import remote_state
+
+#: A crashed owner's lease is reclaimed only once it is at least this old, so a
+#: freshly-created lease (or a pid handoff to a forked worker) is never mistaken
+#: for a leak. Overridable via EVO_LEASE_STALE_SECONDS.
+_DEFAULT_LEASE_STALE_SECONDS = 1800
+
+
+def _this_host() -> str:
+    return socket.gethostname()
+
+
+def _pid_alive(pid: int) -> bool:
+    """True if a process with `pid` exists on this host. `os.kill(pid, 0)`
+    delivers no signal but raises ProcessLookupError when the pid is gone."""
+    try:
+        os.kill(pid, 0)
+    except ProcessLookupError:
+        return False
+    except PermissionError:
+        return True  # exists, owned by another user
+    except OSError:
+        return True  # ambiguous -> conservatively assume alive, do not reclaim
+    return True
+
+
+def _lease_age_seconds(leased_at: str | None) -> float | None:
+    """Seconds since `leased_at` (an ISO-8601 timestamp), or None if unparsable."""
+    if not leased_at:
+        return None
+    try:
+        started = datetime.fromisoformat(leased_at)
+    except ValueError:
+        return None
+    if started.tzinfo is None:
+        started = started.replace(tzinfo=timezone.utc)
+    return (datetime.now(timezone.utc) - started).total_seconds()
+from .environment import EnvironmentEvidence, EnvironmentSpec
 from .protocol import (
     AllocateCtx,
     AllocateResult,
@@ -107,11 +147,14 @@ class RemoteSandboxBackend:
         # Step 2: under the state lock, find or create a free sandbox slot
         # and stamp the lease atomically. Slow operations (provision call,
         # network IO) happen outside the lock.
+        environment = self._environment_for_root(ctx.root)
         slot_id, needs_provision, handle = self._claim_slot(ctx)
 
         try:
             if needs_provision:
-                handle = self._provision_sandbox(slot_id)
+                handle = self._provision_sandbox(
+                    slot_id, root=ctx.root, environment=environment
+                )
                 self._handles[slot_id] = handle
                 with remote_state.locked_state(ctx.root, self.state_key) as state:
                     sandbox = next(
@@ -122,10 +165,15 @@ class RemoteSandboxBackend:
                     sandbox["bearer_token"] = handle.bearer_token
                     sandbox["metadata"] = dict(handle.metadata or {})
                     sandbox["provisioned_at"] = utc_now()
+                    if environment is not None:
+                        sandbox["environment_manifest"] = environment.to_envelope()
+                        sandbox["environment_digest"] = environment.digest()
 
             # Step 3: ship parent commit into the sandbox + check out the
             # experiment's branch.
-            worktree_path = self._setup_workspace(ctx, handle, slot_id)
+            worktree_path = self._setup_workspace(
+                ctx, handle, slot_id, environment=environment
+            )
         except Exception:
             # Unwind: release the lease atomically. Provider-side handle
             # stays warm (transient failures shouldn't burn a sandbox).
@@ -271,10 +319,22 @@ class RemoteSandboxBackend:
                 sandbox["leased_by"] = {
                     "exp_id": ctx.exp_id,
                     "pid": os.getpid(),
+                    "host": _this_host(),
                     "leased_at": utc_now(),
                 }
                 sandbox["last_branch"] = ctx.branch
                 handle = self._handles.get(slot_id)
+                if handle is None:
+                    # Cross-process reclaim: another process may have
+                    # provisioned this slot (and left a live container behind)
+                    # before our in-memory `self._handles` was populated. If the
+                    # persisted record still points at a live sandbox, rehydrate
+                    # the handle from it so we REUSE that container instead of
+                    # provisioning a duplicate and leaking (and continuing to
+                    # bill for) the original. `_handle_from_record` returns None
+                    # when the slot was never provisioned (native_id/base_url
+                    # unset), which correctly keeps needs_provision True.
+                    handle = self._handle_from_record(sandbox)
                 return slot_id, handle is None, handle
 
             if self.pool_size is not None and len(state["sandboxes"]) >= self.pool_size:
@@ -294,6 +354,7 @@ class RemoteSandboxBackend:
                 "leased_by": {
                     "exp_id": ctx.exp_id,
                     "pid": os.getpid(),
+                    "host": _this_host(),
                     "leased_at": utc_now(),
                 },
                 "last_branch": ctx.branch,
@@ -328,18 +389,29 @@ class RemoteSandboxBackend:
             state_key=self.state_key,
         )
 
-    def _provision_sandbox(self, slot_id: int) -> SandboxHandle:
+    def _provision_sandbox(
+        self,
+        slot_id: int,
+        *,
+        root: Path | None = None,
+        environment: EnvironmentSpec | None = None,
+    ) -> SandboxHandle:
         """Call the provider to spin up a new container.
 
         The bearer token is generated here and held in process memory only.
-        The image_ref + env are POC defaults; alpha.4 will plumb these
-        through provider_config.
+        With an environment manifest, its image and environment variables
+        are passed to the provider.  Without one, the historical defaults
+        remain unchanged.
         """
         token = secrets.token_urlsafe(32)
+        if environment is None and root is not None:
+            environment = self._environment_for_root(root)
         spec = SandboxSpec(
-            image_ref="evo-sandbox-base",   # provider resolves to its own image system
-            env={},                          # alpha.4: forwarded user secrets
+            image_ref=(environment.image_ref if environment and environment.image_ref
+                       else "evo-sandbox-base"),
+            env=dict(environment.env) if environment else {},
             bearer_token=token,
+            environment=environment,
         )
         handle = self.provider.provision(spec)
         # Use the handle's token, not the spec's. Manual provider returns
@@ -379,7 +451,12 @@ class RemoteSandboxBackend:
         return self.provider.build_client(handle)
 
     def _setup_workspace(
-        self, ctx: AllocateCtx, handle: SandboxHandle | None, slot_id: int
+        self,
+        ctx: AllocateCtx,
+        handle: SandboxHandle | None,
+        slot_id: int,
+        *,
+        environment: EnvironmentSpec | None = None,
     ) -> Path:
         """Ship parent commit into the sandbox + checkout the experiment branch.
 
@@ -415,15 +492,16 @@ class RemoteSandboxBackend:
             init_check = client.process_run(
                 "git", args=["rev-parse", "--git-dir"], cwd=workspace_root,
             )
-            if init_check.exit_code != 0:
+            if self._result_exit_code(init_check) != 0:
                 # Fresh sandbox: init the repo + set committer identity for
                 # any subsequent in-sandbox commits.
                 init_result = client.process_run(
                     "git", args=["init", "-q"], cwd=workspace_root,
                 )
-                if init_result.exit_code != 0:
+                if self._result_exit_code(init_result) != 0:
                     raise RuntimeError(
-                        f"git init failed in sandbox: {init_result.stderr[:500]}"
+                        f"git init failed in sandbox: "
+                        f"{self._result_stderr(init_result)[:500]}"
                     )
                 client.process_run(
                     "git", args=["config", "user.email", "evo@sandbox"],
@@ -440,7 +518,7 @@ class RemoteSandboxBackend:
                 "git", args=["cat-file", "-e", ctx.parent_commit],
                 cwd=workspace_root,
             )
-            if cat_check.exit_code != 0:
+            if self._result_exit_code(cat_check) != 0:
                 ship_commit_to_sandbox(
                     client, local_repo=ctx.root, commit=ctx.parent_commit,
                     sandbox_repo=workspace_root, bundle_dir=bundle_dir,
@@ -452,11 +530,18 @@ class RemoteSandboxBackend:
                 args=["checkout", "-B", ctx.branch, ctx.parent_commit],
                 cwd=workspace_root,
             )
-            if checkout.exit_code != 0:
+            if self._result_exit_code(checkout) != 0:
                 raise RuntimeError(
                     f"git checkout -B {ctx.branch} {ctx.parent_commit} "
-                    f"failed in sandbox: {checkout.stderr[:500]}"
+                    f"failed in sandbox: {self._result_stderr(checkout)[:500]}"
                 )
+
+            if environment is not None:
+                evidence = self._apply_environment(
+                    client, workspace_root, environment, handle.metadata or {}
+                )
+            else:
+                evidence = None
 
         # Persist on the slot's state record so cmd_run can read the same
         # path via the backend client without re-fetching the handle.
@@ -465,8 +550,129 @@ class RemoteSandboxBackend:
                 if sandbox["id"] == slot_id:
                     sandbox["workspace_root"] = workspace_root
                     sandbox["bundle_dir"] = bundle_dir
+                    if environment is not None and evidence is not None:
+                        sandbox["environment_manifest"] = environment.to_envelope()
+                        sandbox["environment_digest"] = environment.digest()
+                        sandbox["environment_evidence"] = evidence.to_envelope()
+                        sandbox["environment_identity"] = evidence.identity
+                        state["environment_manifest"] = environment.to_envelope()
+                        state["environment_digest"] = environment.digest()
+                        state["environment_evidence"] = evidence.to_envelope()
+                        state["environment_identity"] = evidence.identity
                     break
         return Path(workspace_root)
+
+    def _environment_for_root(self, root: Path | None) -> EnvironmentSpec | None:
+        if root is None:
+            return None
+        return EnvironmentSpec.from_config(self.provider_config, root=root)
+
+    def _apply_environment(
+        self,
+        client: Any,
+        workspace_root: str,
+        environment: EnvironmentSpec,
+        adapter_metadata: dict[str, Any],
+    ) -> EnvironmentEvidence:
+        """Upload fixtures and run the manifest commands inside the sandbox."""
+        if environment.fixtures:
+            client.fs_upload_batch(workspace_root, environment.fixture_tar())
+
+        for command in (*environment.setup_commands, *environment.customize_commands):
+            self._run_environment_command(client, command, workspace_root, environment)
+
+        identity_result = self._run_environment_command(
+            client, environment.identity_command, workspace_root, environment
+        )
+        identity = self._identity_from_result(identity_result)
+        returned_evidence = self._evidence_from_identity(identity)
+        if returned_evidence is not None:
+            return EnvironmentEvidence(
+                digest=returned_evidence.digest or environment.digest(),
+                identity=returned_evidence.identity,
+                adapter_metadata={
+                    **adapter_metadata,
+                    **returned_evidence.adapter_metadata,
+                },
+                identity_command=returned_evidence.identity_command,
+            )
+        return EnvironmentEvidence(
+            digest=environment.digest(),
+            identity=identity,
+            adapter_metadata=dict(adapter_metadata),
+            identity_command=(
+                list(environment.identity_command)
+                if isinstance(environment.identity_command, tuple)
+                else environment.identity_command
+            ),
+        )
+
+    @staticmethod
+    def _run_environment_command(
+        client: Any,
+        command: str | tuple[str, ...],
+        cwd: str,
+        environment: EnvironmentSpec,
+    ) -> Any:
+        if isinstance(command, tuple):
+            executable, *args = command
+            result = client.process_run(
+                executable, args=args, cwd=cwd, env=dict(environment.env)
+            )
+        else:
+            result = client.process_run(
+                "/bin/sh", args=["-lc", command], cwd=cwd, env=dict(environment.env)
+            )
+        exit_code = RemoteSandboxBackend._result_exit_code(result)
+        if exit_code != 0:
+            stderr = RemoteSandboxBackend._result_stderr(result)
+            raise RuntimeError(f"environment command failed ({command!r}): {stderr[:500]}")
+        return result
+
+    @staticmethod
+    def _result_exit_code(result: Any) -> int | None:
+        """Read a process-run result's exit code across shapes.
+
+        Sandbox clients are inconsistent: some return dicts
+        (`{"exitCode": ...}`, camelCase), some return objects
+        (`.exit_code`). Tolerate both so callers don't AttributeError on a
+        provider whose `process_run` returns a dict.
+        """
+        if isinstance(result, dict):
+            return result.get("exitCode")
+        return getattr(result, "exit_code", None)
+
+    @staticmethod
+    def _result_stderr(result: Any) -> str:
+        """Read a process-run result's stderr across dict/object shapes."""
+        if isinstance(result, dict):
+            return str(result.get("stderr", ""))
+        return str(getattr(result, "stderr", ""))
+
+    @staticmethod
+    def _identity_from_result(result: Any) -> str:
+        if isinstance(result, dict):
+            stdout = str(result.get("stdout", ""))
+            stderr = str(result.get("stderr", ""))
+        else:
+            stdout = str(getattr(result, "stdout", ""))
+            stderr = str(getattr(result, "stderr", ""))
+        return (stdout.strip() or stderr.strip()).strip()
+
+    @staticmethod
+    def _evidence_from_identity(identity: str) -> EnvironmentEvidence | None:
+        if not identity:
+            return None
+        try:
+            value = json.loads(identity)
+        except (TypeError, ValueError):
+            return None
+        if not isinstance(value, dict) or value.get("kind") != "evidence":
+            return None
+        try:
+            return EnvironmentEvidence.from_envelope(value)
+        except ValueError:
+            return None
 
     def _slot_for_exp(self, root: Path, exp_id: str) -> int | None:
         """Return the slot id currently leased by `exp_id`, or None."""
@@ -521,16 +727,26 @@ class RemoteSandboxBackend:
         return handle
 
     def _reconcile_orphaned(self, root: Path) -> None:
-        """Clear leases whose owning experiments are now in a terminal state.
+        """Clear leases whose owning process can no longer be using them.
 
         Mirror of pool._reconcile_orphaned_leases (pool.py:249-270). Defends
         the crash window between `_mark_committed` and `release_lease` in
         `cli.cmd_run`: if the process dies after the graph update but before
         the lease release, the slot would otherwise be pinned forever.
 
-        Only acts when the graph has an explicit terminal status. A missing
-        node is NOT treated as terminal -- masks real bugs (e.g. a partial
-        graph write would otherwise look like a leaked lease).
+        Two independent reclaim conditions:
+
+        1. The owning experiment reached an explicit terminal graph status. A
+           missing node is NOT treated as terminal -- that masks real bugs
+           (e.g. a partial graph write would look like a leaked lease).
+
+        2. The owning process is provably gone: the lease was taken on THIS
+           host (a pid is host-local, so a cross-host pid is meaningless), its
+           pid is no longer alive, and it is older than the stale threshold.
+           This covers a crash that never reached a terminal status, which
+           clause 1 alone would leave pinned forever. A freed lease keeps its
+           sandbox record, so the next `_claim_slot` REUSES the live container
+           (see the rehydration there) instead of leaking a duplicate.
         """
         from ..core import load_graph
 
@@ -540,6 +756,13 @@ class RemoteSandboxBackend:
             return
 
         terminal = {"committed", "discarded"}
+        this_host = _this_host()
+        try:
+            stale_seconds = int(
+                os.environ.get("EVO_LEASE_STALE_SECONDS", str(_DEFAULT_LEASE_STALE_SECONDS))
+            )
+        except ValueError:
+            stale_seconds = _DEFAULT_LEASE_STALE_SECONDS
         with remote_state.locked_state(root, self.state_key) as state_locked:
             for sandbox in state_locked["sandboxes"]:
                 lease = sandbox.get("leased_by")
@@ -548,4 +771,15 @@ class RemoteSandboxBackend:
                 exp_id = lease.get("exp_id")
                 node = graph["nodes"].get(exp_id)
                 if node is not None and node.get("status") in terminal:
+                    sandbox["leased_by"] = None
+                    continue
+                lease_pid = lease.get("pid")
+                age = _lease_age_seconds(lease.get("leased_at"))
+                if (
+                    lease.get("host") == this_host
+                    and isinstance(lease_pid, int)
+                    and not _pid_alive(lease_pid)
+                    and age is not None
+                    and age >= stale_seconds
+                ):
                     sandbox["leased_by"] = None

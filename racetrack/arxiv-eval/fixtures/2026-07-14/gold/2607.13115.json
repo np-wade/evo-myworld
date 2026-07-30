@@ -1,0 +1,32 @@
+{
+  "id": "2607.13115",
+  "title": "Improving Molecular Property Prediction in Small Language Models Using Graph-based Tools",
+  "authors": [
+    "Konstantinos Bougiatiotis",
+    "Dimitrios Kelesis",
+    "Georgios Paliouras"
+  ],
+  "published": "2026-07-14T13:10:30Z",
+  "primary_category": "cs.AI",
+  "categories": [
+    "cs.AI",
+    "cs.LG"
+  ],
+  "abstract": "Small language models (SLMs) have shown promise for zero-shot molecular property prediction from SMILES strings, yet they often suffer from structural blindness because sequence representations under-specify key graph-topological cues. We propose a modular Context-Augmented Prompting framework that enables agentic tool use at inference time: a trained GNN expert model provides a predictive hint with confidence, and a GNN extracts an instance-specific explanatory subgraph (e.g., a subgraph SMILES and an accompanying explanatory paragraph). We evaluate three commonly used SLMs on MUTAG and Tox21 under five prompting configurations ranging from SMILES-only to using all available tools at hand. Across two datasets, enriching prompts with graph-derived context yields substantial accuracy gains, often exceeding 25% relative improvement and up to 74% on Tox21. We further validate the functional relevance of the extracted motifs via a necessity-based edge-drop intervention. Despite the observed gains, a persistent gap remains to specialized GNN models, highlighting both the value and limits of text-conditioned reasoning for molecular structure.",
+  "gold_from_latex": {
+    "section_headings": [
+      "Introduction",
+      "Related Work",
+      "Methodology",
+      "Experiments and Discussion",
+      "Discussion and Limitations",
+      "Conclusion",
+      "Declaration on Generative AI",
+      "Prompts Used in Configurations"
+    ],
+    "n_sections": 8,
+    "n_equations": 1,
+    "n_tables": 7,
+    "has_source": true
+  }
+}

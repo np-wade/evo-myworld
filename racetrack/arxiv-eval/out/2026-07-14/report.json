@@ -1,0 +1,2842 @@
+{
+  "prompt": "List all arXiv papers published on 2026-07-14; pick the 5 most beneficial to building a local AI system; save the PDFs.",
+  "date": "2026-07-14",
+  "backend": "curl_cffi",
+  "n_papers": 257,
+  "papers": [
+    {
+      "id": "2607.12227",
+      "title": "Rethinking the Evaluation of Harness Evolution for Agents",
+      "authors": [
+        "Yike Wang",
+        "Huaisheng Zhu",
+        "Zhengyu Hu",
+        "Yige Yuan",
+        "Zhengyu Chen",
+        "Shakti Senthil",
+        "Hannaneh Hajishirzi",
+        "Yulia Tsvetkov",
+        "Pradeep Dasigi",
+        "Teng Xiao"
+      ]
+    },
+    {
+      "id": "2607.12233",
+      "title": "Fin-Analyst at FinMMEval 2026 Task 3: A Live Hybrid Trading Agent with LLM Specialists and Rule-Based Signals",
+      "authors": [
+        "Mohotarema Rashid",
+        "Lingzi Hong",
+        "Junhua Ding",
+        "K.S.M.Tozammel Hossain"
+      ]
+    },
+    {
+      "id": "2607.12236",
+      "title": "Speculate with Memory: Lossless Acceleration for LLM Agents",
+      "authors": [
+        "Yu Li",
+        "Qinyuan Ye",
+        "Prafulla Kumar Choubey",
+        "Jiaxin Zhang",
+        "Chien-Sheng Wu"
+      ]
+    },
+    {
+      "id": "2607.12241",
+      "title": "Gradient-Free Topology Adaptation for Power Flow Surrogates via In-Context Whitening",
+      "authors": [
+        "Ayushi Jolotia",
+        "Parikshit Pareek"
+      ]
+    },
+    {
+      "id": "2607.12243",
+      "title": "Cluster-Weighted EDMD",
+      "authors": [
+        "Lorenzo Tomaz",
+        "Judd Rosenblatt",
+        "Flavio Kicis",
+        "Thomas B. Jones",
+        "Diogo Schwerz de Lucena"
+      ]
+    },
+    {
+      "id": "2607.12245",
+      "title": "Rough Path Signature-Guided Geometry Augmentation for Few-Shot Industrial Surface Defect Detection",
+      "authors": [
+        "Jiaqi Kuang"
+      ]
+    },
+    {
+      "id": "2607.12246",
+      "title": "Proximity Features: Privacy-Compliant Cold-Start Personalization at Airbnb",
+      "authors": [
+        "Wei Jiang",
+        "Bin Xu",
+        "Hui Gao",
+        "Bharathi Thangamani",
+        "Weiwei Guo",
+        "Sundar Srinivasavaradhan",
+        "Tracy Yu",
+        "Huiji Gao",
+        "Michael Kinoti"
+      ]
+    },
+    {
+      "id": "2607.12248",
+      "title": "When Directional Accuracy Lies: A Base-Rate-Honest Benchmark for LoRA-Adapted TimesFM on Equity Forecasting",
+      "authors": [
+        "Taizhen Cheung"
+      ]
+    },
+    {
+      "id": "2607.12252",
+      "title": "FinResearchBench II: A Deep Research Benchmark with Consensus-Derived Gold Rubrics for Distinguishing Financial Report Quality",
+      "authors": [
+        "Beidi Luan",
+        "Rui Sun",
+        "Sinuo Wang",
+        "Yan Gu",
+        "Chao Li",
+        "Zhenliang Xiong",
+        "Jing Li",
+        "Zuo Bai"
+      ]
+    },
+    {
+      "id": "2607.12255",
+      "title": "Understanding Structured Health Data through Interaction-Aware Mixture-of-Experts",
+      "authors": [
+        "Ji Hwan Park",
+        "Ying Ding",
+        "Tianjin Guo"
+      ]
+    },
+    {
+      "id": "2607.12257",
+      "title": "On-Device Deep Research at 4B: Exposure Bounds Faithfulness, Retrieval Bounds Coverage",
+      "authors": [
+        "Vinay Kumar Chaganti"
+      ]
+    },
+    {
+      "id": "2607.12260",
+      "title": "From Many to Meaningful: Feature-Guided Zero-Shot Chronic Kidney Disease Screening Using Large Language Models",
+      "authors": [
+        "Muhammad Ashad Kabir",
+        "Sirajam Munira"
+      ]
+    },
+    {
+      "id": "2607.12266",
+      "title": "Saturation Makes Quantization Error Additive: A Coverage Model with a Certificate",
+      "authors": [
+        "Joshua Hill"
+      ]
+    },
+    {
+      "id": "2607.12267",
+      "title": "Track, Rank, Crack: Epistemic Working Memory Scales Multi-Hop Reasoning in Language Agents",
+      "authors": [
+        "Ning Liu"
+      ]
+    },
+    {
+      "id": "2607.12269",
+      "title": "Quantum Port-Hamiltonian Neural Networks: Learning Conservative and Dissipative Dynamics via Measurement-Induced Nonlinearity",
+      "authors": [
+        "Dibakar Sigdel"
+      ]
+    },
+    {
+      "id": "2607.12271",
+      "title": "A hybrid analytical-PINN model for subsurface simulation of geothermal heat exchangers in heterogeneous underground",
+      "authors": [
+        "Moke Rao",
+        "Thomas Hamacher",
+        "Smajil Halilovic"
+      ]
+    },
+    {
+      "id": "2607.12273",
+      "title": "Code-MUE: Measuring Code LLMs&#39; Uncertainty through Execution-based Semantic Interaction Graphs",
+      "authors": [
+        "Xiaoning Ren",
+        "Yinxing Xue",
+        "Lei Ma",
+        "Yuheng Huang"
+      ]
+    },
+    {
+      "id": "2607.12278",
+      "title": "Auditing Data Leakage in Whole-Slide Image Multimodal Benchmarks",
+      "authors": [
+        "Wenhao Zhang",
+        "Zhongliang Zhou",
+        "John Kang",
+        "Sheng Li"
+      ]
+    },
+    {
+      "id": "2607.12279",
+      "title": "A Shared Subcircuit Lets LLMs Count Down Across Tasks",
+      "authors": [
+        "Jacob Dunefsky",
+        "Wes Gurnee",
+        "Emmanuel Ameisen"
+      ]
+    },
+    {
+      "id": "2607.12281",
+      "title": "SlimPer: Make Personalization Model Slim and Smart",
+      "authors": [
+        "Siqi Wang",
+        "Xianjie Chen",
+        "Shaofeng Deng",
+        "Albert Chen",
+        "Romil Shah",
+        "Jiawei Huang",
+        "Zhaoqin Wang",
+        "Zhang Zhang",
+        "Yiqun Liu",
+        "Meilei Jiang",
+        "Anish Dubey",
+        "Moyan Mei",
+        "Tongxin Wang",
+        "Nathan Berrebbi",
+        "Misael Manjarres",
+        "Armand Sauzay",
+        "Shardul Kothapalli",
+        "Aryaman Vinchhi",
+        "Kevin Johnstone",
+        "Juheon Lee",
+        "Gufan Yin",
+        "Ziheng Huang",
+        "Justin Lin",
+        "Mert Terzihan",
+        "Yilin Qi",
+        "Cynthia Yang",
+        "Colin Peppler",
+        "Qi Ding",
+        "Ruohan Sun",
+        "Ge Song",
+        "Litao Deng",
+        "Parichay Kapoor",
+        "Matt Ma",
+        "Huihui Cheng",
+        "Jiyuan Zhang",
+        "Yanli Zhao",
+        "Yiping Han",
+        "Fangqiu Han",
+        "Ning Yao",
+        "Arun Singh",
+        "Jordan Edwards",
+        "Zhengyu Su",
+        "Abhishek Kumar",
+        "Guangdeng Liao",
+        "Ankit Asthana"
+      ]
+    },
+    {
+      "id": "2607.12290",
+      "title": "The Sound of Absence: Audio-Language Embedding Models Struggle with Negation",
+      "authors": [
+        "Chun-Yi Kuan",
+        "Hung-yi Lee"
+      ]
+    },
+    {
+      "id": "2607.12295",
+      "title": "A Longitudinal Analysis of Public Discourse on AI Ethics in Education Using Twitter Data",
+      "authors": [
+        "Akriti Bagale",
+        "Nafisa Mehjabin",
+        "Ali \u00dcnl\u00fc",
+        "Aditya Johri"
+      ]
+    },
+    {
+      "id": "2607.12296",
+      "title": "A Comparative Analysis of Institutional and Course Generative AI Policies within Higher Education: Implications for Instruction in Computing Education",
+      "authors": [
+        "Amrita Ganguly",
+        "Aditya Johri",
+        "Nora McDonald",
+        "Areej Ali",
+        "Umama Dewan",
+        "Aayushi Hingle Collier"
+      ]
+    },
+    {
+      "id": "2607.12304",
+      "title": "What Does a Temporal Benchmark Score Measure? Decomposing Channel Use in Video VLM Evaluation",
+      "authors": [
+        "Farrukh Rahman"
+      ]
+    },
+    {
+      "id": "2607.12310",
+      "title": "LakeQuest: A Three-Domain Benchmark for Grounded Question Answering across Data Lakes",
+      "authors": [
+        "Michael Solodko",
+        "Steven Gong",
+        "Guangwei Yu",
+        "Satya Krishna Gorti",
+        "Jesse C. Cresswell",
+        "Victor Zhong"
+      ]
+    },
+    {
+      "id": "2607.12332",
+      "title": "Gradient Flow Dynamics and Implicit Bias of Diagonal Linear Networks under Infinitesimal Initialization",
+      "authors": [
+        "Jiajie Zhao",
+        "Jianxing Wang",
+        "Junjie Yang",
+        "Zhiwei Bai",
+        "Yaoyu Zhang"
+      ]
+    },
+    {
+      "id": "2607.12334",
+      "title": "QUBO-Optimized Evidence Selection for Retrieval-Augmented Question Answering with Unconventional Solvers",
+      "authors": [
+        "Rahul Singh",
+        "Madhav Vadlamani"
+      ]
+    },
+    {
+      "id": "2607.12336",
+      "title": "Evaluating Health Misinformation in Low-Resource Languages: Integrating Small Language Models with a Culturally-Sensitive Responsible NLP Framework (Bangla as a Case Study)",
+      "authors": [
+        "Farnaz Farid",
+        "Raihan Alam",
+        "Al Al-Areqi",
+        "Farhad Ahamed",
+        "Muhammad Hassan Khan",
+        "Sadia Hossain",
+        "Irena Veljanova",
+        "Anika Tabassum Binte Hossain"
+      ]
+    },
+    {
+      "id": "2607.12337",
+      "title": "Robust Design of Integrated Sensing and Communication in LEO Satellite Systems",
+      "authors": [
+        "Hezhen Yang",
+        "Xiaoming Chen",
+        "Qi Wang"
+      ]
+    },
+    {
+      "id": "2607.12338",
+      "title": "How Many Tasks Are Enough for Agent Benchmark Decisions? A Replay Analysis of Public LLM Agent Benchmarks",
+      "authors": [
+        "Wei-Jung Huang"
+      ]
+    },
+    {
+      "id": "2607.12341",
+      "title": "Policy-Conditioned Constrained Decoding for Column-Level Access Control in Text-to-SQL",
+      "authors": [
+        "Ryoto Miyamoto",
+        "Xin Fan",
+        "Hayato Yamana"
+      ]
+    },
+    {
+      "id": "2607.12349",
+      "title": "Generating Developable 3D Molecules via Pocket-Conditioned Diffusion and Property-Aware Optimization",
+      "authors": [
+        "Ruoxi Gao",
+        "Jiangweizhi Peng",
+        "Ziqi Chen",
+        "Frazier N. Baker",
+        "David C. Kombo",
+        "John L. Kane Jr.",
+        "Andrew A. Scholte",
+        "Yi Li",
+        "Matthew J. LaMarche",
+        "Luigi I. Iconaru",
+        "Hans-Peter Biemann",
+        "Mingyi Hong",
+        "Xia Ning"
+      ]
+    },
+    {
+      "id": "2607.12354",
+      "title": "Reducing information dependency does not cause training data privacy. Adversarially non-robust features do",
+      "authors": [
+        "Rasmus Torp",
+        "Shailen K. Smith",
+        "Adam Breuer"
+      ]
+    },
+    {
+      "id": "2607.12360",
+      "title": "Same Loss, Same Noise, Opposite Schedules: Noise Structure and Optimizer Normalization Jointly Determine Whether Learning-Rate Cooldown Helps",
+      "authors": [
+        "Subham Singh",
+        "Ashutosh Mishra",
+        "Subha Raut"
+      ]
+    },
+    {
+      "id": "2607.12364",
+      "title": "Lost in Visual Translation: A VLM-Assisted Perceptual-Semantic Coherence Framework for EEG-to-Image Reconstruction",
+      "authors": [
+        "Sukriti Tiwari",
+        "BHVSP Subrahmanyam",
+        "Nidhi Goyal",
+        "Sai Amrit Patnaik"
+      ]
+    },
+    {
+      "id": "2607.12375",
+      "title": "IQA-T1: Tool-based Visual Evidence Reasoning for Image Quality Assessment",
+      "authors": [
+        "Jinjian Wu",
+        "Jiaqi Tang",
+        "Wei Wei",
+        "Yingying Yan",
+        "Jianmin Chen",
+        "Botong Geng",
+        "Lei Zhang",
+        "Qifeng Chen"
+      ]
+    },
+    {
+      "id": "2607.12376",
+      "title": "Demonstration of the common dual-channel feature decoupling characteristic of front-door mediation causal inference methods in whole-slice image classification",
+      "authors": [
+        "Zhirui Zhang",
+        "Tianhang Nan",
+        "Yong Ding",
+        "Zhuolun Song",
+        "Dayu Hu",
+        "Xiaoyu Cui"
+      ]
+    },
+    {
+      "id": "2607.12380",
+      "title": "SinAE: A Single-Architecture Flow-Matching Autoencoder for Cross-Domain Atomic Systems",
+      "authors": [
+        "Yuxuan Ren",
+        "Fan Yang",
+        "Jianhua Yao",
+        "Yatao Bian"
+      ]
+    },
+    {
+      "id": "2607.12382",
+      "title": "Differentiable Clone-Structured Causal Graphs for End-to-End Cognitive Map Learning from Image Sequences",
+      "authors": [
+        "Arash Nikzad",
+        "Sasan Sarbishegi",
+        "Ali Dasmeh",
+        "Muhammad Asif",
+        "Parsa Gharavi",
+        "Erik Husom",
+        "Sagar Sen",
+        "Andrew B. Lehr",
+        "Olivier Penacchio",
+        "Ana Clemente",
+        "Tristan M. St\u00f6ber"
+      ]
+    },
+    {
+      "id": "2607.12383",
+      "title": "Beyond Binary Detection: A Multi-Dimensional Taxonomy of Cancer Misinformation on Reddit",
+      "authors": [
+        "Aria Pessianzadeh",
+        "Pooriya Jamie",
+        "Naima Sultana",
+        "Georgia Himmelstein",
+        "Yuliya Zektser",
+        "Patricia Ganz",
+        "Homa Hosseinmardi",
+        "Amir Ghasemian",
+        "Rezvaneh Rezapour"
+      ]
+    },
+    {
+      "id": "2607.12385",
+      "title": "PM-Bench: Evaluating Prospective Memory in LLM Agents",
+      "authors": [
+        "Genglin Liu",
+        "Saadia Gabriel"
+      ]
+    },
+    {
+      "id": "2607.12389",
+      "title": "Thompson Sampling Is 2-Competitive for Mistakes",
+      "authors": [
+        "Mark Sellke",
+        "Gregory Valiant"
+      ]
+    },
+    {
+      "id": "2607.12391",
+      "title": "ReDiTT: Retrieval Augmented Conditional Diffusion Transformers for Asynchronous Time Series",
+      "authors": [
+        "Saiyue Lyu",
+        "Zhitian Zhang",
+        "Ruizhi Deng",
+        "Thibaut Durand"
+      ]
+    },
+    {
+      "id": "2607.12392",
+      "title": "MESH: Scaling Up Retrieval with Heterogeneous Content Unification",
+      "authors": [
+        "Jiaxing Qu",
+        "Yilin Chen",
+        "Junpeng Hou",
+        "Jinfeng Rao",
+        "Olafur Gudmundsson",
+        "Sai Xiao",
+        "Huizhong Duan"
+      ]
+    },
+    {
+      "id": "2607.12395",
+      "title": "Ring-Zero: Scaling Zero RL to a Trillion Parameters for Emergent Reasoning",
+      "authors": [
+        "Xinyu Tang",
+        "Qianggang Cao",
+        "Yurou Liu",
+        "Yuliang Zhan",
+        "Xiaochong Lan",
+        "Yifan Li",
+        "Yuchen Yan",
+        "Han Peng",
+        "Zican Dong",
+        "Zhenduo Zhang",
+        "Tianshu Wang",
+        "Xinyu Kong",
+        "Zujie Wen",
+        "Wayne Xin Zhao",
+        "Zhiqiang Zhang",
+        "Jun Zhou"
+      ]
+    },
+    {
+      "id": "2607.12397",
+      "title": "Critic Experience Bank: Self-Evolving Step-Level Confidence Estimation for LLM Agents",
+      "authors": [
+        "Yaopei Zeng",
+        "Congchao Wang",
+        "JianHang Chen",
+        "Nan Wang",
+        "Yurui Chang",
+        "Lu Lin"
+      ]
+    },
+    {
+      "id": "2607.12406",
+      "title": "Isolation as a First-Class Principle for LLM-Agent System Safety: Concepts, Taxonomy, Challenges and Future Directions",
+      "authors": [
+        "Huihao Jing",
+        "Wenbin Hu",
+        "Shaojin Chen",
+        "Haochen Shi",
+        "Sirui Zhang",
+        "Hanyu Yang",
+        "Changxuan Fan",
+        "Zhongwei Xie",
+        "Hongyu Luo",
+        "Wun Yu Chan",
+        "Wei Fan",
+        "Haoran Li",
+        "Yangqiu Song"
+      ]
+    },
+    {
+      "id": "2607.12409",
+      "title": "Mechanical Analysis of Parachute Suspension Line Deployment with Binding Tapes Using PINN",
+      "authors": [
+        "Xiang Zhao",
+        "Ronghui Quan",
+        "Yaqi Xiao",
+        "Junlin Chen"
+      ]
+    },
+    {
+      "id": "2607.12417",
+      "title": "PolarBM: Complex-valued Boltzmann Machine for Modeling Audio Signals in Polar and Log-polar Coordinates",
+      "authors": [
+        "Toru Nakashika",
+        "Kohei Yatabe"
+      ]
+    },
+    {
+      "id": "2607.12422",
+      "title": "Accepted Prefixes Are Not All You Need: A Negative Result on PEFT-Based Block-Diffusion Drafting",
+      "authors": [
+        "Abdurrahman Javat",
+        "Allan Kazakov"
+      ]
+    },
+    {
+      "id": "2607.12433",
+      "title": "ARDepth: Auto-regressive Monocular Depth Estimation with Progressive Visual Conditioning",
+      "authors": [
+        "Zijie Wang",
+        "Wei Zhang",
+        "Weiming Zhang",
+        "Xiao Tan",
+        "Weikai Chen",
+        "Xiaoxu Li",
+        "Guanbin Li"
+      ]
+    },
+    {
+      "id": "2607.12438",
+      "title": "Fisher Rank Inflation: A Spectral Signature of Memorization under Label Noise",
+      "authors": [
+        "Satwik Bathula",
+        "Anand A. Joshi"
+      ]
+    },
+    {
+      "id": "2607.12441",
+      "title": "WikiSTAR: A System for Shedding Light on the Hidden History of Scientific Wikipedia Articles",
+      "authors": [
+        "Omer Ehrlich",
+        "Nitzan Barzilay",
+        "Rona Aviram",
+        "Tom Hope"
+      ]
+    },
+    {
+      "id": "2607.12443",
+      "title": "Language Identification with Succinct Machine-Independent Traces",
+      "authors": [
+        "Moses Charikar",
+        "Jon Kleinberg",
+        "Chirag Pabbaraju"
+      ]
+    },
+    {
+      "id": "2607.12447",
+      "title": "The Computational Basis of Confidence in Large Language Models",
+      "authors": [
+        "Dharshan Kumaran",
+        "Viorica Patraucean",
+        "Maks Ovsanikov",
+        "Petar Veli\u010dkovi\u0107",
+        "Nathaniel Daw"
+      ]
+    },
+    {
+      "id": "2607.12454",
+      "title": "Exploring Zero-Shot Foundation Models for Multivariate Time Series Anomaly Detection",
+      "authors": [
+        "Martin Uray",
+        "Saverio Messineo",
+        "Roland Kwitt",
+        "Stefan Huber"
+      ]
+    },
+    {
+      "id": "2607.12455",
+      "title": "EVOQUANT: Self-Evolving Verifier-Guided Strategy Optimization for Robust Quantitative Trading",
+      "authors": [
+        "Jie Mao",
+        "Changlun Li",
+        "Xiang Li",
+        "Qiqi Duan",
+        "Jinhui Yuan",
+        "Xiang Liu",
+        "Yuyu Luo",
+        "Jing Tang",
+        "Xiaowen Chu",
+        "Nan Tang"
+      ]
+    },
+    {
+      "id": "2607.12462",
+      "title": "Do We Really Need Transformers for Global Spatial Information Extraction in Traffic Forecasting?",
+      "authors": [
+        "Qihang Zhang",
+        "Siyao Zhang",
+        "Letao Kang",
+        "Wenzhe Liang",
+        "Miao Zhang",
+        "Zhao Zhang"
+      ]
+    },
+    {
+      "id": "2607.12463",
+      "title": "Function-Aware Fill-in-the-Middle as Mid-Training for Coding Agent Foundation Models",
+      "authors": [
+        "Yubo Wang",
+        "Jiarong Liang",
+        "Yuxuan Zhang",
+        "Xuye Liu",
+        "Cong Wei",
+        "Yuyu Zhang",
+        "Ping Nie",
+        "Wenhu Chen"
+      ]
+    },
+    {
+      "id": "2607.12464",
+      "title": "Steering Diffusion Models via Class-Contrastive Influence for Few-Shot Medical Classification",
+      "authors": [
+        "Jeeyung Kim",
+        "Erfan Esmaeili",
+        "Qiang Qiu"
+      ]
+    },
+    {
+      "id": "2607.12468",
+      "title": "An Omnilingual-ASR-Based Speech-LLM System for the 2nd MLC-SLM Challenge",
+      "authors": [
+        "Shuming Fang",
+        "Shuifei Zeng"
+      ]
+    },
+    {
+      "id": "2607.12469",
+      "title": "Agent-Safety Evaluations as Load-Bearing Evidence: A Vendor-Neutral, Cross-Harness Reconstructability Metric",
+      "authors": [
+        "Oleg Solozobov"
+      ]
+    },
+    {
+      "id": "2607.12474",
+      "title": "From Observation to Insight: Mechanistic World Models and the Quest for Autonomous Discovery",
+      "authors": [
+        "Ingmar Posner",
+        "Anson Lei",
+        "Bernhard Sch\u00f6lkopf"
+      ]
+    },
+    {
+      "id": "2607.12480",
+      "title": "TRACE: An Operational Reasoning Schema for Auditable Agentic Commitments",
+      "authors": [
+        "Edward Y. Chang",
+        "Emily J. Chang"
+      ]
+    },
+    {
+      "id": "2607.12488",
+      "title": "Sample Efficient Generative Optimization for Molecular Design",
+      "authors": [
+        "Sarina Kopf",
+        "Cristina Nevado",
+        "Philippe Schwaller"
+      ]
+    },
+    {
+      "id": "2607.12500",
+      "title": "Adversarial Attacks on Online Handwriting using Salience-based Temporal Editing",
+      "authors": [
+        "Yataro Tamura",
+        "Brian Kenji Iwana",
+        "Jiseok Lee"
+      ]
+    },
+    {
+      "id": "2607.12501",
+      "title": "What Does Goodness Measure? A Likelihood-Ratio Account of Forward-Forward Learning",
+      "authors": [
+        "Paolo Giannitrapani"
+      ]
+    },
+    {
+      "id": "2607.12520",
+      "title": "The Model Knows Your Project, Not You: Measuring Recognition in LLMs with NameRank",
+      "authors": [
+        "Bojie Li",
+        "Noah Shi"
+      ]
+    },
+    {
+      "id": "2607.12523",
+      "title": "OOD-RL-Bench: A Benchmark Framework for Out-of-Distribution Detection in Reinforcement Learning",
+      "authors": [
+        "Emil Mittag",
+        "Richard Dazeley",
+        "Peter Vamplew"
+      ]
+    },
+    {
+      "id": "2607.12526",
+      "title": "From Preimage Search To Source-Grounded Feature Inversion",
+      "authors": [
+        "Kaixiang Shu"
+      ]
+    },
+    {
+      "id": "2607.12527",
+      "title": "Evidence-Grounded AI for Musculoskeletal Care",
+      "authors": [
+        "Wenjie Li",
+        "Yujie Zhang",
+        "Fanrui Zhang",
+        "Haoran Sun",
+        "Renhao Yang",
+        "Junjun He",
+        "Weiran Huang",
+        "Yuanfeng Ji",
+        "Chenrun Wang",
+        "Kailing Wang",
+        "Hongcheng Gao",
+        "Kaipeng Zhang",
+        "Hanyu Wang",
+        "Angela Lin Wang",
+        "Xingqi He",
+        "Yilin Huang",
+        "Shiyi Yao",
+        "Lilong Wang",
+        "Yankai Jiang",
+        "Yirong Chen",
+        "Chenglong Ma",
+        "Jiyao Liu",
+        "Ming Hu",
+        "Gen Li",
+        "Yidong Xu",
+        "Chengyu Zhuang",
+        "Jiawei Liu",
+        "Yin Zhang",
+        "Lequan Yu",
+        "Lu Chen",
+        "Yinpeng Dong",
+        "Lei Liu",
+        "Carlos Gutierrez Sanroman",
+        "Yu Qiao",
+        "Weijie Ma",
+        "Xiaosong Wang",
+        "Lei Wang"
+      ]
+    },
+    {
+      "id": "2607.12547",
+      "title": "Mind the Gap: Promises and Pitfalls of Hierarchical Planning in LeWorldModel",
+      "authors": [
+        "Niccol\u00f2 Caselli",
+        "Francesco Massafra",
+        "Samuele Punzo",
+        "Salvatore Lo Sardo",
+        "Ippokratis Pantelidis",
+        "Sathya Kamesh Bhethanabhotla"
+      ]
+    },
+    {
+      "id": "2607.12550",
+      "title": "A JoLT for the KV Cache: Near-Lossless KV Cache Compression via Joint Tucker and JL-Residual Allocation for LLMs",
+      "authors": [
+        "Rahul Krishnan",
+        "Volker Schulz"
+      ]
+    },
+    {
+      "id": "2607.12569",
+      "title": "Traceback Translators Against Forgetting in Continual Fake Speech Detection",
+      "authors": [
+        "Enrico Gottardis",
+        "Mattia Tamiazzo",
+        "Simone Milani"
+      ]
+    },
+    {
+      "id": "2607.12570",
+      "title": "Deep Learning-based Surrogate Modelling of the LOD Method for Multiscale Problems",
+      "authors": [
+        "Marc Haltmayer",
+        "Jaemin Seo",
+        "Yuseung Lee",
+        "Sungyeop Lee",
+        "Jaehoon Jeong",
+        "Jae Yong Lee"
+      ]
+    },
+    {
+      "id": "2607.12584",
+      "title": "Explainable-by-Design Audio Deepfake Detection via Wiener-Hopf Linear Prediction",
+      "authors": [
+        "Mattia Tamiazzo",
+        "Simone Milani",
+        "Massimo Iuliani",
+        "Marco Fontani"
+      ]
+    },
+    {
+      "id": "2607.12588",
+      "title": "Vertical Standardisation for High-Risk AI Systems under the EU AI Act: A Domain-Specific Framework for Algorithmic Hiring",
+      "authors": [
+        "Anna Gatzioura",
+        "Vrettos Moulos",
+        "Nina Baranowska"
+      ]
+    },
+    {
+      "id": "2607.12590",
+      "title": "Environment Parameter Gradient Theorem for Policy-Environment Co-Design in Reinforcement Learning",
+      "authors": [
+        "Amber Srivastava"
+      ]
+    },
+    {
+      "id": "2607.12599",
+      "title": "Lightweight Multi-Scale Anomaly Detection for Resource-Constrained Edge Devices",
+      "authors": [
+        "Raheen Junaid Wani",
+        "Smruti R. Sarangi"
+      ]
+    },
+    {
+      "id": "2607.12605",
+      "title": "Multi-Perspective Agentic Program Repair via Code Property Graphs and Temporal Execution Graphs",
+      "authors": [
+        "Zhili Huang",
+        "Ling Xu",
+        "Hongyu Zhang"
+      ]
+    },
+    {
+      "id": "2607.12612",
+      "title": "Translation as a Computationally Efficient Bridge: Feasibility of English BERT for Low-Resource Languages",
+      "authors": [
+        "Hielke Muizelaar",
+        "Giulia Rivetti",
+        "Marco Spruit",
+        "Marcel Haas"
+      ]
+    },
+    {
+      "id": "2607.12616",
+      "title": "The Geometry of Memorization: Finite-Time Spectral Sensitivity as a Diagnostic for Flow Matching Models",
+      "authors": [
+        "Shuchan Wang"
+      ]
+    },
+    {
+      "id": "2607.12619",
+      "title": "Agentic Service-Oriented Computing: A Manifesto for the Next Frontier of Service-Oriented Computing",
+      "authors": [
+        "Amin Beheshti",
+        "Rong N. Chang",
+        "Boualem Benatallah",
+        "Fabio Casati",
+        "Schahram Dustdar",
+        "Geoffrey Fox",
+        "Quan Z. Sheng",
+        "Yan Wang",
+        "Jian Yang",
+        "Albert Zomaya"
+      ]
+    },
+    {
+      "id": "2607.12625",
+      "title": "KnowAct-GUIClaw: Know Deeply, Act Perfectly, Personal GUI Assistant with Self-Evolving Memory and Skill",
+      "authors": [
+        "Yunxin Li",
+        "Jinchao Li",
+        "Shibo Su",
+        "Zhenran Xu",
+        "Chenrui Zhao",
+        "Tongshu Bian",
+        "Xiaoman Liang",
+        "Meishan Zhang",
+        "Baotian Hu",
+        "Min Zhang"
+      ]
+    },
+    {
+      "id": "2607.12626",
+      "title": "Gradient-free learning of a closed-loop wall controller for turbulent drag reduction",
+      "authors": [
+        "Giorgio Maria Cavallazzi",
+        "Miguel P\u00e9rez Cuadrado",
+        "Alfredo Pinelli"
+      ]
+    },
+    {
+      "id": "2607.12627",
+      "title": "Learning Forced Multibody Dynamics on Lie Groups",
+      "authors": [
+        "Martine Dyring Hansen",
+        "Marta Ghirardelli",
+        "Elena Celledoni",
+        "David Martin de Diego",
+        "Brynjulf Owren"
+      ]
+    },
+    {
+      "id": "2607.12631",
+      "title": "Can Induced Emotion Bias LLM Behaviors in Sequential Decision Making?",
+      "authors": [
+        "Minh Khoi Ho",
+        "Zihao Zhu",
+        "Runchuan Zhu",
+        "Levina Li",
+        "Zhiwen Fan",
+        "Zhangyang Wang",
+        "Junyuan Hong"
+      ]
+    },
+    {
+      "id": "2607.12634",
+      "title": "Atomic Units of X: The Compression Layer of Intelligence",
+      "authors": [
+        "Sachin Dev Duggal",
+        "Pradyumna Swarnalatha Ramanna",
+        "Alexandros Vassiliades"
+      ]
+    },
+    {
+      "id": "2607.12640",
+      "title": "A Learning-Rate-Gated Failure of GRPO in a Small Language and Vision-Language Model Web Agent: A Controlled Null and Its Mechanism",
+      "authors": [
+        "Chengguang Gan",
+        "Zhixi Cai",
+        "Yunhao Liang",
+        "Hanjun Wei",
+        "Shiwen Ni",
+        "Qinghao Zhang"
+      ]
+    },
+    {
+      "id": "2607.12645",
+      "title": "AdaPCLA: Adaptive Prior-Calibrated Logit Adjustment for Long-Tailed Longitudinal EHR Generation",
+      "authors": [
+        "Shuai Cui",
+        "Chen Wenxuan",
+        "Wenjie Du",
+        "Jian Lou",
+        "Dan Li",
+        "Wenjie Feng"
+      ]
+    },
+    {
+      "id": "2607.12649",
+      "title": "Extractable Memorization From First Principles",
+      "authors": [
+        "A. Feder Cooper",
+        "Marika Swanberg",
+        "Jamie Hayes",
+        "Lea Duesterwald",
+        "Christopher De Sa",
+        "Daniel E. Ho",
+        "Mark A. Lemley",
+        "Percy Liang"
+      ]
+    },
+    {
+      "id": "2607.12650",
+      "title": "Evidence-Grounded Verified Agentic Reasoning: A Path Toward Eliminating LLM Hallucination in Empirical Inference via Tool-Attested Kernel Proofs",
+      "authors": [
+        "Junyu Ren"
+      ]
+    },
+    {
+      "id": "2607.12659",
+      "title": "Jetson-PI: Towards Onboard Real-Time Robot Control via Foresight-Aligned Asynchronous Inference",
+      "authors": [
+        "Zebin Yang",
+        "Qi Wang",
+        "Yunhe Wang",
+        "Xiurui Guo",
+        "Bo Yu",
+        "Shaoshan Liu",
+        "Jiafeng Xu",
+        "Hao Dong",
+        "Meng Li"
+      ]
+    },
+    {
+      "id": "2607.12662",
+      "title": "Internet of Agentic Things: Networked AI Agents for Closed-Loop IoT Orchestration",
+      "authors": [
+        "Quanyan Zhu"
+      ]
+    },
+    {
+      "id": "2607.12678",
+      "title": "Text-Aided Multi-Modal Panoptic Symbol Spotting for CAD Floor Plan Drawings",
+      "authors": [
+        "Yan Gong",
+        "Bohao Li",
+        "Bowen Du",
+        "Junchen Ye"
+      ]
+    },
+    {
+      "id": "2607.12686",
+      "title": "Segregate, Refine, Integrate: Decomposing Multimodal Fusion for Sentiment Analysis",
+      "authors": [
+        "Alexios Filippakopoulos",
+        "Elias Kallioras",
+        "Nikolaos Xiros",
+        "Efthymios Georgiou",
+        "Alexandros Potamianos"
+      ]
+    },
+    {
+      "id": "2607.12687",
+      "title": "From Critic to Confidence: PPO for Language-Based Quantitative Prediction with Confidence Estimation",
+      "authors": [
+        "Mehak Dhaliwal",
+        "Rasta Tadayon",
+        "Andong Hua",
+        "Haewon Jeong",
+        "Yao Qin"
+      ]
+    },
+    {
+      "id": "2607.12696",
+      "title": "Less Experts, Faster Decoding: Cost-Aware Speculative Decoding for Mixture-of-Experts",
+      "authors": [
+        "Jincheng Xie",
+        "Runheng Liu",
+        "Heyan Huang",
+        "Yawen Ling",
+        "Hanbin Dai",
+        "Yu Zheng",
+        "Wen Hu"
+      ]
+    },
+    {
+      "id": "2607.12704",
+      "title": "Label-Decoupled Style Augmentation for Domain Generalization in Multi-Label Remote Sensing Scene Classification",
+      "authors": [
+        "Alaa Almouradi",
+        "Erchan Aptoula"
+      ]
+    },
+    {
+      "id": "2607.12711",
+      "title": "MaxSAT-Based Feedback for Guiding Vision-Language Models in Sudoku",
+      "authors": [
+        "Pedro Orvalho",
+        "Guillem Aleny\u00e0",
+        "Felip Many\u00e0"
+      ]
+    },
+    {
+      "id": "2607.12713",
+      "title": "Line-Anchored Feedback Cuts Token Costs and Improves Correctness in AI Code Editing",
+      "authors": [
+        "William Franz Lamberti"
+      ]
+    },
+    {
+      "id": "2607.12723",
+      "title": "Bulkhead: Automated Semantic Detection and Remediation of Container Escape Vulnerabilities",
+      "authors": [
+        "Qiyuan Fan",
+        "Zhi Li",
+        "Junjie Li",
+        "XiaoFeng Wang",
+        "Bin Yuan",
+        "Deqing Zou"
+      ]
+    },
+    {
+      "id": "2607.12726",
+      "title": "Physically Consistent Parameter Inference: Transparent Machine Learning Emulation in High Energy Physics and Cosmology",
+      "authors": [
+        "Jorge Alda",
+        "Jacobo Asorey",
+        "Alejandro Mir",
+        "Siannah Pe\u00f1aranda"
+      ]
+    },
+    {
+      "id": "2607.12730",
+      "title": "Learning-based Probabilistic Load Forecasting with Post-hoc and In-model Uncertainty",
+      "authors": [
+        "Sarah Al-Shareeda",
+        "Gulcihan Ozdemir",
+        "Heung Seok Jeon"
+      ]
+    },
+    {
+      "id": "2607.12733",
+      "title": "LLMs Can See the Smoke but not the Fire: Evaluating Abductive Reasoning with Elenchos",
+      "authors": [
+        "Julius Steiglechner",
+        "Lucas Mahler",
+        "Gabriele Lohmann"
+      ]
+    },
+    {
+      "id": "2607.12735",
+      "title": "What Makes a Representational Prior Work? Feature Families, Label-Free Invariances, and Critical Windows in Grokking",
+      "authors": [
+        "Gunner Levi Howe"
+      ]
+    },
+    {
+      "id": "2607.12739",
+      "title": "Epistemic Stance Flexibility Probing: Measuring Prompt-Conditioned Register Shift in Large Language Models",
+      "authors": [
+        "Binwen Liu",
+        "Yilin Ren"
+      ]
+    },
+    {
+      "id": "2607.12747",
+      "title": "Tracing Agentic Failure from the Flow of Success",
+      "authors": [
+        "Samuel Yeh",
+        "Yiwen Zhu",
+        "Shaleen Deep",
+        "Sharon Li"
+      ]
+    },
+    {
+      "id": "2607.12748",
+      "title": "Weakly Supervised Spatio-Temporal Candidate Discovery of Dairy Farm Sites from Seasonal Satellite Imagery",
+      "authors": [
+        "Usman Haider",
+        "Fatima Khalid",
+        "Karl Mason"
+      ]
+    },
+    {
+      "id": "2607.12752",
+      "title": "Hallo4D: Multi-Modal Hallucination Mitigation for Consistent Spatio-Temporal Generation",
+      "authors": [
+        "Hongbo Wang",
+        "Huaibo Huang",
+        "Jie Cao",
+        "Jin Liu",
+        "Haoyang Tong",
+        "Ran He"
+      ]
+    },
+    {
+      "id": "2607.12755",
+      "title": "Practical Judgment, Virtue, and Intuition in the Use of Opaque AI-Enabled Systems",
+      "authors": [
+        "Nathan G. Wood",
+        "Andrew P. Rebera"
+      ]
+    },
+    {
+      "id": "2607.12763",
+      "title": "Constraint-Aware Aggregation for Federated Reinforcement Learning in Microgrid Energy Coordination",
+      "authors": [
+        "Usman Haider",
+        "Karl Mason"
+      ]
+    },
+    {
+      "id": "2607.12767",
+      "title": "Accuracy and Normalized Accuracy under Length Bias: Analysis, Guidelines, and a Bayesian Alternative",
+      "authors": [
+        "Koen Oostermeijer"
+      ]
+    },
+    {
+      "id": "2607.12771",
+      "title": "Learning Mechanistic Reasoning for Chemical Reactions with Large Language Models",
+      "authors": [
+        "Xingyu Dang",
+        "Haocheng Tang",
+        "Junmei Wang",
+        "Yanjun Li"
+      ]
+    },
+    {
+      "id": "2607.12774",
+      "title": "HSEmotion Team at the 11th ABAW Challenge: Multi-Task Learning and Ambivalence/Hesitancy Video Recognition",
+      "authors": [
+        "Aleksei Bakin",
+        "Andrey V. Savchenko"
+      ]
+    },
+    {
+      "id": "2607.12775",
+      "title": "Learning-enabled Acceleration of Scenario-based Model Predictive Control",
+      "authors": [
+        "Trinh Tran",
+        "Binh Nguyen",
+        "Truong X. Nghiem"
+      ]
+    },
+    {
+      "id": "2607.12780",
+      "title": "When Close Enough Is Not Enough: Autoregressive Drift in Quantum Circuit Synthesis",
+      "authors": [
+        "Mehdi Saeedi",
+        "Eddie Richter",
+        "Paul Hartke"
+      ]
+    },
+    {
+      "id": "2607.12784",
+      "title": "Directional Constraints for Efficient Exploration in Safe Reinforcement Learning",
+      "authors": [
+        "Paolo Magliano",
+        "Puze Liu",
+        "Jan Peters",
+        "Davide Tateo",
+        "Raffaello Camoriano"
+      ]
+    },
+    {
+      "id": "2607.12787",
+      "title": "Do We Really Need Multimodal Emotion Language Models Larger Than 1B Parameters?",
+      "authors": [
+        "Kaiwen Zheng",
+        "Junchen Fu",
+        "Wenhao Deng",
+        "Hu Han",
+        "Joemon M. Jose",
+        "Xuri Ge"
+      ]
+    },
+    {
+      "id": "2607.12789",
+      "title": "AVQ-Attention: Adaptive Vector-Quantized Attention",
+      "authors": [
+        "Winfried van den dool",
+        "Patrick Forr\u00e9",
+        "Amir Habibian",
+        "Yuki M. Asano",
+        "Max Welling"
+      ]
+    },
+    {
+      "id": "2607.12790",
+      "title": "Who Grades the Grader? Co-Evolving Evaluation Metrics and Skills for Self-Improving LLM Agents",
+      "authors": [
+        "Xing Zhang",
+        "Guanghui Wang",
+        "Yanwei Cui",
+        "Ziyuan Li",
+        "Wei Qiu",
+        "Bing Zhu",
+        "Peiyang He"
+      ]
+    },
+    {
+      "id": "2607.12792",
+      "title": "Silent Alarm: A J-Space Protocol for Comparing Danger Recognition Across Models and Quantization Levels",
+      "authors": [
+        "Roman Prosvirnin",
+        "Victor Minchenkov",
+        "Alexey Soldatov",
+        "Vladimir Bashun"
+      ]
+    },
+    {
+      "id": "2607.12796",
+      "title": "The One-Word Census: Answer-Choice Conformity Across 44 Language Models",
+      "authors": [
+        "Tapan Parikh"
+      ]
+    },
+    {
+      "id": "2607.12801",
+      "title": "Autonomous Tracking and Terminal Guidance of Moving Targets for Fixed-Wing UAVs",
+      "authors": [
+        "Wei-Hao Liou",
+        "Teng-Hu Cheng"
+      ]
+    },
+    {
+      "id": "2607.12811",
+      "title": "PixelLoop: Shortcut Topological Navigation with Pixel-Level Loops",
+      "authors": [
+        "Sarthak Chittawar",
+        "Vansh Garg",
+        "Aditya Vadali",
+        "Krish Pandya",
+        "Rohit Jayanti",
+        "Sourav Garg",
+        "Madhava Krishna"
+      ]
+    },
+    {
+      "id": "2607.12815",
+      "title": "Visual Access Boundaries in Vision-Language Model Reasoning",
+      "authors": [
+        "Hiroto Osaka",
+        "Shohei Taniguchi",
+        "Gouki Minegishi",
+        "Kai Yamashita",
+        "Masahiro Suzuki",
+        "Yutaka Matsuo"
+      ]
+    },
+    {
+      "id": "2607.12823",
+      "title": "Human-AI Agent Interaction as a Neuroplastic Training Environment",
+      "authors": [
+        "Eranga Bandara",
+        "Ross Gore",
+        "Asanga Gunaratna",
+        "Ravi Mukkamala",
+        "Nihal Siriwardanagea",
+        "Gihan Siriwardanagea",
+        "Sachini Rajapakse",
+        "Isurunima Kularathna",
+        "Pramoda Karunarathna",
+        "Chalani Rajapakse",
+        "Sachin Shetty",
+        "Christopher K. Rhea",
+        "Ng Wee Keong",
+        "Kasun De Zoysa",
+        "Amin Hass",
+        "Shaifali Kaushik",
+        "Wathsala Herath",
+        "Preston Samuel",
+        "Anita H. Clayton",
+        "Atmaram Yarlagadd"
+      ]
+    },
+    {
+      "id": "2607.12826",
+      "title": "Solution of the Hempel&#39;s statistical ambiguity problem and Causal AI",
+      "authors": [
+        "Evgenii Vityaev"
+      ]
+    },
+    {
+      "id": "2607.12829",
+      "title": "Accelerating Masked Diffusion Large Language Models: A Survey of Efficient Inference Techniques",
+      "authors": [
+        "Daehoon Gwak",
+        "Minhyung Lee",
+        "Junwoo Park",
+        "Jaegul Choo"
+      ]
+    },
+    {
+      "id": "2607.12831",
+      "title": "Knowledgeless Language Models: Suppressing Parametric Recall for Evidence-Grounded Language Modeling",
+      "authors": [
+        "Roi Cohen",
+        "Yvan Carr\u00e9",
+        "Nick Lechtenb\u00f6rger",
+        "Hendrik Droste",
+        "Lucas Kerschke",
+        "Russa Biswas",
+        "Gerard de Melo",
+        "Jan Buys"
+      ]
+    },
+    {
+      "id": "2607.12833",
+      "title": "ANGLE: Angular Neural Generative Learning via Engression",
+      "authors": [
+        "Rajdeep Pathak",
+        "Archi Roy",
+        "Tanujit Chakraborty"
+      ]
+    },
+    {
+      "id": "2607.12835",
+      "title": "Can LLMs Write Reliable Rubrics? A Meta-Evaluation for Experiment Reproduction",
+      "authors": [
+        "Hanhua Hong",
+        "Yizhi Li",
+        "Jiaoyan Chen",
+        "Luu Gia Huy",
+        "Sophia Ananiadou",
+        "Jung-jae Kim",
+        "Chenghua Lin"
+      ]
+    },
+    {
+      "id": "2607.12840",
+      "title": "Reproducible Reservoir Computing with Thermally Driven Superparamagnets: Controlling Temperature Sensitivity",
+      "authors": [
+        "Zhengfei Chen",
+        "Alex Welbourne",
+        "Matthew O.A. Ellis",
+        "Dan A. Allwood",
+        "Eleni Vasilaki",
+        "Thomas J. Hayward"
+      ]
+    },
+    {
+      "id": "2607.12856",
+      "title": "Verifier-Based Reinforcement Fine-Tuning of Reasoning Models for Thermal Energy Storage Control",
+      "authors": [
+        "Takumi Shioda",
+        "Kohei Terashima",
+        "Tatsuo Nagai"
+      ]
+    },
+    {
+      "id": "2607.12857",
+      "title": "ChartGenEval: Corruption-Tested Multi-Dimensional Feedback for Rhythm-Game Chart Generation",
+      "authors": [
+        "Jhen-Ke Lin"
+      ]
+    },
+    {
+      "id": "2607.12861",
+      "title": "Unveiling Complex Collective Behaviors from Simple Rewards",
+      "authors": [
+        "Yize Mi",
+        "Jianan Li",
+        "Liang Li",
+        "Shiyu Zhao"
+      ]
+    },
+    {
+      "id": "2607.12863",
+      "title": "Toward Localizing and Repairing Bias in Transformer Attention Heads",
+      "authors": [
+        "Sigma Jahan"
+      ]
+    },
+    {
+      "id": "2607.12868",
+      "title": "Deep4ge: DNN Training Trajectories for Fault Detection and Diagnosis",
+      "authors": [
+        "Sigma Jahan"
+      ]
+    },
+    {
+      "id": "2607.12884",
+      "title": "Evaluating Large Language Models on Misconceptions in Multi-Turn Medical Conversations",
+      "authors": [
+        "Monica Munnangi",
+        "Saiph Savage"
+      ]
+    },
+    {
+      "id": "2607.12885",
+      "title": "LLM Judges Can Be Too Generous When There Is No Reference Answer",
+      "authors": [
+        "Chalamalasetti Kranti",
+        "Sowmya Vajjala"
+      ]
+    },
+    {
+      "id": "2607.12886",
+      "title": "A Multi-Agent System for Autonomous, Fine-Tuning-Free Clinical Symptom Detection: Development and Validation Study",
+      "authors": [
+        "Cameron Cagan",
+        "Pedram Fard",
+        "Jiazi Tian",
+        "Jingya Cheng",
+        "Shawn N. Murphy",
+        "Hossein Estiri"
+      ]
+    },
+    {
+      "id": "2607.12888",
+      "title": "Energy-Based Physics-Informed Form Finding for Clustered Tensegrity Structures",
+      "authors": [
+        "Jing Qin",
+        "Muhao Chen"
+      ]
+    },
+    {
+      "id": "2607.12892",
+      "title": "UR-VC: Unsupervised Robotic Value Correction for Time-Derived Progress Proxies",
+      "authors": [
+        "Lirui Zhao",
+        "Modi Shi",
+        "Li Chen",
+        "Qi Liu",
+        "Ping Luo",
+        "Hongyang Li"
+      ]
+    },
+    {
+      "id": "2607.12893",
+      "title": "MemOps: Benchmarking Lifecycle Memory Operations in Long-Horizon Conversations",
+      "authors": [
+        "Xixuan Hao",
+        "Zeyu Zhang",
+        "Zehao Lin",
+        "Yihang Sun",
+        "Ziliang Guo",
+        "Xichong Zhang",
+        "Yuxuan Liang",
+        "Feiyu Xiong",
+        "Zhiyu Li"
+      ]
+    },
+    {
+      "id": "2607.12902",
+      "title": "Accelerated Mixing Time of Randomized Hamiltonian Monte Carlo",
+      "authors": [
+        "Siddharth Mitra",
+        "Vishwak Srinivasan",
+        "Xiuyuan Wang",
+        "Andre Wibisono"
+      ]
+    },
+    {
+      "id": "2607.12909",
+      "title": "Real-time fall detection based on vision for low-power edge platforms",
+      "authors": [
+        "Wenjun Xia",
+        "Zhicheng Peng",
+        "Haopeng Li",
+        "Zhengdi Zhang"
+      ]
+    },
+    {
+      "id": "2607.12916",
+      "title": "Contrastive-Collapsed Loss for Flexible and Geometrically Optimal Embeddings and Faster Convergence",
+      "authors": [
+        "Blanca Cano-Camarero",
+        "\u00c1ngela Fern\u00e1ndez-Pascual",
+        "Jos\u00e9 R. Dorronsoro"
+      ]
+    },
+    {
+      "id": "2607.12922",
+      "title": "LatentFlow: A General Framework for Conditioning Stochastic Processes",
+      "authors": [
+        "Louis Sharrock",
+        "Lachlan Astfalck",
+        "Henry Moss"
+      ]
+    },
+    {
+      "id": "2607.12924",
+      "title": "Knowledge- and Gradient-Guided Reinforcement Learning for Parametrized Action Markov Decision Processes",
+      "authors": [
+        "Jonas Ehrhardt",
+        "Ren\u00e9 Heesch",
+        "Oliver Niggemann"
+      ]
+    },
+    {
+      "id": "2607.12928",
+      "title": "Efficient Sequential Calibration with $O(T^{2/3-\u03b5})$ Error Bound",
+      "authors": [
+        "Zihan Zhang"
+      ]
+    },
+    {
+      "id": "2607.12946",
+      "title": "ViHoRec: A Quality-Controlled Vietnamese Hotel Recommendation Dataset and Cold-Start Benchmark",
+      "authors": [
+        "Minh Hoang Nguyen"
+      ]
+    },
+    {
+      "id": "2607.12954",
+      "title": "Robustness of Deep Learning Models for PV Power Forecasting under NWP Forecast Errors: A Spatiotemporal and Physically Interpretable Analysis",
+      "authors": [
+        "Dandan Chen",
+        "Yan Zhao",
+        "Xuepeng Chen"
+      ]
+    },
+    {
+      "id": "2607.12962",
+      "title": "Form, Not Content? A Preregistered, Placebo-Controlled Evaluation of Learned Error-Conditioned Self-Repair Through Prompts and Weights in Frozen Small Code Models",
+      "authors": [
+        "Mehmet Iscan"
+      ]
+    },
+    {
+      "id": "2607.12963",
+      "title": "The Illusion of Robustness: Aggregate Accuracy Hides Prediction Flips under Task-Irrelevant Context",
+      "authors": [
+        "Yanzhe Zhang",
+        "Sanmi Koyejo",
+        "Diyi Yang"
+      ]
+    },
+    {
+      "id": "2607.12975",
+      "title": "Ensemble Controlled-Flow Filtering for Implicit Data Assimilation",
+      "authors": [
+        "Zhuoyuan Li",
+        "Yue Zhao",
+        "Ming Li"
+      ]
+    },
+    {
+      "id": "2607.12982",
+      "title": "FormalAnalyticGeo: A Neural-Symbolic Based Framework for Multimodal Analytic Geometry Problem Generation",
+      "authors": [
+        "Ruoran Xu",
+        "Wending Gao",
+        "Qiufeng Wang"
+      ]
+    },
+    {
+      "id": "2607.12985",
+      "title": "Resist and Update: Counterfactual Report Coordinates for Incentive-Compatible LLMs",
+      "authors": [
+        "Sen Yang",
+        "Yuen-Hei Yeung"
+      ]
+    },
+    {
+      "id": "2607.12986",
+      "title": "Win by Silence: Deletion Non-Monotonicity, Autonomous Exploitation, and Typed-State Gating in LLM Plan Evaluation",
+      "authors": [
+        "Aleh Manchuliantsau"
+      ]
+    },
+    {
+      "id": "2607.13003",
+      "title": "Watermark Forensics for Generative Models: An Information-Theoretic Perspective",
+      "authors": [
+        "Xiaoyu Li",
+        "Zheng Gao",
+        "Xiaoyan Feng",
+        "Jiaojiao Jiang",
+        "Yulei Sui",
+        "Jiankun Hu"
+      ]
+    },
+    {
+      "id": "2607.13006",
+      "title": "The Spectrum Is Not Enough: When Context Helps Time-Series Forecasting",
+      "authors": [
+        "Mert Onur Cakiroglu",
+        "Mehmet Dalkilic",
+        "Hasan Kurban"
+      ]
+    },
+    {
+      "id": "2607.13007",
+      "title": "Dynamic Resource Allocation for Ensemble Determinization MCTS",
+      "authors": [
+        "Jakub Kowalski",
+        "Adam Ci\u0119\u017ckowski",
+        "Artur Krzy\u017cy\u0144ski",
+        "Mark H. M. Winands"
+      ]
+    },
+    {
+      "id": "2607.13013",
+      "title": "Audio-Native Speech Recognition with a Frozen Discrete-Diffusion Language Model",
+      "authors": [
+        "Harsha Vardhan Khurdula",
+        "Abhinav Kumar Singh",
+        "Yoeven D Khemlani",
+        "Vineet Agarwal"
+      ]
+    },
+    {
+      "id": "2607.13022",
+      "title": "A Shortcut to Statistically Steady-State Turbulence with Flow Matching",
+      "authors": [
+        "Gianluca Galletti",
+        "Gerald Gutenbrunner",
+        "William Hornsby",
+        "Lorenzo Zanisi",
+        "Naomi Carey",
+        "Stanislas Pamela",
+        "Johannes Brandstetter",
+        "Fabian Paischer"
+      ]
+    },
+    {
+      "id": "2607.13027",
+      "title": "PalmClaw: A Native On-Device Agent Framework for Mobile Phones",
+      "authors": [
+        "Hongru Cai",
+        "Yongqi Li",
+        "Ran Wei",
+        "Wenjie Li"
+      ]
+    },
+    {
+      "id": "2607.13028",
+      "title": "TerraZero: Procedural Driving Simulation for Zero-Demonstration Self-Play at Scale",
+      "authors": [
+        "Zhouchonghao Wu",
+        "Akshay Rangesh",
+        "Weixin Li",
+        "Wei-Jer Chang",
+        "Zachary Lee",
+        "Tim Wang",
+        "Wei Zhan"
+      ]
+    },
+    {
+      "id": "2607.13031",
+      "title": "The Seriality Gap in Video Diffusion Models",
+      "authors": [
+        "Jorge Diaz Chao",
+        "Konpat Preechakul",
+        "Yuxi Liu",
+        "Yutong Bai"
+      ]
+    },
+    {
+      "id": "2607.13034",
+      "title": "Do AI Agents Know When a Task Is Simple? Toward Complexity-Aware Reasoning and Execution",
+      "authors": [
+        "Junjie Yin",
+        "Xinyu Feng"
+      ]
+    },
+    {
+      "id": "2607.13035",
+      "title": "FixItFlow: Automated Troubleshooting Guide Generation from Cloud Incidents",
+      "authors": [
+        "Srihari Unnikrishnan",
+        "Jaskaran Singh Walia",
+        "Drishti Goel",
+        "Supriyo Ghosh"
+      ]
+    },
+    {
+      "id": "2607.13036",
+      "title": "Ask Before You Diagnose: Safe-Psych, a Sequential Evaluation Benchmark for LLMs in Psychiatry",
+      "authors": [
+        "Oriana Presacan",
+        "Andreea Grama",
+        "Larisa Irimin\u0103",
+        "Alireza Nik",
+        "Jaya Ojha",
+        "Vajira Thambawita",
+        "Ciprian I. B\u0103cil\u0103",
+        "Bogdan Ionescu",
+        "Michael A. Riegler"
+      ]
+    },
+    {
+      "id": "2607.13037",
+      "title": "OriginBlame: Record- and Token-Level Data Provenance for AI Training Datasets",
+      "authors": [
+        "Haolin Xue"
+      ]
+    },
+    {
+      "id": "2607.13038",
+      "title": "Designing Safety-Constrained LLM Systems for Public Health Information Access",
+      "authors": [
+        "Ben Torkian",
+        "Jun Zhou"
+      ]
+    },
+    {
+      "id": "2607.13039",
+      "title": "Safeguard-Conditioned Uplift: Measuring Utility-Risk Frontiers for Dual-Use Biology Assistants",
+      "authors": [
+        "Dipesh Tharu Mahato"
+      ]
+    },
+    {
+      "id": "2607.13040",
+      "title": "Final Authority in AI Governance: Frontier-Provider Sovereignty and Action-Centered Deployer Governance",
+      "authors": [
+        "Zexun Wang"
+      ]
+    },
+    {
+      "id": "2607.13041",
+      "title": "LessonBench-V1: A Benchmark Dataset for Evaluating AI Lesson Generation Agents",
+      "authors": [
+        "Ravidu Suien Rammuni Silva",
+        "Ahmad Lotfi",
+        "Isibor Kennedy Ihianle",
+        "Golnaz Shahtahmassebi",
+        "Jordan J. Bird"
+      ]
+    },
+    {
+      "id": "2607.13042",
+      "title": "Automatic Differentiation from Scratch: How PyTorch Computes Gradients in Physics-Informed Neural Networks",
+      "authors": [
+        "Abdeladhim Tahimi"
+      ]
+    },
+    {
+      "id": "2607.13043",
+      "title": "Beyond Backbone Backpropagation: A Decoupled Strategy for Efficient Transfer Learning",
+      "authors": [
+        "Daniel Vila-Cruz",
+        "Laura Mor\u00e1n-Fern\u00e1ndez",
+        "Ver\u00f3nica Bol\u00f3n-Canedo"
+      ]
+    },
+    {
+      "id": "2607.13044",
+      "title": "The Perplexity Trap: When Patent Law Makes Human Writing Look Like AI",
+      "authors": [
+        "Anubhab Banerjee"
+      ]
+    },
+    {
+      "id": "2607.13045",
+      "title": "Federated Explainable Artificial Intelligence: Roles, Architectures, Evaluation, and Open Challenges",
+      "authors": [
+        "Masoume Gholizade",
+        "Fabrizio Ruffini",
+        "Pietro Ducange",
+        "Francesco Marcelloni"
+      ]
+    },
+    {
+      "id": "2607.13046",
+      "title": "What Your Model Threw Away and Why You&#39;ll Want It Back: Masking, Fingerprinting, and Privacy from Discarded Geometry",
+      "authors": [
+        "Zachary P. Bradshaw"
+      ]
+    },
+    {
+      "id": "2607.13047",
+      "title": "Targeted Recovery of Weight-Space Mechanisms From Neural Networks",
+      "authors": [
+        "Antoine Vigouroux",
+        "Lee Sharkey"
+      ]
+    },
+    {
+      "id": "2607.13048",
+      "title": "Uncertainty-Aware Sequential Decision Rules for Event-Triggered LLM Invocation in Streaming Systems",
+      "authors": [
+        "Zhaohui Wang"
+      ]
+    },
+    {
+      "id": "2607.13049",
+      "title": "SPINE: Bridging the Cyber-Physical Gap with Agentic AI",
+      "authors": [
+        "Minkyu Ham",
+        "Dongho Kim",
+        "Chan Lee",
+        "Jiayi Wang",
+        "Min Jun Kim",
+        "Yixi Zhang",
+        "Guo Ye",
+        "Jihai Zhao",
+        "Soyeon Park",
+        "Han Liu"
+      ]
+    },
+    {
+      "id": "2607.13051",
+      "title": "Precomputing the Future-Offset Average in TriAttention",
+      "authors": [
+        "Amarnath Mukherjee"
+      ]
+    },
+    {
+      "id": "2607.13054",
+      "title": "Autonomous UAV Route Planning for Coverage Maximization in Environmental Monitoring: A Systematic Literature Review",
+      "authors": [
+        "Sebastian Jouannet-Contreras",
+        "Carola Figueroa-Flores"
+      ]
+    },
+    {
+      "id": "2607.13056",
+      "title": "HRIBench: Benchmarking Interaction-Centric Human-Robot Collaboration",
+      "authors": [
+        "Chang Liu",
+        "Jiawei Zhang",
+        "Tao Zhang",
+        "Ye Wang",
+        "Hongyu Zhou",
+        "Qin Jin"
+      ]
+    },
+    {
+      "id": "2607.13069",
+      "title": "Interventional Grounding Audits: Black-Box Premise-Dependency Tests for LLM Chain-of-Thought via Predicate Substitution",
+      "authors": [
+        "Hironao Nakamura"
+      ]
+    },
+    {
+      "id": "2607.13070",
+      "title": "Falsifiable Release Gates for Self-Improving Systems: Standing Invariants at Scale",
+      "authors": [
+        "Deepak Soni"
+      ]
+    },
+    {
+      "id": "2607.13071",
+      "title": "Compaction as Epistemic Failure: How Agentic LLM Tools Fabricate Confirmed Results from Killed Processes",
+      "authors": [
+        "Hiroki Tamba"
+      ]
+    },
+    {
+      "id": "2607.13072",
+      "title": "HRO: Hierarchical Room-to-Object Framework for Zero-Shot Object Goal Navigation with Large Language Models",
+      "authors": [
+        "Luyuan Jia",
+        "Yinfeng Yu"
+      ]
+    },
+    {
+      "id": "2607.13073",
+      "title": "Probabilistic Extension of Neuro-Symbolic AGI Robots based on Belnap&#39;s Typed Intensional FOL",
+      "authors": [
+        "Zoran Majkic"
+      ]
+    },
+    {
+      "id": "2607.13074",
+      "title": "When is the combined load identifiable from a stress-intensity profile? A coupled forward-inverse study on SIFBench finite-element data",
+      "authors": [
+        "Giansalvo Cirrincione",
+        "Filippo Grassia"
+      ]
+    },
+    {
+      "id": "2607.13075",
+      "title": "The Entanglement Wall: Activation-Space Probes as Risk Detectors, Not Context Adjudicators",
+      "authors": [
+        "Dominik Schwarz"
+      ]
+    },
+    {
+      "id": "2607.13077",
+      "title": "The Hitchhiker&#39;s Guide to Monoculture",
+      "authors": [
+        "Gordon Burtch"
+      ]
+    },
+    {
+      "id": "2607.13078",
+      "title": "Operational Evidence Gaps for LLMs in Fraud Detection and Trust-and-Safety Workflows",
+      "authors": [
+        "Keyur Gabani"
+      ]
+    },
+    {
+      "id": "2607.13080",
+      "title": "Inference Economics of Enterprise Coding Agents: A Case Study of Cloud vs. On-Premise LLMs",
+      "authors": [
+        "Sheng-Wei Peng",
+        "Yi-Hsun Lin",
+        "Yi-Pei Lee"
+      ]
+    },
+    {
+      "id": "2607.13081",
+      "title": "SingGuard-NSFA: Extensible Guardrails for Agentic AI via Generative Reasoning and Real-Time Classification",
+      "authors": [
+        "SingGuard Team"
+      ]
+    },
+    {
+      "id": "2607.13085",
+      "title": "Baselines Before Architecture: Evaluating Coding Agents for Autonomous Penetration Testing",
+      "authors": [
+        "Ananda Dhakal",
+        "Krish Neupane",
+        "Aarjan Chaudhary"
+      ]
+    },
+    {
+      "id": "2607.13088",
+      "title": "Securing LLMs in the Wild: Privacy and Security Challenges at the Edge",
+      "authors": [
+        "Ren-Yi Huang",
+        "Mingchen Li",
+        "Dumindu Samaraweera",
+        "Morris Chang"
+      ]
+    },
+    {
+      "id": "2607.13091",
+      "title": "Self-Improving AI Coding Agents Through Accumulated Behavioral Rules: A Closed-Loop Framework",
+      "authors": [
+        "Aditya Aggarwal",
+        "Nahid Farhady Ghalaty"
+      ]
+    },
+    {
+      "id": "2607.13093",
+      "title": "Efficient and Privacy Aware Edge Cloud Collaborative Inference for Large Language Models",
+      "authors": [
+        "Cheng Li",
+        "Jiexiong Liu",
+        "Yixuan Chen",
+        "Yi Li"
+      ]
+    },
+    {
+      "id": "2607.13094",
+      "title": "Analyzing Curricular Pattern Complexity Using AI to Improve On-Time Graduation Rates",
+      "authors": [
+        "Lynn Vonderhaar",
+        "Juan Couder",
+        "Siri Siqveland",
+        "Omar Ochoa",
+        "James Pembridge"
+      ]
+    },
+    {
+      "id": "2607.13095",
+      "title": "Full-Pipeline Inference Optimization for MiMo-V2.5 Series: Pushing Hybrid SWA Efficiency to the Limit",
+      "authors": [
+        "Xiaomi MiMo Team",
+        "Anqi Liu",
+        "Aoxin Ma",
+        "Bo Chen",
+        "Bo Yang",
+        "Chen Wang",
+        "Chen Zhang",
+        "Chengda Tang",
+        "Chengwei Wang",
+        "Chiheng Lou",
+        "Depeng Yan",
+        "Fuli Luo",
+        "Gang Wang",
+        "Hailin Zhang",
+        "Jiale Sun",
+        "Kang Zhou",
+        "Rui Huang",
+        "Shaohui Liu",
+        "Shen Huang",
+        "Shijie Cao",
+        "Shuaishuai Fan",
+        "Tianling Zhou",
+        "Xiangwei Deng",
+        "Xueyang Xie",
+        "Xuli Wang",
+        "Yingchun Lai",
+        "Yu Yang",
+        "Yuan Zhang",
+        "Zhen Tang",
+        "Zhonghua Deng",
+        "Zihan Jiang"
+      ]
+    },
+    {
+      "id": "2607.13099",
+      "title": "WaterMoE: Expert-Routing-based Watermarking for High Fidelity and Efficiency",
+      "authors": [
+        "Z Sun",
+        "Q Jiang",
+        "S Sheng",
+        "L Xiang"
+      ]
+    },
+    {
+      "id": "2607.13101",
+      "title": "TSSM: Triaxial State Space Model for Global Station Weather Forecasting with Temporal-Variable-Historical Modeling",
+      "authors": [
+        "Songru Yang",
+        "Zili Liu",
+        "Tao Han",
+        "Ben Fei",
+        "Fenghua Ling",
+        "Lei Bai",
+        "Chang Liu",
+        "Xiangyang Ji",
+        "Zhenwei Shi",
+        "Zhengxia Zou"
+      ]
+    },
+    {
+      "id": "2607.13103",
+      "title": "Disentangling Knowledge States with Ability and Proficiency Modeling for Knowledge Tracing",
+      "authors": [
+        "Duantengchuan Li",
+        "Yingqian Bi",
+        "Jinsong Chen",
+        "Rui Zhang",
+        "Mingwen Tong"
+      ]
+    },
+    {
+      "id": "2607.13104",
+      "title": "Self-Improvements in Modern Agentic Systems: A Survey",
+      "authors": [
+        "Zhe Ren",
+        "Yimeng Chen",
+        "Dandan Guo",
+        "Guowei Rong",
+        "Tonghui Li",
+        "R. B. Xiong",
+        "Qingfeng Lan",
+        "Wenyi Wang",
+        "Li Nanbo",
+        "Yibo Yang",
+        "Mingchen Zhuge",
+        "J\u00fcrgen Schmidhuber"
+      ]
+    },
+    {
+      "id": "2607.13107",
+      "title": "DeepCormack: Fermi surface tomography using model-based data-driven algorithms",
+      "authors": [
+        "Georg F. B. Lovric",
+        "Bryn Drury",
+        "Carola-Bibiane Sch\u00f6nlieb",
+        "Stephen B. Dugdale",
+        "Ander Biguri"
+      ]
+    },
+    {
+      "id": "2607.13108",
+      "title": "STKAN: Kolmogorov-Arnold Networks for Spatio-Temporal Forecasting",
+      "authors": [
+        "Sicong Lai",
+        "Yuehong Hu",
+        "Siru Zhong",
+        "Si Qiao",
+        "Yuxuan Liang",
+        "Guangyin Jin"
+      ]
+    },
+    {
+      "id": "2607.13110",
+      "title": "A Hybrid Mamba for Audio-Visual Navigation",
+      "authors": [
+        "Yi Wang",
+        "Yinfeng Yu"
+      ]
+    },
+    {
+      "id": "2607.13111",
+      "title": "SemaDiff: Identifying Semantic-Changing Commits with Generated Code and Tests",
+      "authors": [
+        "Maha Ayub",
+        "Michael Konstantinou",
+        "Ahmed Khanfir",
+        "Nikolaos Tsantalis",
+        "Mike Papadakis"
+      ]
+    },
+    {
+      "id": "2607.13115",
+      "title": "Improving Molecular Property Prediction in Small Language Models Using Graph-based Tools",
+      "authors": [
+        "Konstantinos Bougiatiotis",
+        "Dimitrios Kelesis",
+        "Georgios Paliouras"
+      ]
+    },
+    {
+      "id": "2607.13119",
+      "title": "Mixed-Timescale Differential Coding for Downlink Model Broadcast in Wireless Federated Learning",
+      "authors": [
+        "Chung-Hsuan Hu",
+        "Zheng Chen",
+        "Erik G. Larsson"
+      ]
+    },
+    {
+      "id": "2607.13120",
+      "title": "CoDiffGRN: Rethinking Gene Regulatory Network Inference via the BEELINE-KGC Benchmark and Co-evolutionary Discrete Diffusion",
+      "authors": [
+        "Jiaze Song",
+        "Runhao Zhao",
+        "Minghao Xu",
+        "Bin Cui",
+        "Wentao Zhang"
+      ]
+    },
+    {
+      "id": "2607.13123",
+      "title": "AI in Cyberpsychology: A systematic literature review of Cybersecurity enhancement by using AI for analyzing psychology of Victims, Attackers, and Defenders",
+      "authors": [
+        "Georg Thamer Francis",
+        "Malek Malkawi",
+        "Sevim Ey\u00fcpo\u011flu",
+        "Reda Alhajj",
+        "Selim Akyoku\u015f"
+      ]
+    },
+    {
+      "id": "2607.13124",
+      "title": "ShortOPD: Recovering Pruned LLMs with Short-to-Long On-Policy Distillation",
+      "authors": [
+        "Qingyu Zhang",
+        "Qianhao Yuan",
+        "Hongyu Lin",
+        "Yaojie Lu",
+        "Xianpei Han",
+        "Le Sun",
+        "Xiang Li",
+        "Ming Xu",
+        "Jiarui Li",
+        "Xiuyin Zhao"
+      ]
+    },
+    {
+      "id": "2607.13125",
+      "title": "Boogu-Image-0.1: Boosting Open Agentic Multimodal Generation via Understanding under a Minimal Budget",
+      "authors": [
+        "Guoxuan Chen",
+        "Chufeng Xiao",
+        "Haoran Yang",
+        "Siyue Xie",
+        "Binxiao Huang",
+        "Ming Zhang",
+        "Cheuk Him Chau",
+        "Xinyu Fu",
+        "Yingzhao Lian",
+        "Tom S.Y. Li",
+        "Jintao Lin",
+        "Bowen Dong",
+        "Zian Qian",
+        "Yuhao Liu",
+        "Yuxuan Hu",
+        "Weikang Shi",
+        "Bin Zou",
+        "Bowen Zheng",
+        "Haoxuan Che",
+        "Chang Chen",
+        "Yuyang He",
+        "Heyang Sun",
+        "Tianyu Huang",
+        "Chong Hou Choi",
+        "Cheng Gong",
+        "Han Shi",
+        "Haoli Bai",
+        "Xihui Liu",
+        "Hongsheng Li",
+        "Qifeng Chen",
+        "Chao Huang",
+        "Rui Liu",
+        "Chenyang Lei"
+      ]
+    },
+    {
+      "id": "2607.13155",
+      "title": "HEDGEHOG: Hierarchical Evaluation of Drug Generators Through Rigorous Filtration",
+      "authors": [
+        "Daria A. Ryabchenko",
+        "Pavel Gurevich",
+        "Shamil Kadyrov",
+        "Daria Frolova",
+        "Kseniia Fedisheva",
+        "Sergei A. Nikolenko",
+        "Alexander Shapeev",
+        "Marina A. Pak"
+      ]
+    },
+    {
+      "id": "2607.13157",
+      "title": "Oracle Agent Memory as an Enterprise Memory Substrate for Long-Horizon AI Agents",
+      "authors": [
+        "Richmond Alake",
+        "Cesare Bernardis",
+        "Paul Cayet",
+        "Luca Engel",
+        "Damien Hilloulin",
+        "Sungpack Hong",
+        "Allen Hosler",
+        "Nickolas Kavantzas",
+        "Ingo Kossyk",
+        "Son Le",
+        "Rhicheek Patra",
+        "Kartik Talamadupula",
+        "Valentin Venzin"
+      ]
+    },
+    {
+      "id": "2607.13158",
+      "title": "Do LLMs Need Architectural Changes for Simultaneous Speech Translation? A Prefix-to-Prefix Data Driven Approach",
+      "authors": [
+        "Junkun Chen",
+        "Jian Xue",
+        "Ming Tang",
+        "Abdel Heba",
+        "Hoda Gholami",
+        "Ruchao Fan",
+        "Jinyu Li"
+      ]
+    },
+    {
+      "id": "2607.13160",
+      "title": "Active Beyond-Diagonal RIS Empowered Heterogeneous Edge Computing: A Distributional Reinforcement Learning Approach",
+      "authors": [
+        "Tianyu Pang",
+        "Hongyu Li"
+      ]
+    },
+    {
+      "id": "2607.13162",
+      "title": "What Models Express, Suppress, and Resist: Auditing Open-Weight LLMs with Persona Vectors",
+      "authors": [
+        "Winston Zeng",
+        "Ali Emami",
+        "Jinho D. Choi"
+      ]
+    },
+    {
+      "id": "2607.13164",
+      "title": "Text2Sign: A Single-GPU Diffusion Baseline for Text-to-Sign Language Video Generation",
+      "authors": [
+        "Ruize Xia"
+      ]
+    },
+    {
+      "id": "2607.13172",
+      "title": "Learning Safe Agent Behaviour from Human Preferences and Justifications via World Models",
+      "authors": [
+        "Ilias Kazantzidis",
+        "Timothy J. Norman",
+        "Yali Du",
+        "Christopher T. Freeman"
+      ]
+    },
+    {
+      "id": "2607.13175",
+      "title": "SteinGate: Tail-Sensitive Safe Reinforcement Learning via Stein Discrepancy",
+      "authors": [
+        "Yassine Chemingui",
+        "Chenhua Fan",
+        "Honghao Wei",
+        "Janardhan Rao Doppa"
+      ]
+    },
+    {
+      "id": "2607.13188",
+      "title": "Concurrent Image Understanding and Generation: Self-Correcting Coupled Markov Jump Processes",
+      "authors": [
+        "Minh-Quan Le",
+        "Armand Comas",
+        "Alexandros Lattas",
+        "Stylianos Moschoglou",
+        "Pedro V\u00e9lez",
+        "Amit Raj",
+        "Aaron Germuth",
+        "Thabo Beeler",
+        "Dimitris Samaras",
+        "Di Qiu"
+      ]
+    },
+    {
+      "id": "2607.13189",
+      "title": "RAGthoven at SemEval-2026 Task 1: A Multi-Stage Pipeline Walks Into a Benchmark and Barely Clears the Bar",
+      "authors": [
+        "Marek \u0160uppa",
+        "Vikt\u00f3ria Ondrejov\u00e1",
+        "Lucia Ganajov\u00e1",
+        "Gregor Karetka",
+        "Daniel Skala"
+      ]
+    },
+    {
+      "id": "2607.13203",
+      "title": "BARS: Benign-Anchored Ranking and Selection for False Alarm Reduction in Network Intrusion Detection",
+      "authors": [
+        "Abu Fuad Ahmad",
+        "Istiaque Ahmed"
+      ]
+    },
+    {
+      "id": "2607.13205",
+      "title": "Adaptive Filtering of the KV Cache: Diagnosing and Correcting Structural-Role Bias in LLM Inference",
+      "authors": [
+        "Soumil Mandal"
+      ]
+    },
+    {
+      "id": "2607.13216",
+      "title": "Classifying daily activities needs posture, reconstructing them needs motion",
+      "authors": [
+        "Arefeh Farahmandi",
+        "Gunnar Blohm"
+      ]
+    },
+    {
+      "id": "2607.13217",
+      "title": "Hierarchical $\\mathcal{F}$-Clustering: Approximation and Hardness of Clustering into Trees and Bounded Diameter Graphs",
+      "authors": [
+        "Micha\u0142 Szyfelbein",
+        "Dariusz Dereniowski"
+      ]
+    },
+    {
+      "id": "2607.13218",
+      "title": "Graph Partitioning with Demands: Generalized Conductance and its Applications",
+      "authors": [
+        "Micha\u0142 Szyfelbein",
+        "Dariusz Dereniowski"
+      ]
+    },
+    {
+      "id": "2607.13219",
+      "title": "CayleyR: Solving the TopSpin puzzle via cycle intersection",
+      "authors": [
+        "Yuri Baramykov"
+      ]
+    },
+    {
+      "id": "2607.13220",
+      "title": "Networked Intelligence: Active Shared Context Graphs for Human-AI Team Science",
+      "authors": [
+        "Sutanay Choudhury",
+        "Jeffrey J. Czajka",
+        "Lummy M. O. Monteiro",
+        "Erin Bredeweg",
+        "Jason McDermott",
+        "Katherine Wolf",
+        "Alex Beliaev",
+        "Josh Elmore",
+        "Paul Piehowski",
+        "Kylee Tate",
+        "Yuqian Gao",
+        "Aivett Bilbao",
+        "Kelly Stratton",
+        "Scott Baker",
+        "Jaydeep P. Bardhan",
+        "Kristin Burnum Johnson",
+        "Chris Oehmen",
+        "Robert Rallo"
+      ]
+    },
+    {
+      "id": "2607.13221",
+      "title": "Audited Selective Verification for Risk-Controlled N-1 Thermal Contingency Screening under Deployment Shift",
+      "authors": [
+        "Jayakumar Manoharan"
+      ]
+    },
+    {
+      "id": "2607.13230",
+      "title": "AI-Native Insurance for Agentic AI: Pricing, Underwriting, and End-to-End Automation",
+      "authors": [
+        "Quanyan Zhu"
+      ]
+    },
+    {
+      "id": "2607.13234",
+      "title": "Continuously Evolving Deepfake Detection: An Architecture and Public-Benchmark Evaluation of a Dynamic Detection System",
+      "authors": [
+        "Ken Jon Miyachi",
+        "Dylan Uys"
+      ]
+    },
+    {
+      "id": "2607.13237",
+      "title": "Active Learning for Efficient Annotation of Surgical Videos with Weak Supervision",
+      "authors": [
+        "Manasa Dendukuri",
+        "Matjaz Jogan",
+        "Daniel A. Hashimoto",
+        "Guiqiu Liao"
+      ]
+    },
+    {
+      "id": "2607.13239",
+      "title": "Cost-Optimal Foundation Model Deployment Portfolio for Transportation Management",
+      "authors": [
+        "Xi Cheng",
+        "Ke Liu",
+        "Siyuan Feng",
+        "Jane Lin",
+        "H. Oliver Gao"
+      ]
+    },
+    {
+      "id": "2607.13241",
+      "title": "EMAGN: Efficient Multi-Attention Graph Network via Learned Clustering for Scalable Traffic Forecasting",
+      "authors": [
+        "Mingxing Xu",
+        "Rakesh Chowdary Machineni",
+        "Ke Liu",
+        "Xi Cheng",
+        "Chengqi Lu",
+        "Xin Hu",
+        "Lyuhao Chen",
+        "Xiangyu Li",
+        "Junwei You",
+        "Oliver Gao"
+      ]
+    },
+    {
+      "id": "2607.13246",
+      "title": "Reassessing Muon for Matrix Factorization",
+      "authors": [
+        "Ali Parviz",
+        "Gal Mishne",
+        "Alex Cloninger"
+      ]
+    },
+    {
+      "id": "2607.13248",
+      "title": "GSM-Plus-BN: A Perturbation-Based Benchmark for Bangla Mathematical Reasoning in Large Language Models",
+      "authors": [
+        "Bidyarthi Paul",
+        "Nahida Jannat Mayouree",
+        "Md. Asif Karim",
+        "Sagar Chandra Nath",
+        "Swastika Kundu"
+      ]
+    },
+    {
+      "id": "2607.13260",
+      "title": "Discourse-Aware Policy Analysis with Argumentation: A Hybrid LLM-Symbolic Framework for Disaster Governance",
+      "authors": [
+        "Stylianos Loukas Vasileiou",
+        "Olga Derendiaeva"
+      ]
+    },
+    {
+      "id": "2607.13274",
+      "title": "Deconstructing Actor-Critic: A Large-scale Empirical Study of Design Components for Practitioners",
+      "authors": [
+        "Haseeb Shah",
+        "Lingwei Zhu",
+        "Adam White",
+        "Martha White"
+      ]
+    },
+    {
+      "id": "2607.13285",
+      "title": "Harness Handbook: Making Evolving Agent Harnesses Readable,Navigable, and Editable",
+      "authors": [
+        "Ruhan Wang",
+        "Yucheng Shi",
+        "Zongxia Li",
+        "Zhongzhi Li",
+        "Yue Yu",
+        "Junyao Yang",
+        "Kishan Panaganti",
+        "Haitao Mi",
+        "Dongruo Zhou",
+        "Leoweiliang"
+      ]
+    },
+    {
+      "id": "2607.13292",
+      "title": "Theory-Level Autoformalization: From Isolated Statements to Unified Formal Knowledge Bases",
+      "authors": [
+        "Marcus J. Min",
+        "Mike He",
+        "Zhaoyu Li",
+        "Zixuan Yi",
+        "Sharad Malik",
+        "Aarti Gupta",
+        "Xujie Si",
+        "Osbert Bastani"
+      ]
+    },
+    {
+      "id": "2607.13303",
+      "title": "Faithful Autoformalization of Natural Language Assertions",
+      "authors": [
+        "Hongyi Liu",
+        "Madhusudan Parthasarathy",
+        "Adithya Murali"
+      ]
+    },
+    {
+      "id": "2607.13304",
+      "title": "Where Does the Noise Come From? A Variance-Components Decomposition of Non-Determinism in LLM Brand Answers",
+      "authors": [
+        "Dmitrij \u017batuchin"
+      ]
+    },
+    {
+      "id": "2607.13305",
+      "title": "Accuracy Without Grounding: Diagnosing Visual Dependency Dissociation in Video LLM Benchmarks",
+      "authors": [
+        "Jae Joong Lee"
+      ]
+    },
+    {
+      "id": "2607.13311",
+      "title": "Finding the Right Tables and Columns: A Benchmark and Corpus-Adaptive Embeddings for SQL Schema Retrieval",
+      "authors": [
+        "Qingcheng Zeng",
+        "Puxuan Yu",
+        "Aman Mehta",
+        "Fuheng Zhao",
+        "Rajhans Samdani"
+      ]
+    },
+    {
+      "id": "2607.13314",
+      "title": "Tabular Foundation Models for Discrete Choice Estimation",
+      "authors": [
+        "Liu Liu",
+        "Dan Zhang"
+      ]
+    },
+    {
+      "id": "2607.13315",
+      "title": "Meta-Learning Preferences for Multilingual LLM Alignment",
+      "authors": [
+        "Jiaying Lin",
+        "Seongho Son",
+        "Nam Phuong Tran",
+        "Long Tran-thanh",
+        "Ilija Bogunovic",
+        "Debmalya Mandal"
+      ]
+    },
+    {
+      "id": "2607.13319",
+      "title": "Adapting Generalist Vehicle Models for High-Speed MPC Across Terrains",
+      "authors": [
+        "Rwik Rana",
+        "Jesse Quattrociocchi",
+        "Christian Ellis",
+        "Nathan Tsoi",
+        "Garrett Warnell",
+        "Joydeep Biswas"
+      ]
+    },
+    {
+      "id": "2607.13328",
+      "title": "Privacy Preserving Recommender Systems Balancing Personalization with Privacy",
+      "authors": [
+        "Ranjeet K Jha",
+        "Venkata Suresh Gummadilli"
+      ]
+    },
+    {
+      "id": "2607.13330",
+      "title": "Efficient Text-to-Audio Generation via Pruning",
+      "authors": [
+        "Arshdeep Singh",
+        "Yi Yuan",
+        "Yun Chen",
+        "Wenwu Wang",
+        "Mark D. Plumbley"
+      ]
+    },
+    {
+      "id": "2607.13331",
+      "title": "Accuracy-Preserving Stability Regularization for Large-Scale Retail Demand Forecasting",
+      "authors": [
+        "Jize Li",
+        "Jiani He",
+        "Dishu Yang",
+        "Dingyan Shang",
+        "Jingjing Liu",
+        "Shiqi Huang"
+      ]
+    },
+    {
+      "id": "2607.13332",
+      "title": "Agora: Collective and Permissionless Internet-Scale Pretraining of Large Language Models",
+      "authors": [
+        "Gil Avraham",
+        "Violetta Shevchenko",
+        "Hadi Mohaghegh Dolatabadi",
+        "Karol Pajak",
+        "James Snewin",
+        "Harry Xi",
+        "Rodney O&#39;Donnell",
+        "Thalaiyasingam Ajanthan",
+        "Sameera Ramasinghe",
+        "Chamin Hewa Koneputugodage",
+        "Shamane Siriwardhana",
+        "Alexander Long"
+      ]
+    },
+    {
+      "id": "2607.13336",
+      "title": "Delving into the Temporal Challenges of Unified Video Protection Against Image-to-Video and Fine-Tuning-based Customization",
+      "authors": [
+        "Yuxin Huang",
+        "Ziming Hong",
+        "Mingming Gong",
+        "Wanyu Wang",
+        "Jing Zhang",
+        "Tongliang Liu"
+      ]
+    }
+  ],
+  "picks": [
+    {
+      "id": "2607.13093",
+      "title": "Efficient and Privacy Aware Edge Cloud Collaborative Inference for Large Language Models",
+      "authors": [
+        "Cheng Li",
+        "Jiexiong Liu",
+        "Yixuan Chen",
+        "Yi Li"
+      ]
+    },
+    {
+      "id": "2607.12336",
+      "title": "Evaluating Health Misinformation in Low-Resource Languages: Integrating Small Language Models with a Culturally-Sensitive Responsible NLP Framework (Bangla as a Case Study)",
+      "authors": [
+        "Farnaz Farid",
+        "Raihan Alam",
+        "Al Al-Areqi",
+        "Farhad Ahamed",
+        "Muhammad Hassan Khan",
+        "Sadia Hossain",
+        "Irena Veljanova",
+        "Anika Tabassum Binte Hossain"
+      ]
+    },
+    {
+      "id": "2607.12550",
+      "title": "A JoLT for the KV Cache: Near-Lossless KV Cache Compression via Joint Tucker and JL-Residual Allocation for LLMs",
+      "authors": [
+        "Rahul Krishnan",
+        "Volker Schulz"
+      ]
+    },
+    {
+      "id": "2607.12599",
+      "title": "Lightweight Multi-Scale Anomaly Detection for Resource-Constrained Edge Devices",
+      "authors": [
+        "Raheen Junaid Wani",
+        "Smruti R. Sarangi"
+      ]
+    },
+    {
+      "id": "2607.12612",
+      "title": "Translation as a Computationally Efficient Bridge: Feasibility of English BERT for Low-Resource Languages",
+      "authors": [
+        "Hielke Muizelaar",
+        "Giulia Rivetti",
+        "Marco Spruit",
+        "Marcel Haas"
+      ]
+    }
+  ],
+  "manifest": [
+    {
+      "id": "2607.13093",
+      "pdf": "/home/npwad/coding/docker-envs/projects/evo-myworld/racetrack/arxiv-eval/out/2026-07-14/pdf/2607.13093.pdf",
+      "ok": true,
+      "bytes": 1254797,
+      "sha256": "c41a64a1a6dd94d5724f3c8dc8ec49cc892b705ff682389dc55ad9fdd97f87e5",
+      "md_chars": 50890,
+      "blocked": false
+    },
+    {
+      "id": "2607.12336",
+      "pdf": "/home/npwad/coding/docker-envs/projects/evo-myworld/racetrack/arxiv-eval/out/2026-07-14/pdf/2607.12336.pdf",
+      "ok": true,
+      "bytes": 2270071,
+      "sha256": "17e4da89177afb4cf81e939cef764483d4896b9cfb8a9bc015f4f143899a7f60",
+      "md_chars": 75590,
+      "blocked": false
+    },
+    {
+      "id": "2607.12550",
+      "pdf": "/home/npwad/coding/docker-envs/projects/evo-myworld/racetrack/arxiv-eval/out/2026-07-14/pdf/2607.12550.pdf",
+      "ok": true,
+      "bytes": 279316,
+      "sha256": "8d4220d5d69967b105f5e205c2e61573681f10c3b65535d74524358eff1bdbe2",
+      "md_chars": 39728,
+      "blocked": false
+    },
+    {
+      "id": "2607.12599",
+      "pdf": "/home/npwad/coding/docker-envs/projects/evo-myworld/racetrack/arxiv-eval/out/2026-07-14/pdf/2607.12599.pdf",
+      "ok": true,
+      "bytes": 7159492,
+      "sha256": "2ab8cf241f934a68dd4d5c02d0f95beb8f6fc4fcfe0f2b3a3857ecd96f52a182",
+      "md_chars": 68076,
+      "blocked": false
+    },
+    {
+      "id": "2607.12612",
+      "pdf": "/home/npwad/coding/docker-envs/projects/evo-myworld/racetrack/arxiv-eval/out/2026-07-14/pdf/2607.12612.pdf",
+      "ok": true,
+      "bytes": 1358263,
+      "sha256": "dcf65046f58cd37e7f664733400afc463fd2fdec8563dd23e0125bb6353c6e63",
+      "md_chars": 100956,
+      "blocked": false
+    }
+  ],
+  "requests": 34,
+  "wall_s": 55.2
+}

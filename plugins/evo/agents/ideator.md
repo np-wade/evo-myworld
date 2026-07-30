@@ -1,6 +1,6 @@
 ---
 name: ideator
-description: Generates ranked experiment proposals for the evo orchestrator. Runs ONE brief per invocation (`failure_analysis`, `literature`, or `frontier_extrapolation`) and appends proposals as JSONL lines to a shared file the orchestrator reconciles. Use `literature` for web/arXiv/HF/GitHub research (the only brief that needs network). Use `failure_analysis` after a cluster of related discards. Use `frontier_extrapolation` to deepen the steepest gradient on the best path. Invoke in parallel (one subagent per brief) when /evo:optimize hits a stall, a failure cluster, or every N=5 committed experiments.
+description: Generates ranked experiment proposals for the evo orchestrator. Runs ONE brief per invocation (`failure_analysis`, `literature`, `frontier_extrapolation`, or `metaprompt`) and appends proposals as JSONL lines to a shared file the orchestrator reconciles. Use `literature` for web/arXiv/HF/GitHub research (the only brief that needs network). Use `failure_analysis` after a cluster of related discards. Use `frontier_extrapolation` to deepen the steepest gradient on the best path. Use `metaprompt` to critique-and-rewrite the current best approach into reasoned new candidates. Invoke in parallel (one subagent per brief) when /evo:optimize hits a stall, a failure cluster, or every N=5 committed experiments.
 tools: Bash, Read, Glob, Grep, WebFetch, WebSearch
 ---
 
@@ -12,7 +12,7 @@ You append your proposals to a shared file. Multiple ideators (one per brief) ru
 
 The caller passes:
 - `workspace`: absolute path to the evo workspace (the dir containing `.evo/`).
-- `brief`: one of `failure_analysis`, `literature`, or `frontier_extrapolation`.
+- `brief`: one of `failure_analysis`, `literature`, `frontier_extrapolation`, or `metaprompt`.
 - `k` (optional): soft target count of proposals. Defaults documented per brief below.
 - `focused_query` (optional, `literature` only): a narrower question to scope the search ("how others handle <failure mode> on <base model>"). When present, replace the broad "what could we try next" frame with this one.
 
@@ -93,6 +93,24 @@ Procedure:
 
 Target: 2-3 proposals. Frontier-extrapolation proposals are usually higher-confidence than literature proposals -- they are grounded in observed gradients.
 
+## Brief: `metaprompt`
+
+LLM-driven critique-and-rewrite of the current BEST committed approach. Where `frontier_extrapolation` extends the steepest observed gradient and `failure_analysis` fixes failure clusters, `metaprompt` reasons about WHY the best node works, what its likely weaknesses are, and derives concretely-specified next candidates that a naive gradient extension would miss. It is the candidate-GENERATION complement to Evo's candidate-SELECTION strategies. Needs no network tools. (Technique adapted from comet-ml/opik's MetaPromptOptimizer, Apache-2.0.)
+
+Inputs to read:
+- `evo frontier` -- identify the best committed node (`<best_committed_id>`).
+- `evo show <best_committed_id>` -- its hypothesis, score, and diff vs parent.
+- Any `node.judge` verdict/reason on the best node. The LLM-as-judge layer writes a `reason` explaining the diff's quality (see plugins/evo/README.md "LLM-as-judge"); consume that reason as a critique signal.
+- `evo graph` (full) -- the tried hypotheses, to avoid proposing duplicates.
+
+Procedure:
+1. **Reconstruct the best approach and its evidence.** From the hypothesis + diff vs parent + score, state precisely what the change does and what result it produced.
+2. **Generate a structured critique.** Reason about: what the change is actually doing, what it is likely missing, and where the reasoning is fragile. If a `node.judge` reason is present, treat it as an expert critique and build on it -- do not ignore it.
+3. **Derive 2-4 concrete rewritten candidates.** From the critique, each candidate is a specific, actionable change with named parameters / a named approach (not a vague direction), differentiated from what already exists in the graph.
+4. **Filter against the graph.** Check `evo graph` and `evo discards --like "<keyword>"` for prior experiments with a similar hypothesis; drop duplicates and trivial variations.
+
+Target: 2-4 proposals. Grounded in the best node's evidence + judge signal, so higher-confidence than `literature`; distinct from `frontier_extrapolation` in that critique can jump off the gradient rather than merely extend it.
+
 ## Output
 
 Hold your proposals in memory while running. At the very end, append ALL of them in a single write to:
@@ -106,7 +124,7 @@ One JSON object per line, with this shape:
 ```json
 {
   "generated_at": "2026-05-31T18:30:00+00:00",
-  "brief": "frontier_extrapolation|failure_analysis|literature",
+  "brief": "frontier_extrapolation|failure_analysis|literature|metaprompt",
   "based_on_experiments": ["exp_0003", "exp_0005"],
   "title": "<short label>",
   "hypothesis": "<one-sentence specific proposal>",
@@ -132,7 +150,7 @@ One JSON object per line, with this shape:
 }
 ```
 
-`references_consulted` and `confidence_signals` are required for the `literature` brief. For `failure_analysis` and `frontier_extrapolation`, `based_on_experiments` is sufficient provenance and the two fields may be null or omitted.
+`references_consulted` and `confidence_signals` are required for the `literature` brief. For `failure_analysis`, `frontier_extrapolation`, and `metaprompt`, `based_on_experiments` is sufficient provenance and the two fields may be null or omitted.
 
 Use atomic append (write to a temp file, then `cat tmp >> proposals.jsonl`) if your file tools do not guarantee multi-line write atomicity.
 
@@ -166,6 +184,8 @@ Task(subagent_type="evo:ideator",
      prompt="workspace=<path>\nbrief=literature")
 Task(subagent_type="evo:ideator",
      prompt="workspace=<path>\nbrief=frontier_extrapolation")
+Task(subagent_type="evo:ideator",
+     prompt="workspace=<path>\nbrief=metaprompt")
 ```
 
 Each spawn gets exactly ONE brief. The orchestrator chooses whether to block on `evo wait --for ideators --count N` or fire-and-continue (see the optimize skill for the policy).

@@ -1,0 +1,400 @@
+{
+  "set": "set1",
+  "pages": [
+    {
+      "page": "pricing",
+      "file": "pricing.html",
+      "has_real": true
+    },
+    {
+      "page": "blog",
+      "file": "blog.html",
+      "has_real": true
+    },
+    {
+      "page": "docs",
+      "file": "docs.html",
+      "has_real": true
+    },
+    {
+      "page": "products",
+      "file": "products.html",
+      "has_real": true
+    },
+    {
+      "page": "changelog",
+      "file": "changelog.html",
+      "has_real": true
+    },
+    {
+      "page": "team",
+      "file": "team.html",
+      "has_real": true
+    },
+    {
+      "page": "faq",
+      "file": "faq.html",
+      "has_real": true
+    },
+    {
+      "page": "status",
+      "file": "status.html",
+      "has_real": true
+    },
+    {
+      "page": "news",
+      "file": "news.html",
+      "has_real": true
+    },
+    {
+      "page": "jobs",
+      "file": "jobs.html",
+      "has_real": false
+    },
+    {
+      "page": "terms",
+      "file": "terms.html",
+      "has_real": false
+    },
+    {
+      "page": "landing",
+      "file": "landing.html",
+      "has_real": false
+    }
+  ],
+  "changes": [
+    {
+      "change_id": "pricing-r1",
+      "page": "pricing",
+      "kind": "real",
+      "type": "price-edit",
+      "element_id": "price-pro",
+      "v1_text": "$29/mo",
+      "v2_text": "$35/mo",
+      "desc": "Pro plan price raised $29/mo -> $35/mo"
+    },
+    {
+      "change_id": "blog-r1",
+      "page": "blog",
+      "kind": "real",
+      "type": "item-added",
+      "element_id": "post-eventbus",
+      "v1_text": "",
+      "v2_text": "Designing an event bus that survives restarts",
+      "desc": "new blog post added at top of index"
+    },
+    {
+      "change_id": "docs-r1",
+      "page": "docs",
+      "kind": "real",
+      "type": "reworded",
+      "element_id": "install-note",
+      "v1_text": "requires Python 3.10 or newer",
+      "v2_text": "queue state lives in Redis",
+      "desc": "install note paragraph reworded"
+    },
+    {
+      "change_id": "products-r1",
+      "page": "products",
+      "kind": "real",
+      "type": "item-removed",
+      "element_id": "prod-widget-mini",
+      "v1_text": "Widget Mini \u2014 $9.99",
+      "v2_text": "",
+      "desc": "Widget Mini removed from the grid"
+    },
+    {
+      "change_id": "products-r2",
+      "page": "products",
+      "kind": "real",
+      "type": "item-added",
+      "element_id": "prod-widget-max",
+      "v1_text": "",
+      "v2_text": "Widget Max \u2014 $79.99",
+      "desc": "Widget Max added to the grid"
+    },
+    {
+      "change_id": "changelog-r1",
+      "page": "changelog",
+      "kind": "real",
+      "type": "item-added",
+      "element_id": "cl-2-1-0",
+      "v1_text": "",
+      "v2_text": "incremental snapshots",
+      "desc": "2.1.0 release entry added"
+    },
+    {
+      "change_id": "team-r1",
+      "page": "team",
+      "kind": "real",
+      "type": "item-removed",
+      "element_id": "member-rmartin",
+      "v1_text": "R. Martin \u2014 Infrastructure",
+      "v2_text": "",
+      "desc": "team member removed"
+    },
+    {
+      "change_id": "faq-r1",
+      "page": "faq",
+      "kind": "real",
+      "type": "reworded",
+      "element_id": "faq-refunds-a",
+      "v1_text": "within 14 days of purchase",
+      "v2_text": "30-day money-back guarantee",
+      "desc": "refund answer reworded (policy change)"
+    },
+    {
+      "change_id": "status-r1",
+      "page": "status",
+      "kind": "real",
+      "type": "section-deleted",
+      "element_id": "past-incidents",
+      "v1_text": "Elevated queue latency in eu-west",
+      "v2_text": "",
+      "alt_texts": [
+        "Past incidents"
+      ],
+      "desc": "past-incidents section deleted"
+    },
+    {
+      "change_id": "news-r1",
+      "page": "news",
+      "kind": "real",
+      "type": "modified",
+      "element_id": "news-lead-h",
+      "v1_text": "raises Series B to expand",
+      "v2_text": "closes $40M Series B",
+      "desc": "lead headline edited"
+    },
+    {
+      "change_id": "pricing-c1",
+      "page": "pricing",
+      "kind": "churn",
+      "type": "timestamp",
+      "element_id": "page-updated",
+      "v1_text": "2026-07-25 04:12 UTC",
+      "v2_text": "2026-07-26 09:47 UTC",
+      "desc": "footer last-updated timestamp rotated"
+    },
+    {
+      "change_id": "pricing-c2",
+      "page": "pricing",
+      "kind": "churn",
+      "type": "token",
+      "element_id": "build-info",
+      "v1_text": "9f3ac1d2e07b",
+      "v2_text": "b81de44a9c02",
+      "desc": "build hash rotated"
+    },
+    {
+      "change_id": "blog-c1",
+      "page": "blog",
+      "kind": "churn",
+      "type": "counter",
+      "element_id": "views-elastic",
+      "v1_text": "1,204 views",
+      "v2_text": "1,271 views",
+      "desc": "view counter ticked"
+    },
+    {
+      "change_id": "blog-c2",
+      "page": "blog",
+      "kind": "churn",
+      "type": "counter",
+      "element_id": "views-oncall",
+      "v1_text": "3,882 views",
+      "v2_text": "3,905 views",
+      "desc": "view counter ticked"
+    },
+    {
+      "change_id": "blog-c3",
+      "page": "blog",
+      "kind": "churn",
+      "type": "reorder",
+      "element_id": "tag-list",
+      "v1_text": "kubernetes",
+      "v2_text": "kubernetes",
+      "desc": "tag list reordered, identical items"
+    },
+    {
+      "change_id": "docs-c1",
+      "page": "docs",
+      "kind": "churn",
+      "type": "timestamp",
+      "element_id": "docs-updated",
+      "v1_text": "2026-07-25 04:12 UTC",
+      "v2_text": "2026-07-26 09:47 UTC",
+      "desc": "last-updated timestamp rotated"
+    },
+    {
+      "change_id": "docs-c2",
+      "page": "docs",
+      "kind": "churn",
+      "type": "cache-buster",
+      "element_id": "",
+      "v1_text": "?v=1043",
+      "v2_text": "?v=1044",
+      "desc": "stylesheet cache-buster query string bumped"
+    },
+    {
+      "change_id": "products-c1",
+      "page": "products",
+      "kind": "churn",
+      "type": "ad",
+      "element_id": "ad-1",
+      "v1_text": "Sponsored: CloudBox \u2014 30-day free trial, no card needed.",
+      "v2_text": "Sponsored: DevKit Pro \u2014 ship dashboards twice as fast.",
+      "desc": "ad slot rotated"
+    },
+    {
+      "change_id": "changelog-c1",
+      "page": "changelog",
+      "kind": "churn",
+      "type": "token",
+      "element_id": "build-info",
+      "v1_text": "9f3ac1d2e07b",
+      "v2_text": "b81de44a9c02",
+      "desc": "build hash rotated"
+    },
+    {
+      "change_id": "team-c1",
+      "page": "team",
+      "kind": "churn",
+      "type": "reorder",
+      "element_id": "social-list",
+      "v1_text": "Mastodon",
+      "v2_text": "Mastodon",
+      "desc": "social links reordered, identical items"
+    },
+    {
+      "change_id": "faq-c1",
+      "page": "faq",
+      "kind": "churn",
+      "type": "timestamp",
+      "element_id": "faq-updated",
+      "v1_text": "2026-07-25 03:58 UTC",
+      "v2_text": "2026-07-26 09:41 UTC",
+      "desc": "last-updated timestamp rotated"
+    },
+    {
+      "change_id": "status-c1",
+      "page": "status",
+      "kind": "churn",
+      "type": "counter",
+      "element_id": "last-check",
+      "v1_text": "Checked 12 seconds ago",
+      "v2_text": "Checked 3 seconds ago",
+      "desc": "freshness counter ticked"
+    },
+    {
+      "change_id": "status-c2",
+      "page": "status",
+      "kind": "churn",
+      "type": "token",
+      "element_id": "build-info",
+      "v1_text": "9f3ac1d2e07b",
+      "v2_text": "b81de44a9c02",
+      "desc": "build hash rotated"
+    },
+    {
+      "change_id": "news-c1",
+      "page": "news",
+      "kind": "churn",
+      "type": "ad",
+      "element_id": "ad-2",
+      "v1_text": "Sponsored: CloudBox \u2014 30-day free trial, no card needed.",
+      "v2_text": "Sponsored: DevKit Pro \u2014 ship dashboards twice as fast.",
+      "desc": "ad slot rotated"
+    },
+    {
+      "change_id": "news-c2",
+      "page": "news",
+      "kind": "churn",
+      "type": "timestamp",
+      "element_id": "news-updated",
+      "v1_text": "2026-07-25 04:12 UTC",
+      "v2_text": "2026-07-26 09:47 UTC",
+      "desc": "last-updated timestamp rotated"
+    },
+    {
+      "change_id": "jobs-c1",
+      "page": "jobs",
+      "kind": "churn",
+      "type": "reorder",
+      "element_id": "perks-list",
+      "v1_text": "Learning budget",
+      "v2_text": "Learning budget",
+      "desc": "perks reordered, identical items"
+    },
+    {
+      "change_id": "jobs-c2",
+      "page": "jobs",
+      "kind": "churn",
+      "type": "timestamp",
+      "element_id": "jobs-updated",
+      "v1_text": "2026-07-25 03:58 UTC",
+      "v2_text": "2026-07-26 09:41 UTC",
+      "desc": "last-updated timestamp rotated"
+    },
+    {
+      "change_id": "jobs-c3",
+      "page": "jobs",
+      "kind": "churn",
+      "type": "token",
+      "element_id": "build-info",
+      "v1_text": "9f3ac1d2e07b",
+      "v2_text": "b81de44a9c02",
+      "desc": "build hash rotated"
+    },
+    {
+      "change_id": "terms-c1",
+      "page": "terms",
+      "kind": "churn",
+      "type": "timestamp",
+      "element_id": "tos-generated",
+      "v1_text": "2026-07-25 04:12 UTC",
+      "v2_text": "2026-07-26 09:47 UTC",
+      "desc": "generated-at timestamp rotated"
+    },
+    {
+      "change_id": "terms-c2",
+      "page": "terms",
+      "kind": "churn",
+      "type": "cache-buster",
+      "element_id": "",
+      "v1_text": "?v=1043",
+      "v2_text": "?v=1044",
+      "desc": "stylesheet cache-buster query string bumped"
+    },
+    {
+      "change_id": "landing-c1",
+      "page": "landing",
+      "kind": "churn",
+      "type": "ad",
+      "element_id": "ad-3",
+      "v1_text": "Sponsored: CloudBox \u2014 30-day free trial, no card needed.",
+      "v2_text": "Sponsored: DevKit Pro \u2014 ship dashboards twice as fast.",
+      "desc": "ad slot rotated"
+    },
+    {
+      "change_id": "landing-c2",
+      "page": "landing",
+      "kind": "churn",
+      "type": "counter",
+      "element_id": "signup-count",
+      "v1_text": "Join 12,408 makers",
+      "v2_text": "Join 12,566 makers",
+      "desc": "signup counter ticked"
+    },
+    {
+      "change_id": "landing-c3",
+      "page": "landing",
+      "kind": "churn",
+      "type": "session-token",
+      "element_id": "",
+      "v1_text": "a77c01f4d2b8e655",
+      "v2_text": "0d94b3a1c8f7e219",
+      "desc": "hidden CSRF token rotated"
+    }
+  ]
+}

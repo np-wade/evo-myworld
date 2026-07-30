@@ -1,0 +1,138 @@
+{
+  "sources": [
+    "youtube",
+    "twitch",
+    "arbitrary"
+  ],
+  "retries": 2,
+  "limit": 2,
+  "strategies_skipped": [],
+  "leaderboard": [
+    {
+      "strategy": "curl_cffi-page",
+      "source": "arbitrary",
+      "attempts": 2,
+      "resolve_rate": 1.0,
+      "block_rate": 0.0,
+      "manual_caps_rate": 0.0,
+      "auto_caps_rate": 0.0,
+      "p50_ms": 0.0,
+      "p95_ms": 0.0,
+      "errors": []
+    },
+    {
+      "strategy": "ytdlp-plain",
+      "source": "twitch",
+      "attempts": 2,
+      "resolve_rate": 1.0,
+      "block_rate": 0.0,
+      "manual_caps_rate": 0.0,
+      "auto_caps_rate": 0.0,
+      "p50_ms": 1158.6,
+      "p95_ms": 1250.5,
+      "errors": []
+    },
+    {
+      "strategy": "ytdlp-impersonate",
+      "source": "twitch",
+      "attempts": 2,
+      "resolve_rate": 1.0,
+      "block_rate": 0.0,
+      "manual_caps_rate": 0.0,
+      "auto_caps_rate": 0.0,
+      "p50_ms": 1173.2,
+      "p95_ms": 1185.3,
+      "errors": []
+    },
+    {
+      "strategy": "ytdlp-impersonate",
+      "source": "youtube",
+      "attempts": 4,
+      "resolve_rate": 1.0,
+      "block_rate": 0.0,
+      "manual_caps_rate": 1.0,
+      "auto_caps_rate": 1.0,
+      "p50_ms": 1179.4,
+      "p95_ms": 1257.4,
+      "errors": []
+    },
+    {
+      "strategy": "ytdlp-stealth-ua",
+      "source": "twitch",
+      "attempts": 2,
+      "resolve_rate": 1.0,
+      "block_rate": 0.0,
+      "manual_caps_rate": 0.0,
+      "auto_caps_rate": 0.0,
+      "p50_ms": 1180.1,
+      "p95_ms": 1278.4,
+      "errors": []
+    },
+    {
+      "strategy": "ytdlp-plain",
+      "source": "youtube",
+      "attempts": 4,
+      "resolve_rate": 1.0,
+      "block_rate": 0.0,
+      "manual_caps_rate": 1.0,
+      "auto_caps_rate": 1.0,
+      "p50_ms": 1208.4,
+      "p95_ms": 1230.5,
+      "errors": []
+    },
+    {
+      "strategy": "ytdlp-stealth-ua",
+      "source": "youtube",
+      "attempts": 4,
+      "resolve_rate": 1.0,
+      "block_rate": 0.0,
+      "manual_caps_rate": 1.0,
+      "auto_caps_rate": 1.0,
+      "p50_ms": 1603.2,
+      "p95_ms": 1706.6,
+      "errors": []
+    },
+    {
+      "strategy": "ytdlp-stealth-ua",
+      "source": "arbitrary",
+      "attempts": 2,
+      "resolve_rate": 0.0,
+      "block_rate": 0.0,
+      "manual_caps_rate": 0.0,
+      "auto_caps_rate": 0.0,
+      "p50_ms": 27.0,
+      "p95_ms": 27.8,
+      "errors": [
+        "file:// URLs are disabled by default in yt-dlp for security reasons. Use --enable-file-urls to enable at your own risk."
+      ]
+    },
+    {
+      "strategy": "ytdlp-impersonate",
+      "source": "arbitrary",
+      "attempts": 2,
+      "resolve_rate": 0.0,
+      "block_rate": 0.0,
+      "manual_caps_rate": 0.0,
+      "auto_caps_rate": 0.0,
+      "p50_ms": 27.6,
+      "p95_ms": 28.8,
+      "errors": [
+        "file:// URLs are disabled by default in yt-dlp for security reasons. Use --enable-file-urls to enable at your own risk."
+      ]
+    },
+    {
+      "strategy": "ytdlp-plain",
+      "source": "arbitrary",
+      "attempts": 2,
+      "resolve_rate": 0.0,
+      "block_rate": 0.0,
+      "manual_caps_rate": 0.0,
+      "auto_caps_rate": 0.0,
+      "p50_ms": 45.5,
+      "p95_ms": 59.6,
+      "errors": [
+        "file:// URLs are disabled by default in yt-dlp for security reasons. Use --enable-file-urls to enable at your own risk."
+      ]
+    }
+  ]
+}

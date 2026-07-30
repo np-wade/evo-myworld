@@ -1,0 +1,224 @@
+{
+  "note": "heuristic local-AI relevance pool; drives pick-5, NOT gold",
+  "n": 18,
+  "pool": [
+    {
+      "id": "2607.13093",
+      "title": "Efficient and Privacy Aware Edge Cloud Collaborative Inference for Large Language Models",
+      "relevance_score": 21,
+      "hits": [
+        "on-device",
+        "edge device",
+        "quantized",
+        "kv cache",
+        "speculative decoding",
+        "latency",
+        "edge",
+        "inference",
+        "embedding"
+      ]
+    },
+    {
+      "id": "2607.12550",
+      "title": "A JoLT for the KV Cache: Near-Lossless KV Cache Compression via Joint Tucker and JL-Residual Allocation for LLMs",
+      "relevance_score": 16,
+      "hits": [
+        "quantization",
+        "kv cache",
+        "low-rank",
+        "throughput",
+        "compression",
+        "inference",
+        "long context",
+        "attention",
+        "transformer"
+      ]
+    },
+    {
+      "id": "2607.12792",
+      "title": "Silent Alarm: A J-Space Protocol for Comparing Danger Recognition Across Models and Quantization Levels",
+      "relevance_score": 12,
+      "hits": [
+        "quantization",
+        "int4",
+        "int8",
+        "rag",
+        "fine-tuning"
+      ]
+    },
+    {
+      "id": "2607.13115",
+      "title": "Improving Molecular Property Prediction in Small Language Models Using Graph-based Tools",
+      "relevance_score": 11,
+      "hits": [
+        "small language model",
+        "slm",
+        "rag",
+        "edge",
+        "inference"
+      ]
+    },
+    {
+      "id": "2607.12599",
+      "title": "Lightweight Multi-Scale Anomaly Detection for Resource-Constrained Edge Devices",
+      "relevance_score": 10,
+      "hits": [
+        "edge device",
+        "rag",
+        "latency",
+        "edge",
+        "inference"
+      ]
+    },
+    {
+      "id": "2607.14149",
+      "title": "Enhancing Small Language Models Reasoning through Knowledge Graph Grounding",
+      "relevance_score": 10,
+      "hits": [
+        "small language model",
+        "slm",
+        "rag",
+        "edge"
+      ]
+    },
+    {
+      "id": "2607.12789",
+      "title": "AVQ-Attention: Adaptive Vector-Quantized Attention",
+      "relevance_score": 10,
+      "hits": [
+        "quantization",
+        "quantized",
+        "flash attention",
+        "attention",
+        "transformer"
+      ]
+    },
+    {
+      "id": "2607.12336",
+      "title": "Evaluating Health Misinformation in Low-Resource Languages: Integrating Small Language Models with a Culturally-Sensitive Responsible NLP Framework (Bangla as a Case Study)",
+      "relevance_score": 10,
+      "hits": [
+        "small language model",
+        "slm",
+        "edge",
+        "fine-tuning",
+        "serving"
+      ]
+    },
+    {
+      "id": "2607.12422",
+      "title": "Accepted Prefixes Are Not All You Need: A Negative Result on PEFT-Based Block-Diffusion Drafting",
+      "relevance_score": 10,
+      "hits": [
+        "speculative decoding",
+        "lora",
+        "parameter-efficient",
+        "peft",
+        "adapter",
+        "inference",
+        "tokenizer"
+      ]
+    },
+    {
+      "id": "2607.12659",
+      "title": "Jetson-PI: Towards Onboard Real-Time Robot Control via Foresight-Aligned Asynchronous Inference",
+      "relevance_score": 10,
+      "hits": [
+        "llama.cpp",
+        "rag",
+        "latency",
+        "edge",
+        "inference"
+      ]
+    },
+    {
+      "id": "2607.12266",
+      "title": "Saturation Makes Quantization Error Additive: A Coverage Model with a Certificate",
+      "relevance_score": 8,
+      "hits": [
+        "quantization",
+        "4-bit",
+        "rag"
+      ]
+    },
+    {
+      "id": "2607.14161",
+      "title": "Deep-learning Causal Retrieval Optimization for Efficient e-commerce Distribution in Pinterest",
+      "relevance_score": 8,
+      "hits": [
+        "lora",
+        "rag",
+        "latency",
+        "offline"
+      ]
+    },
+    {
+      "id": "2607.12787",
+      "title": "Do We Really Need Multimodal Emotion Language Models Larger Than 1B Parameters?",
+      "relevance_score": 8,
+      "hits": [
+        "distillation",
+        "edge",
+        "mobile",
+        "inference"
+      ]
+    },
+    {
+      "id": "2607.13160",
+      "title": "Active Beyond-Diagonal RIS Empowered Heterogeneous Edge Computing: A Distributional Reinforcement Learning Approach",
+      "relevance_score": 8,
+      "hits": [
+        "rag",
+        "latency",
+        "edge",
+        "mobile"
+      ]
+    },
+    {
+      "id": "2607.12730",
+      "title": "Learning-based Probabilistic Load Forecasting with Post-hoc and In-model Uncertainty",
+      "relevance_score": 7,
+      "hits": [
+        "rag",
+        "offline",
+        "inference",
+        "attention",
+        "transformer"
+      ]
+    },
+    {
+      "id": "2607.12856",
+      "title": "Verifier-Based Reinforcement Fine-Tuning of Reasoning Models for Thermal Energy Storage Control",
+      "relevance_score": 7,
+      "hits": [
+        "rag",
+        "offline",
+        "fine-tuning",
+        "inference",
+        "open-weight"
+      ]
+    },
+    {
+      "id": "2607.13124",
+      "title": "ShortOPD: Recovering Pruned LLMs with Short-to-Long On-Policy Distillation",
+      "relevance_score": 7,
+      "hits": [
+        "distillation",
+        "pruning",
+        "compression"
+      ]
+    },
+    {
+      "id": "2607.13095",
+      "title": "Full-Pipeline Inference Optimization for MiMo-V2.5 Series: Pushing Hybrid SWA Efficiency to the Limit",
+      "relevance_score": 7,
+      "hits": [
+        "moe",
+        "rag",
+        "inference",
+        "serving",
+        "attention"
+      ]
+    }
+  ]
+}

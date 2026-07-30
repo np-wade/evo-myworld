@@ -1,0 +1,33 @@
+{
+  "mode": "S8 DOCX package validity vs OOXML required parts (gate: valid zip+parts)",
+  "n_entries": 2,
+  "candidates_unavailable": [],
+  "leaderboard": [
+    {
+      "candidate": "ip-incumbent",
+      "fails": 0,
+      "error": "",
+      "docx_valid": 1,
+      "has_footnotes": 1,
+      "has_styles": 1,
+      "latency_ms_p50": 43.8,
+      "latency_ms_p95": 44.0,
+      "deterministic": -1,
+      "gate": "PASS",
+      "score": 1.0
+    },
+    {
+      "candidate": "python-docx",
+      "fails": 0,
+      "error": "",
+      "docx_valid": 1,
+      "has_footnotes": 0,
+      "has_styles": 1,
+      "latency_ms_p50": 149.2,
+      "latency_ms_p95": 194.4,
+      "deterministic": -1,
+      "gate": "PASS",
+      "score": 1.0
+    }
+  ]
+}

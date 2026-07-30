@@ -37,7 +37,8 @@ evo plugin
 │       │                           benchmark command / harness changes
 │       └── evo:ideator             stalled, or every ~5 committed experiments.
 │                                   One subagent per brief:
-│                                   failure_analysis, literature, frontier_extrapolation
+│                                   failure_analysis, literature,
+│                                   frontier_extrapolation, metaprompt
 │
 ├── Subagent thread  (each subagent spawned by /optimize step 5)
 │   │

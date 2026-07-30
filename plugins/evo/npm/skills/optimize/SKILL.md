@@ -58,7 +58,8 @@ main thread (you)
 └── Subagents to dispatch (Task tool, subagent_type=...)
     └── evo:ideator        stalled, or every ~5 committed experiments.
                            One subagent per brief:
-                           failure_analysis, literature, frontier_extrapolation
+                           failure_analysis, literature,
+                           frontier_extrapolation, metaprompt
 
 subagent thread (each subagent spawned by step 5)
 ├── evo:subagent skill     loaded by the subagent on first turn -- the brief's
@@ -444,12 +445,13 @@ Spawn ideators in parallel when ANY of these triggers fire:
 - **Failure cluster**: M=3 consecutive discards with related root causes (use the `evo discards` output)
 - **User-triggered**: a directive (`evo direct`) asks for fresh ideas
 
-When a trigger fires, spawn three parallel **evo ideator subagents** via your host's Task tool -- one per brief:
+When a trigger fires, spawn four parallel **evo ideator subagents** via your host's Task tool -- one per brief:
 
 ```
 Task(subagent_type="evo:ideator", prompt="workspace=<path>\nbrief=failure_analysis")
 Task(subagent_type="evo:ideator", prompt="workspace=<path>\nbrief=literature")
 Task(subagent_type="evo:ideator", prompt="workspace=<path>\nbrief=frontier_extrapolation")
+Task(subagent_type="evo:ideator", prompt="workspace=<path>\nbrief=metaprompt")
 ```
 
 | Brief | What it does |
@@ -457,6 +459,7 @@ Task(subagent_type="evo:ideator", prompt="workspace=<path>\nbrief=frontier_extra
 | `failure_analysis` | Cross-graph clustering of discards/failures |
 | `literature` | Web/arXiv scan for untried techniques in the workspace domain |
 | `frontier_extrapolation` | Deeper variants of the steepest score gradient on the best path |
+| `metaprompt` | LLM critique-and-rewrite of the best committed approach into reasoned new candidates |
 
 Each subagent runs the brief in its own context, appends proposals as JSONL lines to `.evo/run_<run_id>/ideator/proposals.jsonl` (single final write), and returns a JSON summary. See `plugins/evo/agents/ideator.md` for the full procedure each ideator follows.
 
@@ -491,7 +494,7 @@ evo wait --for ideators --count 1 --timeout 120   # 2 min cap, fail-open
 For each new proposal:
 
 1. Check the workspace graph -- has the proposed config already been tried? Use `evo discards --like "<keyword>"` to scan. If yes, skip.
-2. Score each remaining proposal by `expected_score_uplift × confidence`. Confidence ranking: `frontier_extrapolation > failure_analysis > literature`, all else equal.
+2. Score each remaining proposal by `expected_score_uplift × confidence`. Confidence ranking: `frontier_extrapolation > failure_analysis > metaprompt > literature`, all else equal.
 3. The top 1-2 proposals become objectives in the next round's briefs (step 4). Cite the proposal's `hypothesis` and `mechanism` in the brief's *Objective* field.
 4. Leave the rest in the queue -- they may surface as winners after a few more rounds when the frontier shifts.
 

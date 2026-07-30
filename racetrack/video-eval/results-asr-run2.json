@@ -1,0 +1,91 @@
+{
+  "n_fixtures": 5,
+  "fixtures": [
+    "youtube/UF8uR6Z6KLc",
+    "youtube/8jPQjjsBbIc",
+    "youtube/aircAruvnKk",
+    "twitch/twitch-demo",
+    "arbitrary/self-hosted-demo"
+  ],
+  "candidates_skipped": [],
+  "leaderboard": [
+    {
+      "candidate": "faster-whisper-small",
+      "n_gold": 4,
+      "n_nogold": 1,
+      "wer_med": 0.042,
+      "cer_med": 0.0287,
+      "drift_s_med": 0.64,
+      "cost_s_per_min": 19.79,
+      "wall_s_med": 39.57,
+      "fails": 0,
+      "note": "",
+      "error": ""
+    },
+    {
+      "candidate": "faster-whisper-tiny",
+      "n_gold": 4,
+      "n_nogold": 1,
+      "wer_med": 0.0508,
+      "cer_med": 0.037,
+      "drift_s_med": 0.379,
+      "cost_s_per_min": 1.88,
+      "wall_s_med": 3.75,
+      "fails": 0,
+      "note": "",
+      "error": ""
+    },
+    {
+      "candidate": "whisper-streaming-tiny",
+      "n_gold": 4,
+      "n_nogold": 1,
+      "wer_med": 0.0522,
+      "cer_med": 0.0391,
+      "drift_s_med": 8.851,
+      "cost_s_per_min": 31.25,
+      "wall_s_med": 62.49,
+      "fails": 0,
+      "note": "",
+      "error": ""
+    },
+    {
+      "candidate": "faster-whisper-base",
+      "n_gold": 4,
+      "n_nogold": 1,
+      "wer_med": 0.0527,
+      "cer_med": 0.037,
+      "drift_s_med": 1.169,
+      "cost_s_per_min": 9.84,
+      "wall_s_med": 19.67,
+      "fails": 0,
+      "note": "",
+      "error": ""
+    },
+    {
+      "candidate": "openai-whisper-base",
+      "n_gold": 4,
+      "n_nogold": 1,
+      "wer_med": 0.0527,
+      "cer_med": 0.037,
+      "drift_s_med": 3.175,
+      "cost_s_per_min": 10.18,
+      "wall_s_med": 20.36,
+      "fails": 0,
+      "note": "",
+      "error": ""
+    },
+    {
+      "candidate": "openai-whisper-tiny",
+      "n_gold": 4,
+      "n_nogold": 1,
+      "wer_med": 0.0576,
+      "cer_med": 0.0414,
+      "drift_s_med": 0.61,
+      "cost_s_per_min": 7.53,
+      "wall_s_med": 15.05,
+      "fails": 0,
+      "note": "",
+      "error": ""
+    }
+  ]
+}

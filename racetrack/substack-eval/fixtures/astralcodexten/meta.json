@@ -1,0 +1,8 @@
+{
+  "pub": "astralcodexten",
+  "base_url": "https://www.astralcodexten.com",
+  "ref_date": "2026-07-26",
+  "window_days": 60,
+  "window_start": "2026-05-27",
+  "note": "window pinned at fixture-freeze; scored path never uses a live now()"
+}

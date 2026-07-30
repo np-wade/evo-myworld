@@ -1,0 +1,74 @@
+{
+  "mode": "S4 local-vault sentence retrieval vs gold evidence (gate: recall@5>0)",
+  "n_entries": 6,
+  "candidates_unavailable": [],
+  "leaderboard": [
+    {
+      "candidate": "ip-incumbent",
+      "fails": 0,
+      "error": "",
+      "recall_at_1": 0.0713,
+      "recall_at_5": 0.3564,
+      "latency_ms_p50": 42.1,
+      "latency_ms_p95": 64.8,
+      "deterministic": 1,
+      "gate": "PASS",
+      "score": 0.3564
+    },
+    {
+      "candidate": "rank-bm25",
+      "fails": 0,
+      "error": "",
+      "recall_at_1": 0.0713,
+      "recall_at_5": 0.3564,
+      "latency_ms_p50": 151.6,
+      "latency_ms_p95": 199.1,
+      "deterministic": 1,
+      "gate": "PASS",
+      "score": 0.3564
+    },
+    {
+      "candidate": "faiss-hashdense",
+      "fails": 0,
+      "error": "",
+      "recall_at_1": 0.0713,
+      "recall_at_5": 0.345,
+      "latency_ms_p50": 197.6,
+      "latency_ms_p95": 248.7,
+      "deterministic": 1,
+      "gate": "PASS",
+      "score": 0.345
+    },
+    {
+      "candidate": "tantivy-py",
+      "fails": 0,
+      "error": "",
+      "recall_at_1": 0.0713,
+      "recall_at_5": 0.345,
+      "latency_ms_p50": 146.3,
+      "latency_ms_p95": 166.8,
+      "deterministic": 0,
+      "gate": "PASS",
+      "score": 0.345
+    },
+    {
+      "candidate": "naive-baseline",
+      "fails": 0,
+      "error": "",
+      "recall_at_1": 0.0713,
+      "recall_at_5": 0.3362,
+      "latency_ms_p50": 0.0,
+      "latency_ms_p95": 0.1,
+      "deterministic": 1,
+      "gate": "PASS",
+      "score": 0.3362
+    },
+    {
+      "candidate": "haystack-bm25",
+      "fails": 1,
+      "error": "RuntimeError: ack/document_stores/in_memory/document_store.py\", line 468, in write_documents\n    raise DuplicateDocumentError(f\"ID '{document.id}' already exists.\")\nhaystack.document_stores.errors.errors.DuplicateDocumentError: ID '7cbdaec22cfb3a65de9018e32a070e89e3db719ee7468fbaaeb548c22925c413' al",
+      "gate": "FAIL",
+      "score": 0.0
+    }
+  ]
+}

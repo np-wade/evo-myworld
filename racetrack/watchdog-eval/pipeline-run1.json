@@ -1,0 +1,25 @@
+{
+  "outdir": "/home/npwad/coding/docker-envs/projects/evo-myworld/racetrack/watchdog-eval/out/set1",
+  "combo": "dom-diff/strip",
+  "hard": {
+    "f1": 1.0,
+    "recall": 1.0,
+    "precision": 1.0,
+    "false_alarm_rate": 0.0,
+    "localization": 1.0,
+    "real_hit": "10/10",
+    "churn_flagged": "0/23",
+    "churn_suppressed": 20,
+    "missed": [],
+    "false_alarms": [],
+    "pages": 12,
+    "p50_ms_per_page": 0.46,
+    "wall_s": 0.04
+  },
+  "advisory": {
+    "reported_rows": 11,
+    "snippet_coverage": 1.0,
+    "avg_snippet_chars": 78.5,
+    "note": "advisory only \u2014 human-facing summary quality, not optimized"
+  }
+}

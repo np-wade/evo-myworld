@@ -5,7 +5,7 @@
 (() => {
   'use strict';
 
-  const VIEWS = ['overview', 'tree', 'river', 'reports', 'observability', 'testlab'];
+  const VIEWS = ['overview', 'tree', 'river', 'reports', 'observability', 'racetrack', 'testlab'];
   const roots = {};
   document.querySelectorAll('[data-view-root]').forEach((el) => {
     roots[el.dataset.viewRoot] = el;
@@ -34,6 +34,7 @@
       loadObservability();
       obsTimer = setInterval(loadObservability, 5000);
     }
+    if (view === 'racetrack') loadRacetrack();
     if (view === 'testlab') loadTestlab();
   }
 
@@ -46,6 +47,7 @@
       else if (target === 'river') loadRiver();
       else if (target === 'reports') loadReports();
       else if (target === 'observability') loadObservability();
+      else if (target === 'racetrack') loadRacetrack();
       else if (target === 'testlab') loadTestlab();
     });
   });
@@ -224,6 +226,93 @@
     } catch (e) {
       pre.textContent = `logs unavailable — ${e.message}`;
     }
+  }
+
+  // ---- racetrack (scraper/search benchmark suite) ----------------------
+  let rtData = null;
+  let rtSelected = null;
+
+  async function loadRacetrack() {
+    const suitesEl = document.getElementById('rt-suites');
+    try {
+      rtData = await fetchJson('/api/racetrack');
+      if (!rtData.available) {
+        suitesEl.innerHTML = `<div class="testlab-empty">racetrack unavailable — ${esc(rtData.error || 'not found')}</div>`;
+        return;
+      }
+      document.getElementById('rt-sub').textContent =
+        `${rtData.suites.filter((s) => s.built).length}/${rtData.suites.length} suites built · ${esc(rtData.racetrack_dir)}`;
+      suitesEl.innerHTML = rtData.suites.map((s) => {
+        const nRuns = s.leaderboards.length;
+        const cls = s.built ? '' : ' rt-suite-todo';
+        return `<div class="rt-suite${cls} ${rtSelected === s.id ? 'selected' : ''}" data-suite="${esc(s.id)}">
+          <div class="rt-suite-head"><span class="rt-tid">${esc(s.id)}</span>
+            <span class="rt-title">${esc(s.title)}</span>
+            <span class="rt-status">${esc(s.status)}</span></div>
+          <div class="rt-suite-sit">${esc(s.situation)}</div>
+          <div class="rt-suite-meta mono">${esc(s.package)} · ${nRuns} result${nRuns === 1 ? '' : 's'}</div>
+        </div>`;
+      }).join('');
+      suitesEl.querySelectorAll('.rt-suite').forEach((card) => {
+        card.addEventListener('click', () => {
+          rtSelected = card.dataset.suite;
+          suitesEl.querySelectorAll('.rt-suite').forEach((c) => c.classList.toggle('selected', c === card));
+          renderRacetrackDetail(rtSelected);
+        });
+      });
+      // auto-open the first built suite (or keep the current selection)
+      if (!rtSelected || !rtData.suites.find((s) => s.id === rtSelected)) {
+        const first = rtData.suites.find((s) => s.built) || rtData.suites[0];
+        if (first) {
+          rtSelected = first.id;
+          suitesEl.querySelector(`[data-suite="${rtSelected}"]`)?.classList.add('selected');
+        }
+      }
+      if (rtSelected) renderRacetrackDetail(rtSelected);
+    } catch (e) {
+      suitesEl.innerHTML = `<div class="testlab-empty">racetrack unavailable — ${esc(e.message)}</div>`;
+    }
+  }
+
+  function renderRacetrackDetail(id) {
+    const suite = (rtData?.suites || []).find((s) => s.id === id);
+    const detail = document.getElementById('rt-detail');
+    document.getElementById('rt-detail-label').textContent = suite ? `${suite.id} · ${suite.title}` : '';
+    document.getElementById('rt-card-label').textContent = suite ? suite.package : '';
+    document.getElementById('rt-card').textContent = suite?.card_md || '(no result card yet)';
+    if (!suite || !suite.leaderboards.length) {
+      detail.innerHTML = `<div class="testlab-empty">${suite && !suite.built ? 'suite not built yet — see the T5 spec in HANDOFF-integration-and-T5.md' : 'no leaderboard JSON emitted for this suite yet'}</div>`;
+      return;
+    }
+    detail.innerHTML = suite.leaderboards.map((lb) => {
+      const label = `${esc(lb.stage)}${lb.run ? ` · run ${lb.run}` : ''}`;
+      const modeChip = lb.mode ? `<span class="rt-mode">${esc(lb.mode)}</span>` : '';
+      if (lb.rows) return rtTable(label, modeChip, lb, suite.key);
+      // pipeline scorecard / non-tabular: pretty-print the raw object
+      return `<div class="rt-lb"><div class="rt-lb-head"><span class="mono">${label}</span> ${modeChip}</div>
+        <pre class="ascii-panel selectable" data-copy-wrap>${esc(JSON.stringify(lb.raw, null, 2))}</pre></div>`;
+    }).join('');
+  }
+
+  // winner column per suite so the leaderboard highlights the right leader
+  const RT_WIN = { video: 'wer_med', arxiv: 'f1', substack: 'recall', watchdog: 'f1' };
+
+  function rtTable(label, modeChip, lb, key) {
+    const cols = lb.columns;
+    const head = cols.map((c) => `<th>${esc(c)}</th>`).join('');
+    const body = lb.rows.map((row, i) => {
+      const cells = cols.map((c) => {
+        let v = row[c];
+        if (typeof v === 'number') v = (Number.isInteger(v) ? v : v.toFixed(v < 1 && v > -1 ? 4 : 2));
+        else if (Array.isArray(v)) v = v.join(', ');
+        return `<td class="mono">${esc(v)}</td>`;
+      }).join('');
+      return `<tr class="${i === 0 ? 'rt-lead' : ''}">${cells}</tr>`;
+    }).join('');
+    return `<div class="rt-lb">
+      <div class="rt-lb-head"><span class="mono">${label}</span> ${modeChip}<span class="rt-lb-n">${lb.rows.length} candidates</span></div>
+      <div class="rt-table-wrap"><table class="rt-table"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>
+    </div>`;
   }
 
   // ---- test lab (Assembly Office bridge) -------------------------------

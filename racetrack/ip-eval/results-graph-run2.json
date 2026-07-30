@@ -1,0 +1,59 @@
+{
+  "mode": "S5 concept graph vs gold co-occurrence edges (gate: node_f1>0)",
+  "n_entries": 4,
+  "candidates_unavailable": [],
+  "leaderboard": [
+    {
+      "candidate": "ip-incumbent",
+      "fails": 0,
+      "error": "",
+      "node_f1": 1.0,
+      "edge_precision": 1.0,
+      "edge_recall": 1.0,
+      "latency_ms_p50": 40.2,
+      "latency_ms_p95": 44.0,
+      "deterministic": 1,
+      "gate": "PASS",
+      "score": 1.0
+    },
+    {
+      "candidate": "jaccard-graph",
+      "fails": 0,
+      "error": "",
+      "node_f1": 1.0,
+      "edge_precision": 1.0,
+      "edge_recall": 1.0,
+      "latency_ms_p50": 0.0,
+      "latency_ms_p95": 0.2,
+      "deterministic": 1,
+      "gate": "PASS",
+      "score": 1.0
+    },
+    {
+      "candidate": "naive-baseline",
+      "fails": 0,
+      "error": "",
+      "node_f1": 1.0,
+      "edge_precision": 1.0,
+      "edge_recall": 1.0,
+      "latency_ms_p50": 0.0,
+      "latency_ms_p95": 0.0,
+      "deterministic": 1,
+      "gate": "PASS",
+      "score": 1.0
+    },
+    {
+      "candidate": "networkx-cooc",
+      "fails": 0,
+      "error": "",
+      "node_f1": 1.0,
+      "edge_precision": 1.0,
+      "edge_recall": 1.0,
+      "latency_ms_p50": 136.4,
+      "latency_ms_p95": 478.0,
+      "deterministic": 1,
+      "gate": "PASS",
+      "score": 1.0
+    }
+  ]
+}

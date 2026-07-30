@@ -1,0 +1,41 @@
+{
+  "id": "2607.12789",
+  "title": "AVQ-Attention: Adaptive Vector-Quantized Attention",
+  "authors": [
+    "Winfried van den dool",
+    "Patrick Forr\u00e9",
+    "Amir Habibian",
+    "Yuki M. Asano",
+    "Max Welling"
+  ],
+  "published": "2026-07-14T14:02:22Z",
+  "primary_category": "cs.LG",
+  "categories": [
+    "cs.LG",
+    "cs.CV"
+  ],
+  "abstract": "The $\\mathcal{O}(N^2)$ complexity of attention over $N$ tokens remains a computational bottleneck in transformer models. Vector-Quantized (VQ) attention reduces this to $\\mathcal{O}(MN)$ by representing keys with $M$ codewords, but applies uniform codebook capacity regardless of where attention mass concentrates: high-attention regions of key space may be coarsely approximated while low-attention regions waste representational capacity. We propose Adaptive Vector-Quantized (AVQ) Attention, which adaptively allocates codebook capacity based on attention importance. Starting from a small set of codewords, our method identifies the most important codes during the forward pass and refines them with pre-learned child codewords, achieving fine-grained quantization where it matters most while maintaining coarse quantization elsewhere. We develop an implementation using custom Triton kernels that enables the full adaptive refinement process, including importance scoring, child codeword insertion, and parent contribution replacement, to be carried out within the tiled computation paradigm of Flash Attention with minimal overhead. Our approach maintains $\\mathcal{O}(MN)$ complexity while achieving improved accuracy-efficiency trade-offs compared to fixed-codebook VQ-attention.",
+  "gold_from_latex": {
+    "section_headings": [
+      "Acknowledgements",
+      "Codeword Clustering During Training",
+      "Computing Importance with Tiled Codewords",
+      "Correcting Attention Derivation",
+      "Numerical Stability of Online Softmax in VQ-Attention",
+      "Benchmark Details",
+      "Training Details",
+      "Alternative VQ Training Methods",
+      "Results Analysis",
+      "Discussion and Conclusion",
+      "Experiments and Results",
+      "Introduction",
+      "Method",
+      "Preliminaries",
+      "Related Work"
+    ],
+    "n_sections": 15,
+    "n_equations": 19,
+    "n_tables": 19,
+    "has_source": true
+  }
+}

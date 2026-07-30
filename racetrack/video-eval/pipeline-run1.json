@@ -1,0 +1,118 @@
+{
+  "score": {
+    "outdir": "/home/npwad/coding/docker-envs/projects/evo-myworld/racetrack/video-eval/out/youtube/UF8uR6Z6KLc",
+    "hard": {
+      "save_ok": true,
+      "transcript_nonempty": true,
+      "transform_method": "caption-scrape",
+      "accuracy": {
+        "has_gold": true,
+        "wer": 0.0312,
+        "cer": 0.032,
+        "drift_s": 0.0,
+        "drift_anchors": 105,
+        "ref_words": 256,
+        "hyp_words": 264,
+        "note": ""
+      }
+    },
+    "stealth": {
+      "strategy": "ytdlp-impersonate",
+      "resolved": true,
+      "blocked": false,
+      "latency_ms": 1202.1
+    },
+    "advisory": {
+      "n_sections": 8,
+      "section_table": "advisory-only (not hard-scored)"
+    },
+    "wall_s": 3.7
+  },
+  "report": {
+    "prompt": "Get me the transcript of https://www.youtube.com/watch?v=UF8uR6Z6KLc; produce a clean timestamped transcript + a table of sections/topics; save transcript.md.",
+    "source": "youtube",
+    "vid": "UF8uR6Z6KLc",
+    "url": "https://www.youtube.com/watch?v=UF8uR6Z6KLc",
+    "resolve_strategy": "ytdlp-impersonate",
+    "stealth": {
+      "strategy": "ytdlp-impersonate",
+      "ok": true,
+      "blocked": false,
+      "latency_ms": 1202.1,
+      "n_formats": 15,
+      "has_manual_caps": true,
+      "has_auto_caps": true,
+      "caption_langs": [
+        "aa",
+        "ab",
+        "af",
+        "ak",
+        "am",
+        "ar",
+        "as",
+        "ay",
+        "az",
+        "ba",
+        "be",
+        "bg"
+      ],
+      "error": "",
+      "note": "title=Steve Jobs' 2005 Stanford Commencement Address"
+    },
+    "transform_method": "caption-scrape",
+    "transform_detail": "UF8uR6Z6KLc.en-eEY6OEpapPo.vtt",
+    "n_cues": 244,
+    "transcript_words": 2302,
+    "sections": [
+      {
+        "start_s": 0.0,
+        "end_s": 113.0,
+        "topic": "college, stanford, today, want"
+      },
+      {
+        "start_s": 113.0,
+        "end_s": 225.9,
+        "topic": "college, every, later, would"
+      },
+      {
+        "start_s": 225.9,
+        "end_s": 338.9,
+        "topic": "have, connect, about, never"
+      },
+      {
+        "start_s": 338.9,
+        "end_s": 451.9,
+        "topic": "apple, what, company, life"
+      },
+      {
+        "start_s": 451.9,
+        "end_s": 564.9,
+        "topic": "your, what, work, love"
+      },
+      {
+        "start_s": 564.9,
+        "end_s": 677.8,
+        "topic": "your, have, what, know"
+      },
+      {
+        "start_s": 677.8,
+        "end_s": 790.8,
+        "topic": "death, don't, when, want"
+      },
+      {
+        "start_s": 790.8,
+        "end_s": 903.8,
+        "topic": "stay, hungry, foolish, whole"
+      }
+    ],
+    "manifest": [
+      {
+        "file": "transcript.md",
+        "bytes": 15352,
+        "sha256": "81bcaa25f31cb4a4a6c3d6199311d6d31ad46cb177e6d2875b58994c1e41fd69"
+      }
+    ],
+    "wall_s": 3.7,
+    "audio_used": ""
+  }
+}

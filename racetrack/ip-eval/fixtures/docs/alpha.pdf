@@ -1,0 +1,256 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R 5 0 R 7 0 R] /Count 3 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 9 0 R >> >> /Contents 4 0 R >>
+endobj
+4 0 obj
+<< /Length 2717 >>
+stream
+BT
+/F1 11 Tf
+72 740 Td
+14 TL
+(Grounded Evidence Pipelines for Scientific Write-ups) Tj
+T*
+() Tj
+T*
+(Abstract) Tj
+T*
+(We pair the Evidence Graph Transformer with the Citation Verifier Pipeline to keep) Tj
+T*
+(attribution exact. We pair the Review Benchmark Dataset with the Citation Verifier) Tj
+T*
+(Pipeline to keep attribution exact. We pair the Adaptive Chunking Algorithm with the) Tj
+T*
+(Review Benchmark Dataset to keep attribution exact.) Tj
+T*
+() Tj
+T*
+(The Citation Verifier Pipeline processes 149 documents while staying under 2 GB of) Tj
+T*
+(memory. We pair the Review Benchmark Dataset with the Citation Verifier Pipeline to keep) Tj
+T*
+(attribution exact. The Adaptive Chunking Algorithm processes 245 documents while staying) Tj
+T*
+(under 4 GB of memory.) Tj
+T*
+() Tj
+T*
+(Introduction) Tj
+T*
+(The Evidence Graph Transformer reuses spans emitted by the Adaptive Chunking Algorithm) Tj
+T*
+(without re-parsing the source. The Adaptive Chunking Algorithm processes 214 documents) Tj
+T*
+(while staying under 4 GB of memory. The Evidence Graph Transformer reduces extraction) Tj
+T*
+(error by 57% relative to the baseline.) Tj
+T*
+() Tj
+T*
+(We pair the Evidence Graph Transformer with the Adaptive Chunking Algorithm to keep) Tj
+T*
+(attribution exact. The Adaptive Chunking Algorithm processes 120 documents while staying) Tj
+T*
+(under 12 GB of memory. Ablation on the Review Benchmark Dataset shows the Adaptive) Tj
+T*
+(Chunking Algorithm contributes 31 F1 points.) Tj
+T*
+() Tj
+T*
+(The Review Benchmark Dataset achieves 45.2% accuracy on the Review Benchmark Dataset.) Tj
+T*
+(Unlike prior work, the Review Benchmark Dataset never fabricates a citation it cannot) Tj
+T*
+(trace.) Tj
+T*
+() Tj
+T*
+(Methods) Tj
+T*
+(We pair the Review Benchmark Dataset with the Citation Verifier Pipeline to keep) Tj
+T*
+(attribution exact. The Citation Verifier Pipeline processes 336 documents while staying) Tj
+T*
+(under 2 GB of memory. Ablation on the Review Benchmark Dataset shows the Adaptive) Tj
+T*
+(Chunking Algorithm contributes 59.5 F1 points.) Tj
+T*
+() Tj
+T*
+(Ablation on the Review Benchmark Dataset shows the Adaptive Chunking Algorithm) Tj
+T*
+(contributes 51 F1 points. The Citation Verifier Pipeline reuses spans emitted by the) Tj
+T*
+(Evidence Graph Transformer without re-parsing the source.) Tj
+T*
+() Tj
+T*
+(Unlike prior work, the Citation Verifier Pipeline never fabricates a citation it cannot) Tj
+T*
+(trace. Ablation on the Review Benchmark Dataset shows the Citation Verifier Pipeline) Tj
+T*
+(contributes 69 F1 points. Across three seeds the Review Benchmark Dataset holds latency) Tj
+T*
+(of 289 ms at p95.) Tj
+T*
+() Tj
+T*
+(Ablation on the Review Benchmark Dataset shows the Citation Verifier Pipeline) Tj
+T*
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 9 0 R >> >> /Contents 6 0 R >>
+endobj
+6 0 obj
+<< /Length 2736 >>
+stream
+BT
+/F1 11 Tf
+72 740 Td
+14 TL
+(contributes 85.5 F1 points. The Adaptive Chunking Algorithm reuses spans emitted by the) Tj
+T*
+(Review Benchmark Dataset without re-parsing the source. Unlike prior work, the Adaptive) Tj
+T*
+(Chunking Algorithm never fabricates a citation it cannot trace.) Tj
+T*
+() Tj
+T*
+(Experiments) Tj
+T*
+(The Review Benchmark Dataset achieves 65.2% accuracy on the Review Benchmark Dataset.) Tj
+T*
+(Across three seeds the Citation Verifier Pipeline holds latency of 723 ms at p95.) Tj
+T*
+() Tj
+T*
+(The Adaptive Chunking Algorithm reuses spans emitted by the Review Benchmark Dataset) Tj
+T*
+(without re-parsing the source. The Citation Verifier Pipeline achieves 66.2% accuracy on) Tj
+T*
+(the Review Benchmark Dataset. The Review Benchmark Dataset achieves 80% accuracy on the) Tj
+T*
+(Review Benchmark Dataset.) Tj
+T*
+() Tj
+T*
+(The Adaptive Chunking Algorithm processes 159 documents while staying under 12 GB of) Tj
+T*
+(memory. Ablation on the Review Benchmark Dataset shows the Citation Verifier Pipeline) Tj
+T*
+(contributes 45.2 F1 points.) Tj
+T*
+() Tj
+T*
+(Results) Tj
+T*
+(The Adaptive Chunking Algorithm achieves 11.2% accuracy on the Review Benchmark Dataset.) Tj
+T*
+(Ablation on the Review Benchmark Dataset shows the Evidence Graph Transformer) Tj
+T*
+(contributes 38 F1 points. Ablation on the Review Benchmark Dataset shows the Citation) Tj
+T*
+(Verifier Pipeline contributes 81.5 F1 points.) Tj
+T*
+() Tj
+T*
+(The Adaptive Chunking Algorithm reuses spans emitted by the Review Benchmark Dataset) Tj
+T*
+(without re-parsing the source. The Evidence Graph Transformer reuses spans emitted by) Tj
+T*
+(the Citation Verifier Pipeline without re-parsing the source.) Tj
+T*
+() Tj
+T*
+(The Review Benchmark Dataset reduces extraction error by 80% relative to the baseline.) Tj
+T*
+(Unlike prior work, the Review Benchmark Dataset never fabricates a citation it cannot) Tj
+T*
+(trace. We pair the Adaptive Chunking Algorithm with the Citation Verifier Pipeline to) Tj
+T*
+(keep attribution exact.) Tj
+T*
+() Tj
+T*
+(Discussion) Tj
+T*
+(The Adaptive Chunking Algorithm processes 210 documents while staying under 12 GB of) Tj
+T*
+(memory. We pair the Citation Verifier Pipeline with the Adaptive Chunking Algorithm to) Tj
+T*
+(keep attribution exact.) Tj
+T*
+() Tj
+T*
+(Ablation on the Review Benchmark Dataset shows the Citation Verifier Pipeline) Tj
+T*
+(contributes 52.5 F1 points. The Review Benchmark Dataset reuses spans emitted by the) Tj
+T*
+(Evidence Graph Transformer without re-parsing the source.) Tj
+T*
+() Tj
+T*
+(Conclusion) Tj
+T*
+(Across three seeds the Citation Verifier Pipeline holds latency of 218 ms at p95. Across) Tj
+T*
+(three seeds the Review Benchmark Dataset holds latency of 740 ms at p95. The Evidence) Tj
+T*
+ET
+endstream
+endobj
+7 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 9 0 R >> >> /Contents 8 0 R >>
+endobj
+8 0 obj
+<< /Length 438 >>
+stream
+BT
+/F1 11 Tf
+72 740 Td
+14 TL
+(Graph Transformer achieves 90.5% accuracy on the Review Benchmark Dataset.) Tj
+T*
+() Tj
+T*
+(References) Tj
+T*
+([1] Beltagy \(2019\). SciBERT: A Pretrained Language Model for Scientific Text.) Tj
+T*
+([2] Vaswani \(2017\). Attention Is All You Need.) Tj
+T*
+([3] Karpukhin \(2020\). Dense Passage Retrieval for Open-Domain QA.) Tj
+T*
+([4] Wadden \(2020\). Fact or Fiction: Verifying Scientific Claims.) Tj
+T*
+ET
+endstream
+endobj
+9 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+xref
+0 10
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000127 00000 n 
+0000000253 00000 n 
+0000003022 00000 n 
+0000003148 00000 n 
+0000005936 00000 n 
+0000006062 00000 n 
+0000006551 00000 n 
+trailer
+<< /Size 10 /Root 1 0 R >>
+startxref
+6621
+%%EOF

@@ -1,0 +1,91 @@
+{
+  "mode": "S4 local-vault sentence retrieval vs gold evidence (gate: recall@5>0)",
+  "n_entries": 6,
+  "candidates_unavailable": [],
+  "leaderboard": [
+    {
+      "candidate": "haystack-bm25",
+      "fails": 0,
+      "error": "",
+      "recall_at_1": 0.0713,
+      "recall_at_5": 0.3564,
+      "hard_recall_at_1": 0.6667,
+      "hard_recall_at_5": 1.0,
+      "latency_ms_p50": 470.9,
+      "latency_ms_p95": 514.6,
+      "deterministic": 1,
+      "gate": "PASS",
+      "score": 0.3564
+    },
+    {
+      "candidate": "ip-incumbent",
+      "fails": 0,
+      "error": "",
+      "recall_at_1": 0.0713,
+      "recall_at_5": 0.3564,
+      "hard_recall_at_1": 0.6667,
+      "hard_recall_at_5": 0.8333,
+      "latency_ms_p50": 44.6,
+      "latency_ms_p95": 56.7,
+      "deterministic": 1,
+      "gate": "PASS",
+      "score": 0.3564
+    },
+    {
+      "candidate": "rank-bm25",
+      "fails": 0,
+      "error": "",
+      "recall_at_1": 0.0713,
+      "recall_at_5": 0.3564,
+      "hard_recall_at_1": 0.6667,
+      "hard_recall_at_5": 1.0,
+      "latency_ms_p50": 135.4,
+      "latency_ms_p95": 214.0,
+      "deterministic": 1,
+      "gate": "PASS",
+      "score": 0.3564
+    },
+    {
+      "candidate": "tantivy-py",
+      "fails": 0,
+      "error": "",
+      "recall_at_1": 0.0713,
+      "recall_at_5": 0.3564,
+      "hard_recall_at_1": 0.6667,
+      "hard_recall_at_5": 1.0,
+      "latency_ms_p50": 143.0,
+      "latency_ms_p95": 151.8,
+      "deterministic": 1,
+      "gate": "PASS",
+      "score": 0.3564
+    },
+    {
+      "candidate": "faiss-hashdense",
+      "fails": 0,
+      "error": "",
+      "recall_at_1": 0.0713,
+      "recall_at_5": 0.345,
+      "hard_recall_at_1": 0.5,
+      "hard_recall_at_5": 0.6667,
+      "latency_ms_p50": 183.4,
+      "latency_ms_p95": 311.1,
+      "deterministic": 1,
+      "gate": "PASS",
+      "score": 0.345
+    },
+    {
+      "candidate": "naive-baseline",
+      "fails": 0,
+      "error": "",
+      "recall_at_1": 0.0713,
+      "recall_at_5": 0.3362,
+      "hard_recall_at_1": 0.6667,
+      "hard_recall_at_5": 0.8333,
+      "latency_ms_p50": 0.1,
+      "latency_ms_p95": 0.1,
+      "deterministic": 1,
+      "gate": "PASS",
+      "score": 0.3362
+    }
+  ]
+}

@@ -54,6 +54,9 @@ while :; do
     ./racetrack/run-race.sh "$REQ" >>"$LOG" 2>&1 && RACES=$((RACES+1))
   done
 
+  status "cycle $CYCLE: selfdev review"
+  ./selfdev/cycle-review.sh >>"$LOG" 2>&1 || true
+
   # self-heal: docker seats write as root on the bind mount
   docker run --rm -v "$REPO":/w alpine chown -R 1000:1000 /w >/dev/null 2>&1 || true
   status "cycle $CYCLE: committing"

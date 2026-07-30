@@ -1,0 +1,26 @@
+{
+  "mode": "F11: playwright probes \u2014 routes, console, keyboard, responsive overflow, deep-link refresh (gate: routes render)",
+  "n_entries": 1,
+  "candidates_unavailable": [],
+  "leaderboard": [
+    {
+      "candidate": "ip-frontend-playwright",
+      "fails": 0,
+      "error": "",
+      "ui_pass": 5,
+      "ui_total": 5,
+      "pass_rate": 1.0,
+      "probe_routes_render": 1,
+      "probe_console_clean": 1,
+      "probe_keyboard_focus": 1,
+      "probe_responsive_no_overflow": 1,
+      "probe_deep_link_refresh": 1,
+      "details": "{\"routes_render\": \"9/9 routes 200 + non-empty #root\", \"console_clean\": \"0 errors across 9 routes\", \"keyboard_focus\": \"focus on <button class='brand'> outline=solid 2px shadow='none'\", \"responsive_no_overflow\": \"no overflow on 9 routes at 320x800 and 1440x900\", \"deep_link_refresh\": \"/stage4-research: direct load == client-side nav (481 chars)\"}",
+      "latency_ms_p50": -1.0,
+      "latency_ms_p95": -1.0,
+      "deterministic": -1,
+      "gate": "PASS",
+      "score": 1.0
+    }
+  ]
+}

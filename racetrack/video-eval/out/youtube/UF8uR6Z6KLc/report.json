@@ -1,0 +1,87 @@
+{
+  "prompt": "Get me the transcript of https://www.youtube.com/watch?v=UF8uR6Z6KLc; produce a clean timestamped transcript + a table of sections/topics; save transcript.md.",
+  "source": "youtube",
+  "vid": "UF8uR6Z6KLc",
+  "url": "https://www.youtube.com/watch?v=UF8uR6Z6KLc",
+  "resolve_strategy": "ytdlp-impersonate",
+  "stealth": {
+    "strategy": "ytdlp-impersonate",
+    "ok": true,
+    "blocked": false,
+    "latency_ms": 5918.5,
+    "n_formats": 15,
+    "has_manual_caps": true,
+    "has_auto_caps": true,
+    "caption_langs": [
+      "aa",
+      "ab",
+      "af",
+      "ak",
+      "am",
+      "ar",
+      "as",
+      "ay",
+      "az",
+      "ba",
+      "be",
+      "bg"
+    ],
+    "error": "",
+    "note": "title=Steve Jobs' 2005 Stanford Commencement Address"
+  },
+  "transform_method": "caption-scrape-live",
+  "transform_detail": "innertube-android",
+  "n_cues": 332,
+  "transcript_words": 2311,
+  "sections": [
+    {
+      "start_s": 0.0,
+      "end_s": 113.0,
+      "topic": "college, mother, stanford, today"
+    },
+    {
+      "start_s": 113.0,
+      "end_s": 226.1,
+      "topic": "college, every, later, parents"
+    },
+    {
+      "start_s": 226.1,
+      "end_s": 339.1,
+      "topic": "have, never, connect, dots"
+    },
+    {
+      "start_s": 339.1,
+      "end_s": 452.2,
+      "topic": "apple, what, about, love"
+    },
+    {
+      "start_s": 452.2,
+      "end_s": 565.2,
+      "topic": "what, work, your, next"
+    },
+    {
+      "start_s": 565.2,
+      "end_s": 678.2,
+      "topic": "what, your, know, everything"
+    },
+    {
+      "start_s": 678.2,
+      "end_s": 791.3,
+      "topic": "death, don't, want, your"
+    },
+    {
+      "start_s": 791.3,
+      "end_s": 904.3,
+      "topic": "stay, hungry, foolish, whole"
+    }
+  ],
+  "manifest": [
+    {
+      "file": "transcript.md",
+      "bytes": 16075,
+      "sha256": "90c24c3b746aac252f9fbceb1796894fb4f615be2db5d30b7cbc6fa4b2aa6e7e"
+    }
+  ],
+  "wall_s": 9.2,
+  "audio_used": ""
+}

@@ -1,0 +1,40 @@
+{
+  "mode": "S2 section splitting vs gold headings (gate: mean_f1>=0.3)",
+  "n_entries": 3,
+  "candidates_unavailable": [],
+  "leaderboard": [
+    {
+      "candidate": "ip-incumbent",
+      "fails": 0,
+      "error": "",
+      "mean_f1": 1.0,
+      "latency_ms_p50": 68.6,
+      "latency_ms_p95": 72.4,
+      "deterministic": 1,
+      "gate": "PASS",
+      "score": 1.0
+    },
+    {
+      "candidate": "naive-baseline",
+      "fails": 0,
+      "error": "",
+      "mean_f1": 0.9412,
+      "latency_ms_p50": 0.0,
+      "latency_ms_p95": 0.2,
+      "deterministic": 1,
+      "gate": "PASS",
+      "score": 0.9412
+    },
+    {
+      "candidate": "haystack-splitter",
+      "fails": 0,
+      "error": "",
+      "mean_f1": 0.0,
+      "latency_ms_p50": 652.6,
+      "latency_ms_p95": 1983.6,
+      "deterministic": 1,
+      "gate": "FAIL",
+      "score": 0.0
+    }
+  ]
+}

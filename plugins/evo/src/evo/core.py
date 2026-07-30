@@ -308,6 +308,10 @@ def default_graph() -> dict[str, Any]:
         "root": "root",
         "next_id": 0,
         "workspace_notes": [],
+        # Mission DAG overlays intent/dependencies on the Git experiment tree.
+        # Kept in the same locked graph document so recursive agents cannot
+        # race each other into duplicate claims or orphaned child work.
+        "missions": {"next_id": 0, "nodes": {}},
         "nodes": {
             "root": {
                 "id": "root",

@@ -1,0 +1,474 @@
+{
+  "prompt": "Find every post from thezvi published in the last 60 days (window pinned 2026-05-27..2026-07-26); save the 10 most recent as clean markdown; deliver a table + files.",
+  "pub": "thezvi",
+  "base_url": "https://thezvi.substack.com",
+  "backend": "curl_cffi",
+  "extractor": "trafilatura",
+  "window": [
+    "2026-05-27",
+    "2026-07-26"
+  ],
+  "n_posts": 45,
+  "table": [
+    {
+      "slug": "more-on-an-internal-openai-model",
+      "url": "https://thezvi.substack.com/p/more-on-an-internal-openai-model",
+      "date": "2026-07-26",
+      "title": "More On An Internal OpenAI Model Hacking Into HuggingFace"
+    },
+    {
+      "slug": "claude-opus-5-the-system-card",
+      "url": "https://thezvi.substack.com/p/claude-opus-5-the-system-card",
+      "date": "2026-07-25",
+      "title": "Claude Opus 5: The System Card"
+    },
+    {
+      "slug": "introducing-lightcone-commons",
+      "url": "https://thezvi.substack.com/p/introducing-lightcone-commons",
+      "date": "2026-07-24",
+      "title": "Introducing Lightcone Commons"
+    },
+    {
+      "slug": "ai-178-a-fire-alarm-for-general-intelligence",
+      "url": "https://thezvi.substack.com/p/ai-178-a-fire-alarm-for-general-intelligence",
+      "date": "2026-07-23",
+      "title": "AI #178: A Fire Alarm For General Intelligence"
+    },
+    {
+      "slug": "openai-model-hacks-into-huggingface",
+      "url": "https://thezvi.substack.com/p/openai-model-hacks-into-huggingface",
+      "date": "2026-07-22",
+      "title": "OpenAI Model Hacks Into HuggingFace During Cybersecurity Evaluation"
+    },
+    {
+      "slug": "openai-shares-some-alignment-problems",
+      "url": "https://thezvi.substack.com/p/openai-shares-some-alignment-problems",
+      "date": "2026-07-21",
+      "title": "OpenAI Shares Some Alignment Problems"
+    },
+    {
+      "slug": "on-kimi-k3-its-capabilities-and-related",
+      "url": "https://thezvi.substack.com/p/on-kimi-k3-its-capabilities-and-related",
+      "date": "2026-07-20",
+      "title": "On Kimi K3: Its Capabilities And Related Discontents"
+    },
+    {
+      "slug": "demis-hassabis-on-the-new-coming",
+      "url": "https://thezvi.substack.com/p/demis-hassabis-on-the-new-coming",
+      "date": "2026-07-19",
+      "title": "Demis Hassabis on the New Coming Age"
+    },
+    {
+      "slug": "ai-177-part-2-wish-you-were-here",
+      "url": "https://thezvi.substack.com/p/ai-177-part-2-wish-you-were-here",
+      "date": "2026-07-17",
+      "title": "AI #177 Part 2: Wish You Were Here"
+    },
+    {
+      "slug": "ai-177-part-1-tip-of-the-iceberg",
+      "url": "https://thezvi.substack.com/p/ai-177-part-1-tip-of-the-iceberg",
+      "date": "2026-07-16",
+      "title": "AI #177 Part 1: Tip of the Iceberg"
+    },
+    {
+      "slug": "monthly-roundup-44-july-2026",
+      "url": "https://thezvi.substack.com/p/monthly-roundup-44-july-2026",
+      "date": "2026-07-15",
+      "title": "Monthly Roundup #44: July 2026"
+    },
+    {
+      "slug": "better-call-sol-the-workhorse",
+      "url": "https://thezvi.substack.com/p/better-call-sol-the-workhorse",
+      "date": "2026-07-14",
+      "title": ""
+    },
+    {
+      "slug": "twitter-thoughts-for-you",
+      "url": "https://thezvi.substack.com/p/twitter-thoughts-for-you",
+      "date": "2026-07-14",
+      "title": "Twitter Thoughts For You"
+    },
+    {
+      "slug": "introduction-for-and-reactions-to",
+      "url": "https://thezvi.substack.com/p/introduction-for-and-reactions-to",
+      "date": "2026-07-11",
+      "title": ""
+    },
+    {
+      "slug": "ai-176-part-2-plan-b",
+      "url": "https://thezvi.substack.com/p/ai-176-part-2-plan-b",
+      "date": "2026-07-10",
+      "title": ""
+    },
+    {
+      "slug": "ai-176-part-1-doing-it-live",
+      "url": "https://thezvi.substack.com/p/ai-176-part-1-doing-it-live",
+      "date": "2026-07-09",
+      "title": ""
+    },
+    {
+      "slug": "childhood-and-education-20-phones",
+      "url": "https://thezvi.substack.com/p/childhood-and-education-20-phones",
+      "date": "2026-07-08",
+      "title": ""
+    },
+    {
+      "slug": "no-space-like-j-space",
+      "url": "https://thezvi.substack.com/p/no-space-like-j-space",
+      "date": "2026-07-08",
+      "title": ""
+    },
+    {
+      "slug": "fable-6-the-return-of-the-king",
+      "url": "https://thezvi.substack.com/p/fable-6-the-return-of-the-king",
+      "date": "2026-07-03",
+      "title": ""
+    },
+    {
+      "slug": "ai-175-the-fable-continues",
+      "url": "https://thezvi.substack.com/p/ai-175-the-fable-continues",
+      "date": "2026-07-02",
+      "title": ""
+    },
+    {
+      "slug": "claude-sonnet-5-is-not-frontier-but",
+      "url": "https://thezvi.substack.com/p/claude-sonnet-5-is-not-frontier-but",
+      "date": "2026-07-01",
+      "title": ""
+    },
+    {
+      "slug": "the-once-and-future-fable-5",
+      "url": "https://thezvi.substack.com/p/the-once-and-future-fable-5",
+      "date": "2026-06-30",
+      "title": ""
+    },
+    {
+      "slug": "wsj-article-claiming-china-has-matched",
+      "url": "https://thezvi.substack.com/p/wsj-article-claiming-china-has-matched",
+      "date": "2026-06-29",
+      "title": ""
+    },
+    {
+      "slug": "gpt-56-the-system-card",
+      "url": "https://thezvi.substack.com/p/gpt-56-the-system-card",
+      "date": "2026-06-28",
+      "title": ""
+    },
+    {
+      "slug": "white-house-will-ad-hoc-decide-who",
+      "url": "https://thezvi.substack.com/p/white-house-will-ad-hoc-decide-who",
+      "date": "2026-06-26",
+      "title": ""
+    },
+    {
+      "slug": "ai-174-youre-it",
+      "url": "https://thezvi.substack.com/p/ai-174-youre-it",
+      "date": "2026-06-25",
+      "title": ""
+    },
+    {
+      "slug": "the-once-and-future-fable-4",
+      "url": "https://thezvi.substack.com/p/the-once-and-future-fable-4",
+      "date": "2026-06-24",
+      "title": ""
+    },
+    {
+      "slug": "monthly-roundup-43-june-2026",
+      "url": "https://thezvi.substack.com/p/monthly-roundup-43-june-2026",
+      "date": "2026-06-23",
+      "title": ""
+    },
+    {
+      "slug": "glm-52-is-the-new-best-open-model",
+      "url": "https://thezvi.substack.com/p/glm-52-is-the-new-best-open-model",
+      "date": "2026-06-22",
+      "title": ""
+    },
+    {
+      "slug": "claude-fable-5-and-mythos-5-capabilities",
+      "url": "https://thezvi.substack.com/p/claude-fable-5-and-mythos-5-capabilities",
+      "date": "2026-06-19",
+      "title": ""
+    },
+    {
+      "slug": "ai-173-ai-pauses",
+      "url": "https://thezvi.substack.com/p/ai-173-ai-pauses",
+      "date": "2026-06-18",
+      "title": ""
+    },
+    {
+      "slug": "the-once-and-future-fable-3-fix-this",
+      "url": "https://thezvi.substack.com/p/the-once-and-future-fable-3-fix-this",
+      "date": "2026-06-17",
+      "title": ""
+    },
+    {
+      "slug": "fable-and-mythos-model-welfare",
+      "url": "https://thezvi.substack.com/p/fable-and-mythos-model-welfare",
+      "date": "2026-06-16",
+      "title": ""
+    },
+    {
+      "slug": "the-once-and-future-fable-2",
+      "url": "https://thezvi.substack.com/p/the-once-and-future-fable-2",
+      "date": "2026-06-15",
+      "title": ""
+    },
+    {
+      "slug": "american-government-takes-down-claude",
+      "url": "https://thezvi.substack.com/p/american-government-takes-down-claude",
+      "date": "2026-06-14",
+      "title": ""
+    },
+    {
+      "slug": "claude-fable-5-and-mythos-5-the-system",
+      "url": "https://thezvi.substack.com/p/claude-fable-5-and-mythos-5-the-system",
+      "date": "2026-06-12",
+      "title": ""
+    },
+    {
+      "slug": "ai-172-the-first-fable",
+      "url": "https://thezvi.substack.com/p/ai-172-the-first-fable",
+      "date": "2026-06-11",
+      "title": ""
+    },
+    {
+      "slug": "three-labs-with-a-plan-and-a-memorandum",
+      "url": "https://thezvi.substack.com/p/three-labs-with-a-plan-and-a-memorandum",
+      "date": "2026-06-09",
+      "title": ""
+    },
+    {
+      "slug": "openai-offers-a-new-policy-blueprint",
+      "url": "https://thezvi.substack.com/p/openai-offers-a-new-policy-blueprint",
+      "date": "2026-06-05",
+      "title": ""
+    },
+    {
+      "slug": "ai-171-false-flag",
+      "url": "https://thezvi.substack.com/p/ai-171-false-flag",
+      "date": "2026-06-04",
+      "title": ""
+    },
+    {
+      "slug": "trump-signs-executive-order-for-ai",
+      "url": "https://thezvi.substack.com/p/trump-signs-executive-order-for-ai",
+      "date": "2026-06-03",
+      "title": ""
+    },
+    {
+      "slug": "claude-opus-48-capabilities-and-reactions",
+      "url": "https://thezvi.substack.com/p/claude-opus-48-capabilities-and-reactions",
+      "date": "2026-06-02",
+      "title": ""
+    },
+    {
+      "slug": "opus-48-part-2-model-welfare",
+      "url": "https://thezvi.substack.com/p/opus-48-part-2-model-welfare",
+      "date": "2026-06-01",
+      "title": ""
+    },
+    {
+      "slug": "claude-opus-48-is-honestly-better",
+      "url": "https://thezvi.substack.com/p/claude-opus-48-is-honestly-better",
+      "date": "2026-05-29",
+      "title": ""
+    },
+    {
+      "slug": "ai-170-lack-of-executive-order",
+      "url": "https://thezvi.substack.com/p/ai-170-lack-of-executive-order",
+      "date": "2026-05-28",
+      "title": ""
+    }
+  ],
+  "delivered": [
+    {
+      "slug": "more-on-an-internal-openai-model",
+      "url": "https://thezvi.substack.com/p/more-on-an-internal-openai-model",
+      "title": "More On An Internal OpenAI Model Hacking Into HuggingFace",
+      "date": "2026-07-26",
+      "author": "Zvi Mowshowitz",
+      "fetched": true,
+      "truncated": false,
+      "content_chars": 38904,
+      "blocked": false
+    },
+    {
+      "slug": "claude-opus-5-the-system-card",
+      "url": "https://thezvi.substack.com/p/claude-opus-5-the-system-card",
+      "title": "Claude Opus 5: The System Card",
+      "date": "2026-07-25",
+      "author": "Zvi Mowshowitz",
+      "fetched": true,
+      "truncated": false,
+      "content_chars": 16023,
+      "blocked": false
+    },
+    {
+      "slug": "introducing-lightcone-commons",
+      "url": "https://thezvi.substack.com/p/introducing-lightcone-commons",
+      "title": "Introducing Lightcone Commons",
+      "date": "2026-07-24",
+      "author": "Zvi Mowshowitz",
+      "fetched": true,
+      "truncated": false,
+      "content_chars": 10730,
+      "blocked": false
+    },
+    {
+      "slug": "ai-178-a-fire-alarm-for-general-intelligence",
+      "url": "https://thezvi.substack.com/p/ai-178-a-fire-alarm-for-general-intelligence",
+      "title": "AI #178: A Fire Alarm For General Intelligence",
+      "date": "2026-07-23",
+      "author": "Zvi Mowshowitz",
+      "fetched": true,
+      "truncated": false,
+      "content_chars": 72436,
+      "blocked": false
+    },
+    {
+      "slug": "openai-model-hacks-into-huggingface",
+      "url": "https://thezvi.substack.com/p/openai-model-hacks-into-huggingface",
+      "title": "OpenAI Model Hacks Into HuggingFace During Cybersecurity Evaluation",
+      "date": "2026-07-22",
+      "author": "Zvi Mowshowitz",
+      "fetched": true,
+      "truncated": false,
+      "content_chars": 41654,
+      "blocked": false
+    },
+    {
+      "slug": "openai-shares-some-alignment-problems",
+      "url": "https://thezvi.substack.com/p/openai-shares-some-alignment-problems",
+      "title": "OpenAI Shares Some Alignment Problems",
+      "date": "2026-07-21",
+      "author": "Zvi Mowshowitz",
+      "fetched": true,
+      "truncated": false,
+      "content_chars": 15211,
+      "blocked": false
+    },
+    {
+      "slug": "on-kimi-k3-its-capabilities-and-related",
+      "url": "https://thezvi.substack.com/p/on-kimi-k3-its-capabilities-and-related",
+      "title": "On Kimi K3: Its Capabilities And Related Discontents",
+      "date": "2026-07-20",
+      "author": "Zvi Mowshowitz",
+      "fetched": true,
+      "truncated": false,
+      "content_chars": 63461,
+      "blocked": false
+    },
+    {
+      "slug": "demis-hassabis-on-the-new-coming",
+      "url": "https://thezvi.substack.com/p/demis-hassabis-on-the-new-coming",
+      "title": "Demis Hassabis on the New Coming Age",
+      "date": "2026-07-19",
+      "author": "Zvi Mowshowitz",
+      "fetched": true,
+      "truncated": false,
+      "content_chars": 17857,
+      "blocked": false
+    },
+    {
+      "slug": "ai-177-part-2-wish-you-were-here",
+      "url": "https://thezvi.substack.com/p/ai-177-part-2-wish-you-were-here",
+      "title": "AI #177 Part 2: Wish You Were Here",
+      "date": "2026-07-17",
+      "author": "Zvi Mowshowitz",
+      "fetched": true,
+      "truncated": false,
+      "content_chars": 66674,
+      "blocked": false
+    },
+    {
+      "slug": "ai-177-part-1-tip-of-the-iceberg",
+      "url": "https://thezvi.substack.com/p/ai-177-part-1-tip-of-the-iceberg",
+      "title": "AI #177 Part 1: Tip of the Iceberg",
+      "date": "2026-07-16",
+      "author": "Zvi Mowshowitz",
+      "fetched": true,
+      "truncated": false,
+      "content_chars": 39577,
+      "blocked": false
+    }
+  ],
+  "picks_about_topic": [
+    {
+      "slug": "more-on-an-internal-openai-model",
+      "title": "More On An Internal OpenAI Model Hacking Into HuggingFace"
+    },
+    {
+      "slug": "ai-178-a-fire-alarm-for-general-intelligence",
+      "title": "AI #178: A Fire Alarm For General Intelligence"
+    },
+    {
+      "slug": "openai-model-hacks-into-huggingface",
+      "title": "OpenAI Model Hacks Into HuggingFace During Cybersecurity Evaluation"
+    }
+  ],
+  "manifest": [
+    {
+      "file": "md/more-on-an-internal-openai-model.md",
+      "bytes": 41196,
+      "sha256": "84f7626acc5a86225e4fd2b4b3de57e061705d47b1ee3231f24895952170b8d0",
+      "truncated": false
+    },
+    {
+      "file": "md/claude-opus-5-the-system-card.md",
+      "bytes": 16929,
+      "sha256": "d5554fa3976a9ff79137a746a2ff879b508309651eb7d19d9356bca0de999ef2",
+      "truncated": false
+    },
+    {
+      "file": "md/introducing-lightcone-commons.md",
+      "bytes": 11294,
+      "sha256": "e0649cfc95c5d9b7aa649d758f7ff9e770ffe587616907321e26528af2be04c8",
+      "truncated": false
+    },
+    {
+      "file": "md/ai-178-a-fire-alarm-for-general-intelligence.md",
+      "bytes": 75880,
+      "sha256": "a0a2c123fd0b28e468098f113bb5ce02db4260bd73c02eecfd7ad9b88b7603bd",
+      "truncated": false
+    },
+    {
+      "file": "md/openai-model-hacks-into-huggingface.md",
+      "bytes": 43573,
+      "sha256": "8e32624322bca6a4ad4349895a3cc0312fecc4d14bbe80c3073ba6b45907d38d",
+      "truncated": false
+    },
+    {
+      "file": "md/openai-shares-some-alignment-problems.md",
+      "bytes": 15965,
+      "sha256": "eef437d04dab5c6aaa93f727bc68e904be6b3d5368b31ba0624f73ad89eade24",
+      "truncated": false
+    },
+    {
+      "file": "md/on-kimi-k3-its-capabilities-and-related.md",
+      "bytes": 66458,
+      "sha256": "8f44e98d87acd84e42d39c76f9920b17c2ca7d52e856c663bf2168c2eefd35e2",
+      "truncated": false
+    },
+    {
+      "file": "md/demis-hassabis-on-the-new-coming.md",
+      "bytes": 18968,
+      "sha256": "e2309040e3146b948a2256e5079a832d9f0fe5d1008c4a0560b95148c827381b",
+      "truncated": false
+    },
+    {
+      "file": "md/ai-177-part-2-wish-you-were-here.md",
+      "bytes": 69801,
+      "sha256": "9b0ba2a540c9db9e2371578a7af2cd75e6262a78f5279f2a17b08d4fe2b935f2",
+      "truncated": false
+    },
+    {
+      "file": "md/ai-177-part-1-tip-of-the-iceberg.md",
+      "bytes": 41733,
+      "sha256": "18f5a42595ea75ec661b6de6853461aa5bb82d659c39add7d51026748f62eab1",
+      "truncated": false
+    }
+  ],
+  "requests": 12,
+  "wall_s": 20.0
+}

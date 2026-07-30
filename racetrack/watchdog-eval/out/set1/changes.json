@@ -1,0 +1,284 @@
+{
+  "set": "set1",
+  "detections": [
+    {
+      "page": "blog",
+      "change_type": "added",
+      "element_id": "post-eventbus",
+      "before": "",
+      "after": "Designing an event bus that survives restarts \u2014 12 views",
+      "context": "",
+      "label": "real"
+    },
+    {
+      "page": "blog",
+      "change_type": "modified",
+      "element_id": "views-oncall",
+      "before": "3,882 views",
+      "after": "3,905 views",
+      "context": "",
+      "label": "churn"
+    },
+    {
+      "page": "blog",
+      "change_type": "modified",
+      "element_id": "views-elastic",
+      "before": "1,204 views",
+      "after": "1,271 views",
+      "context": "",
+      "label": "churn"
+    },
+    {
+      "page": "blog",
+      "change_type": "moved",
+      "element_id": "tag-list",
+      "before": "kubernetes observability python sre",
+      "after": "python sre kubernetes observability",
+      "context": "",
+      "label": "churn"
+    },
+    {
+      "page": "changelog",
+      "change_type": "added",
+      "element_id": "cl-2-1-0",
+      "before": "",
+      "after": "2.1.0 \u2014 Adds incremental snapshots and a --dry-run flag.",
+      "context": "",
+      "label": "real"
+    },
+    {
+      "page": "changelog",
+      "change_type": "modified",
+      "element_id": "build-info",
+      "before": "build 9f3ac1d2e07b",
+      "after": "build b81de44a9c02",
+      "context": "",
+      "label": "churn"
+    },
+    {
+      "page": "docs",
+      "change_type": "modified",
+      "element_id": "install-note",
+      "before": "Acme Pipeline requires Python 3.10 or newer and a running Redis instance for queue state.",
+      "after": "You need Python 3.10+ and a reachable Redis server; queue state lives in Redis.",
+      "context": "",
+      "label": "real"
+    },
+    {
+      "page": "docs",
+      "change_type": "modified",
+      "element_id": "docs-updated",
+      "before": "Last updated: 2026-07-25 04:12 UTC",
+      "after": "Last updated: 2026-07-26 09:47 UTC",
+      "context": "",
+      "label": "churn"
+    },
+    {
+      "page": "faq",
+      "change_type": "modified",
+      "element_id": "faq-refunds-a",
+      "before": "Refunds are available within 14 days of purchase; contact support with your order number.",
+      "after": "We offer a 30-day money-back guarantee \u2014 email support with your order number to start one.",
+      "context": "",
+      "label": "real"
+    },
+    {
+      "page": "faq",
+      "change_type": "modified",
+      "element_id": "faq-updated",
+      "before": "Last updated: 2026-07-25 03:58 UTC",
+      "after": "Last updated: 2026-07-26 09:41 UTC",
+      "context": "",
+      "label": "churn"
+    },
+    {
+      "page": "jobs",
+      "change_type": "modified",
+      "element_id": "build-info",
+      "before": "build 9f3ac1d2e07b",
+      "after": "build b81de44a9c02",
+      "context": "",
+      "label": "churn"
+    },
+    {
+      "page": "jobs",
+      "change_type": "moved",
+      "element_id": "perks-list",
+      "before": "Remote-first Learning budget Hardware of your choice",
+      "after": "Hardware of your choice Remote-first Learning budget",
+      "context": "",
+      "label": "churn"
+    },
+    {
+      "page": "jobs",
+      "change_type": "modified",
+      "element_id": "jobs-updated",
+      "before": "Last updated: 2026-07-25 03:58 UTC",
+      "after": "Last updated: 2026-07-26 09:41 UTC",
+      "context": "",
+      "label": "churn"
+    },
+    {
+      "page": "landing",
+      "change_type": "modified",
+      "element_id": "signup-count",
+      "before": "Join 12,408 makers already shipping with Acme.",
+      "after": "Join 12,566 makers already shipping with Acme.",
+      "context": "",
+      "label": "churn"
+    },
+    {
+      "page": "landing",
+      "change_type": "modified",
+      "element_id": "ad-3",
+      "before": "Sponsored: CloudBox \u2014 30-day free trial, no card needed.",
+      "after": "Sponsored: DevKit Pro \u2014 ship dashboards twice as fast.",
+      "context": "ad-slot",
+      "label": "churn"
+    },
+    {
+      "page": "news",
+      "change_type": "modified",
+      "element_id": "news-updated",
+      "before": "Last updated: 2026-07-25 04:12 UTC",
+      "after": "Last updated: 2026-07-26 09:47 UTC",
+      "context": "",
+      "label": "churn"
+    },
+    {
+      "page": "news",
+      "change_type": "modified",
+      "element_id": "ad-2",
+      "before": "Sponsored: CloudBox \u2014 30-day free trial, no card needed.",
+      "after": "Sponsored: DevKit Pro \u2014 ship dashboards twice as fast.",
+      "context": "ad-slot",
+      "label": "churn"
+    },
+    {
+      "page": "news",
+      "change_type": "modified",
+      "element_id": "news-lead-h",
+      "before": "Acme raises Series B to expand data tooling",
+      "after": "Acme closes $40M Series B, doubles down on data tooling",
+      "context": "",
+      "label": "real"
+    },
+    {
+      "page": "pricing",
+      "change_type": "modified",
+      "element_id": "price-pro",
+      "before": "Pro \u2014 $29/mo \u2014 10 projects, email support, 90-day history",
+      "after": "Pro \u2014 $35/mo \u2014 10 projects, email support, 90-day history",
+      "context": "",
+      "label": "real"
+    },
+    {
+      "page": "pricing",
+      "change_type": "modified",
+      "element_id": "build-info",
+      "before": "build 9f3ac1d2e07b",
+      "after": "build b81de44a9c02",
+      "context": "",
+      "label": "churn"
+    },
+    {
+      "page": "pricing",
+      "change_type": "modified",
+      "element_id": "page-updated",
+      "before": "Last updated: 2026-07-25 04:12 UTC",
+      "after": "Last updated: 2026-07-26 09:47 UTC",
+      "context": "",
+      "label": "churn"
+    },
+    {
+      "page": "products",
+      "change_type": "added",
+      "element_id": "prod-widget-max",
+      "before": "",
+      "after": "Widget Max \u2014 $79.99 \u2014 preorder",
+      "context": "",
+      "label": "real"
+    },
+    {
+      "page": "products",
+      "change_type": "removed",
+      "element_id": "prod-widget-mini",
+      "before": "Widget Mini \u2014 $9.99 \u2014 in stock",
+      "after": "",
+      "context": "",
+      "label": "real"
+    },
+    {
+      "page": "products",
+      "change_type": "modified",
+      "element_id": "ad-1",
+      "before": "Sponsored: CloudBox \u2014 30-day free trial, no card needed.",
+      "after": "Sponsored: DevKit Pro \u2014 ship dashboards twice as fast.",
+      "context": "ad-slot",
+      "label": "churn"
+    },
+    {
+      "page": "status",
+      "change_type": "removed",
+      "element_id": "past-incidents",
+      "before": "Past incidents",
+      "after": "",
+      "context": "",
+      "label": "real"
+    },
+    {
+      "page": "status",
+      "change_type": "removed",
+      "element_id": "incident-0714",
+      "before": "2026-07-14 \u2014 Elevated queue latency in eu-west for 41 minutes; resolved by scaling workers.",
+      "after": "",
+      "context": "",
+      "label": "real"
+    },
+    {
+      "page": "status",
+      "change_type": "modified",
+      "element_id": "last-check",
+      "before": "Checked 12 seconds ago.",
+      "after": "Checked 3 seconds ago.",
+      "context": "",
+      "label": "churn"
+    },
+    {
+      "page": "status",
+      "change_type": "modified",
+      "element_id": "build-info",
+      "before": "build 9f3ac1d2e07b",
+      "after": "build b81de44a9c02",
+      "context": "",
+      "label": "churn"
+    },
+    {
+      "page": "team",
+      "change_type": "removed",
+      "element_id": "member-rmartin",
+      "before": "R. Martin \u2014 Infrastructure",
+      "after": "",
+      "context": "",
+      "label": "real"
+    },
+    {
+      "page": "team",
+      "change_type": "moved",
+      "element_id": "social-list",
+      "before": "GitHub Mastodon LinkedIn",
+      "after": "LinkedIn GitHub Mastodon",
+      "context": "",
+      "label": "churn"
+    },
+    {
+      "page": "terms",
+      "change_type": "modified",
+      "element_id": "tos-generated",
+      "before": "Generated at 2026-07-25 04:12 UTC",
+      "after": "Generated at 2026-07-26 09:47 UTC",
+      "context": "",
+      "label": "churn"
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "mode": "S8 v2 BibTeX: gold coverage + adversarial refs (unicode/braces/missing year) (gate: emits entries)",
+  "n_entries": 1,
+  "candidates_unavailable": [
+    {
+      "candidate": "jabref-bibtex",
+      "reason": "jabref is a Java/Gradle project; no java on this box"
+    }
+  ],
+  "leaderboard": [
+    {
+      "candidate": "ip-incumbent",
+      "fails": 0,
+      "error": "",
+      "bibtex_coverage": 1.0,
+      "entry_count": 4,
+      "hard_score": 1.0,
+      "latency_ms_p50": 82.7,
+      "latency_ms_p95": 102.6,
+      "deterministic": 1,
+      "gate": "PASS",
+      "score": 1.0
+    }
+  ]
+}

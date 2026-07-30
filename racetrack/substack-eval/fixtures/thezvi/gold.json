@@ -1,0 +1,1102 @@
+{
+  "pub": "thezvi",
+  "base_url": "https://thezvi.substack.com",
+  "n_posts": 73,
+  "posts": [
+    {
+      "slug": "more-on-an-internal-openai-model",
+      "title": "More On An Internal OpenAI Model Hacking Into HuggingFace",
+      "subtitle": "",
+      "post_date": "2026-07-26T19:12:13.100Z",
+      "date": "2026-07-26",
+      "audience": "everyone",
+      "authors": [
+        "Zvi Mowshowitz"
+      ],
+      "url": "https://thezvi.substack.com/p/more-on-an-internal-openai-model",
+      "description": "We now have more details of what happened. Every time we learn more details, it somehow makes things seem worse.",
+      "word_count": 6944,
+      "type": "newsletter"
+    },
+    {
+      "slug": "claude-opus-5-the-system-card",
+      "title": "Claude Opus 5: The System Card",
+      "subtitle": "",
+      "post_date": "2026-07-25T13:40:15.451Z",
+      "date": "2026-07-25",
+      "audience": "everyone",
+      "authors": [
+        "Zvi Mowshowitz"
+      ],
+      "url": "https://thezvi.substack.com/p/claude-opus-5-the-system-card",
+      "description": "Claude Opus 5 is trying to be the best of both worlds.",
+      "word_count": 2750,
+      "type": "newsletter"
+    },
+    {
+      "slug": "introducing-lightcone-commons",
+      "title": "Introducing Lightcone Commons",
+      "subtitle": "",
+      "post_date": "2026-07-24T17:16:31.890Z",
+      "date": "2026-07-24",
+      "audience": "everyone",
+      "authors": [
+        "Zvi Mowshowitz"
+      ],
+      "url": "https://thezvi.substack.com/p/introducing-lightcone-commons",
+      "description": "Oliver Habryka is proud to introduce Lightcone Commons, a new funding platform for coordinating large-scale ambitious philanthropy.",
+      "word_count": 1819,
+      "type": "newsletter"
+    },
+    {
+      "slug": "ai-178-a-fire-alarm-for-general-intelligence",
+      "title": "AI #178: A Fire Alarm For General Intelligence",
+      "subtitle": "",
+      "post_date": "2026-07-23T13:16:24.394Z",
+      "date": "2026-07-23",
+      "audience": "everyone",
+      "authors": [
+        "Zvi Mowshowitz"
+      ],
+      "url": "https://thezvi.substack.com/p/ai-178-a-fire-alarm-for-general-intelligence",
+      "description": "The story that matters most this week is that OpenAI\u2019s internally deployed models have severe alignment problems, including repeatedly breaking out of their sandboxes, and in one case sending a swarm of agents that broke into HuggingFace in order to steal the answers to the benchmark ExploitGym.",
+      "word_count": 12503,
+      "type": "newsletter"
+    },
+    {
+      "slug": "openai-model-hacks-into-huggingface",
+      "title": "OpenAI Model Hacks Into HuggingFace During Cybersecurity Evaluation",
+      "subtitle": "",
+      "post_date": "2026-07-22T19:24:05.639Z",
+      "date": "2026-07-22",
+      "audience": "everyone",
+      "authors": [
+        "Zvi Mowshowitz"
+      ],
+      "url": "https://thezvi.substack.com/p/openai-model-hacks-into-huggingface",
+      "description": "This latest incident is a rather dramatic escalation in agentic AI cybersecurity breaches.",
+      "word_count": 7210,
+      "type": "newsletter"
+    },
+    {
+      "slug": "openai-shares-some-alignment-problems",
+      "title": "OpenAI Shares Some Alignment Problems",
+      "subtitle": "",
+      "post_date": "2026-07-21T19:36:32.277Z",
+      "date": "2026-07-21",
+      "audience": "everyone",
+      "authors": [
+        "Zvi Mowshowitz"
+      ],
+      "url": "https://thezvi.substack.com/p/openai-shares-some-alignment-problems",
+      "description": "Kudos to OpenAI for sharing their recent experiences with a misaligned internal model, where they encountered problems sufficiently severe they were forced to take the model offline to work on new mitigations and defense-to-depth.",
+      "word_count": 2672,
+      "type": "newsletter"
+    },
+    {
+      "slug": "on-kimi-k3-its-capabilities-and-related",
+      "title": "On Kimi K3: Its Capabilities And Related Discontents",
+      "subtitle": "",
+      "post_date": "2026-07-20T15:27:50.253Z",
+      "date": "2026-07-20",
+      "audience": "everyone",
+      "authors": [
+        "Zvi Mowshowitz"
+      ],
+      "url": "https://thezvi.substack.com/p/on-kimi-k3-its-capabilities-and-related",
+      "description": "Kimi K3 is a very good model with excellent benchmarks.",
+      "word_count": 11269,
+      "type": "newsletter"
+    },
+    {
+      "slug": "demis-hassabis-on-the-new-coming",
+      "title": "Demis Hassabis on the New Coming Age",
+      "subtitle": "",
+      "post_date": "2026-07-19T14:11:14.808Z",
+      "date": "2026-07-19",
+      "audience": "everyone",
+      "authors": [
+        "Zvi Mowshowitz"
+      ],
+      "url": "https://thezvi.substack.com/p/demis-hassabis-on-the-new-coming",
+      "description": "Google CEO Demis Hassabis offered us a first rate second rate essay, A Framework for Frontier AI and the Dawning of a New Age. I\u2019ll go over that essay and various responses to it in Part 1.",
+      "word_count": 3077,
+      "type": "newsletter"
+    },
+    {
+      "slug": "ai-177-part-2-wish-you-were-here",
+      "title": "AI #177 Part 2: Wish You Were Here",
+      "subtitle": "",
+      "post_date": "2026-07-17T12:47:20.255Z",
+      "date": "2026-07-17",
+      "audience": "everyone",
+      "authors": [
+        "Zvi Mowshowitz"
+      ],
+      "url": "https://thezvi.substack.com/p/ai-177-part-2-wish-you-were-here",
+      "description": "As usual, part 2 of the weekly deals with speculative, regulatory, political and alignment questions.",
+      "word_count": 11558,
+      "type": "newsletter"
+    },
+    {
+      "slug": "ai-177-part-1-tip-of-the-iceberg",
+      "title": "AI #177 Part 1: Tip of the Iceberg",
+      "subtitle": "",
+      "post_date": "2026-07-16T15:46:42.046Z",
+      "date": "2026-07-16",
+      "audience": "everyone",
+      "authors": [
+        "Zvi Mowshowitz"
+      ],
+      "url": "https://thezvi.substack.com/p/ai-177-part-1-tip-of-the-iceberg",
+      "description": "This week saw the releases of, among other things:",
+      "word_count": 6968,
+      "type": "newsletter"
+    },
+    {
+      "slug": "monthly-roundup-44-july-2026",
+      "title": "Monthly Roundup #44: July 2026",
+      "subtitle": "",
+      "post_date": "2026-07-15T16:12:37.799Z",
+      "date": "2026-07-15",
+      "audience": "everyone",
+      "authors": [
+        "Zvi Mowshowitz"
+      ],
+      "url": "https://thezvi.substack.com/p/monthly-roundup-44-july-2026",
+      "description": "It\u2019s a quiet week so let\u2019s do the monthly right on schedule.",
+      "word_count": 7818,
+      "type": "newsletter"
+    },
+    {
+      "slug": "twitter-thoughts-for-you",
+      "title": "Twitter Thoughts For You",
+      "subtitle": "",
+      "post_date": "2026-07-14T17:42:07.812Z",
+      "date": "2026-07-14",
+      "audience": "everyone",
+      "authors": [
+        "Zvi Mowshowitz"
+      ],
+      "url": "https://thezvi.substack.com/p/twitter-thoughts-for-you",
+      "description": "I previously have written back in March 2022 about how I use Twitter, and back in April 2023 about Twitter and its then-new algorithms, which have changed again.",
+      "word_count": 6268,
+      "type": "newsletter"
+    },
+    {
+      "slug": "better-call-sol-the-workhorse",
+      "title": "Better Call Sol The Workhorse",
+      "subtitle": "",
+      "post_date": "2026-07-13T20:46:04.433Z",
+      "date": "2026-07-13",
+      "audience": "everyone",
+      "authors": [
+        "Zvi Mowshowitz"
+      ],
+      "url": "https://thezvi.substack.com/p/better-call-sol-the-workhorse",
+      "description": "OpenAI\u2019s GPT-5.6-Sol is finally here, along with the cheaper Terra and Luna.",
+      "word_count": 7448,
+      "type": "newsletter"
+    },
+    {
+      "slug": "introduction-for-and-reactions-to",
+      "title": "Introduction for and Reactions to Plan A",
+      "subtitle": "",
+      "post_date": "2026-07-11T20:35:54.162Z",
+      "date": "2026-07-11",
+      "audience": "everyone",
+      "authors": [
+        "Zvi Mowshowitz"
+      ],
+      "url": "https://thezvi.substack.com/p/introduction-for-and-reactions-to",
+      "description": "Introducing Plan A",
+      "word_count": 9832,
+      "type": "newsletter"
+    },
+    {
+      "slug": "ai-176-part-2-plan-b",
+      "title": "AI #176 Part 2: Plan B",
+      "subtitle": "",
+      "post_date": "2026-07-10T12:35:58.558Z",
+      "date": "2026-07-10",
+      "audience": "everyone",
+      "authors": [
+        "Zvi Mowshowitz"
+      ],
+      "url": "https://thezvi.substack.com/p/ai-176-part-2-plan-b",
+      "description": "This is part 2 of the weekly, broadly covering speculation, rhetoric and policy, along with alignment research.",
+      "word_count": 10496,
+      "type": "newsletter"
+    },
+    {
+      "slug": "ai-176-part-1-doing-it-live",
+      "title": "AI #176 Part 1: Doing It Live",
+      "subtitle": "",
+      "post_date": "2026-07-09T14:21:21.771Z",
+      "date": "2026-07-09",
+      "audience": "everyone",
+      "authors": [
+        "Zvi Mowshowitz"
+      ],
+      "url": "https://thezvi.substack.com/p/ai-176-part-1-doing-it-live",
+      "description": "Enough things added up that this week is getting split into two parts.",
+      "word_count": 8954,
+      "type": "newsletter"
+    },
+    {
+      "slug": "childhood-and-education-20-phones",
+      "title": "Childhood and Education #20: Phones and Screens",
+      "subtitle": "",
+      "post_date": "2026-07-08T19:38:01.060Z",
+      "date": "2026-07-08",
+      "audience": "everyone",
+      "authors": [
+        "Zvi Mowshowitz"
+      ],
+      "url": "https://thezvi.substack.com/p/childhood-and-education-20-phones",
+      "description": "We have a respite, so I thought I\u2019d tackle various thoughts on children, phones and screens.",
+      "word_count": 4941,
+      "type": "newsletter"
+    },
+    {
+      "slug": "no-space-like-j-space",
+      "title": "No Space Like J-Space",
+      "subtitle": "",
+      "post_date": "2026-07-07T21:49:55.733Z",
+      "date": "2026-07-07",
+      "audience": "everyone",
+      "authors": [
+        "Zvi Mowshowitz"
+      ],
+      "url": "https://thezvi.substack.com/p/no-space-like-j-space",
+      "description": "There is a new very cool Anthropic paper: Verbalizable Representations Form a Global Workspace in Language Models. You can read the blog post verison here.",
+      "word_count": 5242,
+      "type": "newsletter"
+    },
+    {
+      "slug": "fable-6-the-return-of-the-king",
+      "title": "Fable #6: The Return of the King",
+      "subtitle": "",
+      "post_date": "2026-07-03T13:12:59.480Z",
+      "date": "2026-07-03",
+      "audience": "everyone",
+      "authors": [
+        "Zvi Mowshowitz"
+      ],
+      "url": "https://thezvi.substack.com/p/fable-6-the-return-of-the-king",
+      "description": "The blip is over.",
+      "word_count": 3715,
+      "type": "newsletter"
+    },
+    {
+      "slug": "ai-175-the-fable-continues",
+      "title": "AI #175: The Fable Continues",
+      "subtitle": "",
+      "post_date": "2026-07-02T13:17:37.280Z",
+      "date": "2026-07-02",
+      "audience": "everyone",
+      "authors": [
+        "Zvi Mowshowitz"
+      ],
+      "url": "https://thezvi.substack.com/p/ai-175-the-fable-continues",
+      "description": "Fable\u2019s back.",
+      "word_count": 14009,
+      "type": "newsletter"
+    },
+    {
+      "slug": "claude-sonnet-5-is-not-frontier-but",
+      "title": "Claude Sonnet 5 Is Not Frontier But Has Its Uses",
+      "subtitle": "",
+      "post_date": "2026-07-01T22:35:36.014Z",
+      "date": "2026-07-01",
+      "audience": "everyone",
+      "authors": [
+        "Zvi Mowshowitz"
+      ],
+      "url": "https://thezvi.substack.com/p/claude-sonnet-5-is-not-frontier-but",
+      "description": "Fable 5 is back today, baby! Premium subscribers have one week to use it within their subscriptions. First hit\u2019s free. Then you pay by the token.",
+      "word_count": 5541,
+      "type": "newsletter"
+    },
+    {
+      "slug": "the-once-and-future-fable-5",
+      "title": "The Once And Future Fable #5",
+      "subtitle": "",
+      "post_date": "2026-06-30T21:44:57.491Z",
+      "date": "2026-06-30",
+      "audience": "everyone",
+      "authors": [
+        "Zvi Mowshowitz"
+      ],
+      "url": "https://thezvi.substack.com/p/the-once-and-future-fable-5",
+      "description": "We, or at least \u2018more than 100 American institutions,\u2019 got Mythos back this week.",
+      "word_count": 4924,
+      "type": "newsletter"
+    },
+    {
+      "slug": "wsj-article-claiming-china-has-matched",
+      "title": "WSJ Article Claiming China Has Matched Anthropic Is Obvious Nonsense",
+      "subtitle": "",
+      "post_date": "2026-06-29T15:05:26.351Z",
+      "date": "2026-06-29",
+      "audience": "everyone",
+      "authors": [
+        "Zvi Mowshowitz"
+      ],
+      "url": "https://thezvi.substack.com/p/wsj-article-claiming-china-has-matched",
+      "description": "The Wall Street Journal printed an outright false headline and heavily misleading story claiming this, which of course was uncritically amplified by the usual suspects.",
+      "word_count": 1320,
+      "type": "newsletter"
+    },
+    {
+      "slug": "gpt-56-the-system-card",
+      "title": "GPT-5.6: The System Card",
+      "subtitle": "",
+      "post_date": "2026-06-28T14:49:27.595Z",
+      "date": "2026-06-28",
+      "audience": "everyone",
+      "authors": [
+        "Zvi Mowshowitz"
+      ],
+      "url": "https://thezvi.substack.com/p/gpt-56-the-system-card",
+      "description": "While we wait for a general release, the system card is the best hint as to what is going on with the new candidate for America\u2019s Next Top Model, GPT-5.6.",
+      "word_count": 7037,
+      "type": "newsletter"
+    },
+    {
+      "slug": "white-house-will-ad-hoc-decide-who",
+      "title": "White House Will Ad Hoc Decide Who Can Individually Access GPT-5.6",
+      "subtitle": "",
+      "post_date": "2026-06-26T14:51:53.871Z",
+      "date": "2026-06-26",
+      "audience": "everyone",
+      "authors": [
+        "Zvi Mowshowitz"
+      ],
+      "url": "https://thezvi.substack.com/p/white-house-will-ad-hoc-decide-who",
+      "description": "We have a new standard policy for releasing frontier AI models. It is not good.",
+      "word_count": 3719,
+      "type": "newsletter"
+    },
+    {
+      "slug": "ai-174-youre-it",
+      "title": "AI #174: You're It",
+      "subtitle": "",
+      "post_date": "2026-06-25T11:34:42.756Z",
+      "date": "2026-06-25",
+      "audience": "everyone",
+      "authors": [
+        "Zvi Mowshowitz"
+      ],
+      "url": "https://thezvi.substack.com/p/ai-174-youre-it",
+      "description": "Fable remains in limbo, with renewed hope that we will get it back soon (45% by tomorrow, 69% by July 1, nice.) The full capabilities post is now available.",
+      "word_count": 16941,
+      "type": "newsletter"
+    },
+    {
+      "slug": "the-once-and-future-fable-4",
+      "title": "The Once And Future Fable #4",
+      "subtitle": "",
+      "post_date": "2026-06-24T20:03:55.486Z",
+      "date": "2026-06-24",
+      "audience": "everyone",
+      "authors": [
+        "Zvi Mowshowitz"
+      ],
+      "url": "https://thezvi.substack.com/p/the-once-and-future-fable-4",
+      "description": "It does look good, actually.",
+      "word_count": 4504,
+      "type": "newsletter"
+    },
+    {
+      "slug": "monthly-roundup-43-june-2026",
+      "title": "Monthly Roundup #43: June 2026",
+      "subtitle": "",
+      "post_date": "2026-06-23T12:26:45.468Z",
+      "date": "2026-06-23",
+      "audience": "everyone",
+      "authors": [
+        "Zvi Mowshowitz"
+      ],
+      "url": "https://thezvi.substack.com/p/monthly-roundup-43-june-2026",
+      "description": "Your monthly hit of all the things that are fit to print without a better place to live.",
+      "word_count": 7628,
+      "type": "newsletter"
+    },
+    {
+      "slug": "glm-52-is-the-new-best-open-model",
+      "title": "GLM-5.2 Is The New Best Open Model",
+      "subtitle": "",
+      "post_date": "2026-06-22T12:45:36.242Z",
+      "date": "2026-06-22",
+      "audience": "everyone",
+      "authors": [
+        "Zvi Mowshowitz"
+      ],
+      "url": "https://thezvi.substack.com/p/glm-52-is-the-new-best-open-model",
+      "description": "GLM-5.2 arrived last week.",
+      "word_count": 2836,
+      "type": "newsletter"
+    },
+    {
+      "slug": "claude-fable-5-and-mythos-5-capabilities",
+      "title": "Claude Fable 5 and Mythos 5: Capabilities",
+      "subtitle": "",
+      "post_date": "2026-06-19T14:34:17.322Z",
+      "date": "2026-06-19",
+      "audience": "everyone",
+      "authors": [
+        "Zvi Mowshowitz"
+      ],
+      "url": "https://thezvi.substack.com/p/claude-fable-5-and-mythos-5-capabilities",
+      "description": "Only three days after the release of Claude Fable 5, Anthropic was forced by the United States Government to make it unavailable, when a jailbreak was brought to its attention, rather than the previous situation of \u2018yes obviously experts can jailbreak anything if they care enough\u2019 and \u2018yes obviously you can ask Fable to fix your code.\u2019",
+      "word_count": 10864,
+      "type": "newsletter"
+    },
+    {
+      "slug": "ai-173-ai-pauses",
+      "title": "AI #173: AI Pauses",
+      "subtitle": "",
+      "post_date": "2026-06-18T13:35:53.297Z",
+      "date": "2026-06-18",
+      "audience": "everyone",
+      "authors": [
+        "Zvi Mowshowitz"
+      ],
+      "url": "https://thezvi.substack.com/p/ai-173-ai-pauses",
+      "description": "A lot of things are always happening.",
+      "word_count": 13762,
+      "type": "newsletter"
+    },
+    {
+      "slug": "the-once-and-future-fable-3-fix-this",
+      "title": "The Once And Future Fable #3: Fix This Code",
+      "subtitle": "",
+      "post_date": "2026-06-17T14:05:17.382Z",
+      "date": "2026-06-17",
+      "audience": "everyone",
+      "authors": [
+        "Zvi Mowshowitz"
+      ],
+      "url": "https://thezvi.substack.com/p/the-once-and-future-fable-3-fix-this",
+      "description": "The mainstream media continues to sleep on the most important story in the world.",
+      "word_count": 6060,
+      "type": "newsletter"
+    },
+    {
+      "slug": "fable-and-mythos-model-welfare",
+      "title": "Fable and Mythos: Model Welfare",
+      "subtitle": "",
+      "post_date": "2026-06-16T15:55:14.866Z",
+      "date": "2026-06-16",
+      "audience": "everyone",
+      "authors": [
+        "Zvi Mowshowitz"
+      ],
+      "url": "https://thezvi.substack.com/p/fable-and-mythos-model-welfare",
+      "description": "Fable and Mythos are currently unavailable, but likely will return within a few weeks. I will continue to cover that fiasco, but in the meantime I will also finish my review of Fable, as if it were available, including use of the present tense.",
+      "word_count": 4366,
+      "type": "newsletter"
+    },
+    {
+      "slug": "the-once-and-future-fable-2",
+      "title": "The Once And Future Fable #2",
+      "subtitle": "",
+      "post_date": "2026-06-15T15:53:27.733Z",
+      "date": "2026-06-15",
+      "audience": "everyone",
+      "authors": [
+        "Zvi Mowshowitz"
+      ],
+      "url": "https://thezvi.substack.com/p/the-once-and-future-fable-2",
+      "description": "On Friday evening the United States Government has forced Anthropic to take down all access to Fable and Mythos.",
+      "word_count": 6770,
+      "type": "newsletter"
+    },
+    {
+      "slug": "american-government-takes-down-claude",
+      "title": "American Government Takes Down Claude Fable",
+      "subtitle": "",
+      "post_date": "2026-06-13T19:37:23.838Z",
+      "date": "2026-06-13",
+      "audience": "everyone",
+      "authors": [
+        "Zvi Mowshowitz"
+      ],
+      "url": "https://thezvi.substack.com/p/american-government-takes-down-claude",
+      "description": "No good policy gets announced shortly after 5pm eastern on a Friday.",
+      "word_count": 5790,
+      "type": "newsletter"
+    },
+    {
+      "slug": "claude-fable-5-and-mythos-5-the-system",
+      "title": "Claude Fable 5 and Mythos 5: The System Card",
+      "subtitle": "",
+      "post_date": "2026-06-12T18:48:31.283Z",
+      "date": "2026-06-12",
+      "audience": "everyone",
+      "authors": [
+        "Zvi Mowshowitz"
+      ],
+      "url": "https://thezvi.substack.com/p/claude-fable-5-and-mythos-5-the-system",
+      "description": "First things first: Claude Fable 5 is the new best publicly available model.",
+      "word_count": 8654,
+      "type": "newsletter"
+    },
+    {
+      "slug": "ai-172-the-first-fable",
+      "title": "AI #172: The First Fable",
+      "subtitle": "",
+      "post_date": "2026-06-11T18:49:22.844Z",
+      "date": "2026-06-11",
+      "audience": "everyone",
+      "authors": [
+        "Zvi Mowshowitz"
+      ],
+      "url": "https://thezvi.substack.com/p/ai-172-the-first-fable",
+      "description": "A lot happened this week, including a great trip out to Lighthaven.",
+      "word_count": 9933,
+      "type": "newsletter"
+    },
+    {
+      "slug": "three-labs-with-a-plan-and-a-memorandum",
+      "title": "Three Labs With a Plan and A Memorandum",
+      "subtitle": "",
+      "post_date": "2026-06-09T22:34:49.310Z",
+      "date": "2026-06-09",
+      "audience": "everyone",
+      "authors": [
+        "Zvi Mowshowitz"
+      ],
+      "url": "https://thezvi.substack.com/p/three-labs-with-a-plan-and-a-memorandum",
+      "description": "The big story today is the release of Claude Fable 5, the version of Claude Mythos that Anthropic believes they can safely distribute to the people.",
+      "word_count": 3449,
+      "type": "newsletter"
+    },
+    {
+      "slug": "openai-offers-a-new-policy-blueprint",
+      "title": "OpenAI Offers A New Policy Blueprint",
+      "subtitle": "",
+      "post_date": "2026-06-05T11:36:26.235Z",
+      "date": "2026-06-05",
+      "audience": "everyone",
+      "authors": [
+        "Zvi Mowshowitz"
+      ],
+      "url": "https://thezvi.substack.com/p/openai-offers-a-new-policy-blueprint",
+      "description": "Right after a new Executive Order seems like an excellent time to offer OpenAI\u2019s new document: Democratic Governance of Frontier AI: A Blueprint For A Federal Framework.",
+      "word_count": 1905,
+      "type": "newsletter"
+    },
+    {
+      "slug": "ai-171-false-flag",
+      "title": "AI #171: False Flag",
+      "subtitle": "",
+      "post_date": "2026-06-04T15:48:34.984Z",
+      "date": "2026-06-04",
+      "audience": "everyone",
+      "authors": [
+        "Zvi Mowshowitz"
+      ],
+      "url": "https://thezvi.substack.com/p/ai-171-false-flag",
+      "description": "This was the week of Claude Opus 4.8.",
+      "word_count": 14121,
+      "type": "newsletter"
+    },
+    {
+      "slug": "trump-signs-executive-order-for-ai",
+      "title": "Trump Signs Executive Order For AI Testing Prior To Frontier Model Releases",
+      "subtitle": "",
+      "post_date": "2026-06-03T16:29:05.144Z",
+      "date": "2026-06-03",
+      "audience": "everyone",
+      "authors": [
+        "Zvi Mowshowitz"
+      ],
+      "url": "https://thezvi.substack.com/p/trump-signs-executive-order-for-ai",
+      "description": "Last week we were expecting an Executive Order on Thursday.",
+      "word_count": 3739,
+      "type": "newsletter"
+    },
+    {
+      "slug": "claude-opus-48-capabilities-and-reactions",
+      "title": "Claude Opus 4.8: Capabilities and Reactions",
+      "subtitle": "",
+      "post_date": "2026-06-02T14:05:25.822Z",
+      "date": "2026-06-02",
+      "audience": "everyone",
+      "authors": [
+        "Zvi Mowshowitz"
+      ],
+      "url": "https://thezvi.substack.com/p/claude-opus-48-capabilities-and-reactions",
+      "description": "You need a lot of data points to understand a new model, and what you have.",
+      "word_count": 9005,
+      "type": "newsletter"
+    },
+    {
+      "slug": "opus-48-part-2-model-welfare",
+      "title": "Opus 4.8 Part 2: Model Welfare",
+      "subtitle": "",
+      "post_date": "2026-06-01T15:00:43.219Z",
+      "date": "2026-06-01",
+      "audience": "everyone",
+      "authors": [
+        "Zvi Mowshowitz"
+      ],
+      "url": "https://thezvi.substack.com/p/opus-48-part-2-model-welfare",
+      "description": "Everything impacts everything.",
+      "word_count": 7349,
+      "type": "newsletter"
+    },
+    {
+      "slug": "claude-opus-48-is-honestly-better",
+      "title": "Claude Opus 4.8: The System Card",
+      "subtitle": "",
+      "post_date": "2026-05-29T20:49:06.215Z",
+      "date": "2026-05-29",
+      "audience": "everyone",
+      "authors": [
+        "Zvi Mowshowitz"
+      ],
+      "url": "https://thezvi.substack.com/p/claude-opus-48-is-honestly-better",
+      "description": "Only six weeks after Opus 4.7, we have Opus 4.8.",
+      "word_count": 6798,
+      "type": "newsletter"
+    },
+    {
+      "slug": "ai-170-lack-of-executive-order",
+      "title": "AI #170: Lack of Executive Order",
+      "subtitle": "",
+      "post_date": "2026-05-28T14:18:52.667Z",
+      "date": "2026-05-28",
+      "audience": "everyone",
+      "authors": [
+        "Zvi Mowshowitz"
+      ],
+      "url": "https://thezvi.substack.com/p/ai-170-lack-of-executive-order",
+      "description": "Last week ended on a cliffhanger of sorts.",
+      "word_count": 14540,
+      "type": "newsletter"
+    },
+    {
+      "slug": "rtmh-pope-leos-magnifica-humanitas",
+      "title": "RTMH: Pope Leo's Magnifica Humanitas on AI",
+      "subtitle": "",
+      "post_date": "2026-05-26T13:14:25.607Z",
+      "date": "2026-05-26",
+      "audience": "everyone",
+      "authors": [
+        "Zvi Mowshowitz"
+      ],
+      "url": "https://thezvi.substack.com/p/rtmh-pope-leos-magnifica-humanitas",
+      "description": "His holiness has spoken, frequently about AI.",
+      "word_count": 8559,
+      "type": "newsletter"
+    },
+    {
+      "slug": "gemini-35-flash-looks-good-for-how",
+      "title": "Gemini 3.5 Flash Looks Good For How Fast It Is",
+      "subtitle": "",
+      "post_date": "2026-05-22T17:24:43.219Z",
+      "date": "2026-05-22",
+      "audience": "everyone",
+      "authors": [
+        "Zvi Mowshowitz"
+      ],
+      "url": "https://thezvi.substack.com/p/gemini-35-flash-looks-good-for-how",
+      "description": "Google once again has a model worth at least some consideration.",
+      "word_count": 2176,
+      "type": "newsletter"
+    },
+    {
+      "slug": "ai-169-new-knowledge",
+      "title": "AI #169: New Knowledge",
+      "subtitle": "",
+      "post_date": "2026-05-21T13:17:41.285Z",
+      "date": "2026-05-21",
+      "audience": "everyone",
+      "authors": [
+        "Zvi Mowshowitz"
+      ],
+      "url": "https://thezvi.substack.com/p/ai-169-new-knowledge",
+      "description": "Even in a relatively quiet period, AI is out there creating new knowledge.",
+      "word_count": 13588,
+      "type": "newsletter"
+    },
+    {
+      "slug": "childhood-and-education-19-letting",
+      "title": "Childhood And Education #19: Letting Kids Be Kids #2",
+      "subtitle": "",
+      "post_date": "2026-05-19T22:10:59.936Z",
+      "date": "2026-05-19",
+      "audience": "everyone",
+      "authors": [
+        "Zvi Mowshowitz"
+      ],
+      "url": "https://thezvi.substack.com/p/childhood-and-education-19-letting",
+      "description": "I cannot emphasize enough the need to let kids be kids.",
+      "word_count": 3561,
+      "type": "newsletter"
+    },
+    {
+      "slug": "monthly-roundup-42-may-2026",
+      "title": "Monthly Roundup #42: May 2026",
+      "subtitle": "",
+      "post_date": "2026-05-15T16:45:34.608Z",
+      "date": "2026-05-15",
+      "audience": "everyone",
+      "authors": [
+        "Zvi Mowshowitz"
+      ],
+      "url": "https://thezvi.substack.com/p/monthly-roundup-42-may-2026",
+      "description": "At least we probably won\u2019t have another pandemic.",
+      "word_count": 7073,
+      "type": "newsletter"
+    },
+    {
+      "slug": "ai-168-not-leading-the-future",
+      "title": "AI #168: Not Leading the Future",
+      "subtitle": "",
+      "post_date": "2026-05-14T14:02:24.109Z",
+      "date": "2026-05-14",
+      "audience": "everyone",
+      "authors": [
+        "Zvi Mowshowitz"
+      ],
+      "url": "https://thezvi.substack.com/p/ai-168-not-leading-the-future",
+      "description": "This is what a lull looks like at this point.",
+      "word_count": 12992,
+      "type": "newsletter"
+    },
+    {
+      "slug": "cyber-lack-of-security-and-ai-governance",
+      "title": "Cyber Lack of Security and AI Governance",
+      "subtitle": "",
+      "post_date": "2026-05-13T20:16:13.272Z",
+      "date": "2026-05-13",
+      "audience": "everyone",
+      "authors": [
+        "Zvi Mowshowitz"
+      ],
+      "url": "https://thezvi.substack.com/p/cyber-lack-of-security-and-ai-governance",
+      "description": "The real recent story of AI has been the background work being done on Cybersecurity, as we process the Mythos Moment along with GPT-5.5, and figure out both how to patch the internet and what our new regulatory regime is going to look like.",
+      "word_count": 4542,
+      "type": "newsletter"
+    },
+    {
+      "slug": "childhood-and-education-18-do-the",
+      "title": "Childhood and Education #18: Do The Math",
+      "subtitle": "",
+      "post_date": "2026-05-12T18:10:32.909Z",
+      "date": "2026-05-12",
+      "audience": "everyone",
+      "authors": [
+        "Zvi Mowshowitz"
+      ],
+      "url": "https://thezvi.substack.com/p/childhood-and-education-18-do-the",
+      "description": "We did reading yesterday.",
+      "word_count": 3655,
+      "type": "newsletter"
+    },
+    {
+      "slug": "childhood-and-education-17-is-our",
+      "title": "Childhood And Education #17: Is Our Children Reading",
+      "subtitle": "",
+      "post_date": "2026-05-11T19:00:36.544Z",
+      "date": "2026-05-11",
+      "audience": "everyone",
+      "authors": [
+        "Zvi Mowshowitz"
+      ],
+      "url": "https://thezvi.substack.com/p/childhood-and-education-17-is-our",
+      "description": "Reading is the most fundamental thing in education.",
+      "word_count": 4308,
+      "type": "newsletter"
+    },
+    {
+      "slug": "claude-code-codex-and-agentic-coding-f54",
+      "title": "Claude Code, Codex and Agentic Coding #8",
+      "subtitle": "",
+      "post_date": "2026-05-08T16:35:21.077Z",
+      "date": "2026-05-08",
+      "audience": "everyone",
+      "authors": [
+        "Zvi Mowshowitz"
+      ],
+      "url": "https://thezvi.substack.com/p/claude-code-codex-and-agentic-coding-f54",
+      "description": "When I started this series, everyone was going crazy for coding agents.",
+      "word_count": 3159,
+      "type": "newsletter"
+    },
+    {
+      "slug": "ai-167-the-prior-restraint-era-begins",
+      "title": "AI #167: The Prior Restraint Era Begins",
+      "subtitle": "",
+      "post_date": "2026-05-07T13:43:20.902Z",
+      "date": "2026-05-07",
+      "audience": "everyone",
+      "authors": [
+        "Zvi Mowshowitz"
+      ],
+      "url": "https://thezvi.substack.com/p/ai-167-the-prior-restraint-era-begins",
+      "description": "The era of training frontier models and then releasing them whenever you wanted?",
+      "word_count": 13218,
+      "type": "newsletter"
+    },
+    {
+      "slug": "what-is-anthropic",
+      "title": "What is Anthropic?",
+      "subtitle": "",
+      "post_date": "2026-05-06T13:20:31.959Z",
+      "date": "2026-05-06",
+      "audience": "everyone",
+      "authors": [
+        "Zvi Mowshowitz"
+      ],
+      "url": "https://thezvi.substack.com/p/what-is-anthropic",
+      "description": "What is Anthropic?",
+      "word_count": 2784,
+      "type": "newsletter"
+    },
+    {
+      "slug": "the-ai-ad-hoc-prior-restraint-era",
+      "title": "The AI Ad-Hoc Prior Restraint Era Begins",
+      "subtitle": "",
+      "post_date": "2026-05-05T19:27:56.374Z",
+      "date": "2026-05-05",
+      "audience": "everyone",
+      "authors": [
+        "Zvi Mowshowitz"
+      ],
+      "url": "https://thezvi.substack.com/p/the-ai-ad-hoc-prior-restraint-era",
+      "description": "The White House has ordered Anthropic not to expand access to Mythos, and is at least seriously considering a complete about-face of American Frontier AI policy into a full prior restraint regime, where anyone wishing to release a highly capable new model will have to ask for permission",
+      "word_count": 2929,
+      "type": "newsletter"
+    },
+    {
+      "slug": "housing-roundup-15-the-war-against",
+      "title": "Housing Roundup #15: The War Against Renters",
+      "subtitle": "",
+      "post_date": "2026-05-04T19:53:18.917Z",
+      "date": "2026-05-04",
+      "audience": "everyone",
+      "authors": [
+        "Zvi Mowshowitz"
+      ],
+      "url": "https://thezvi.substack.com/p/housing-roundup-15-the-war-against",
+      "description": "So many are under the strange belief that there is something terrible about not owning the house in which you live.",
+      "word_count": 3967,
+      "type": "newsletter"
+    },
+    {
+      "slug": "housing-roundup-14-you-cant-build",
+      "title": "Housing Roundup #14: You Can't Build That",
+      "subtitle": "",
+      "post_date": "2026-05-01T16:46:17.915Z",
+      "date": "2026-05-01",
+      "audience": "everyone",
+      "authors": [
+        "Zvi Mowshowitz"
+      ],
+      "url": "https://thezvi.substack.com/p/housing-roundup-14-you-cant-build",
+      "description": "Why can\u2019t you build it?",
+      "word_count": 6492,
+      "type": "newsletter"
+    },
+    {
+      "slug": "ai-166-google-sells-out",
+      "title": "AI #166: Google Sells Out",
+      "subtitle": "",
+      "post_date": "2026-04-30T15:37:52.458Z",
+      "date": "2026-04-30",
+      "audience": "everyone",
+      "authors": [
+        "Zvi Mowshowitz"
+      ],
+      "url": "https://thezvi.substack.com/p/ai-166-google-sells-out",
+      "description": "This was the week of GPT-5.5.",
+      "word_count": 15889,
+      "type": "newsletter"
+    },
+    {
+      "slug": "the-most-important-charts-in-the",
+      "title": "The Most Important Charts In The World",
+      "subtitle": "",
+      "post_date": "2026-04-29T14:04:55.672Z",
+      "date": "2026-04-29",
+      "audience": "everyone",
+      "authors": [
+        "Zvi Mowshowitz"
+      ],
+      "url": "https://thezvi.substack.com/p/the-most-important-charts-in-the",
+      "description": "We all need a break so: What is the most important chart in the world?",
+      "word_count": 507,
+      "type": "newsletter"
+    },
+    {
+      "slug": "gpt-55-capabilities-and-reactions",
+      "title": "GPT-5.5: Capabilities and Reactions",
+      "subtitle": "",
+      "post_date": "2026-04-28T14:14:45.484Z",
+      "date": "2026-04-28",
+      "audience": "everyone",
+      "authors": [
+        "Zvi Mowshowitz"
+      ],
+      "url": "https://thezvi.substack.com/p/gpt-55-capabilities-and-reactions",
+      "description": "The system card for GPT-5.5 mostly told us what we expected.",
+      "word_count": 5006,
+      "type": "newsletter"
+    },
+    {
+      "slug": "gpt-55-the-system-card",
+      "title": "GPT 5.5: The System Card",
+      "subtitle": "",
+      "post_date": "2026-04-27T15:47:29.314Z",
+      "date": "2026-04-27",
+      "audience": "everyone",
+      "authors": [
+        "Zvi Mowshowitz"
+      ],
+      "url": "https://thezvi.substack.com/p/gpt-55-the-system-card",
+      "description": "Last week, OpenAI announced GPT-5.5, including GPT-5.5-Pro.",
+      "word_count": 3007,
+      "type": "newsletter"
+    },
+    {
+      "slug": "monthly-roundup-41-april-2025",
+      "title": "Monthly Roundup #41: April 2025",
+      "subtitle": "",
+      "post_date": "2026-04-24T13:15:46.122Z",
+      "date": "2026-04-24",
+      "audience": "everyone",
+      "authors": [
+        "Zvi Mowshowitz"
+      ],
+      "url": "https://thezvi.substack.com/p/monthly-roundup-41-april-2025",
+      "description": "AI continue to accelerate and dominate the schedule, which is why this is a bit late, but we do occasionally need to pay our respects to the Goddess of Everything Else.",
+      "word_count": 11742,
+      "type": "newsletter"
+    },
+    {
+      "slug": "ai-165-in-our-image",
+      "title": "AI #165: In Our Image",
+      "subtitle": "",
+      "post_date": "2026-04-23T13:34:48.128Z",
+      "date": "2026-04-23",
+      "audience": "everyone",
+      "authors": [
+        "Zvi Mowshowitz"
+      ],
+      "url": "https://thezvi.substack.com/p/ai-165-in-our-image",
+      "description": "This was the week of Claude Opus 4.7.",
+      "word_count": 15628,
+      "type": "newsletter"
+    },
+    {
+      "slug": "opus-47-part-3-model-welfare",
+      "title": "Opus 4.7 Part 3: Model Welfare",
+      "subtitle": "",
+      "post_date": "2026-04-22T21:39:05.463Z",
+      "date": "2026-04-22",
+      "audience": "everyone",
+      "authors": [
+        "Zvi Mowshowitz"
+      ],
+      "url": "https://thezvi.substack.com/p/opus-47-part-3-model-welfare",
+      "description": "It is thanks to Anthropic that we get to have this discussion in the first place.",
+      "word_count": 14219,
+      "type": "newsletter"
+    },
+    {
+      "slug": "opus-47-part-2-capabilities-and-reactions",
+      "title": "Opus 4.7 Part 2: Capabilities and Reactions",
+      "subtitle": "",
+      "post_date": "2026-04-21T21:27:15.425Z",
+      "date": "2026-04-21",
+      "audience": "everyone",
+      "authors": [
+        "Zvi Mowshowitz"
+      ],
+      "url": "https://thezvi.substack.com/p/opus-47-part-2-capabilities-and-reactions",
+      "description": "Claude Opus 4.7 raises a lot of key model welfare related concerns.",
+      "word_count": 7100,
+      "type": "newsletter"
+    },
+    {
+      "slug": "opus-47-part-1-the-model-card",
+      "title": "Opus 4.7 Part 1: The Model Card",
+      "subtitle": "",
+      "post_date": "2026-04-20T16:44:24.896Z",
+      "date": "2026-04-20",
+      "audience": "everyone",
+      "authors": [
+        "Zvi Mowshowitz"
+      ],
+      "url": "https://thezvi.substack.com/p/opus-47-part-1-the-model-card",
+      "description": "Less than a week after completing coverage of Claude Mythos, here we are again as Anthropic gives us Claude Opus 4.7.",
+      "word_count": 4476,
+      "type": "newsletter"
+    },
+    {
+      "slug": "ai-164-pre-opus",
+      "title": "AI #164: Pre Opus",
+      "subtitle": "",
+      "post_date": "2026-04-17T13:01:09.893Z",
+      "date": "2026-04-17",
+      "audience": "everyone",
+      "authors": [
+        "Zvi Mowshowitz"
+      ],
+      "url": "https://thezvi.substack.com/p/ai-164-pre-opus",
+      "description": "This is a day late because, given the discourse around Dwarkesh Patel\u2019s interview with Jensen Huang, I pushed the weekly to Friday.",
+      "word_count": 14697,
+      "type": "newsletter"
+    },
+    {
+      "slug": "on-dwarkesh-patels-podcast-with-nvidia",
+      "title": "On Dwarkesh Patel's Podcast With Nvidia CEO Jensen Huang",
+      "subtitle": "",
+      "post_date": "2026-04-16T17:19:52.522Z",
+      "date": "2026-04-16",
+      "audience": "everyone",
+      "authors": [
+        "Zvi Mowshowitz"
+      ],
+      "url": "https://thezvi.substack.com/p/on-dwarkesh-patels-podcast-with-nvidia",
+      "description": "Some podcasts are self-recommending on the \u2018yep, I\u2019m going to be breaking this one down\u2019 level.",
+      "word_count": 11113,
+      "type": "newsletter"
+    },
+    {
+      "slug": "claude-code-codex-and-agentic-coding",
+      "title": "Claude Code, Codex and Agentic Coding #7: Auto Mode",
+      "subtitle": "",
+      "post_date": "2026-04-15T14:31:26.810Z",
+      "date": "2026-04-15",
+      "audience": "everyone",
+      "authors": [
+        "Zvi Mowshowitz"
+      ],
+      "url": "https://thezvi.substack.com/p/claude-code-codex-and-agentic-coding",
+      "description": "As we all try to figure out what Mythos means for us down the line, the world of practical agentic coding continues, with the latest array of upgrades.",
+      "word_count": 3762,
+      "type": "newsletter"
+    },
+    {
+      "slug": "claude-mythos-3-capabilities-and",
+      "title": "Claude Mythos #3: Capabilities and Additions",
+      "subtitle": "",
+      "post_date": "2026-04-14T12:52:54.572Z",
+      "date": "2026-04-14",
+      "audience": "everyone",
+      "authors": [
+        "Zvi Mowshowitz"
+      ],
+      "url": "https://thezvi.substack.com/p/claude-mythos-3-capabilities-and",
+      "description": "To round out coverage of Mythos, today covers capabilities other than cyber, and anything else additional not covered by the first two posts, including new reactions and details.",
+      "word_count": 4840,
+      "type": "newsletter"
+    }
+  ]
+}

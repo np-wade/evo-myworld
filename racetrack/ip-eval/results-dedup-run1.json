@@ -1,0 +1,40 @@
+{
+  "mode": "S7 exact/near duplicate removal, unique content preserved (gate: unique kept)",
+  "n_entries": 2,
+  "candidates_unavailable": [
+    {
+      "candidate": "last30days-dedupe",
+      "reason": "import failed: attempted relative import with no known parent package"
+    },
+    {
+      "candidate": "graphify-dedup",
+      "reason": "import failed: No module named 'graphify'"
+    }
+  ],
+  "leaderboard": [
+    {
+      "candidate": "naive-baseline",
+      "fails": 0,
+      "error": "",
+      "dedup_pass": 1,
+      "unique_kept": 1,
+      "latency_ms_p50": 0.0,
+      "latency_ms_p95": 0.0,
+      "deterministic": 1,
+      "gate": "PASS",
+      "score": 1.0
+    },
+    {
+      "candidate": "ip-incumbent",
+      "fails": 0,
+      "error": "",
+      "dedup_pass": 0,
+      "unique_kept": 1,
+      "latency_ms_p50": 42.0,
+      "latency_ms_p95": 43.7,
+      "deterministic": 1,
+      "gate": "PASS",
+      "score": 0.0
+    }
+  ]
+}

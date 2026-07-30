@@ -1,0 +1,79 @@
+{
+  "mode": "S4 local-vault sentence retrieval vs gold evidence (gate: recall@5>0)",
+  "n_entries": 6,
+  "candidates_unavailable": [],
+  "leaderboard": [
+    {
+      "candidate": "haystack-bm25",
+      "fails": 0,
+      "error": "",
+      "recall_at_1": 0.0713,
+      "recall_at_5": 0.3564,
+      "latency_ms_p50": 561.9,
+      "latency_ms_p95": 994.2,
+      "deterministic": 1,
+      "gate": "PASS",
+      "score": 0.3564
+    },
+    {
+      "candidate": "ip-incumbent",
+      "fails": 0,
+      "error": "",
+      "recall_at_1": 0.0713,
+      "recall_at_5": 0.3564,
+      "latency_ms_p50": 53.5,
+      "latency_ms_p95": 64.2,
+      "deterministic": 1,
+      "gate": "PASS",
+      "score": 0.3564
+    },
+    {
+      "candidate": "rank-bm25",
+      "fails": 0,
+      "error": "",
+      "recall_at_1": 0.0713,
+      "recall_at_5": 0.3564,
+      "latency_ms_p50": 178.0,
+      "latency_ms_p95": 215.0,
+      "deterministic": 1,
+      "gate": "PASS",
+      "score": 0.3564
+    },
+    {
+      "candidate": "tantivy-py",
+      "fails": 0,
+      "error": "",
+      "recall_at_1": 0.0713,
+      "recall_at_5": 0.3564,
+      "latency_ms_p50": 146.2,
+      "latency_ms_p95": 164.4,
+      "deterministic": 1,
+      "gate": "PASS",
+      "score": 0.3564
+    },
+    {
+      "candidate": "faiss-hashdense",
+      "fails": 0,
+      "error": "",
+      "recall_at_1": 0.0713,
+      "recall_at_5": 0.345,
+      "latency_ms_p50": 198.7,
+      "latency_ms_p95": 302.4,
+      "deterministic": 1,
+      "gate": "PASS",
+      "score": 0.345
+    },
+    {
+      "candidate": "naive-baseline",
+      "fails": 0,
+      "error": "",
+      "recall_at_1": 0.0713,
+      "recall_at_5": 0.3362,
+      "latency_ms_p50": 0.0,
+      "latency_ms_p95": 0.1,
+      "deterministic": 1,
+      "gate": "PASS",
+      "score": 0.3362
+    }
+  ]
+}

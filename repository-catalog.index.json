@@ -1,0 +1,3211 @@
+{
+ "Racetrack Repository & Codebase Testing Catalog (Exhaustive Cross-Category Pass)": [],
+ "1. SEARCH & RETRIEVAL SYSTEMS (Multiple Paradigms)": [
+  {
+   "repo": "meilisearch_meilisearch (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/meilisearch_meilisearch)",
+   "path": "",
+   "blurb": "Fast, open-source hybrid search engine."
+  },
+  {
+   "repo": "searxng_searxng (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/searxng_searxng)",
+   "path": "",
+   "blurb": "Privacy-respecting metasearch engine."
+  },
+  {
+   "repo": "quickwit-oss_tantivy (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/quickwit-oss_tantivy)",
+   "path": "",
+   "blurb": "Full-text BM25 search engine library written in Rust."
+  },
+  {
+   "repo": "qdrant_qdrant (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/qdrant_qdrant)",
+   "path": "",
+   "blurb": "High-performance vector + payload hybrid search engine."
+  },
+  {
+   "repo": "facebookresearch_faiss (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/facebookresearch_faiss)",
+   "path": "",
+   "blurb": "Dense vector retrieval and ANN similarity search."
+  },
+  {
+   "repo": "stanford-oval_suql (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/stanford-oval_suql)",
+   "path": "",
+   "blurb": "Structured and Unstructured Query Language for conversational retrieval."
+  },
+  {
+   "repo": "openags_paper-search-mcp (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/openags_paper-search-mcp)",
+   "path": "",
+   "blurb": "Academic paper search Model Context Protocol (MCP) server."
+  },
+  {
+   "repo": "langchain-ai_openwiki (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/langchain-ai_openwiki)",
+   "path": "",
+   "blurb": "Open Wikipedia retrieval and indexing engine."
+  },
+  {
+   "repo": "Johell1NS_browser-search (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Johell1NS_browser-search)",
+   "path": "",
+   "blurb": "In-browser local search retrieval system."
+  },
+  {
+   "repo": "kiryano_Scout (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/kiryano_Scout)",
+   "path": "",
+   "blurb": "Autonomous deep search and discovery tool."
+  },
+  {
+   "repo": "StarTrail-org_PixelRAG (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/StarTrail-org_PixelRAG)",
+   "path": "",
+   "blurb": "Multimodal visual RAG and retrieval framework."
+  },
+  {
+   "repo": "StarTrail-org_LEANN (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/StarTrail-org_LEANN)",
+   "path": "",
+   "blurb": "Lightweight Efficient Approximate Nearest Neighbor search engine."
+  },
+  {
+   "repo": "deepsense-ai_ragbits (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/deepsense-ai_ragbits)",
+   "path": "",
+   "blurb": "Modular building blocks for production RAG pipelines."
+  },
+  {
+   "repo": "deepsense-ai_create-ragbits-app (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/deepsense-ai_create-ragbits-app)",
+   "path": "",
+   "blurb": "Scaffolding tool for RAG applications."
+  },
+  {
+   "repo": "deepset-ai_haystack (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/deepset-ai_haystack)",
+   "path": "",
+   "blurb": "End-to-end LLM orchestration and search framework."
+  },
+  {
+   "repo": "deepset-ai_haystack-cookbook (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/deepset-ai_haystack-cookbook)",
+   "path": "",
+   "blurb": "Search and RAG recipes."
+  },
+  {
+   "repo": "deepset-ai_haystack-experimental (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/deepset-ai_haystack-experimental)",
+   "path": "",
+   "blurb": "Cutting-edge research search paradigms."
+  },
+  {
+   "repo": "deepset-ai_hayhooks (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/deepset-ai_hayhooks)",
+   "path": "",
+   "blurb": "REST interface for Haystack retrieval pipelines."
+  },
+  {
+   "repo": "langchain-ai_local-deep-researcher (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/langchain-ai_local-deep-researcher)",
+   "path": "",
+   "blurb": "Local agentic web research and retrieval system."
+  },
+  {
+   "repo": "harveyai_deep-research-starter (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/harveyai_deep-research-starter)",
+   "path": "",
+   "blurb": "Deep domain retrieval and synthesis starter."
+  },
+  {
+   "repo": "stanford-oval_storm (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/stanford-oval_storm)",
+   "path": "",
+   "blurb": "Knowledge curation search engine from web sources."
+  },
+  {
+   "repo": "stanford-oval_WikiChat (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/stanford-oval_WikiChat)",
+   "path": "",
+   "blurb": "Real-time grounded retrieval system over Wikipedia."
+  },
+  {
+   "repo": "PJDude_librer (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/PJDude_librer)",
+   "path": "",
+   "blurb": "Open-source document search and library indexer."
+  },
+  {
+   "repo": "Shubhamsaboo_awesome-llm-apps (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Shubhamsaboo_awesome-llm-apps)",
+   "path": "",
+   "blurb": "RAG and search application designs."
+  },
+  {
+   "repo": "secbear_neuron (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/secbear_neuron)",
+   "path": "",
+   "blurb": "Neural indexer and search subsystem."
+  },
+  {
+   "repo": "lissy93_web-check (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/lissy93_web-check)",
+   "path": "",
+   "blurb": "Open-source OSINT & web retrieval suite."
+  },
+  {
+   "repo": "unclecode_crawl4ai (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/unclecode_crawl4ai)",
+   "path": "",
+   "blurb": "Crawling-retrieval pipeline for LLM apps."
+  },
+  {
+   "repo": "ScrapeGraphAI_Scrapegraph-ai (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/ScrapeGraphAI_Scrapegraph-ai)",
+   "path": "",
+   "blurb": "Graph-retrieval web scraping engine."
+  },
+  {
+   "repo": "supermemoryai_supermemory (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/supermemoryai_supermemory)",
+   "path": "",
+   "blurb": "Agent memory search and retrieval."
+  },
+  {
+   "repo": "DeusData_codebase-memory-mcp (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/DeusData_codebase-memory-mcp)",
+   "path": "",
+   "blurb": "Codebase semantic retrieval MCP server."
+  },
+  {
+   "repo": "Graphify-Labs_graphify (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Graphify-Labs_graphify)",
+   "path": "",
+   "blurb": "Code graph retrieval system."
+  },
+  {
+   "repo": "racetrack/scraper-search-lab (/home/npwad/coding/docker-envs/projects/evo-myworld/racetrack/scraper-search-lab)",
+   "path": "Racetrack Eval",
+   "blurb": "Standing benchmark harness for web search & scraping pipeline races."
+  },
+  {
+   "repo": "racetrack/arxiv-eval (/home/npwad/coding/docker-envs/projects/evo-myworld/racetrack/arxiv-eval)",
+   "path": "Racetrack Eval",
+   "blurb": "Standing benchmark harness for academic paper retrieval & parsing."
+  }
+ ],
+ "2. KNOWLEDGE / GRAPH SYSTEMS": [
+  {
+   "repo": "Graphify-Labs_graphify (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Graphify-Labs_graphify)",
+   "path": "",
+   "blurb": "Codebase knowledge graph extraction and AST representation engine."
+  },
+  {
+   "repo": "growgraph_ontocast (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/growgraph_ontocast)",
+   "path": "",
+   "blurb": "Ontology casting and knowledge graph alignment."
+  },
+  {
+   "repo": "tirth8205_code-review-graph (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/tirth8205_code-review-graph)",
+   "path": "",
+   "blurb": "Knowledge graph generator for code reviews."
+  },
+  {
+   "repo": "CatalaLang_catala (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/CatalaLang_catala)",
+   "path": "",
+   "blurb": "Formal specification language for domain logic and legislative graphs."
+  },
+  {
+   "repo": "Egonex-AI_Understand-Anything (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Egonex-AI_Understand-Anything)",
+   "path": "",
+   "blurb": "Graph representation learning engine for codebases."
+  },
+  {
+   "repo": "likec4_likec4 (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/likec4_likec4)",
+   "path": "",
+   "blurb": "Architecture-as-code diagramming and component graph engine."
+  },
+  {
+   "repo": "freeplane_freeplane (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/freeplane_freeplane)",
+   "path": "",
+   "blurb": "Mind mapping and hierarchical knowledge representation app."
+  },
+  {
+   "repo": "papers-we-love_papers-we-love (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/papers-we-love_papers-we-love)",
+   "path": "",
+   "blurb": "CS paper knowledge graph and repository."
+  },
+  {
+   "repo": "SapienzaNLP_ewiser (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/SapienzaNLP_ewiser)",
+   "path": "",
+   "blurb": "Entity and Word Sense Disambiguation using knowledge graphs."
+  },
+  {
+   "repo": "jpwahle_21-word-sense-disambiguation (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/jpwahle_21-word-sense-disambiguation)",
+   "path": "",
+   "blurb": "Semantic sense graph disambiguation engine."
+  },
+  {
+   "repo": "imoscovitz_wittgenstein (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/imoscovitz_wittgenstein)",
+   "path": "",
+   "blurb": "Inductive rule learning and knowledge classification engine."
+  },
+  {
+   "repo": "synthetic-sciences_openscience (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/synthetic-sciences_openscience)",
+   "path": "",
+   "blurb": "Open scientific knowledge graph engine."
+  },
+  {
+   "repo": "iyulab_undoc (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/iyulab_undoc)",
+   "path": "",
+   "blurb": "Knowledge extraction from unstructured documents."
+  },
+  {
+   "repo": "supermemoryai_supermemory (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/supermemoryai_supermemory)",
+   "path": "",
+   "blurb": "Knowledge graph second brain for AI agents."
+  },
+  {
+   "repo": "EverMind-AI_HyperMem (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/EverMind-AI_HyperMem)",
+   "path": "",
+   "blurb": "Hypergraph-based agent memory system."
+  },
+  {
+   "repo": "deepcausality_deep_causality (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/deepcausality_deep_causality)",
+   "path": "",
+   "blurb": "Hypergraph causal reasoning engine."
+  },
+  {
+   "repo": "repowise-dev_repowise (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/repowise-dev_repowise)",
+   "path": "",
+   "blurb": "Repository structural dependency graph."
+  },
+  {
+   "repo": "bytedance_flow-builder (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/bytedance_flow-builder)",
+   "path": "",
+   "blurb": "Visual node graph layout component."
+  }
+ ],
+ "3. MEMORY SYSTEMS": [
+  {
+   "repo": "supermemoryai_supermemory (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/supermemoryai_supermemory)",
+   "path": "",
+   "blurb": "Personal AI second brain and universal agent memory layer."
+  },
+  {
+   "repo": "TencentCloud_tencentdb-agent-memory (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/TencentCloud_tencentdb-agent-memory)",
+   "path": "",
+   "blurb": "Agent memory infrastructure on database storage."
+  },
+  {
+   "repo": "Wassimyounes01_memory (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Wassimyounes01_memory)",
+   "path": "",
+   "blurb": "Persistent semantic agent memory module."
+  },
+  {
+   "repo": "EverMind-AI_HyperMem (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/EverMind-AI_HyperMem)",
+   "path": "",
+   "blurb": "Hypergraph-based memory system for AI agents."
+  },
+  {
+   "repo": "EverMind-AI_EverMemBench (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/EverMind-AI_EverMemBench)",
+   "path": "",
+   "blurb": "Benchmark suite for long-term agent memory engines."
+  },
+  {
+   "repo": "EverMind-AI_MSA (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/EverMind-AI_MSA)",
+   "path": "",
+   "blurb": "Memory architecture and state alignment for multi-agent systems."
+  },
+  {
+   "repo": "EverMind-AI_EverMe (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/EverMind-AI_EverMe)",
+   "path": "",
+   "blurb": "Personal agent memory profile manager."
+  },
+  {
+   "repo": "EverMind-AI_raven (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/EverMind-AI_raven)",
+   "path": "",
+   "blurb": "Memory retrieval and continuous consolidation engine."
+  },
+  {
+   "repo": "DeusData_codebase-memory-mcp (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/DeusData_codebase-memory-mcp)",
+   "path": "",
+   "blurb": "Codebase semantic memory MCP server."
+  },
+  {
+   "repo": "raiyanyahya_recall (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/raiyanyahya_recall)",
+   "path": "",
+   "blurb": "Lightweight persistent memory module for agents."
+  },
+  {
+   "repo": "redis_redis (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/redis_redis)",
+   "path": "",
+   "blurb": "Working memory key-value state store."
+  },
+  {
+   "repo": "moka-rs_mini-moka (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/moka-rs_mini-moka)",
+   "path": "",
+   "blurb": "Episodic concurrent memory cache."
+  },
+  {
+   "repo": "LMCache_LMCache (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/LMCache_LMCache)",
+   "path": "",
+   "blurb": "LLM KV prompt memory reuse layer."
+  },
+  {
+   "repo": "ruvnet_ruvector (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/ruvnet_ruvector)",
+   "path": "",
+   "blurb": "Embedded agent vector memory store."
+  }
+ ],
+ "4. DATA (Streaming, Batch, OLAP & Data Engineering)": [
+  {
+   "repo": "apache_spark (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_spark)",
+   "path": "",
+   "blurb": "Unified analytics engine for large-scale data processing."
+  },
+  {
+   "repo": "apache_flink (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_flink)",
+   "path": "",
+   "blurb": "Stateful stream processing engine over data streams."
+  },
+  {
+   "repo": "twitter_scalding (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/twitter_scalding)",
+   "path": "",
+   "blurb": "Scala API for Cascading Hadoop map-reduce batch data jobs."
+  },
+  {
+   "repo": "apache_druid (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_druid)",
+   "path": "",
+   "blurb": "High-performance real-time analytical (OLAP) database."
+  },
+  {
+   "repo": "apache_paimon (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_paimon)",
+   "path": "",
+   "blurb": "Streaming data lake storage format."
+  },
+  {
+   "repo": "spotify_scio (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/spotify_scio)",
+   "path": "",
+   "blurb": "Scala API for Apache Beam & Google Cloud Dataflow."
+  },
+  {
+   "repo": "apache_seatunnel (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_seatunnel)",
+   "path": "",
+   "blurb": "Very high-performance distributed data integration system."
+  },
+  {
+   "repo": "apache_sedona-db (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_sedona-db)",
+   "path": "",
+   "blurb": "Spatial data processing engine."
+  },
+  {
+   "repo": "microsoft_SynapseML (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/microsoft_SynapseML)",
+   "path": "",
+   "blurb": "Massive scale machine learning pipeline framework on Spark."
+  },
+  {
+   "repo": "apache_datasketches (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_datasketches)",
+   "path": "",
+   "blurb": "Java streaming approximate algorithms / sketch algorithms."
+  },
+  {
+   "repo": "apache_datasketches-rust (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_datasketches-rust)",
+   "path": "",
+   "blurb": "Rust implementation of Apache DataSketches."
+  },
+  {
+   "repo": "twitter_algebird (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/twitter_algebird)",
+   "path": "",
+   "blurb": "Abstract algebra for data aggregation and streaming."
+  },
+  {
+   "repo": "floci-io_floci (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/floci-io_floci)",
+   "path": "",
+   "blurb": "Local emulator for AWS data/streaming infrastructure."
+  },
+  {
+   "repo": "google-research_tabfm (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/google-research_tabfm)",
+   "path": "",
+   "blurb": "Tabular data foundation modeling engine."
+  },
+  {
+   "repo": "spotify_chartify (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/spotify_chartify)",
+   "path": "",
+   "blurb": "Python library for easy data visualization creation."
+  },
+  {
+   "repo": "apache_superset (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_superset)",
+   "path": "",
+   "blurb": "Enterprise data exploration and visualization platform."
+  },
+  {
+   "repo": "polynote_polynote (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/polynote_polynote)",
+   "path": "",
+   "blurb": "Polyglot notebook for data science (Scala/Python/SQL)."
+  },
+  {
+   "repo": "cicirello_Chips-n-Salsa (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/cicirello_Chips-n-Salsa)",
+   "path": "",
+   "blurb": "Custom data structures and stochastic local search algorithms."
+  },
+  {
+   "repo": "adilkhash_Data-Engineering-HowTo (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/adilkhash_Data-Engineering-HowTo)",
+   "path": "",
+   "blurb": "Reference data engineering architecture patterns."
+  },
+  {
+   "repo": "apache_kafka (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_kafka)",
+   "path": "",
+   "blurb": "Real-time event data streaming platform."
+  },
+  {
+   "repo": "lance-format_lance (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/lance-format_lance)",
+   "path": "",
+   "blurb": "Columnar data lake format for AI."
+  },
+  {
+   "repo": "apache_iceberg (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_iceberg)",
+   "path": "",
+   "blurb": "Analytics data lake table format."
+  },
+  {
+   "repo": "apache_datafusion (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_datafusion)",
+   "path": "",
+   "blurb": "In-memory OLAP SQL query engine in Rust."
+  },
+  {
+   "repo": "racetrack/video-eval (/home/npwad/coding/docker-envs/projects/evo-myworld/racetrack/video-eval)",
+   "path": "Racetrack Eval",
+   "blurb": "Standing benchmark harness for streaming video data processing."
+  }
+ ],
+ "5. MESSAGE / EVENT SYSTEMS": [
+  {
+   "repo": "apache_kafka (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_kafka)",
+   "path": "",
+   "blurb": "Distributed event streaming platform."
+  },
+  {
+   "repo": "spotify_docker-kafka (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/spotify_docker-kafka)",
+   "path": "",
+   "blurb": "Dockerized Kafka & ZooKeeper event cluster."
+  },
+  {
+   "repo": "leandrocp_awesome-cqrs-event-sourcing (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/leandrocp_awesome-cqrs-event-sourcing)",
+   "path": "",
+   "blurb": "CQRS and event sourcing architecture library."
+  },
+  {
+   "repo": "pyeventsourcing_eventsourcing (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/pyeventsourcing_eventsourcing)",
+   "path": "",
+   "blurb": "Python framework for event-sourced systems."
+  },
+  {
+   "repo": "apache_dubbo (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_dubbo)",
+   "path": "",
+   "blurb": "High-performance RPC and messaging framework."
+  },
+  {
+   "repo": "socketio_socket.io (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/socketio_socket.io)",
+   "path": "",
+   "blurb": "Real-time bi-directional event-based communication engine."
+  },
+  {
+   "repo": "mrasu_echoed (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/mrasu_echoed)",
+   "path": "",
+   "blurb": "Event recording and replay message subsystem."
+  },
+  {
+   "repo": "apache_openwhisk (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_openwhisk)",
+   "path": "",
+   "blurb": "Serverless event-driven execution platform."
+  },
+  {
+   "repo": "apache_openwhisk-cli (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_openwhisk-cli)",
+   "path": "",
+   "blurb": "CLI for Apache OpenWhisk event triggers."
+  },
+  {
+   "repo": "apache_camel-kamelets (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_camel-kamelets)",
+   "path": "",
+   "blurb": "Reusable event source and sink connectors."
+  },
+  {
+   "repo": "quinn-rs_quinn (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/quinn-rs_quinn)",
+   "path": "",
+   "blurb": "Async QUIC event transport."
+  },
+  {
+   "repo": "PipeWire_pipewire (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/PipeWire_pipewire)",
+   "path": "",
+   "blurb": "Low-latency audio/video event daemon."
+  }
+ ],
+ "6. VECTOR DATABASES": [
+  {
+   "repo": "qdrant_qdrant (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/qdrant_qdrant)",
+   "path": "",
+   "blurb": "High-performance Rust vector search engine with payload filtering."
+  },
+  {
+   "repo": "facebookresearch_faiss (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/facebookresearch_faiss)",
+   "path": "",
+   "blurb": "Library for efficient similarity search and clustering of dense vectors."
+  },
+  {
+   "repo": "ruvnet_ruvector (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/ruvnet_ruvector)",
+   "path": "",
+   "blurb": "Embedded vector database engine in Rust."
+  },
+  {
+   "repo": "spotify_annoy (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/spotify_annoy)",
+   "path": "",
+   "blurb": "Approximate Nearest Neighbors Oh Yeah in C++/Python."
+  },
+  {
+   "repo": "schlegelp_aann (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/schlegelp_aann)",
+   "path": "",
+   "blurb": "Adaptive Approximate Nearest Neighbors library."
+  },
+  {
+   "repo": "NVIDIA_nv-embedding-cache (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/NVIDIA_nv-embedding-cache)",
+   "path": "",
+   "blurb": "GPU-accelerated vector embedding cache."
+  },
+  {
+   "repo": "StarTrail-org_LEANN (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/StarTrail-org_LEANN)",
+   "path": "",
+   "blurb": "Lightweight ANN vector search engine."
+  },
+  {
+   "repo": "deepsense-ai_ragbits (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/deepsense-ai_ragbits)",
+   "path": "",
+   "blurb": "Vector storage wrappers for RAG pipelines."
+  }
+ ],
+ "7. FULL-TEXT SEARCH": [
+  {
+   "repo": "quickwit-oss_tantivy (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/quickwit-oss_tantivy)",
+   "path": "",
+   "blurb": "Full-text search engine library inspired by Lucene, built in Rust."
+  },
+  {
+   "repo": "meilisearch_meilisearch (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/meilisearch_meilisearch)",
+   "path": "",
+   "blurb": "Ultra-fast full-text search engine with typo tolerance."
+  },
+  {
+   "repo": "elastic_elasticsearch (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/elastic_elasticsearch)",
+   "path": "",
+   "blurb": "Distributed RESTful full-text search and analytics engine."
+  },
+  {
+   "repo": "searxng_searxng (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/searxng_searxng)",
+   "path": "",
+   "blurb": "Full-text metasearch aggregator."
+  },
+  {
+   "repo": "PJDude_librer (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/PJDude_librer)",
+   "path": "",
+   "blurb": "Document full-text indexer."
+  }
+ ],
+ "8. DOCUMENT DATABASES": [
+  {
+   "repo": "apache_couchdb (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_couchdb)",
+   "path": "",
+   "blurb": "Seamless multi-master syncing JSON document database."
+  },
+  {
+   "repo": "pouchdb_pouchdb (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/pouchdb_pouchdb)",
+   "path": "",
+   "blurb": "In-browser JavaScript document database that syncs with CouchDB."
+  },
+  {
+   "repo": "apache_couchdb-docker (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_couchdb-docker)",
+   "path": "",
+   "blurb": "Official Docker repository for Apache CouchDB."
+  },
+  {
+   "repo": "postgres_postgres (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/postgres_postgres)",
+   "path": "",
+   "blurb": "PostgreSQL JSONB document storage."
+  },
+  {
+   "repo": "tursodatabase_turso (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/tursodatabase_turso)",
+   "path": "",
+   "blurb": "SQLite-edge document JSON engine."
+  },
+  {
+   "repo": "karakeep-app_karakeep (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/karakeep-app_karakeep)",
+   "path": "",
+   "blurb": "Document archive store."
+  }
+ ],
+ "9. RELATIONAL DATABASES": [
+  {
+   "repo": "postgres_postgres (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/postgres_postgres)",
+   "path": "",
+   "blurb": "World's most advanced open-source relational SQL database."
+  },
+  {
+   "repo": "cockroachdb_cockroach (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/cockroachdb_cockroach)",
+   "path": "",
+   "blurb": "Cloud-native distributed SQL database engine."
+  },
+  {
+   "repo": "tursodatabase_turso (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/tursodatabase_turso)",
+   "path": "",
+   "blurb": "SQLite-compatible edge relational database engine."
+  },
+  {
+   "repo": "OtterMind_Chat2DB (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/OtterMind_Chat2DB)",
+   "path": "",
+   "blurb": "AI-driven relational database client and SQL generator."
+  },
+  {
+   "repo": "deepsense-ai_db-ally (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/deepsense-ai_db-ally)",
+   "path": "",
+   "blurb": "Natural language interface to relational databases."
+  },
+  {
+   "repo": "nocodb_nocodb (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/nocodb_nocodb)",
+   "path": "",
+   "blurb": "Open-source Airtable alternative connecting to SQL databases."
+  },
+  {
+   "repo": "Canner_WrenAI (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Canner_WrenAI)",
+   "path": "",
+   "blurb": "Text-to-SQL engine for relational databases."
+  },
+  {
+   "repo": "hasura_graphql-engine (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/hasura_graphql-engine)",
+   "path": "",
+   "blurb": "Instant GraphQL APIs over SQL relational databases."
+  },
+  {
+   "repo": "dbeaver_dbeaver (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/dbeaver_dbeaver)",
+   "path": "",
+   "blurb": "Free universal database tool and SQL editor."
+  },
+  {
+   "repo": "twentyhq_twenty (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/twentyhq_twenty)",
+   "path": "",
+   "blurb": "Open-source relational CRM database system."
+  }
+ ],
+ "10. TIME-SERIES DATABASES": [
+  {
+   "repo": "spotify_kairosdb (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/spotify_kairosdb)",
+   "path": "",
+   "blurb": "Fast distributed time-series database."
+  },
+  {
+   "repo": "spotify_heroic (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/spotify_heroic)",
+   "path": "",
+   "blurb": "Scalable time-series database for metrics aggregation."
+  },
+  {
+   "repo": "netdata_netdata (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/netdata_netdata)",
+   "path": "",
+   "blurb": "Real-time time-series metric collector daemon."
+  },
+  {
+   "repo": "zeroclaw-labs_zeroclaw-metrics (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/zeroclaw-labs_zeroclaw-metrics)",
+   "path": "",
+   "blurb": "Agent time-series telemetry exporter."
+  }
+ ],
+ "11. KEY-VALUE STORES": [
+  {
+   "repo": "redis_redis (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/redis_redis)",
+   "path": "",
+   "blurb": "In-memory data structure store used as a database, cache, and message broker."
+  },
+  {
+   "repo": "redis-rs_redis-rs (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/redis-rs_redis-rs)",
+   "path": "",
+   "blurb": "High-performance Rust client and embedded driver for Redis."
+  },
+  {
+   "repo": "arthurprs_quick-cache (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/arthurprs_quick-cache)",
+   "path": "",
+   "blurb": "Ultra-fast lock-free in-memory KV cache."
+  },
+  {
+   "repo": "moka-rs_mini-moka (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/moka-rs_mini-moka)",
+   "path": "",
+   "blurb": "Concurrent KV cache library."
+  }
+ ],
+ "12. COLUMNAR STORES": [
+  {
+   "repo": "apache_datafusion (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_datafusion)",
+   "path": "",
+   "blurb": "Extensible columnar query engine written in Rust using Apache Arrow."
+  },
+  {
+   "repo": "lance-format_lance (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/lance-format_lance)",
+   "path": "",
+   "blurb": "Modern columnar data format for AI and multimodal vectors."
+  },
+  {
+   "repo": "apache_arrow-rs (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_arrow-rs)",
+   "path": "",
+   "blurb": "In-memory columnar data structure standard."
+  }
+ ],
+ "13. SCHEMA / DATA LAYER": [
+  {
+   "repo": "apache_iceberg (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_iceberg)",
+   "path": "",
+   "blurb": "Open table format for huge analytic datasets in Java."
+  },
+  {
+   "repo": "apache_iceberg-rust (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_iceberg-rust)",
+   "path": "",
+   "blurb": "Rust implementation of the Apache Iceberg spec."
+  },
+  {
+   "repo": "lance-format_lance (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/lance-format_lance)",
+   "path": "",
+   "blurb": "High-performance columnar schema format."
+  },
+  {
+   "repo": "apache_arrow-rs (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_arrow-rs)",
+   "path": "",
+   "blurb": "Rust implementation of Apache Arrow columnar memory format."
+  },
+  {
+   "repo": "apache_opendal (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_opendal)",
+   "path": "",
+   "blurb": "Unified data access layer accessing underlying data stores seamlessly."
+  },
+  {
+   "repo": "apache_thrift (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_thrift)",
+   "path": "",
+   "blurb": "RPC IDL schema definition layer."
+  },
+  {
+   "repo": "apache_fory (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_fory)",
+   "path": "",
+   "blurb": "Zero-copy binary schema encoder."
+  },
+  {
+   "repo": "BoundaryML_baml (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/BoundaryML_baml)",
+   "path": "",
+   "blurb": "Agent tool structured output schema domain language."
+  }
+ ],
+ "14. AGENT FRAMEWORKS": [
+  {
+   "repo": "crewAIInc_crewAI (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/crewAIInc_crewAI)",
+   "path": "",
+   "blurb": "Framework for orchestrating role-playing autonomous AI agents."
+  },
+  {
+   "repo": "deepset-ai_haystack (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/deepset-ai_haystack)",
+   "path": "",
+   "blurb": "End-to-end framework for building agentic AI pipelines."
+  },
+  {
+   "repo": "livekit_agents (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/livekit_agents)",
+   "path": "",
+   "blurb": "Real-time multimodal voice and video AI agent framework."
+  },
+  {
+   "repo": "NirDiamant_GenAI_Agents (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/NirDiamant_GenAI_Agents)",
+   "path": "",
+   "blurb": "Comprehensive collection of AI agent design patterns."
+  },
+  {
+   "repo": "Wassimyounes01_agent-os (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Wassimyounes01_agent-os)",
+   "path": "",
+   "blurb": "Operating system kernel and workspace for AI agents."
+  },
+  {
+   "repo": "EverMind-AI_EverOS (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/EverMind-AI_EverOS)",
+   "path": "",
+   "blurb": "Agent operating system with memory, tools, and execution loop."
+  },
+  {
+   "repo": "EverMind-AI_EvoAgentBench (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/EverMind-AI_EvoAgentBench)",
+   "path": "",
+   "blurb": "Benchmark for evaluating evolutionary agent architectures."
+  },
+  {
+   "repo": "msitarzewski_agency-agents (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/msitarzewski_agency-agents)",
+   "path": "",
+   "blurb": "Ready-to-use specialized AI agents for agency workflows."
+  },
+  {
+   "repo": "superagent-ai_superagent (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/superagent-ai_superagent)",
+   "path": "",
+   "blurb": "Open-source AI agent framework with API management."
+  },
+  {
+   "repo": "FlowiseAI_Flowise (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/FlowiseAI_Flowise)",
+   "path": "",
+   "blurb": "Drag-and-drop UI to build customized LLM agent workflows."
+  },
+  {
+   "repo": "CoWork-OS_CoWork-OS (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/CoWork-OS_CoWork-OS)",
+   "path": "",
+   "blurb": "Collaborative multi-agent operating workspace."
+  },
+  {
+   "repo": "liquidos-ai_AutoAgents (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/liquidos-ai_AutoAgents)",
+   "path": "",
+   "blurb": "Autonomous generation of multi-agent teams."
+  },
+  {
+   "repo": "agentscope-ai_QwenPaw (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/agentscope-ai_QwenPaw)",
+   "path": "",
+   "blurb": "Agent Scope tool integration runtime."
+  },
+  {
+   "repo": "agentset-ai_agentset (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/agentset-ai_agentset)",
+   "path": "",
+   "blurb": "Production agent routing and tool calling framework."
+  },
+  {
+   "repo": "harishkotra_agent-office (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/harishkotra_agent-office)",
+   "path": "",
+   "blurb": "Visual simulated office environment for autonomous agents."
+  },
+  {
+   "repo": "Moh4696_build-ai-agents-free (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Moh4696_build-ai-agents-free)",
+   "path": "",
+   "blurb": "Hands-on collection of open-source agent implementations."
+  },
+  {
+   "repo": "cuga-project_cuga-agent (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/cuga-project_cuga-agent)",
+   "path": "",
+   "blurb": "CUDA-accelerated GPU agent runtime environment."
+  },
+  {
+   "repo": "agentcontrol_agent-control (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/agentcontrol_agent-control)",
+   "path": "",
+   "blurb": "Control plane and policy layer for agent tool execution."
+  },
+  {
+   "repo": "ashishpatel26_500-AI-Agents-Projects (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/ashishpatel26_500-AI-Agents-Projects)",
+   "path": "",
+   "blurb": "Repository of 500+ practical agent designs and implementations."
+  },
+  {
+   "repo": "Wassimyounes01_sentience-loop (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Wassimyounes01_sentience-loop)",
+   "path": "",
+   "blurb": "Continuous agent perception and action loop."
+  },
+  {
+   "repo": "Wassimyounes01_flywheel (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Wassimyounes01_flywheel)",
+   "path": "",
+   "blurb": "Agent self-improvement flywheel execution harness."
+  },
+  {
+   "repo": "Wassimyounes01_megacycle (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Wassimyounes01_megacycle)",
+   "path": "",
+   "blurb": "Multi-turn macro execution loop for agents."
+  },
+  {
+   "repo": "Wassimyounes01_myriad (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Wassimyounes01_myriad)",
+   "path": "",
+   "blurb": "Parallel subagent dispatcher and swarm supervisor."
+  },
+  {
+   "repo": "Wassimyounes01_prompt-engineer (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Wassimyounes01_prompt-engineer)",
+   "path": "",
+   "blurb": "Automated prompt optimizer for agent tools."
+  },
+  {
+   "repo": "NoFxAiOS_nofx (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/NoFxAiOS_nofx)",
+   "path": "",
+   "blurb": "Zero-framework agent engine for complex tasks."
+  },
+  {
+   "repo": "AgentTankOS_tankwork (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/AgentTankOS_tankwork)",
+   "path": "",
+   "blurb": "Sandboxed execution environment for agent workloads."
+  },
+  {
+   "repo": "kagent-dev_kagent (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/kagent-dev_kagent)",
+   "path": "",
+   "blurb": "Kubernetes-native autonomous agent framework."
+  },
+  {
+   "repo": "openinterpreter_openinterpreter (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/openinterpreter_openinterpreter)",
+   "path": "",
+   "blurb": "Open-source natural language code execution agent."
+  },
+  {
+   "repo": "bytedance_flow-builder (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/bytedance_flow-builder)",
+   "path": "",
+   "blurb": "Flow-based visual agent creation system."
+  },
+  {
+   "repo": "microsoft_RD-Agent (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/microsoft_RD-Agent)",
+   "path": "",
+   "blurb": "Autonomous R&D agent for data science and ML research."
+  },
+  {
+   "repo": "stanford-oval_genie-worksheets (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/stanford-oval_genie-worksheets)",
+   "path": "",
+   "blurb": "Agent formal state-sheet specification engine."
+  },
+  {
+   "repo": "stanford-oval_Churro (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/stanford-oval_Churro)",
+   "path": "",
+   "blurb": "Agent dialogue state tracking engine."
+  },
+  {
+   "repo": "stablyai_orca (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/stablyai_orca)",
+   "path": "",
+   "blurb": "Multimodal agent workflow engine."
+  },
+  {
+   "repo": "Dallionking_claude-orca-workflow (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Dallionking_claude-orca-workflow)",
+   "path": "",
+   "blurb": "Claude + Orca agent workflow pipeline."
+  },
+  {
+   "repo": "zeroclaw-labs_zeroclaw (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/zeroclaw-labs_zeroclaw)",
+   "path": "",
+   "blurb": "Ultra-lightweight agent framework in Rust."
+  },
+  {
+   "repo": "zeroclaw-labs_zeroclaw-skills (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/zeroclaw-labs_zeroclaw-skills)",
+   "path": "",
+   "blurb": "Modular skill library for ZeroClaw agents."
+  },
+  {
+   "repo": "zeroclaw-labs_zeroclaw-plugins (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/zeroclaw-labs_zeroclaw-plugins)",
+   "path": "",
+   "blurb": "Extension plugins for ZeroClaw agent framework."
+  },
+  {
+   "repo": "zeroclaw-labs_crabfleet (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/zeroclaw-labs_crabfleet)",
+   "path": "",
+   "blurb": "Distributed fleet management for Rust AI agents."
+  },
+  {
+   "repo": "zeroclaw-labs_clawsweeper (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/zeroclaw-labs_clawsweeper)",
+   "path": "",
+   "blurb": "Security audit tool for agent action spaces."
+  },
+  {
+   "repo": "zeroclaw-labs_zeroclaw-paperclip-adapter (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/zeroclaw-labs_zeroclaw-paperclip-adapter)",
+   "path": "",
+   "blurb": "Paperclip adapter interface for ZeroClaw."
+  },
+  {
+   "repo": "zeroclaw-labs_claw-standards (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/zeroclaw-labs_claw-standards)",
+   "path": "",
+   "blurb": "Open agent specification and protocol standard."
+  },
+  {
+   "repo": "zeroclaw-labs_clawpatch (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/zeroclaw-labs_clawpatch)",
+   "path": "",
+   "blurb": "Hot-patching library for active agent runtimes."
+  },
+  {
+   "repo": "PleasePrompto_google-ai-mode-skill (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/PleasePrompto_google-ai-mode-skill)",
+   "path": "",
+   "blurb": "Agent skill module for Google AI models."
+  },
+  {
+   "repo": "InsForge_insforge-skills (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/InsForge_insforge-skills)",
+   "path": "",
+   "blurb": "Curated skills for InsForge agents."
+  },
+  {
+   "repo": "Leonxlnx_taste-skill (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Leonxlnx_taste-skill)",
+   "path": "",
+   "blurb": "Taste and preference skill module for agents."
+  },
+  {
+   "repo": "mvanhorn_last30days-skill (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/mvanhorn_last30days-skill)",
+   "path": "",
+   "blurb": "Recent trend retrieval skill for agent intelligence."
+  },
+  {
+   "repo": "Dallionking_fable-prompting (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Dallionking_fable-prompting)",
+   "path": "",
+   "blurb": "Fable narrative prompting library for agent planning."
+  },
+  {
+   "repo": "Nutlope_hallmark (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Nutlope_hallmark)",
+   "path": "",
+   "blurb": "AI hallmark detection and verification module."
+  },
+  {
+   "repo": "OhadAssulin_headless-coder-sdk (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/OhadAssulin_headless-coder-sdk)",
+   "path": "",
+   "blurb": "Headless SDK for automated coding agents."
+  },
+  {
+   "repo": "poe-platform_poe-code (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/poe-platform_poe-code)",
+   "path": "",
+   "blurb": "Poe API integration for developer agents."
+  },
+  {
+   "repo": "BoundaryML_baml (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/BoundaryML_baml)",
+   "path": "",
+   "blurb": "Structured output domain language and agent tool typing engine."
+  },
+  {
+   "repo": "goat-sdk_goat (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/goat-sdk_goat)",
+   "path": "",
+   "blurb": "Great Onchain Agent Toolkit for Web3/Blockchain agent tools."
+  },
+  {
+   "repo": "sigoden_aichat (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/sigoden_aichat)",
+   "path": "",
+   "blurb": "All-in-one CLI agent tool with multi-provider execution."
+  },
+  {
+   "repo": "off-grid-ai_console (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/off-grid-ai_console)",
+   "path": "",
+   "blurb": "Offline agent management console."
+  },
+  {
+   "repo": "zavora-ai_adk-rust (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/zavora-ai_adk-rust)",
+   "path": "",
+   "blurb": "Agent Development Kit in Rust."
+  },
+  {
+   "repo": "bradygaster_squad (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/bradygaster_squad)",
+   "path": "",
+   "blurb": "Multi-agent squad orchestration framework."
+  },
+  {
+   "repo": "obsei_obsei (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/obsei_obsei)",
+   "path": "",
+   "blurb": "Low-code AI observer and automated workflow engine."
+  },
+  {
+   "repo": "rohitg00_ai-engineering-from-scratch (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/rohitg00_ai-engineering-from-scratch)",
+   "path": "",
+   "blurb": "Core implementation of AI agents from first principles."
+  },
+  {
+   "repo": "featherless-ai_featherless-cookbook (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/featherless-ai_featherless-cookbook)",
+   "path": "",
+   "blurb": "Lightweight serverless LLM agent patterns."
+  },
+  {
+   "repo": "xai-org_xai-cookbook (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/xai-org_xai-cookbook)",
+   "path": "",
+   "blurb": "Grok/xAI tool calling and agent recipes."
+  },
+  {
+   "repo": "harveyai_teams-ai (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/harveyai_teams-ai)",
+   "path": "",
+   "blurb": "Collaborative agent team orchestration."
+  },
+  {
+   "repo": "openclaw_crabbox (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/openclaw_crabbox)",
+   "path": "",
+   "blurb": "Sandboxed execution environment for untrusted agent code."
+  },
+  {
+   "repo": "NVIDIA_OpenShell (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/NVIDIA_OpenShell)",
+   "path": "",
+   "blurb": "NVIDIA open agent shell execution container."
+  },
+  {
+   "repo": "cursor_cookbook (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/cursor_cookbook)",
+   "path": "",
+   "blurb": "Code agent prompt engineering and tool recipes."
+  },
+  {
+   "repo": "delibae_claude-prism (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/delibae_claude-prism)",
+   "path": "",
+   "blurb": "Visual prism interface for Claude agents."
+  },
+  {
+   "repo": "osisdie_claude-code-channels (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/osisdie_claude-code-channels)",
+   "path": "",
+   "blurb": "Channel multiplexing for Claude agent execution."
+  },
+  {
+   "repo": "HKUDS_DeepTutor (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/HKUDS_DeepTutor)",
+   "path": "",
+   "blurb": "Deep reasoning tutoring agent framework."
+  },
+  {
+   "repo": "unclecode_crawl4ai (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/unclecode_crawl4ai)",
+   "path": "",
+   "blurb": "Agentic crawler & scraper framework."
+  },
+  {
+   "repo": "ScrapeGraphAI_Scrapegraph-ai (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/ScrapeGraphAI_Scrapegraph-ai)",
+   "path": "",
+   "blurb": "Agentic web scraping graph pipeline."
+  }
+ ],
+ "15. ML TRAINING FRAMEWORKS": [
+  {
+   "repo": "pytorch_pytorch (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/pytorch_pytorch)",
+   "path": "",
+   "blurb": "Tensors and Dynamic neural networks in Python with strong GPU acceleration."
+  },
+  {
+   "repo": "Lightning-AI_pytorch-lightning (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Lightning-AI_pytorch-lightning)",
+   "path": "",
+   "blurb": "Lightweight PyTorch wrapper for high-performance ML research."
+  },
+  {
+   "repo": "tinygrad_tinygrad (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/tinygrad_tinygrad)",
+   "path": "",
+   "blurb": "Extremely simple deep learning framework for training and inference."
+  },
+  {
+   "repo": "NVIDIA_JAX-Toolbox (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/NVIDIA_JAX-Toolbox)",
+   "path": "",
+   "blurb": "Accelerated containerized training tools for JAX on GPUs."
+  },
+  {
+   "repo": "Tracel-AI_burn (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Tracel-AI_burn)",
+   "path": "",
+   "blurb": "Flexible and ultra-fast Rust Deep Learning Framework."
+  },
+  {
+   "repo": "LaurentMazare_tch-rs (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/LaurentMazare_tch-rs)",
+   "path": "",
+   "blurb": "Rust bindings for C++ LibTorch."
+  },
+  {
+   "repo": "keras-team_keras (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/keras-team_keras)",
+   "path": "",
+   "blurb": "Multi-backend high-level neural networks API (JAX/PyTorch/TensorFlow)."
+  },
+  {
+   "repo": "deeplearning4j_deeplearning4j (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/deeplearning4j_deeplearning4j)",
+   "path": "",
+   "blurb": "Open-source, distributed deep learning framework for Java/Scala."
+  },
+  {
+   "repo": "pymc-devs_pymc (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/pymc-devs_pymc)",
+   "path": "",
+   "blurb": "Probabilistic programming framework in Python."
+  },
+  {
+   "repo": "pymc-devs_pytensor (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/pymc-devs_pytensor)",
+   "path": "",
+   "blurb": "Symbolic tensor computation engine for PyMC."
+  },
+  {
+   "repo": "hiyouga_LlamaFactory (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/hiyouga_LlamaFactory)",
+   "path": "",
+   "blurb": "Unified fine-tuning framework for 100+ LLMs."
+  },
+  {
+   "repo": "rust-ml_linfa (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/rust-ml_linfa)",
+   "path": "",
+   "blurb": "Comprehensive toolkit for classical Machine Learning in Rust."
+  },
+  {
+   "repo": "Doriandarko_texts-to-transformer (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Doriandarko_texts-to-transformer)",
+   "path": "",
+   "blurb": "Custom Transformer training script generator."
+  },
+  {
+   "repo": "Angel-ML_angel (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Angel-ML_angel)",
+   "path": "",
+   "blurb": "High-performance distributed machine learning platform."
+  },
+  {
+   "repo": "hallvardnmbu_neurons (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/hallvardnmbu_neurons)",
+   "path": "",
+   "blurb": "Minimalist neural network simulation library."
+  },
+  {
+   "repo": "huggingface_candle (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/huggingface_candle)",
+   "path": "",
+   "blurb": "Minimalist ML training and inference framework in Rust."
+  },
+  {
+   "repo": "facebookresearch_fastText (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/facebookresearch_fastText)",
+   "path": "",
+   "blurb": "Library for fast text representation and classification."
+  },
+  {
+   "repo": "facebookresearch_multicalibration_for_matching (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/facebookresearch_multicalibration_for_matching)",
+   "path": "",
+   "blurb": "Statistical multicalibration ML algorithms."
+  },
+  {
+   "repo": "AlexisLspk_neuronbox (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/AlexisLspk_neuronbox)",
+   "path": "",
+   "blurb": "Neural network architecture sandbox."
+  }
+ ],
+ "16. ML INFERENCE ENGINES": [
+  {
+   "repo": "ggml-org_llama.cpp (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/ggml-org_llama.cpp)",
+   "path": "",
+   "blurb": "LLM inference in C/C++ with GGML quantization."
+  },
+  {
+   "repo": "microsoft_onnxruntime (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/microsoft_onnxruntime)",
+   "path": "",
+   "blurb": "Cross-platform, high performance ML inferencing engine."
+  },
+  {
+   "repo": "onnx_onnx (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/onnx_onnx)",
+   "path": "",
+   "blurb": "Open standard for machine learning interoperability."
+  },
+  {
+   "repo": "apache_tvm (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_tvm)",
+   "path": "",
+   "blurb": "End-to-end deep learning compiler stack for CPUs, GPUs, and accelerators."
+  },
+  {
+   "repo": "tracel-ai_burn-onnx (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/tracel-ai_burn-onnx)",
+   "path": "",
+   "blurb": "ONNX model compiler for the Burn runtime."
+  },
+  {
+   "repo": "lyogavin_airllm (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/lyogavin_airllm)",
+   "path": "",
+   "blurb": "70B+ LLM inference on single 4GB consumer GPUs."
+  },
+  {
+   "repo": "lm-sys_FastChat (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/lm-sys_FastChat)",
+   "path": "",
+   "blurb": "Open platform for training, serving, and evaluating LLM chatbots."
+  },
+  {
+   "repo": "Chen-zexi_vllm-cli (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Chen-zexi_vllm-cli)",
+   "path": "",
+   "blurb": "CLI runner for high-throughput vLLM inference engine."
+  },
+  {
+   "repo": "deepsense-ai_edge-slm (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/deepsense-ai_edge-slm)",
+   "path": "",
+   "blurb": "Edge deployment framework for Small Language Models (SLMs)."
+  },
+  {
+   "repo": "a-ghorbani_pocketpal-ai (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/a-ghorbani_pocketpal-ai)",
+   "path": "",
+   "blurb": "On-device local AI inference engine for mobile."
+  },
+  {
+   "repo": "mudler_LocalAI (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/mudler_LocalAI)",
+   "path": "",
+   "blurb": "Self-hosted, drop-in REST API replacement for OpenAI."
+  },
+  {
+   "repo": "latitude-dev_latitude-llm (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/latitude-dev_latitude-llm)",
+   "path": "",
+   "blurb": "Production LLM deployment and inference gateway."
+  },
+  {
+   "repo": "onnx_models (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/onnx_models)",
+   "path": "",
+   "blurb": "Official open-source ONNX model zoo repository."
+  },
+  {
+   "repo": "OEvortex_llm4free (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/OEvortex_llm4free)",
+   "path": "",
+   "blurb": "Unified local inference provider router."
+  },
+  {
+   "repo": "graniet_llm (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/graniet_llm)",
+   "path": "",
+   "blurb": "Rust-native LLM inference binary."
+  },
+  {
+   "repo": "shubham0204_SmolChat-Android (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/shubham0204_SmolChat-Android)",
+   "path": "",
+   "blurb": "Local LLM inference engine running natively on Android."
+  },
+  {
+   "repo": "Tako-Research_TakoVM (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Tako-Research_TakoVM)",
+   "path": "",
+   "blurb": "Specialized virtual machine for tensor & LLM inference workloads."
+  },
+  {
+   "repo": "allenai_olmocr (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/allenai_olmocr)",
+   "path": "",
+   "blurb": "Vision-based OCR inference model runner."
+  },
+  {
+   "repo": "facebookresearch_faiss (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/facebookresearch_faiss)",
+   "path": "",
+   "blurb": "Vector index inference engine."
+  }
+ ],
+ "17. GPU KERNEL SYSTEMS": [
+  {
+   "repo": "NVIDIA_cutlass (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/NVIDIA_cutlass)",
+   "path": "",
+   "blurb": "CUDA C++ template abstractions for high-performance matrix multiplication."
+  },
+  {
+   "repo": "tracel-ai_cubecl (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/tracel-ai_cubecl)",
+   "path": "",
+   "blurb": "Modern Rust multi-platform GPU kernel language (CUDA/ROCm/WebGPU)."
+  },
+  {
+   "repo": "tracel-ai_cubek (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/tracel-ai_cubek)",
+   "path": "",
+   "blurb": "High-level GPU kernel operator library."
+  },
+  {
+   "repo": "NVIDIA_NV-Kernels (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/NVIDIA_NV-Kernels)",
+   "path": "",
+   "blurb": "High-efficiency custom NVIDIA GPU compute kernels."
+  },
+  {
+   "repo": "NVIDIA_open-gpu-kernel-modules (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/NVIDIA_open-gpu-kernel-modules)",
+   "path": "",
+   "blurb": "Official Linux kernel GPU driver modules from NVIDIA."
+  },
+  {
+   "repo": "cupy_cupy (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/cupy_cupy)",
+   "path": "",
+   "blurb": "NumPy-compatible array library accelerated with CUDA."
+  },
+  {
+   "repo": "vickiegpt_nvidia_greenboost (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/vickiegpt_nvidia_greenboost)",
+   "path": "",
+   "blurb": "Energy-efficient GPU kernel optimization framework."
+  },
+  {
+   "repo": "cuga-project_cuga-agent (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/cuga-project_cuga-agent)",
+   "path": "",
+   "blurb": "CUDA GPU agent execution kernels."
+  },
+  {
+   "repo": "ggml-org_llama.cpp (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/ggml-org_llama.cpp)",
+   "path": "",
+   "blurb": "CUDA/ROCm GPU matrix multiplication kernels."
+  }
+ ],
+ "18. CAUSAL": [
+  {
+   "repo": "deepcausality_deep_causality (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/deepcausality_deep_causality)",
+   "path": "",
+   "blurb": "Hypergraph-based computational causal reasoning engine in Rust."
+  },
+  {
+   "repo": "imoscovitz_wittgenstein (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/imoscovitz_wittgenstein)",
+   "path": "",
+   "blurb": "Inductive rule learning and causal classification engine."
+  }
+ ],
+ "19. CODE ANALYSIS (Graph-Based & AST Understanding)": [
+  {
+   "repo": "tirth8205_code-review-graph (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/tirth8205_code-review-graph)",
+   "path": "",
+   "blurb": "Automated code dependency graph analyzer for PRs."
+  },
+  {
+   "repo": "Egonex-AI_Understand-Anything (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Egonex-AI_Understand-Anything)",
+   "path": "",
+   "blurb": "Structural AST & semantics analyzer for polyglot codebases."
+  },
+  {
+   "repo": "yvgude_lean-ctx (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/yvgude_lean-ctx)",
+   "path": "",
+   "blurb": "Lean context extraction engine for LLM coding tasks."
+  },
+  {
+   "repo": "dtolnay_syn (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/dtolnay_syn)",
+   "path": "",
+   "blurb": "Nominal syntax tree parser for Rust code analysis."
+  },
+  {
+   "repo": "PyO3_pyo3 (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/PyO3_pyo3)",
+   "path": "",
+   "blurb": "Foreign Function Interface AST bridge between Python and Rust."
+  },
+  {
+   "repo": "XAMPPRocky_tokei (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/XAMPPRocky_tokei)",
+   "path": "",
+   "blurb": "Ultra-fast code statistics and AST line counter."
+  },
+  {
+   "repo": "bergercookie_asm-lsp (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/bergercookie_asm-lsp)",
+   "path": "",
+   "blurb": "Language Server Protocol for x86/ARM Assembly language analysis."
+  },
+  {
+   "repo": "repowise-dev_repowise (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/repowise-dev_repowise)",
+   "path": "",
+   "blurb": "Repository code metrics and structural analysis engine."
+  },
+  {
+   "repo": "dtolnay_unicode-ident (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/dtolnay_unicode-ident)",
+   "path": "",
+   "blurb": "Unicode identifier syntax analyzer for compilers."
+  },
+  {
+   "repo": "Peternator7_strum (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Peternator7_strum)",
+   "path": "",
+   "blurb": "Enum AST macro analysis and generation for Rust."
+  },
+  {
+   "repo": "JelteF_derive_more (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/JelteF_derive_more)",
+   "path": "",
+   "blurb": "Proc-macro derive analysis library."
+  },
+  {
+   "repo": "bkchr_proc-macro-crate (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/bkchr_proc-macro-crate)",
+   "path": "",
+   "blurb": "Macro crate name resolution inside procedural macros."
+  },
+  {
+   "repo": "dtolnay_inventory (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/dtolnay_inventory)",
+   "path": "",
+   "blurb": "Typed plugin registration via static code inspection."
+  },
+  {
+   "repo": "dtolnay_linkme (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/dtolnay_linkme)",
+   "path": "",
+   "blurb": "Distributed slice linking for binary reflection."
+  },
+  {
+   "repo": "dtolnay_rustversion (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/dtolnay_rustversion)",
+   "path": "",
+   "blurb": "Compiler version conditional macro evaluator."
+  },
+  {
+   "repo": "gregorygaines_bitfields-rs (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/gregorygaines_bitfields-rs)",
+   "path": "",
+   "blurb": "Bitfield macro generation and layout validator."
+  },
+  {
+   "repo": "cuviper_autocfg (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/cuviper_autocfg)",
+   "path": "",
+   "blurb": "Build script probe for checking compiler capabilities."
+  },
+  {
+   "repo": "katharostech_cfg_aliases (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/katharostech_cfg_aliases)",
+   "path": "",
+   "blurb": "Short-hand conditional compilation alias engine."
+  },
+  {
+   "repo": "nvzqz_static-assertions-rs (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/nvzqz_static-assertions-rs)",
+   "path": "",
+   "blurb": "Compile-time assertions for type correctness."
+  },
+  {
+   "repo": "altsysrq_rusty-fork (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/altsysrq_rusty-fork)",
+   "path": "",
+   "blurb": "Subprocess test execution isolation engine."
+  },
+  {
+   "repo": "la10736_rstest (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/la10736_rstest)",
+   "path": "",
+   "blurb": "Fixture-based test generator for Rust AST."
+  },
+  {
+   "repo": "proptest-rs_proptest (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/proptest-rs_proptest)",
+   "path": "",
+   "blurb": "Property-based testing framework."
+  },
+  {
+   "repo": "rust-fuzz_arbitrary (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/rust-fuzz_arbitrary)",
+   "path": "",
+   "blurb": "Fuzz testing input generation for structured types."
+  },
+  {
+   "repo": "palfrey_serial_test (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/palfrey_serial_test)",
+   "path": "",
+   "blurb": "Serialized test execution attribute runner."
+  },
+  {
+   "repo": "hyhmrright_brooks-lint (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/hyhmrright_brooks-lint)",
+   "path": "",
+   "blurb": "Code quality static linter engine."
+  },
+  {
+   "repo": "rust-lang_rust-clippy (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/rust-lang_rust-clippy)",
+   "path": "",
+   "blurb": "Official static analysis linter for Rust codebase idiom safety."
+  },
+  {
+   "repo": "codecrafters-io_build-your-own-x (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/codecrafters-io_build-your-own-x)",
+   "path": "",
+   "blurb": "Step-by-step programming language & engine implementation guides."
+  },
+  {
+   "repo": "facebook_astryx (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/facebook_astryx)",
+   "path": "",
+   "blurb": "AST manipulation and transform tool."
+  },
+  {
+   "repo": "facebookresearch_exca (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/facebookresearch_exca)",
+   "path": "",
+   "blurb": "Exact Code Analysis tool suite."
+  },
+  {
+   "repo": "x64dbg_x64dbg (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/x64dbg_x64dbg)",
+   "path": "",
+   "blurb": "Open-source x64/x32 binary disassembler & debugger engine."
+  },
+  {
+   "repo": "filiksyos_gitreverse (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/filiksyos_gitreverse)",
+   "path": "",
+   "blurb": "Git commit history analysis and reverse engineering tool."
+  },
+  {
+   "repo": "pkivolowitz_asm_book (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/pkivolowitz_asm_book)",
+   "path": "",
+   "blurb": "Low-level x86_64 assembly analysis textbook code."
+  },
+  {
+   "repo": "Dman95_SASM (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Dman95_SASM)",
+   "path": "",
+   "blurb": "Simple Assembler IDE & static analysis environment."
+  },
+  {
+   "repo": "milessabin_shapeless (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/milessabin_shapeless)",
+   "path": "",
+   "blurb": "Generic type-class and AST compile-time engine for Scala."
+  },
+  {
+   "repo": "diffplug_spotless (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/diffplug_spotless)",
+   "path": "",
+   "blurb": "Polyglot code formatting & syntax enforcement build plugin."
+  },
+  {
+   "repo": "zkat_is_ci (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/zkat_is_ci)",
+   "path": "",
+   "blurb": "CI environment detection library for build scripts."
+  },
+  {
+   "repo": "raimannma_rust-optimizer (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/raimannma_rust-optimizer)",
+   "path": "",
+   "blurb": "Rust WebAssembly binary size and bytecode optimizer."
+  },
+  {
+   "repo": "jbaublitz_getset (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/jbaublitz_getset)",
+   "path": "",
+   "blurb": "Automatic struct getter/setter AST generation."
+  },
+  {
+   "repo": "danielhenrymantilla_lending-iterator (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/danielhenrymantilla_lending-iterator)",
+   "path": "",
+   "blurb": "Advanced lifetime lending iterator macro engine."
+  },
+  {
+   "repo": "Graphify-Labs_graphify (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Graphify-Labs_graphify)",
+   "path": "",
+   "blurb": "Codebase AST dependency graph analyzer."
+  }
+ ],
+ "20. CRAWLING / SCRAPING (Data Collection & Browser Automation)": [
+  {
+   "repo": "unclecode_crawl4ai (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/unclecode_crawl4ai)",
+   "path": "",
+   "blurb": "LLM-friendly web crawler & scraper built for AI pipelines."
+  },
+  {
+   "repo": "ScrapeGraphAI_Scrapegraph-ai (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/ScrapeGraphAI_Scrapegraph-ai)",
+   "path": "",
+   "blurb": "Graph-based web scraping pipeline using LLMs."
+  },
+  {
+   "repo": "D4Vinci_Scrapling (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/D4Vinci_Scrapling)",
+   "path": "",
+   "blurb": "High-speed, undetectable web scraping & parsing framework."
+  },
+  {
+   "repo": "Mahanaicoach_google-maps-scraper-kit (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Mahanaicoach_google-maps-scraper-kit)",
+   "path": "",
+   "blurb": "Specialized Google Maps data collection toolkit."
+  },
+  {
+   "repo": "oxylabs_how-to-scrape-google-scholar (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/oxylabs_how-to-scrape-google-scholar)",
+   "path": "",
+   "blurb": "Academic publication scraping pipeline."
+  },
+  {
+   "repo": "ythx-101_x-tweet-fetcher (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/ythx-101_x-tweet-fetcher)",
+   "path": "",
+   "blurb": "Automated social media data collection engine."
+  },
+  {
+   "repo": "saifyxpro_HeadlessX (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/saifyxpro_HeadlessX)",
+   "path": "",
+   "blurb": "High-concurrency headless browser proxy fleet."
+  },
+  {
+   "repo": "jo-inc_camofox-browser (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/jo-inc_camofox-browser)",
+   "path": "",
+   "blurb": "Anti-fingerprinting stealth scraping browser engine."
+  },
+  {
+   "repo": "cloakhq_cloakbrowser (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/cloakhq_cloakbrowser)",
+   "path": "",
+   "blurb": "Stealth browser automation for data collection."
+  },
+  {
+   "repo": "feder-cr_invisible_playwright (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/feder-cr_invisible_playwright)",
+   "path": "",
+   "blurb": "Undetectable Playwright extension for scraping."
+  },
+  {
+   "repo": "microsoft_playwright (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/microsoft_playwright)",
+   "path": "",
+   "blurb": "Node.js/Python library for reliable end-to-end browser automation."
+  },
+  {
+   "repo": "puppeteer_puppeteer (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/puppeteer_puppeteer)",
+   "path": "",
+   "blurb": "Headless Chrome Node.js API for crawling."
+  },
+  {
+   "repo": "SeleniumHQ_selenium (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/SeleniumHQ_selenium)",
+   "path": "",
+   "blurb": "Classic cross-browser automation framework."
+  },
+  {
+   "repo": "remorses_playwriter (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/remorses_playwriter)",
+   "path": "",
+   "blurb": "Extension for controlling Playwright via natural language."
+  },
+  {
+   "repo": "Panniantong_Agent-Reach (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Panniantong_Agent-Reach)",
+   "path": "",
+   "blurb": "Multi-channel web reachability & scraping agent."
+  },
+  {
+   "repo": "browserless_browserless (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/browserless_browserless)",
+   "path": "",
+   "blurb": "Scalable headless Chrome service for web scraping."
+  },
+  {
+   "repo": "alibaba_page-agent (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/alibaba_page-agent)",
+   "path": "",
+   "blurb": "Autonomous in-browser DOM scraping agent."
+  },
+  {
+   "repo": "openkylin_beautifulsoup4 (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/openkylin_beautifulsoup4)",
+   "path": "",
+   "blurb": "HTML/XML parser library for web scraping."
+  },
+  {
+   "repo": "appium_appium (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/appium_appium)",
+   "path": "",
+   "blurb": "Cross-platform mobile automation framework for scraping mobile apps."
+  },
+  {
+   "repo": "codeceptjs_CodeceptJS (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/codeceptjs_CodeceptJS)",
+   "path": "",
+   "blurb": "High-level browser interaction test & crawling scenario engine."
+  },
+  {
+   "repo": "Tallyb_cucumber-playwright (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Tallyb_cucumber-playwright)",
+   "path": "",
+   "blurb": "BDD browser automation driver."
+  },
+  {
+   "repo": "projectdiscovery_nuclei (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/projectdiscovery_nuclei)",
+   "path": "",
+   "blurb": "Security crawling scanner engine."
+  },
+  {
+   "repo": "racetrack/scrapler-eval (/home/npwad/coding/docker-envs/projects/evo-myworld/racetrack/scrapler-eval)",
+   "path": "Racetrack Eval",
+   "blurb": "Standing benchmark harness for scraping speed and stealth."
+  },
+  {
+   "repo": "racetrack/scraper-search-lab (/home/npwad/coding/docker-envs/projects/evo-myworld/racetrack/scraper-search-lab)",
+   "path": "Racetrack Eval",
+   "blurb": "Standing benchmark harness for combined crawling + search pipelines."
+  }
+ ],
+ "21. OBSERVABILITY (Monitoring, Tracing & APM)": [
+  {
+   "repo": "apache_skywalking (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_skywalking)",
+   "path": "",
+   "blurb": "Application Performance Monitor (APM) and observability mesh."
+  },
+  {
+   "repo": "apache_hertzbeat (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_hertzbeat)",
+   "path": "",
+   "blurb": "Real-time monitoring system with user-friendly alerting."
+  },
+  {
+   "repo": "netdata_netdata (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/netdata_netdata)",
+   "path": "",
+   "blurb": "Distributed real-time performance and health monitoring agent."
+  },
+  {
+   "repo": "netxms_netxms (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/netxms_netxms)",
+   "path": "",
+   "blurb": "Enterprise network and infrastructure monitoring system."
+  },
+  {
+   "repo": "comet-ml_opik (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/comet-ml_opik)",
+   "path": "",
+   "blurb": "Open-source LLM application evaluation, tracking, and observability."
+  },
+  {
+   "repo": "cursor_agent-trace (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/cursor_agent-trace)",
+   "path": "",
+   "blurb": "Execution step tracer and logger for AI agents."
+  },
+  {
+   "repo": "Roy3838_Observer (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Roy3838_Observer)",
+   "path": "",
+   "blurb": "Lightweight system resource monitoring daemon."
+  },
+  {
+   "repo": "CSIRT-MU_Stream4Flow (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/CSIRT-MU_Stream4Flow)",
+   "path": "",
+   "blurb": "Real-time IP flow monitoring and network traffic analysis."
+  },
+  {
+   "repo": "zeroclaw-labs_zeroclaw-metrics (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/zeroclaw-labs_zeroclaw-metrics)",
+   "path": "",
+   "blurb": "Telemetry exporter for ZeroClaw agents."
+  },
+  {
+   "repo": "PostHog_posthog (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/PostHog_posthog)",
+   "path": "",
+   "blurb": "Open-source product analytics, session recording, and feature flags platform."
+  },
+  {
+   "repo": "amir20_dtop (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/amir20_dtop)",
+   "path": "",
+   "blurb": "Terminal-based Docker container metric monitor."
+  },
+  {
+   "repo": "NVIDIA_SkillSpector (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/NVIDIA_SkillSpector)",
+   "path": "",
+   "blurb": "Skill execution profiling and observability inspector."
+  },
+  {
+   "repo": "deepsense-ai_seahorse (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/deepsense-ai_seahorse)",
+   "path": "",
+   "blurb": "Visual spark workflow monitoring and lineage inspector."
+  },
+  {
+   "repo": "koala73_worldmonitor (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/koala73_worldmonitor)",
+   "path": "",
+   "blurb": "System and network global state monitor."
+  },
+  {
+   "repo": "HalFrgrd_flyline (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/HalFrgrd_flyline)",
+   "path": "",
+   "blurb": "Real-time telemetry pipeline logger."
+  },
+  {
+   "repo": "aquasecurity_trivy (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/aquasecurity_trivy)",
+   "path": "",
+   "blurb": "Security vulnerability observability daemon."
+  },
+  {
+   "repo": "racetrack/watchdog-eval (/home/npwad/coding/docker-envs/projects/evo-myworld/racetrack/watchdog-eval)",
+   "path": "Racetrack Eval",
+   "blurb": "Standing benchmark harness for system monitoring & alerting latency."
+  }
+ ],
+ "22. CACHING (LRU, TTL & KV Cache Engines)": [
+  {
+   "repo": "arthurprs_quick-cache (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/arthurprs_quick-cache)",
+   "path": "",
+   "blurb": "Ultra-fast lock-free LRU cache for Rust."
+  },
+  {
+   "repo": "moka-rs_mini-moka (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/moka-rs_mini-moka)",
+   "path": "",
+   "blurb": "Fast, concurrent, bounded in-memory cache inspired by Java Caffeine."
+  },
+  {
+   "repo": "behzadnouri_lazy-lru (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/behzadnouri_lazy-lru)",
+   "path": "",
+   "blurb": "Lazy evaluation LRU cache in JavaScript."
+  },
+  {
+   "repo": "jaemk_cached (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/jaemk_cached)",
+   "path": "",
+   "blurb": "Simple macro-based function caching for Rust."
+  },
+  {
+   "repo": "LMCache_LMCache (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/LMCache_LMCache)",
+   "path": "",
+   "blurb": "Context cache layer for long LLM prompt reuse."
+  },
+  {
+   "repo": "NVIDIA_nv-embedding-cache (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/NVIDIA_nv-embedding-cache)",
+   "path": "",
+   "blurb": "GPU-accelerated vector embedding cache."
+  },
+  {
+   "repo": "lance0_ttl (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/lance0_ttl)",
+   "path": "",
+   "blurb": "Time-To-Live expiration cache manager."
+  },
+  {
+   "repo": "gdt050579_filecache (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/gdt050579_filecache)",
+   "path": "",
+   "blurb": "High-throughput file-backed cache buffer."
+  },
+  {
+   "repo": "spotify_SPTPersistentCache (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/spotify_SPTPersistentCache)",
+   "path": "",
+   "blurb": "Objective-C persistent disk cache framework."
+  },
+  {
+   "repo": "david-soto-m_sliding_window_alt (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/david-soto-m_sliding_window_alt)",
+   "path": "",
+   "blurb": "Sliding window cache eviction algorithm."
+  },
+  {
+   "repo": "magiclen_sliding-window-counter (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/magiclen_sliding-window-counter)",
+   "path": "",
+   "blurb": "High-concurrency sliding window rate limiter cache."
+  },
+  {
+   "repo": "flo-l_rust-sliding_windows (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/flo-l_rust-sliding_windows)",
+   "path": "",
+   "blurb": "Sliding window cache iterator in Rust."
+  },
+  {
+   "repo": "greenhat616_bolt-load (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/greenhat616_bolt-load)",
+   "path": "",
+   "blurb": "Cache warming and load generator framework."
+  },
+  {
+   "repo": "pmcgleenon_heavykeeper-rs (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/pmcgleenon_heavykeeper-rs)",
+   "path": "",
+   "blurb": "HeavyKeeper top-k cache tracking algorithm in Rust."
+  },
+  {
+   "repo": "cloudflare_pingora (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/cloudflare_pingora)",
+   "path": "",
+   "blurb": "In-memory proxy caching engine."
+  }
+ ],
+ "23. SERIALIZATION (Protobuf, RPC & Data Encoding)": [
+  {
+   "repo": "apache_thrift (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_thrift)",
+   "path": "",
+   "blurb": "Cross-language RPC and binary serialization framework."
+  },
+  {
+   "repo": "apache_fory (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_fory)",
+   "path": "",
+   "blurb": "Ultra-fast cross-language serialization framework."
+  },
+  {
+   "repo": "Aleph-Alpha_ts-rs (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Aleph-Alpha_ts-rs)",
+   "path": "",
+   "blurb": "Rust structure to TypeScript type serialization compiler."
+  },
+  {
+   "repo": "cool-japan_oxiarc (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/cool-japan_oxiarc)",
+   "path": "",
+   "blurb": "Pure Rust implementation of archive and decompression formats."
+  },
+  {
+   "repo": "toml-rs_toml (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/toml-rs_toml)",
+   "path": "",
+   "blurb": "Serde-based TOML serialization library for Rust."
+  },
+  {
+   "repo": "LukasKalbertodt_litrs (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/LukasKalbertodt_litrs)",
+   "path": "",
+   "blurb": "Literal parsing and string escaping library."
+  },
+  {
+   "repo": "apache_incubator-seata (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_incubator-seata)",
+   "path": "",
+   "blurb": "Distributed transaction data protocol serializer."
+  },
+  {
+   "repo": "transmute-app_transmute (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/transmute-app_transmute)",
+   "path": "",
+   "blurb": "Data format transmuter and schema converter."
+  },
+  {
+   "repo": "wooorm_mdxjs-rs (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/wooorm_mdxjs-rs)",
+   "path": "",
+   "blurb": "MDX AST serialization library in Rust."
+  },
+  {
+   "repo": "web-infra-dev_mdx-rs (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/web-infra-dev_mdx-rs)",
+   "path": "",
+   "blurb": "Fast MDX markup serializer compiler."
+  }
+ ],
+ "24. AUDIO / VOICE (STT, TTS & Audio Processing)": [
+  {
+   "repo": "ufal_whisper_streaming (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/ufal_whisper_streaming)",
+   "path": "",
+   "blurb": "Real-time low-latency Whisper speech recognition streaming."
+  },
+  {
+   "repo": "ShayneP_local-voice-ai (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/ShayneP_local-voice-ai)",
+   "path": "",
+   "blurb": "Local offline voice interaction pipeline (STT + LLM + TTS)."
+  },
+  {
+   "repo": "microsoft_VibeVoice (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/microsoft_VibeVoice)",
+   "path": "",
+   "blurb": "Conversational zero-shot text-to-speech synthesis engine."
+  },
+  {
+   "repo": "PipeWire_pipewire (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/PipeWire_pipewire)",
+   "path": "",
+   "blurb": "Low-latency audio and video processing daemon."
+  },
+  {
+   "repo": "SamiPerttu_fundsp (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/SamiPerttu_fundsp)",
+   "path": "",
+   "blurb": "Audio DSP signal processing graph engine in Rust."
+  },
+  {
+   "repo": "spotify_pedalboard (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/spotify_pedalboard)",
+   "path": "",
+   "blurb": "Spotify's Python library for audio effects and DSP processing."
+  },
+  {
+   "repo": "klebz_surge-rs (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/klebz_surge-rs)",
+   "path": "",
+   "blurb": "Surge audio synthesizer DSP port in Rust."
+  },
+  {
+   "repo": "livekit_agents (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/livekit_agents)",
+   "path": "",
+   "blurb": "Multimodal voice agent framework."
+  },
+  {
+   "repo": "racetrack/video-eval (/home/npwad/coding/docker-envs/projects/evo-myworld/racetrack/video-eval)",
+   "path": "Racetrack Eval",
+   "blurb": "Standing benchmark harness for video and audio stream parsing."
+  }
+ ],
+ "25. OCR / DOCUMENT PARSING": [
+  {
+   "repo": "allenai_olmocr (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/allenai_olmocr)",
+   "path": "",
+   "blurb": "Toolkit for training and evaluating vision-based document OCR models."
+  },
+  {
+   "repo": "PaddlePaddle_PaddleOCR (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/PaddlePaddle_PaddleOCR)",
+   "path": "",
+   "blurb": "Ultra-lightweight OCR system supporting 80+ languages."
+  },
+  {
+   "repo": "opendatalab_MinerU (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/opendatalab_MinerU)",
+   "path": "",
+   "blurb": "High-precision PDF layout extraction and markdown converter."
+  },
+  {
+   "repo": "greatv_oar-ocr (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/greatv_oar-ocr)",
+   "path": "",
+   "blurb": "Optical character recognition pipeline wrapper."
+  },
+  {
+   "repo": "zibo-chen_rust-paddle-ocr (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/zibo-chen_rust-paddle-ocr)",
+   "path": "",
+   "blurb": "Rust bindings for PaddleOCR engine."
+  },
+  {
+   "repo": "tesseract-ocr_tesseract (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/tesseract-ocr_tesseract)",
+   "path": "",
+   "blurb": "World famous open-source OCR engine."
+  },
+  {
+   "repo": "ShayHill_docx2python (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/ShayHill_docx2python)",
+   "path": "",
+   "blurb": "Extract text, images, and tables from DOCX files into Python dicts."
+  },
+  {
+   "repo": "SheetJS_sheetjs (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/SheetJS_sheetjs)",
+   "path": "",
+   "blurb": "Spreadsheet (XLSX/CSV) data extraction & parsing engine."
+  },
+  {
+   "repo": "Automattic_harper (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Automattic_harper)",
+   "path": "",
+   "blurb": "High-performance text grammar parser engine in Rust."
+  },
+  {
+   "repo": "facebookresearch_segment-anything (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/facebookresearch_segment-anything)",
+   "path": "",
+   "blurb": "SAM vision segmentation model for document region masking."
+  },
+  {
+   "repo": "roboflow_supervision (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/roboflow_supervision)",
+   "path": "",
+   "blurb": "Computer vision utilities for document region detection."
+  },
+  {
+   "repo": "strawlab_convert-image (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/strawlab_convert-image)",
+   "path": "",
+   "blurb": "High-speed image format transformation for document pipelines."
+  },
+  {
+   "repo": "racetrack/arxiv-eval (/home/npwad/coding/docker-envs/projects/evo-myworld/racetrack/arxiv-eval)",
+   "path": "Racetrack Eval",
+   "blurb": "Standing benchmark harness for LaTeX/PDF academic paper extraction."
+  },
+  {
+   "repo": "racetrack/substack-eval (/home/npwad/coding/docker-envs/projects/evo-myworld/racetrack/substack-eval)",
+   "path": "Racetrack Eval",
+   "blurb": "Standing benchmark harness for HTML newsletter & document parsing."
+  }
+ ],
+ "26. AUTH / SECURITY": [
+  {
+   "repo": "FiloSottile_mkcert (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/FiloSottile_mkcert)",
+   "path": "",
+   "blurb": "Zero-config tool for making locally-trusted TLS development certificates."
+  },
+  {
+   "repo": "aquasecurity_trivy (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/aquasecurity_trivy)",
+   "path": "",
+   "blurb": "Comprehensive vulnerability and misconfiguration scanner for containers & repos."
+  },
+  {
+   "repo": "pennersr_django-allauth (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/pennersr_django-allauth)",
+   "path": "",
+   "blurb": "Integrated set of Django apps for authentication & social auth."
+  },
+  {
+   "repo": "projectdiscovery_nuclei (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/projectdiscovery_nuclei)",
+   "path": "",
+   "blurb": "Fast and customizable vulnerability scanner based on simple YAML DSL."
+  },
+  {
+   "repo": "Gallopsled_pwntools (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Gallopsled_pwntools)",
+   "path": "",
+   "blurb": "CTF framework and exploit development library in Python."
+  },
+  {
+   "repo": "OWASP_CheatSheetSeries (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/OWASP_CheatSheetSeries)",
+   "path": "",
+   "blurb": "Official OWASP Application Security Cheat Sheets."
+  },
+  {
+   "repo": "apache_directory-fortress-commander (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_directory-fortress-commander)",
+   "path": "",
+   "blurb": "Web interface for RBAC authorization & identity management."
+  },
+  {
+   "repo": "apache_infrastructure-otp (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_infrastructure-otp)",
+   "path": "",
+   "blurb": "One-time password authentication server."
+  },
+  {
+   "repo": "fortra_impacket (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/fortra_impacket)",
+   "path": "",
+   "blurb": "Network protocol security testing suite."
+  },
+  {
+   "repo": "ErickShepherd_excubitor (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/ErickShepherd_excubitor)",
+   "path": "",
+   "blurb": "Security sentinel and execution sandbox validator."
+  },
+  {
+   "repo": "ErickShepherd_pydlock (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/ErickShepherd_pydlock)",
+   "path": "",
+   "blurb": "Cryptographic dependency locking engine."
+  },
+  {
+   "repo": "NVIDIA_NeMo-Guardrails (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/NVIDIA_NeMo-Guardrails)",
+   "path": "",
+   "blurb": "Toolkit for adding guardrails & safety policies to LLMs."
+  },
+  {
+   "repo": "NVIDIA-NeMo_Guardrails (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/NVIDIA-NeMo_Guardrails)",
+   "path": "",
+   "blurb": "Secondary mirror of NeMo Guardrails safety framework."
+  },
+  {
+   "repo": "guardrails-ai_guardrails (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/guardrails-ai_guardrails)",
+   "path": "",
+   "blurb": "Framework for adding input/output validation & security guards to LLM calls."
+  },
+  {
+   "repo": "data-privacy-stack_presidio (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/data-privacy-stack_presidio)",
+   "path": "",
+   "blurb": "Context aware PII anonymization & privacy guard module."
+  },
+  {
+   "repo": "jumpserver_jumpserver (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/jumpserver_jumpserver)",
+   "path": "",
+   "blurb": "Open-source bastion host and PAM privileged access security system."
+  },
+  {
+   "repo": "bgreenwell_xleak (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/bgreenwell_xleak)",
+   "path": "",
+   "blurb": "Cross-origin side-channel vulnerability scanner."
+  },
+  {
+   "repo": "elder-plinius_G0DM0D3 (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/elder-plinius_G0DM0D3)",
+   "path": "",
+   "blurb": "AI red-teaming and jailbreak evaluation suite."
+  },
+  {
+   "repo": "elder-plinius_GLOSSOPETRAE (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/elder-plinius_GLOSSOPETRAE)",
+   "path": "",
+   "blurb": "Red-teaming security payload generator."
+  },
+  {
+   "repo": "AFLplusplus_LibAFL (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/AFLplusplus_LibAFL)",
+   "path": "",
+   "blurb": "Advanced fuzzing framework built in Rust for security auditing."
+  },
+  {
+   "repo": "usestrix_strix (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/usestrix_strix)",
+   "path": "",
+   "blurb": "Open-source security analysis and vulnerability detection engine."
+  },
+  {
+   "repo": "00-team_shah (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/00-team_shah)",
+   "path": "",
+   "blurb": "Internal security exploit testing repository."
+  },
+  {
+   "repo": "ErickShepherd_shields (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/ErickShepherd_shields)",
+   "path": "",
+   "blurb": "Security policy enforcer daemon."
+  },
+  {
+   "repo": "StevenBlack_hosts (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/StevenBlack_hosts)",
+   "path": "",
+   "blurb": "Unified malware and ad-blocking security hosts file generator."
+  },
+  {
+   "repo": "hardikpandya_stop-slop (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/hardikpandya_stop-slop)",
+   "path": "",
+   "blurb": "AI content filter and safety guard extension."
+  },
+  {
+   "repo": "google_gvisor (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/google_gvisor)",
+   "path": "",
+   "blurb": "Container security sandbox boundaries."
+  }
+ ],
+ "27. DEVELOPER TOOLS (CLI, Build Systems & Utilities)": [
+  {
+   "repo": "BurntSushi_ripgrep (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/BurntSushi_ripgrep)",
+   "path": "",
+   "blurb": "Ultra-fast recursive line-oriented search tool."
+  },
+  {
+   "repo": "Canop_broot (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Canop_broot)",
+   "path": "",
+   "blurb": "Interactive tree view terminal directory navigator."
+  },
+  {
+   "repo": "sharkdp_bat (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/sharkdp_bat)",
+   "path": "",
+   "blurb": "A `cat` clone with syntax highlighting and Git integration."
+  },
+  {
+   "repo": "sxyazi_yazi (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/sxyazi_yazi)",
+   "path": "",
+   "blurb": "Blazing fast terminal file manager in Rust."
+  },
+  {
+   "repo": "yorukot_superfile (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/yorukot_superfile)",
+   "path": "",
+   "blurb": "Fancy and modern terminal file manager."
+  },
+  {
+   "repo": "clap-rs_clap (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/clap-rs_clap)",
+   "path": "",
+   "blurb": "Command Line Argument Parser for Rust."
+  },
+  {
+   "repo": "fastapi_typer (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/fastapi_typer)",
+   "path": "",
+   "blurb": "Python library for building CLI applications with type hints."
+  },
+  {
+   "repo": "pallets_click (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/pallets_click)",
+   "path": "",
+   "blurb": "Python composable command line interface toolkit."
+  },
+  {
+   "repo": "tj_commander.js (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/tj_commander.js)",
+   "path": "",
+   "blurb": "Complete solution for Node.js command-line interfaces."
+  },
+  {
+   "repo": "bashly-framework_bashly (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/bashly-framework_bashly)",
+   "path": "",
+   "blurb": "Bash script generator and CLI framework."
+  },
+  {
+   "repo": "rust-lang_cc-rs (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/rust-lang_cc-rs)",
+   "path": "",
+   "blurb": "Rust build script library for invoking C/C++ compilers."
+  },
+  {
+   "repo": "rust-lang_cmake-rs (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/rust-lang_cmake-rs)",
+   "path": "",
+   "blurb": "Rust build script library for driving CMake builds."
+  },
+  {
+   "repo": "pantsbuild_pants (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/pantsbuild_pants)",
+   "path": "",
+   "blurb": "Fast, scalable polyglot build system for Python/Java/Go/Rust."
+  },
+  {
+   "repo": "apache_maven (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_maven)",
+   "path": "",
+   "blurb": "Apache Maven build automation tool for Java."
+  },
+  {
+   "repo": "pnpm_pnpm (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/pnpm_pnpm)",
+   "path": "",
+   "blurb": "Fast, disk space efficient package manager for JavaScript."
+  },
+  {
+   "repo": "direnv_direnv (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/direnv_direnv)",
+   "path": "",
+   "blurb": "Shell extension that loads/unloads environment variables per directory."
+  },
+  {
+   "repo": "NixOS_nix (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/NixOS_nix)",
+   "path": "",
+   "blurb": "Purely functional package manager and build environment system."
+  },
+  {
+   "repo": "jetify-com__devbox (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/jetify-com__devbox)",
+   "path": "",
+   "blurb": "Instant, reproducible dev environments using Nix."
+  },
+  {
+   "repo": "google_zx (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/google_zx)",
+   "path": "",
+   "blurb": "Tool for writing shell scripts in JavaScript."
+  },
+  {
+   "repo": "jlevy_the-art-of-command-line (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/jlevy_the-art-of-command-line)",
+   "path": "",
+   "blurb": "Command line reference guide repository."
+  },
+  {
+   "repo": "onceupon_Bash-Oneliner (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/onceupon_Bash-Oneliner)",
+   "path": "",
+   "blurb": "Collection of bash one-liners for terminal productivity."
+  },
+  {
+   "repo": "trimstray_the-book-of-secret-knowledge (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/trimstray_the-book-of-secret-knowledge)",
+   "path": "",
+   "blurb": "CLI and sysadmin command handbook."
+  },
+  {
+   "repo": "InsForge_CLI (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/InsForge_CLI)",
+   "path": "",
+   "blurb": "Command line tool for InsForge development stack."
+  },
+  {
+   "repo": "ReviewStage_stage-cli (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/ReviewStage_stage-cli)",
+   "path": "",
+   "blurb": "CLI runner for preview stages."
+  },
+  {
+   "repo": "autohandai_code-cli (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/autohandai_code-cli)",
+   "path": "",
+   "blurb": "Autonomous CLI execution agent tool."
+  },
+  {
+   "repo": "iOfficeAI_OfficeCLI (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/iOfficeAI_OfficeCLI)",
+   "path": "",
+   "blurb": "CLI tool suite for AI office automation."
+  },
+  {
+   "repo": "iOfficeAI_OfficeCli (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/iOfficeAI_OfficeCli)",
+   "path": "",
+   "blurb": "Secondary mirror of OfficeCLI tool."
+  },
+  {
+   "repo": "forgejo-contrib_forgejo-cli (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/forgejo-contrib_forgejo-cli)",
+   "path": "",
+   "blurb": "CLI client for Forgejo git hosting platform."
+  },
+  {
+   "repo": "tracel-ai_tracel-cli (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/tracel-ai_tracel-cli)",
+   "path": "",
+   "blurb": "CLI tool for Tracel AI benchmark tooling."
+  },
+  {
+   "repo": "tracel-ai_xtask (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/tracel-ai_xtask)",
+   "path": "",
+   "blurb": "Cargo xtask build helper automation."
+  },
+  {
+   "repo": "dalance_procs (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/dalance_procs)",
+   "path": "",
+   "blurb": "Modern replacement for `ps` written in Rust."
+  },
+  {
+   "repo": "bootandy_dust (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/bootandy_dust)",
+   "path": "",
+   "blurb": "Intuitive disk usage analyzer (`du` alternative) in Rust."
+  },
+  {
+   "repo": "XAMPPRocky_tokei (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/XAMPPRocky_tokei)",
+   "path": "",
+   "blurb": "Fast line counter CLI tool."
+  },
+  {
+   "repo": "tldr-pages_tldr (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/tldr-pages_tldr)",
+   "path": "",
+   "blurb": "Collaborative simplified man pages."
+  },
+  {
+   "repo": "shshemi_tabiew (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/shshemi_tabiew)",
+   "path": "",
+   "blurb": "Terminal TUI viewer for CSV/TSV files."
+  },
+  {
+   "repo": "ynqa_jnv (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/ynqa_jnv)",
+   "path": "",
+   "blurb": "Interactive JSON filter and viewer CLI using jq syntax."
+  },
+  {
+   "repo": "ynqa_ynqa (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/ynqa_ynqa)",
+   "path": "",
+   "blurb": "Interactive TUI filter library."
+  },
+  {
+   "repo": "julien-cpsn_ATAC (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/julien-cpsn_ATAC)",
+   "path": "",
+   "blurb": "Terminal-based API client (Postman alternative in TUI)."
+  },
+  {
+   "repo": "pacak_bpaf (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/pacak_bpaf)",
+   "path": "",
+   "blurb": "Lightweight command line argument parser for Rust."
+  },
+  {
+   "repo": "harryfei_which-rs (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/harryfei_which-rs)",
+   "path": "",
+   "blurb": "Rust implementation of executable lookup utility `which`."
+  },
+  {
+   "repo": "bircni_get-size2 (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/bircni_get-size2)",
+   "path": "",
+   "blurb": "In-memory struct size calculator in Rust."
+  },
+  {
+   "repo": "ardaku_whoami (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/ardaku_whoami)",
+   "path": "",
+   "blurb": "OS user and environment details retriever library."
+  },
+  {
+   "repo": "manishearth_elsa (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/manishearth_elsa)",
+   "path": "",
+   "blurb": "Append-only vector data structure for stable memory pointers."
+  },
+  {
+   "repo": "orlp_slotmap (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/orlp_slotmap)",
+   "path": "",
+   "blurb": "High-performance slot map data structure for Rust."
+  },
+  {
+   "repo": "tafia_nested (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/tafia_nested)",
+   "path": "",
+   "blurb": "Nested vector data structure helper."
+  },
+  {
+   "repo": "anderslanglands_ustr (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/anderslanglands_ustr)",
+   "path": "",
+   "blurb": "Fast string interning library for compilers."
+  },
+  {
+   "repo": "matklad_xshell (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/matklad_xshell)",
+   "path": "",
+   "blurb": "Ergonomic bash-like scripting utilities in Rust."
+  },
+  {
+   "repo": "rustyhorde_vergen (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/rustyhorde_vergen)",
+   "path": "",
+   "blurb": "Build script generator for embedding git/compiler status flags into binaries."
+  },
+  {
+   "repo": "mcgoo_vcpkg-rs (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/mcgoo_vcpkg-rs)",
+   "path": "",
+   "blurb": "Cargo build helper for finding C/C++ libraries installed via vcpkg."
+  },
+  {
+   "repo": "sbt_sbt (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/sbt_sbt)",
+   "path": "",
+   "blurb": "The interactive build tool for Scala."
+  },
+  {
+   "repo": "scala_scala (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/scala_scala)",
+   "path": "",
+   "blurb": "Scala 2 compiler and core standard library."
+  },
+  {
+   "repo": "scala_scala3 (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/scala_scala3)",
+   "path": "",
+   "blurb": "Next-generation Scala 3 compiler and Dotty language system."
+  },
+  {
+   "repo": "ziglang_zig (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/ziglang_zig)",
+   "path": "",
+   "blurb": "General-purpose programming language and toolchain for robust software."
+  },
+  {
+   "repo": "bytecodealliance_rustix (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/bytecodealliance_rustix)",
+   "path": "",
+   "blurb": "Safe, efficient Rust bindings to POSIX/Linux syscalls."
+  },
+  {
+   "repo": "bytecodealliance_wasi-rs (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/bytecodealliance_wasi-rs)",
+   "path": "",
+   "blurb": "WebAssembly System Interface (WASI) API bindings."
+  },
+  {
+   "repo": "nvm-sh_nvm (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/nvm-sh_nvm)",
+   "path": "",
+   "blurb": "Node Version Manager for POSIX-compliant bash shells."
+  },
+  {
+   "repo": "oven-sh_bun (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/oven-sh_bun)",
+   "path": "",
+   "blurb": "Incredibly fast JavaScript all-in-one runtime, bundler, and package manager."
+  },
+  {
+   "repo": "cookiecutter_cookiecutter-django (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/cookiecutter_cookiecutter-django)",
+   "path": "",
+   "blurb": "Cookiecutter template for production-ready Django projects."
+  },
+  {
+   "repo": "Raphire_Win11Debloat (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Raphire_Win11Debloat)",
+   "path": "",
+   "blurb": "PowerShell script utility for Windows system customization."
+  },
+  {
+   "repo": "coreybutler_node-windows (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/coreybutler_node-windows)",
+   "path": "",
+   "blurb": "Run Node.js scripts as native Windows background services."
+  },
+  {
+   "repo": "dustinkirkland_byobu (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/dustinkirkland_byobu)",
+   "path": "",
+   "blurb": "Text-based window manager and terminal multiplexer."
+  },
+  {
+   "repo": "kovidgoyal_kitty (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/kovidgoyal_kitty)",
+   "path": "",
+   "blurb": "Fast, feature-rich GPU-accelerated terminal emulator."
+  },
+  {
+   "repo": "uxabix_FileTree (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/uxabix_FileTree)",
+   "path": "",
+   "blurb": "File system tree visualizer component."
+  },
+  {
+   "repo": "jtutor26_file-structure-generator (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/jtutor26_file-structure-generator)",
+   "path": "",
+   "blurb": "Project directory structure generator tool."
+  },
+  {
+   "repo": "architecture-decision-record_architecture-decision-record (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/architecture-decision-record_architecture-decision-record)",
+   "path": "",
+   "blurb": "Command line tool for ADR decision logging."
+  },
+  {
+   "repo": "LeCoupa_awesome-cheatsheets (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/LeCoupa_awesome-cheatsheets)",
+   "path": "",
+   "blurb": "Comprehensive cheatsheets for developer tools."
+  },
+  {
+   "repo": "practical-tutorials_project-based-learning (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/practical-tutorials_project-based-learning)",
+   "path": "",
+   "blurb": "Build-your-own software project tutorials repo."
+  },
+  {
+   "repo": "engineering-management_awesome-engineering-management (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/engineering-management_awesome-engineering-management)",
+   "path": "",
+   "blurb": "Engineering management frameworks and tools reference."
+  },
+  {
+   "repo": "goldbergyoni_nodebestpractices (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/goldbergyoni_nodebestpractices)",
+   "path": "",
+   "blurb": "Production Node.js best practices guide."
+  },
+  {
+   "repo": "sindresorhus_awesome-nodejs (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/sindresorhus_awesome-nodejs)",
+   "path": "",
+   "blurb": "Curated catalog of Node.js libraries."
+  },
+  {
+   "repo": "shadawck_awesome-cli-frameworks (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/shadawck_awesome-cli-frameworks)",
+   "path": "",
+   "blurb": "CLI construction frameworks directory."
+  },
+  {
+   "repo": "zeroclaw-labs_scoop-zeroclaw (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/zeroclaw-labs_scoop-zeroclaw)",
+   "path": "",
+   "blurb": "Scoop package installer manifest for ZeroClaw binaries."
+  },
+  {
+   "repo": "zeroclaw-labs_homebrew-tap (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/zeroclaw-labs_homebrew-tap)",
+   "path": "",
+   "blurb": "Homebrew tap installer formula for ZeroClaw."
+  },
+  {
+   "repo": "PowerShell_PowerShell (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/PowerShell_PowerShell)",
+   "path": "",
+   "blurb": "Cross-platform PowerShell automation and scripting engine."
+  },
+  {
+   "repo": "BurntSushi_walkdir (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/BurntSushi_walkdir)",
+   "path": "",
+   "blurb": "High-performance recursive directory iterator in Rust."
+  },
+  {
+   "repo": "rust-random_rand (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/rust-random_rand)",
+   "path": "",
+   "blurb": "Random number generators and sampling algorithms in Rust."
+  },
+  {
+   "repo": "fulmicoton_fastdivide (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/fulmicoton_fastdivide)",
+   "path": "",
+   "blurb": "Fast integer division by constants using multiplication tricks."
+  },
+  {
+   "repo": "dylni_os_str_bytes (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/dylni_os_str_bytes)",
+   "path": "",
+   "blurb": "Lossless conversions between OS strings and raw byte sequences."
+  },
+  {
+   "repo": "apache_ossie (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_ossie)",
+   "path": "",
+   "blurb": "Open source infrastructure management utilities."
+  },
+  {
+   "repo": "automazeio_ccpm (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/automazeio_ccpm)",
+   "path": "",
+   "blurb": "Codebase project management CLI tool."
+  },
+  {
+   "repo": "k1tbyte_Wand-Enhancer (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/k1tbyte_Wand-Enhancer)",
+   "path": "",
+   "blurb": "Developer productivity enhancer toolkit."
+  },
+  {
+   "repo": "kanaka_mal (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/kanaka_mal)",
+   "path": "",
+   "blurb": "Make a Lisp: step-by-step Lisp interpreter implementation in 80+ languages."
+  },
+  {
+   "repo": "tock_tock (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/tock_tock)",
+   "path": "",
+   "blurb": "Embedded operating system kernel for microcontrollers in Rust."
+  },
+  {
+   "repo": "farion1231_cc-switch (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/farion1231_cc-switch)",
+   "path": "",
+   "blurb": "Context switcher CLI utility."
+  },
+  {
+   "repo": "FiloSottile_mkcert (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/FiloSottile_mkcert)",
+   "path": "",
+   "blurb": "Dev SSL certificate CLI tool."
+  },
+  {
+   "repo": "jgm_pandoc (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/jgm_pandoc)",
+   "path": "",
+   "blurb": "CLI document compiler binary."
+  }
+ ],
+ "28. UI / COMPONENT LIBRARIES & CORE FRAMEWORKS": [
+  {
+   "repo": "angular_angular (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/angular_angular)",
+   "path": "",
+   "blurb": "Modern Angular component-based web framework."
+  },
+  {
+   "repo": "sveltejs_svelte (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/sveltejs_svelte)",
+   "path": "",
+   "blurb": "Cybernetically enhanced web apps with compile-time UI rendering."
+  },
+  {
+   "repo": "solidjs_solid (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/solidjs_solid)",
+   "path": "",
+   "blurb": "Reactive, lightweight UI library for building web interfaces."
+  },
+  {
+   "repo": "twbs_bootstrap (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/twbs_bootstrap)",
+   "path": "",
+   "blurb": "Classic CSS layout and component toolkit."
+  },
+  {
+   "repo": "unovue_reka-ui (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/unovue_reka-ui)",
+   "path": "",
+   "blurb": "Unstyled, accessible UI primitive components for Vue/JavaScript."
+  },
+  {
+   "repo": "ibelick_ui-skills (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/ibelick_ui-skills)",
+   "path": "",
+   "blurb": "Crafted UI components and micro-animation primitives."
+  },
+  {
+   "repo": "knockout_knockout (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/knockout_knockout)",
+   "path": "",
+   "blurb": "MVVM web UI binding component framework."
+  },
+  {
+   "repo": "refinedev_refine (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/refinedev_refine)",
+   "path": "",
+   "blurb": "React framework for enterprise internal tools and CRUD UI components."
+  },
+  {
+   "repo": "apache_wicket (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_wicket)",
+   "path": "",
+   "blurb": "Component-oriented web application UI framework for Java."
+  },
+  {
+   "repo": "codemirror_dev (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/codemirror_dev)",
+   "path": "",
+   "blurb": "Code mirror web UI component."
+  },
+  {
+   "repo": "pmndrs_react-three-fiber (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/pmndrs_react-three-fiber)",
+   "path": "",
+   "blurb": "React 3D fiber UI component renderer."
+  }
+ ],
+ "29. FINANCIAL SYSTEMS": [
+  {
+   "repo": "HKUDS_Vibe-Trading (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/HKUDS_Vibe-Trading)",
+   "path": "",
+   "blurb": "Multi-agent market simulation & quantitative trading framework."
+  },
+  {
+   "repo": "TraderAlice_OpenAlice (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/TraderAlice_OpenAlice)",
+   "path": "",
+   "blurb": "Autonomous AI trading execution agent."
+  },
+  {
+   "repo": "bitcoin-s_bitcoin-s (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/bitcoin-s_bitcoin-s)",
+   "path": "",
+   "blurb": "Scala implementation of Bitcoin protocol & cryptographic primitives."
+  },
+  {
+   "repo": "EverMind-AI_EverAlgo (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/EverMind-AI_EverAlgo)",
+   "path": "",
+   "blurb": "Algorithmic trading backtesting and execution engine."
+  },
+  {
+   "repo": "harry0703_MoneyPrinterTurbo (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/harry0703_MoneyPrinterTurbo)",
+   "path": "",
+   "blurb": "Automated short video content generation monetization tool."
+  }
+ ],
+ "30. NETWORKING": [
+  {
+   "repo": "cloudflare_pingora (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/cloudflare_pingora)",
+   "path": "",
+   "blurb": "Rust framework for building programmable network proxies."
+  },
+  {
+   "repo": "istio_istio (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/istio_istio)",
+   "path": "",
+   "blurb": "Open-source service mesh for managing microservice network traffic."
+  },
+  {
+   "repo": "cilium_cilium (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/cilium_cilium)",
+   "path": "",
+   "blurb": "eBPF-based networking, security, and observability for Kubernetes."
+  },
+  {
+   "repo": "nginx_nginx (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/nginx_nginx)",
+   "path": "",
+   "blurb": "High-performance HTTP server and reverse proxy."
+  },
+  {
+   "repo": "apache_dubbo (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_dubbo)",
+   "path": "",
+   "blurb": "High-performance RPC and microservice network communication."
+  },
+  {
+   "repo": "apache_shenyu (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_shenyu)",
+   "path": "",
+   "blurb": "Asynchronous Java microservices API gateway."
+  },
+  {
+   "repo": "mitmproxy_mitmproxy (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/mitmproxy_mitmproxy)",
+   "path": "",
+   "blurb": "Interactive HTTPS proxy tool for network inspection."
+  },
+  {
+   "repo": "quinn-rs_quinn (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/quinn-rs_quinn)",
+   "path": "",
+   "blurb": "Async QUIC protocol implementation in Rust."
+  },
+  {
+   "repo": "clash-verge-rev_clash-verge-rev (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/clash-verge-rev_clash-verge-rev)",
+   "path": "",
+   "blurb": "GUI client for Clash network proxy rule core."
+  },
+  {
+   "repo": "juanfont_headscale (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/juanfont_headscale)",
+   "path": "",
+   "blurb": "Open-source implementation of Tailscale control server."
+  },
+  {
+   "repo": "GyulyVGC_sniffnet (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/GyulyVGC_sniffnet)",
+   "path": "",
+   "blurb": "Cross-platform application to monitor network traffic."
+  },
+  {
+   "repo": "simplex-chat_simplex-chat (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/simplex-chat_simplex-chat)",
+   "path": "",
+   "blurb": "Privacy-first end-to-end encrypted messaging protocol without user IDs."
+  },
+  {
+   "repo": "quantumsheep_sshs (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/quantumsheep_sshs)",
+   "path": "",
+   "blurb": "Graphical terminal SSH server manager."
+  },
+  {
+   "repo": "lwthiker_curl-impersonate (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/lwthiker_curl-impersonate)",
+   "path": "",
+   "blurb": "Special build of curl that impersonates browser TLS/HTTP fingerprints."
+  },
+  {
+   "repo": "relumetech_Domain-Connect-Templates (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/relumetech_Domain-Connect-Templates)",
+   "path": "",
+   "blurb": "Domain Connect DNS template specification."
+  },
+  {
+   "repo": "octelium_octelium (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/octelium_octelium)",
+   "path": "",
+   "blurb": "Distributed peer-to-peer overlay network node."
+  },
+  {
+   "repo": "aksheyd_WhatsUp (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/aksheyd_WhatsUp)",
+   "path": "",
+   "blurb": "Real-time peer network ping status checker."
+  },
+  {
+   "repo": "iptv-org_iptv (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/iptv-org_iptv)",
+   "path": "",
+   "blurb": "Open collection of publicly available IPTV channels streams."
+  },
+  {
+   "repo": "spotify_mobius (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/spotify_mobius)",
+   "path": "",
+   "blurb": "Functional reactive network state management framework."
+  },
+  {
+   "repo": "spotify_SPTDataLoader (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/spotify_SPTDataLoader)",
+   "path": "",
+   "blurb": "Objective-C network HTTP data loading framework."
+  },
+  {
+   "repo": "diegosouzapw_OmniRoute (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/diegosouzapw_OmniRoute)",
+   "path": "",
+   "blurb": "Dynamic multipath network packet router."
+  },
+  {
+   "repo": "5c0_metropolis (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/5c0_metropolis)",
+   "path": "",
+   "blurb": "Peer-to-peer mesh node protocol implementation."
+  },
+  {
+   "repo": "ogulcancelik_herdr (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/ogulcancelik_herdr)",
+   "path": "",
+   "blurb": "Cluster discovery network daemon."
+  }
+ ],
+ "31. CONTAINERIZATION (Docker, K8s & Isolation Runtimes)": [
+  {
+   "repo": "google_gvisor (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/google_gvisor)",
+   "path": "",
+   "blurb": "Application kernel for container isolation providing secure sandbox boundaries."
+  },
+  {
+   "repo": "NVIDIA_nvidia-container-toolkit (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/NVIDIA_nvidia-container-toolkit)",
+   "path": "",
+   "blurb": "Build and run GPU-accelerated Docker containers."
+  },
+  {
+   "repo": "budtmo_docker-android (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/budtmo_docker-android)",
+   "path": "",
+   "blurb": "Android emulator in Docker with web UI & no-VNC streaming."
+  },
+  {
+   "repo": "HQarroum_docker-android (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/HQarroum_docker-android)",
+   "path": "",
+   "blurb": "Secondary mirror of docker-android container environment."
+  },
+  {
+   "repo": "netbox-community_netbox-operator (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/netbox-community_netbox-operator)",
+   "path": "",
+   "blurb": "Kubernetes Operator for deploying NetBox on K8s clusters."
+  },
+  {
+   "repo": "coollabsio_coolify (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/coollabsio_coolify)",
+   "path": "",
+   "blurb": "Self-hosted Heroku/Netlify alternative for Docker & Kubernetes."
+  },
+  {
+   "repo": "1Panel-dev_1Panel (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/1Panel-dev_1Panel)",
+   "path": "",
+   "blurb": "Modern open-source Docker container management panel."
+  },
+  {
+   "repo": "IceWhaleTech_CasaOS (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/IceWhaleTech_CasaOS)",
+   "path": "",
+   "blurb": "Simple, easy-to-use home server OS around Docker containers."
+  },
+  {
+   "repo": "stagex_stagex (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/stagex_stagex)",
+   "path": "",
+   "blurb": "Immutable Linux distribution built from scratch for reproducible container images."
+  },
+  {
+   "repo": "NVIDIA_infra-controller (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/NVIDIA_infra-controller)",
+   "path": "",
+   "blurb": "Kubernetes GPU infrastructure controller."
+  },
+  {
+   "repo": "alexei-led_pi-fusion (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/alexei-led_pi-fusion)",
+   "path": "",
+   "blurb": "Multi-arch container image builder for ARM/Raspberry Pi."
+  },
+  {
+   "repo": "floci-io_floci (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/floci-io_floci)",
+   "path": "",
+   "blurb": "Containerized cloud infrastructure emulator."
+  },
+  {
+   "repo": "vyuh-labs_create-devstack (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/vyuh-labs_create-devstack)",
+   "path": "",
+   "blurb": "Dev container stack bootstrapper."
+  },
+  {
+   "repo": "vyuh-labs_dxkit (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/vyuh-labs_dxkit)",
+   "path": "",
+   "blurb": "Docker-based developer experience toolkit."
+  },
+  {
+   "repo": "ventoy_Ventoy (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/ventoy_Ventoy)",
+   "path": "",
+   "blurb": "Bootable USB drive creator for ISO/WIM/IMG containerized operating system images."
+  }
+ ],
+ "32. DOCUMENT (Pandoc, PDF Tools & Publication Suites)": [
+  {
+   "repo": "jgm_pandoc (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/jgm_pandoc)",
+   "path": "",
+   "blurb": "Universal document converter (Markdown, HTML, PDF, LaTeX, DOCX, EPUB)."
+  },
+  {
+   "repo": "Stirling-Tools_Stirling-PDF (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Stirling-Tools_Stirling-PDF)",
+   "path": "",
+   "blurb": "Robust local web-based PDF editing & manipulation suite."
+  },
+  {
+   "repo": "harveyai_react-doc-viewer (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/harveyai_react-doc-viewer)",
+   "path": "",
+   "blurb": "Document viewing component for PDF/DOCX/XLSX."
+  },
+  {
+   "repo": "apilayer_html2pdf.it (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apilayer_html2pdf.it)",
+   "path": "",
+   "blurb": "HTML to PDF conversion microservice engine."
+  },
+  {
+   "repo": "bgreenwell_doxx (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/bgreenwell_doxx)",
+   "path": "",
+   "blurb": "Automated documentation generator."
+  },
+  {
+   "repo": "bgreenwell_lstr (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/bgreenwell_lstr)",
+   "path": "",
+   "blurb": "Structured document string layout engine."
+  },
+  {
+   "repo": "hmemcpy_milewski-ctfp-pdf (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/hmemcpy_milewski-ctfp-pdf)",
+   "path": "",
+   "blurb": "PDF publishing compilation pipeline."
+  },
+  {
+   "repo": "WUBING2023_PaperSpine (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/WUBING2023_PaperSpine)",
+   "path": "",
+   "blurb": "Academic paper structural spine extractor."
+  },
+  {
+   "repo": "dwzhu-pku_PaperBanana (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/dwzhu-pku_PaperBanana)",
+   "path": "",
+   "blurb": "Automated paper diagram & layout publishing tool."
+  },
+  {
+   "repo": "PaperDebugger_paperdebugger (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/PaperDebugger_paperdebugger)",
+   "path": "",
+   "blurb": "Academic document LaTeX syntax debugger."
+  },
+  {
+   "repo": "JabRef_jabref (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/JabRef_jabref)",
+   "path": "",
+   "blurb": "Open-source graphical BibTeX reference & document manager."
+  },
+  {
+   "repo": "ChenLiu-1996_CitationMap (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/ChenLiu-1996_CitationMap)",
+   "path": "",
+   "blurb": "Academic citation document mapping engine."
+  },
+  {
+   "repo": "suitenumerique_docs (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/suitenumerique_docs)",
+   "path": "",
+   "blurb": "Collaborative document editing suite."
+  },
+  {
+   "repo": "a1akris_page-turner (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/a1akris_page-turner)",
+   "path": "",
+   "blurb": "EPUB/PDF digital book reader engine."
+  },
+  {
+   "repo": "eudoxia0_hashcards (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/eudoxia0_hashcards)",
+   "path": "",
+   "blurb": "Markdown-based flashcard document system."
+  },
+  {
+   "repo": "jkudish_librarium (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/jkudish_librarium)",
+   "path": "",
+   "blurb": "Digital library and document management system."
+  },
+  {
+   "repo": "bugzmanov_bookokrat (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/bugzmanov_bookokrat)",
+   "path": "",
+   "blurb": "E-book parser and document indexer."
+  },
+  {
+   "repo": "karakeep-app_karakeep (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/karakeep-app_karakeep)",
+   "path": "",
+   "blurb": "Personal bookmark and document archiving suite."
+  }
+ ],
+ "33. UI / DESKTOP & CROSS-PLATFORM CONTAINERS": [
+  {
+   "repo": "electron_electron (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/electron_electron)",
+   "path": "",
+   "blurb": "Build cross-platform desktop applications with JS/HTML/CSS."
+  },
+  {
+   "repo": "nwjs_nw.js (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/nwjs_nw.js)",
+   "path": "",
+   "blurb": "Direct Node.js call runtime inside DOM windows."
+  },
+  {
+   "repo": "tw93_Pake (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/tw93_Pake)",
+   "path": "",
+   "blurb": "Lightweight Tauri Rust desktop app packaging tool."
+  },
+  {
+   "repo": "nativefier_nativefier (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/nativefier_nativefier)",
+   "path": "",
+   "blurb": "Convert web apps instantly into desktop Electron apps."
+  },
+  {
+   "repo": "flutter_flutter (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/flutter_flutter)",
+   "path": "",
+   "blurb": "Google UI engine for compiling native mobile & desktop screens."
+  },
+  {
+   "repo": "shubham0204_SmolChat-Android (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/shubham0204_SmolChat-Android)",
+   "path": "",
+   "blurb": "Native Android local AI UI wrapper."
+  }
+ ],
+ "34. UI / CODE & TEXT EDITORS": [
+  {
+   "repo": "codemirror_dev (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/codemirror_dev)",
+   "path": "",
+   "blurb": "Extensible code editor component for the web."
+  },
+  {
+   "repo": "harveyai_react-doc-viewer (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/harveyai_react-doc-viewer)",
+   "path": "",
+   "blurb": "Document viewing & editing viewport component."
+  },
+  {
+   "repo": "suitenumerique_docs (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/suitenumerique_docs)",
+   "path": "",
+   "blurb": "Collaborative rich text document editor surface."
+  }
+ ],
+ "35. UI / 3D GRAPHICS, SHADERS & CANVAS": [
+  {
+   "repo": "pmndrs_react-three-fiber (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/pmndrs_react-three-fiber)",
+   "path": "",
+   "blurb": "React renderer for Three.js 3D web graphics."
+  },
+  {
+   "repo": "ruucm_shadergradient (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/ruucm_shadergradient)",
+   "path": "",
+   "blurb": "Animated WebGL fluid shader gradient component."
+  },
+  {
+   "repo": "collidingScopes_liquid-logo (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/collidingScopes_liquid-logo)",
+   "path": "",
+   "blurb": "Generative canvas and SVG liquid UI animation component."
+  }
+ ],
+ "36. UI / DATA VISUALIZATION & CHARTS": [
+  {
+   "repo": "apache_echarts (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/apache_echarts)",
+   "path": "",
+   "blurb": "Enterprise interactive data visualization and charting engine."
+  },
+  {
+   "repo": "spotify_chartify (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/spotify_chartify)",
+   "path": "",
+   "blurb": "High-level plotting and chart generation component."
+  },
+  {
+   "repo": "NO6KIKO_gorest-2d-animation-spritesheet-generator (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/NO6KIKO_gorest-2d-animation-spritesheet-generator)",
+   "path": "",
+   "blurb": "2D graphic animation sprite sheet generator UI."
+  }
+ ],
+ "37. UI / GLASSMORPHISM, STYLING & DESIGN TOKENS": [
+  {
+   "repo": "dashersw_liquid-glass-js (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/dashersw_liquid-glass-js)",
+   "path": "",
+   "blurb": "Glassmorphism visual distortion & glass UI component."
+  },
+  {
+   "repo": "zanwei_design-dna (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/zanwei_design-dna)",
+   "path": "",
+   "blurb": "Design tokens and UI design DNA component library."
+  },
+  {
+   "repo": "nexu-io_open-design (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/nexu-io_open-design)",
+   "path": "",
+   "blurb": "Web vector design editor component."
+  },
+  {
+   "repo": "relumetech_webflowpy (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/relumetech_webflowpy)",
+   "path": "",
+   "blurb": "Webflow styling component SDK."
+  }
+ ],
+ "38. UI / TERMINAL & TUI INTERFACES": [
+  {
+   "repo": "gyscos_Cursive (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/gyscos_Cursive)",
+   "path": "",
+   "blurb": "Rust terminal user interface (TUI) widget library."
+  },
+  {
+   "repo": "shshemi_tabiew (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/shshemi_tabiew)",
+   "path": "",
+   "blurb": "Terminal tabular data viewer TUI interface."
+  },
+  {
+   "repo": "ynqa_jnv (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/ynqa_jnv)",
+   "path": "",
+   "blurb": "Interactive JSON viewer and filter TUI."
+  },
+  {
+   "repo": "ynqa_ynqa (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/ynqa_ynqa)",
+   "path": "",
+   "blurb": "Interactive TUI filter selection component."
+  },
+  {
+   "repo": "julien-cpsn_ATAC (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/julien-cpsn_ATAC)",
+   "path": "",
+   "blurb": "Full API client interface running entirely in the terminal."
+  },
+  {
+   "repo": "amir20_dtop (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/amir20_dtop)",
+   "path": "",
+   "blurb": "Terminal container monitoring dashboard TUI."
+  }
+ ],
+ "39. UI / MEDIA & VIDEO EDITORS": [
+  {
+   "repo": "OpenCut-app_OpenCut (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/OpenCut-app_OpenCut)",
+   "path": "",
+   "blurb": "Open-source web video editing UI application."
+  },
+  {
+   "repo": "bradautomates_claude-video (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/bradautomates_claude-video)",
+   "path": "",
+   "blurb": "Automated video rendering frontend."
+  },
+  {
+   "repo": "harry0703_MoneyPrinterTurbo (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/harry0703_MoneyPrinterTurbo)",
+   "path": "",
+   "blurb": "Short-form video editing UI automation pipeline."
+  }
+ ],
+ "40. UI / PAGE BUILDERS, TEMPLATES & FLOW GRAPHS": [
+  {
+   "repo": "gatsbyjs_gatsby (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/gatsbyjs_gatsby)",
+   "path": "",
+   "blurb": "React static site generator framework."
+  },
+  {
+   "repo": "JCodesMore_ai-website-cloner-template (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/JCodesMore_ai-website-cloner-template)",
+   "path": "",
+   "blurb": "AI-generated website UI cloner template."
+  },
+  {
+   "repo": "CoreBunch_Instatic (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/CoreBunch_Instatic)",
+   "path": "",
+   "blurb": "Modern static page generator template."
+  },
+  {
+   "repo": "bytedance_flow-builder (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/bytedance_flow-builder)",
+   "path": "",
+   "blurb": "Flowchart and node-graph workflow builder UI component."
+  },
+  {
+   "repo": "FlowiseAI_Flowise (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/FlowiseAI_Flowise)",
+   "path": "",
+   "blurb": "Visual drag-and-drop flow interface for LLM pipelines."
+  }
+ ],
+ "41. UI / DOCUMENT PREVIEWERS & READERS": [
+  {
+   "repo": "a1akris_page-turner (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/a1akris_page-turner)",
+   "path": "",
+   "blurb": "EPUB and PDF digital reader UI interface."
+  },
+  {
+   "repo": "eudoxia0_hashcards (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/eudoxia0_hashcards)",
+   "path": "",
+   "blurb": "Flashcard document study surface."
+  },
+  {
+   "repo": "Stirling-Tools_Stirling-PDF (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/Stirling-Tools_Stirling-PDF)",
+   "path": "",
+   "blurb": "Full-featured local PDF manipulation web UI."
+  }
+ ],
+ "42. UI / DATABASE & DATA GUIS": [
+  {
+   "repo": "OtterMind_Chat2DB (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/OtterMind_Chat2DB)",
+   "path": "",
+   "blurb": "Visual SQL client and AI database management frontend."
+  },
+  {
+   "repo": "nocodb_nocodb (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/nocodb_nocodb)",
+   "path": "",
+   "blurb": "Smart spreadsheet and relational database GUI surface."
+  },
+  {
+   "repo": "dbeaver_dbeaver (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/dbeaver_dbeaver)",
+   "path": "",
+   "blurb": "Universal desktop SQL GUI workspace."
+  }
+ ],
+ "43. UI / AGENT & LLM CHAT SURFACES": [
+  {
+   "repo": "delibae_claude-prism (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/delibae_claude-prism)",
+   "path": "",
+   "blurb": "Visual prism debug frontend for Claude AI."
+  },
+  {
+   "repo": "harishkotra_agent-office (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/harishkotra_agent-office)",
+   "path": "",
+   "blurb": "2D simulated office environment for agent swarms."
+  },
+  {
+   "repo": "CoWork-OS_CoWork-OS (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/CoWork-OS_CoWork-OS)",
+   "path": "",
+   "blurb": "Visual multi-agent team workspace UI."
+  },
+  {
+   "repo": "off-grid-ai_console (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/off-grid-ai_console)",
+   "path": "",
+   "blurb": "Local agent management console UI."
+  },
+  {
+   "repo": "brianharms_reminder-watch (/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/brianharms_reminder-watch)",
+   "path": "",
+   "blurb": "Smart watch UI app interface."
+  }
+ ],
+ "Benchmark Racetrack Filing & Execution Instructions": [],
+ "candidate:": []
+}

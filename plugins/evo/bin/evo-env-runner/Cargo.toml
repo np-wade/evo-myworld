@@ -1,0 +1,16 @@
+[package]
+name = "evo-env-runner"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+# Keep the runner usable on a clean host: JSON, hashing, and process control
+# are implemented with the Rust standard library only.
+
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
+strip = true
+panic = "abort"

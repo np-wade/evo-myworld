@@ -74,6 +74,7 @@
     <a href="#river" data-view="river" class="page-tab">River</a>
     <a href="#reports" data-view="reports" class="page-tab">Reports</a>
     <a href="#observability" data-view="observability" class="page-tab">Observability</a>
+    <a href="#racetrack" data-view="racetrack" class="page-tab">Racetrack</a>
     <a href="#testlab" data-view="testlab" class="page-tab">Test Lab</a>
     <span class="page-nav-spacer"></span>
     <span id="office-status" class="office-status" title="Assembly Office link">office: <b>checking…</b></span>
@@ -160,6 +161,23 @@
     <section class="obs-tail-card">
       <h3>Live log tail <span id="obs-tail-target" class="mono"></span></h3>
       <pre id="obs-tail" class="ascii-panel selectable" data-copy-wrap>select an active experiment above…</pre>
+    </section>
+  </main>
+
+  <main id="view-racetrack" class="app-view alt-view hidden" data-view-root="racetrack">
+    <div class="view-head">
+      <h2>Racetrack</h2>
+      <span id="rt-sub" class="view-sub">scraper &amp; search tool races — the document-processing app benchmark suite</span>
+      <button class="btn-ghost view-refresh" data-refresh="racetrack">refresh</button>
+    </div>
+    <section id="rt-suites" class="rt-suites"></section>
+    <section class="rt-detail-card">
+      <div class="view-head"><h3>Leaderboards <span id="rt-detail-label" class="mono"></span></h3></div>
+      <div id="rt-detail" class="rt-detail"><div class="testlab-empty">select a suite above…</div></div>
+    </section>
+    <section class="rt-card-card">
+      <h3>Result card <span id="rt-card-label" class="mono"></span></h3>
+      <pre id="rt-card" class="ascii-panel selectable" data-copy-wrap>select a suite above…</pre>
     </section>
   </main>
 

@@ -1,0 +1,420 @@
+{
+  "prompt": "Find every post from astralcodexten published in the last 60 days (window pinned 2026-05-27..2026-07-26); save the 10 most recent as clean markdown; deliver a table + files.",
+  "pub": "astralcodexten",
+  "base_url": "https://www.astralcodexten.com",
+  "backend": "curl_cffi",
+  "extractor": "trafilatura",
+  "window": [
+    "2026-05-27",
+    "2026-07-26"
+  ],
+  "n_posts": 36,
+  "table": [
+    {
+      "slug": "the-hugging-face-incident",
+      "url": "https://www.astralcodexten.com/p/the-hugging-face-incident",
+      "date": "2026-07-24",
+      "title": "The Hugging Face Incident"
+    },
+    {
+      "slug": "breakdown-in-pakistan",
+      "url": "https://www.astralcodexten.com/p/breakdown-in-pakistan",
+      "date": "2026-07-24",
+      "title": "Your Book Review: Breakdown In Pakistan"
+    },
+    {
+      "slug": "mistakes",
+      "url": "https://www.astralcodexten.com/p/mistakes",
+      "date": "2026-07-24",
+      "title": "Mistakes"
+    },
+    {
+      "slug": "links-for-july-2026-part-1",
+      "url": "https://www.astralcodexten.com/p/links-for-july-2026-part-1",
+      "date": "2026-07-22",
+      "title": "Links For July 2026 (Part 1)"
+    },
+    {
+      "slug": "contra-pritchard-on-liberal-happiness",
+      "url": "https://www.astralcodexten.com/p/contra-pritchard-on-liberal-happiness",
+      "date": "2026-07-21",
+      "title": "Contra Pritchard On Liberal Happiness"
+    },
+    {
+      "slug": "open-thread-443",
+      "url": "https://www.astralcodexten.com/p/open-thread-443",
+      "date": "2026-07-20",
+      "title": "Open Thread 443"
+    },
+    {
+      "slug": "god-help-us-lets-try-to-understand",
+      "url": "https://www.astralcodexten.com/p/god-help-us-lets-try-to-understand",
+      "date": "2026-07-18",
+      "title": ""
+    },
+    {
+      "slug": "your-book-review-great-and-desperate",
+      "url": "https://www.astralcodexten.com/p/your-book-review-great-and-desperate",
+      "date": "2026-07-17",
+      "title": "Your Book Review: Great And Desperate Cures"
+    },
+    {
+      "slug": "against-stochastic-terrorism",
+      "url": "https://www.astralcodexten.com/p/against-stochastic-terrorism",
+      "date": "2026-07-16",
+      "title": "Against &quot;Stochastic Terrorism&quot;"
+    },
+    {
+      "slug": "six-slightly-skew-boogeymen",
+      "url": "https://www.astralcodexten.com/p/six-slightly-skew-boogeymen",
+      "date": "2026-07-16",
+      "title": ""
+    },
+    {
+      "slug": "ai-chip-regulation-is-not-a-dystopian",
+      "url": "https://www.astralcodexten.com/p/ai-chip-regulation-is-not-a-dystopian",
+      "date": "2026-07-15",
+      "title": "AI Chip Regulation Is Not A Dystopian Surveillance State"
+    },
+    {
+      "slug": "open-thread-442",
+      "url": "https://www.astralcodexten.com/p/open-thread-442",
+      "date": "2026-07-13",
+      "title": "Open Thread 442"
+    },
+    {
+      "slug": "the-pauseai-protest-a-photo-essay",
+      "url": "https://www.astralcodexten.com/p/the-pauseai-protest-a-photo-essay",
+      "date": "2026-07-11",
+      "title": ""
+    },
+    {
+      "slug": "introducing-plan-a",
+      "url": "https://www.astralcodexten.com/p/introducing-plan-a",
+      "date": "2026-07-09",
+      "title": "Introducing Plan A"
+    },
+    {
+      "slug": "your-book-review-the-book-of-abraham",
+      "url": "https://www.astralcodexten.com/p/your-book-review-the-book-of-abraham",
+      "date": "2026-07-08",
+      "title": "Your Book Review: The Book Of Abraham"
+    },
+    {
+      "slug": "open-thread-441",
+      "url": "https://www.astralcodexten.com/p/open-thread-441",
+      "date": "2026-07-06",
+      "title": ""
+    },
+    {
+      "slug": "the-ai-superforecasters-are-here",
+      "url": "https://www.astralcodexten.com/p/the-ai-superforecasters-are-here",
+      "date": "2026-07-04",
+      "title": ""
+    },
+    {
+      "slug": "hidden-open-thread-4405",
+      "url": "https://www.astralcodexten.com/p/hidden-open-thread-4405",
+      "date": "2026-07-02",
+      "title": ""
+    },
+    {
+      "slug": "chip-off-the-old-block",
+      "url": "https://www.astralcodexten.com/p/chip-off-the-old-block",
+      "date": "2026-07-01",
+      "title": ""
+    },
+    {
+      "slug": "open-thread-440",
+      "url": "https://www.astralcodexten.com/p/open-thread-440",
+      "date": "2026-06-29",
+      "title": ""
+    },
+    {
+      "slug": "waiting-for-the-miracle",
+      "url": "https://www.astralcodexten.com/p/waiting-for-the-miracle",
+      "date": "2026-06-29",
+      "title": ""
+    },
+    {
+      "slug": "the-metaculus-threat-to-democracy",
+      "url": "https://www.astralcodexten.com/p/the-metaculus-threat-to-democracy",
+      "date": "2026-06-26",
+      "title": ""
+    },
+    {
+      "slug": "hidden-open-thread-4395",
+      "url": "https://www.astralcodexten.com/p/hidden-open-thread-4395",
+      "date": "2026-06-25",
+      "title": ""
+    },
+    {
+      "slug": "should-people-avoid-whole-body-screening",
+      "url": "https://www.astralcodexten.com/p/should-people-avoid-whole-body-screening",
+      "date": "2026-06-23",
+      "title": ""
+    },
+    {
+      "slug": "open-thread-439",
+      "url": "https://www.astralcodexten.com/p/open-thread-439",
+      "date": "2026-06-23",
+      "title": ""
+    },
+    {
+      "slug": "preliminary-thoughts-on-the-midjourney",
+      "url": "https://www.astralcodexten.com/p/preliminary-thoughts-on-the-midjourney",
+      "date": "2026-06-19",
+      "title": ""
+    },
+    {
+      "slug": "open-thread-438",
+      "url": "https://www.astralcodexten.com/p/open-thread-438",
+      "date": "2026-06-16",
+      "title": ""
+    },
+    {
+      "slug": "never-cross-a-river-four-feet-deep",
+      "url": "https://www.astralcodexten.com/p/never-cross-a-river-four-feet-deep",
+      "date": "2026-06-16",
+      "title": ""
+    },
+    {
+      "slug": "my-ai-opinions",
+      "url": "https://www.astralcodexten.com/p/my-ai-opinions",
+      "date": "2026-06-12",
+      "title": ""
+    },
+    {
+      "slug": "hidden-open-thread-4375",
+      "url": "https://www.astralcodexten.com/p/hidden-open-thread-4375",
+      "date": "2026-06-11",
+      "title": ""
+    },
+    {
+      "slug": "open-thread-437",
+      "url": "https://www.astralcodexten.com/p/open-thread-437",
+      "date": "2026-06-08",
+      "title": ""
+    },
+    {
+      "slug": "berkeley-meetup-this-wednesday-77b",
+      "url": "https://www.astralcodexten.com/p/berkeley-meetup-this-wednesday-77b",
+      "date": "2026-06-08",
+      "title": ""
+    },
+    {
+      "slug": "choose-book-review-finalists-2026",
+      "url": "https://www.astralcodexten.com/p/choose-book-review-finalists-2026",
+      "date": "2026-06-03",
+      "title": ""
+    },
+    {
+      "slug": "open-thread-436",
+      "url": "https://www.astralcodexten.com/p/open-thread-436",
+      "date": "2026-06-02",
+      "title": ""
+    },
+    {
+      "slug": "book-review-the-dialectical-imagination",
+      "url": "https://www.astralcodexten.com/p/book-review-the-dialectical-imagination",
+      "date": "2026-05-29",
+      "title": ""
+    },
+    {
+      "slug": "hidden-open-thread-4355",
+      "url": "https://www.astralcodexten.com/p/hidden-open-thread-4355",
+      "date": "2026-05-27",
+      "title": ""
+    }
+  ],
+  "delivered": [
+    {
+      "slug": "the-hugging-face-incident",
+      "url": "https://www.astralcodexten.com/p/the-hugging-face-incident",
+      "title": "The Huggingface Incident",
+      "date": "2026-07-24",
+      "author": "Scott Alexander",
+      "fetched": true,
+      "truncated": false,
+      "content_chars": 8922,
+      "blocked": false
+    },
+    {
+      "slug": "breakdown-in-pakistan",
+      "url": "https://www.astralcodexten.com/p/breakdown-in-pakistan",
+      "title": "Your Book Review: Breakdown In Pakistan",
+      "date": "2026-07-24",
+      "author": "Scott Alexander",
+      "fetched": true,
+      "truncated": false,
+      "content_chars": 46081,
+      "blocked": false
+    },
+    {
+      "slug": "mistakes",
+      "url": "https://www.astralcodexten.com/p/mistakes",
+      "title": "Mistakes",
+      "date": "2020-09-29",
+      "author": "Astral Codex Ten",
+      "fetched": true,
+      "truncated": false,
+      "content_chars": 32128,
+      "blocked": false
+    },
+    {
+      "slug": "links-for-july-2026-part-1",
+      "url": "https://www.astralcodexten.com/p/links-for-july-2026-part-1",
+      "title": "Links For July 2026 (Part 1)",
+      "date": "2026-07-22",
+      "author": "Scott Alexander",
+      "fetched": true,
+      "truncated": false,
+      "content_chars": 16355,
+      "blocked": false
+    },
+    {
+      "slug": "contra-pritchard-on-liberal-happiness",
+      "url": "https://www.astralcodexten.com/p/contra-pritchard-on-liberal-happiness",
+      "title": "Contra Pritchard On Liberal Happiness",
+      "date": "2026-07-21",
+      "author": "Scott Alexander",
+      "fetched": true,
+      "truncated": false,
+      "content_chars": 9233,
+      "blocked": false
+    },
+    {
+      "slug": "open-thread-443",
+      "url": "https://www.astralcodexten.com/p/open-thread-443",
+      "title": "Open Thread 443",
+      "date": "2026-07-20",
+      "author": "Scott Alexander",
+      "fetched": true,
+      "truncated": false,
+      "content_chars": 3606,
+      "blocked": false
+    },
+    {
+      "slug": "god-help-us-lets-try-to-understand",
+      "url": "https://www.astralcodexten.com/p/god-help-us-lets-try-to-understand",
+      "title": "God Help Us, Let's Try To Understand The Paper On AI Monosemanticity",
+      "date": "2023-11-27",
+      "author": "Scott Alexander",
+      "fetched": true,
+      "truncated": false,
+      "content_chars": 16904,
+      "blocked": false
+    },
+    {
+      "slug": "your-book-review-great-and-desperate",
+      "url": "https://www.astralcodexten.com/p/your-book-review-great-and-desperate",
+      "title": "Your Book Review: Great And Desperate Cures",
+      "date": "2026-07-17",
+      "author": "Scott Alexander",
+      "fetched": true,
+      "truncated": false,
+      "content_chars": 114937,
+      "blocked": false
+    },
+    {
+      "slug": "against-stochastic-terrorism",
+      "url": "https://www.astralcodexten.com/p/against-stochastic-terrorism",
+      "title": "Against \"Stochastic Terrorism\"",
+      "date": "2026-07-16",
+      "author": "Scott Alexander",
+      "fetched": true,
+      "truncated": false,
+      "content_chars": 10934,
+      "blocked": false
+    },
+    {
+      "slug": "six-slightly-skew-boogeymen",
+      "url": "https://www.astralcodexten.com/p/six-slightly-skew-boogeymen",
+      "title": "Six Slightly Skew Boogeymen",
+      "date": "2026-07-16",
+      "author": "Scott Alexander",
+      "fetched": true,
+      "truncated": true,
+      "content_chars": 156,
+      "blocked": false
+    }
+  ],
+  "picks_about_topic": [
+    {
+      "slug": "ai-chip-regulation-is-not-a-dystopian",
+      "title": "AI Chip Regulation Is Not A Dystopian Surveillance State"
+    },
+    {
+      "slug": "the-ai-superforecasters-are-here",
+      "title": ""
+    },
+    {
+      "slug": "my-ai-opinions",
+      "title": ""
+    }
+  ],
+  "manifest": [
+    {
+      "file": "md/the-hugging-face-incident.md",
+      "bytes": 9515,
+      "sha256": "7b73329946934f46325ce0b3e13624163ced71a418182e2757a01c5642da67fe",
+      "truncated": false
+    },
+    {
+      "file": "md/breakdown-in-pakistan.md",
+      "bytes": 47936,
+      "sha256": "05179dd08db0557b8d14e44016f9c8f2b2e42c80d2f833ce318e0e004acadacf",
+      "truncated": false
+    },
+    {
+      "file": "md/mistakes.md",
+      "bytes": 33945,
+      "sha256": "b735d33ef97b6b147614d9f23964f18d012a333719711d303f2e0b911aa8e8c1",
+      "truncated": false
+    },
+    {
+      "file": "md/links-for-july-2026-part-1.md",
+      "bytes": 17651,
+      "sha256": "555f55427fbf43ac99e55ec5701244d8d57bc880fa571b254ab6fdd3e2b4775b",
+      "truncated": false
+    },
+    {
+      "file": "md/contra-pritchard-on-liberal-happiness.md",
+      "bytes": 9824,
+      "sha256": "42a70d6ec034cef499d84d3a37ea1d934e725666f7c5dc52a875fab2435b9c36",
+      "truncated": false
+    },
+    {
+      "file": "md/open-thread-443.md",
+      "bytes": 3935,
+      "sha256": "796352d4ed64d4f9162bd0247b01e94846bd5221c7e080ada0d512216c872ef4",
+      "truncated": false
+    },
+    {
+      "file": "md/god-help-us-lets-try-to-understand.md",
+      "bytes": 18082,
+      "sha256": "9ad4cdca4e5dababab11098d481779aa24391d8779eedee64e3d1a16eeb82c1a",
+      "truncated": false
+    },
+    {
+      "file": "md/your-book-review-great-and-desperate.md",
+      "bytes": 120260,
+      "sha256": "e22af9dfe6cde1e78fbb6f90ab66e0707c2ab27836d31a046e14ebfbd82a9497",
+      "truncated": false
+    },
+    {
+      "file": "md/against-stochastic-terrorism.md",
+      "bytes": 11616,
+      "sha256": "2f2764c0a99ee0dc4c3fbd2a63f8e04231532b481bc57b394b5a025920c52e8a",
+      "truncated": false
+    },
+    {
+      "file": "md/six-slightly-skew-boogeymen.md",
+      "bytes": 377,
+      "sha256": "3f3cc034be6a64c907a12989d7993fa420d435517a854c703b44b4734fdc2376",
+      "truncated": true
+    }
+  ],
+  "requests": 12,
+  "wall_s": 19.2
+}

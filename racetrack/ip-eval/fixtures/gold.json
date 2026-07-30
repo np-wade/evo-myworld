@@ -1,0 +1,655 @@
+{
+  "seed": 20260727,
+  "documents": {
+    "alpha": {
+      "formats": {
+        "md": {
+          "file": "docs/alpha.md",
+          "mime": "text/markdown",
+          "canonical_text": "# Grounded Evidence Pipelines for Scientific Write-ups\n\n## Abstract\n\nWe pair the Evidence Graph Transformer with the Citation Verifier Pipeline to keep attribution exact. We pair the Review Benchmark Dataset with the Citation Verifier Pipeline to keep attribution exact. We pair the Adaptive Chunking Algorithm with the Review Benchmark Dataset to keep attribution exact.\n\nThe Citation Verifier Pipeline processes 149 documents while staying under 2 GB of memory. We pair the Review Benchmark Dataset with the Citation Verifier Pipeline to keep attribution exact. The Adaptive Chunking Algorithm processes 245 documents while staying under 4 GB of memory.\n\n## Introduction\n\nThe Evidence Graph Transformer reuses spans emitted by the Adaptive Chunking Algorithm without re-parsing the source. The Adaptive Chunking Algorithm processes 214 documents while staying under 4 GB of memory. The Evidence Graph Transformer reduces extraction error by 57% relative to the baseline.\n\nWe pair the Evidence Graph Transformer with the Adaptive Chunking Algorithm to keep attribution exact. The Adaptive Chunking Algorithm processes 120 documents while staying under 12 GB of memory. Ablation on the Review Benchmark Dataset shows the Adaptive Chunking Algorithm contributes 31 F1 points.\n\nThe Review Benchmark Dataset achieves 45.2% accuracy on the Review Benchmark Dataset. Unlike prior work, the Review Benchmark Dataset never fabricates a citation it cannot trace.\n\n## Methods\n\nWe pair the Review Benchmark Dataset with the Citation Verifier Pipeline to keep attribution exact. The Citation Verifier Pipeline processes 336 documents while staying under 2 GB of memory. Ablation on the Review Benchmark Dataset shows the Adaptive Chunking Algorithm contributes 59.5 F1 points.\n\nAblation on the Review Benchmark Dataset shows the Adaptive Chunking Algorithm contributes 51 F1 points. The Citation Verifier Pipeline reuses spans emitted by the Evidence Graph Transformer without re-parsing the source.\n\nUnlike prior work, the Citation Verifier Pipeline never fabricates a citation it cannot trace. Ablation on the Review Benchmark Dataset shows the Citation Verifier Pipeline contributes 69 F1 points. Across three seeds the Review Benchmark Dataset holds latency of 289 ms at p95.\n\nAblation on the Review Benchmark Dataset shows the Citation Verifier Pipeline contributes 85.5 F1 points. The Adaptive Chunking Algorithm reuses spans emitted by the Review Benchmark Dataset without re-parsing the source. Unlike prior work, the Adaptive Chunking Algorithm never fabricates a citation it cannot trace.\n\n## Experiments\n\nThe Review Benchmark Dataset achieves 65.2% accuracy on the Review Benchmark Dataset. Across three seeds the Citation Verifier Pipeline holds latency of 723 ms at p95.\n\nThe Adaptive Chunking Algorithm reuses spans emitted by the Review Benchmark Dataset without re-parsing the source. The Citation Verifier Pipeline achieves 66.2% accuracy on the Review Benchmark Dataset. The Review Benchmark Dataset achieves 80% accuracy on the Review Benchmark Dataset.\n\nThe Adaptive Chunking Algorithm processes 159 documents while staying under 12 GB of memory. Ablation on the Review Benchmark Dataset shows the Citation Verifier Pipeline contributes 45.2 F1 points.\n\n## Results\n\nThe Adaptive Chunking Algorithm achieves 11.2% accuracy on the Review Benchmark Dataset. Ablation on the Review Benchmark Dataset shows the Evidence Graph Transformer contributes 38 F1 points. Ablation on the Review Benchmark Dataset shows the Citation Verifier Pipeline contributes 81.5 F1 points.\n\nThe Adaptive Chunking Algorithm reuses spans emitted by the Review Benchmark Dataset without re-parsing the source. The Evidence Graph Transformer reuses spans emitted by the Citation Verifier Pipeline without re-parsing the source.\n\nThe Review Benchmark Dataset reduces extraction error by 80% relative to the baseline. Unlike prior work, the Review Benchmark Dataset never fabricates a citation it cannot trace. We pair the Adaptive Chunking Algorithm with the Citation Verifier Pipeline to keep attribution exact.\n\n## Discussion\n\nThe Adaptive Chunking Algorithm processes 210 documents while staying under 12 GB of memory. We pair the Citation Verifier Pipeline with the Adaptive Chunking Algorithm to keep attribution exact.\n\nAblation on the Review Benchmark Dataset shows the Citation Verifier Pipeline contributes 52.5 F1 points. The Review Benchmark Dataset reuses spans emitted by the Evidence Graph Transformer without re-parsing the source.\n\n## Conclusion\n\nAcross three seeds the Citation Verifier Pipeline holds latency of 218 ms at p95. Across three seeds the Review Benchmark Dataset holds latency of 740 ms at p95. The Evidence Graph Transformer achieves 90.5% accuracy on the Review Benchmark Dataset.\n\n## References\n\n[1] Beltagy (2019). SciBERT: A Pretrained Language Model for Scientific Text.\n\n[2] Vaswani (2017). Attention Is All You Need.\n\n[3] Karpukhin (2020). Dense Passage Retrieval for Open-Domain QA.\n\n[4] Wadden (2020). Fact or Fiction: Verifying Scientific Claims."
+        },
+        "html": {
+          "file": "docs/alpha.html",
+          "mime": "text/html",
+          "canonical_text": "# Grounded Evidence Pipelines for Scientific Write-ups\n\n## Abstract\n\nWe pair the Evidence Graph Transformer with the Citation Verifier Pipeline to keep attribution exact. We pair the Review Benchmark Dataset with the Citation Verifier Pipeline to keep attribution exact. We pair the Adaptive Chunking Algorithm with the Review Benchmark Dataset to keep attribution exact.\n\nThe Citation Verifier Pipeline processes 149 documents while staying under 2 GB of memory. We pair the Review Benchmark Dataset with the Citation Verifier Pipeline to keep attribution exact. The Adaptive Chunking Algorithm processes 245 documents while staying under 4 GB of memory.\n\n## Introduction\n\nThe Evidence Graph Transformer reuses spans emitted by the Adaptive Chunking Algorithm without re-parsing the source. The Adaptive Chunking Algorithm processes 214 documents while staying under 4 GB of memory. The Evidence Graph Transformer reduces extraction error by 57% relative to the baseline.\n\nWe pair the Evidence Graph Transformer with the Adaptive Chunking Algorithm to keep attribution exact. The Adaptive Chunking Algorithm processes 120 documents while staying under 12 GB of memory. Ablation on the Review Benchmark Dataset shows the Adaptive Chunking Algorithm contributes 31 F1 points.\n\nThe Review Benchmark Dataset achieves 45.2% accuracy on the Review Benchmark Dataset. Unlike prior work, the Review Benchmark Dataset never fabricates a citation it cannot trace.\n\n## Methods\n\nWe pair the Review Benchmark Dataset with the Citation Verifier Pipeline to keep attribution exact. The Citation Verifier Pipeline processes 336 documents while staying under 2 GB of memory. Ablation on the Review Benchmark Dataset shows the Adaptive Chunking Algorithm contributes 59.5 F1 points.\n\nAblation on the Review Benchmark Dataset shows the Adaptive Chunking Algorithm contributes 51 F1 points. The Citation Verifier Pipeline reuses spans emitted by the Evidence Graph Transformer without re-parsing the source.\n\nUnlike prior work, the Citation Verifier Pipeline never fabricates a citation it cannot trace. Ablation on the Review Benchmark Dataset shows the Citation Verifier Pipeline contributes 69 F1 points. Across three seeds the Review Benchmark Dataset holds latency of 289 ms at p95.\n\nAblation on the Review Benchmark Dataset shows the Citation Verifier Pipeline contributes 85.5 F1 points. The Adaptive Chunking Algorithm reuses spans emitted by the Review Benchmark Dataset without re-parsing the source. Unlike prior work, the Adaptive Chunking Algorithm never fabricates a citation it cannot trace.\n\n## Experiments\n\nThe Review Benchmark Dataset achieves 65.2% accuracy on the Review Benchmark Dataset. Across three seeds the Citation Verifier Pipeline holds latency of 723 ms at p95.\n\nThe Adaptive Chunking Algorithm reuses spans emitted by the Review Benchmark Dataset without re-parsing the source. The Citation Verifier Pipeline achieves 66.2% accuracy on the Review Benchmark Dataset. The Review Benchmark Dataset achieves 80% accuracy on the Review Benchmark Dataset.\n\nThe Adaptive Chunking Algorithm processes 159 documents while staying under 12 GB of memory. Ablation on the Review Benchmark Dataset shows the Citation Verifier Pipeline contributes 45.2 F1 points.\n\n## Results\n\nThe Adaptive Chunking Algorithm achieves 11.2% accuracy on the Review Benchmark Dataset. Ablation on the Review Benchmark Dataset shows the Evidence Graph Transformer contributes 38 F1 points. Ablation on the Review Benchmark Dataset shows the Citation Verifier Pipeline contributes 81.5 F1 points.\n\nThe Adaptive Chunking Algorithm reuses spans emitted by the Review Benchmark Dataset without re-parsing the source. The Evidence Graph Transformer reuses spans emitted by the Citation Verifier Pipeline without re-parsing the source.\n\nThe Review Benchmark Dataset reduces extraction error by 80% relative to the baseline. Unlike prior work, the Review Benchmark Dataset never fabricates a citation it cannot trace. We pair the Adaptive Chunking Algorithm with the Citation Verifier Pipeline to keep attribution exact.\n\n## Discussion\n\nThe Adaptive Chunking Algorithm processes 210 documents while staying under 12 GB of memory. We pair the Citation Verifier Pipeline with the Adaptive Chunking Algorithm to keep attribution exact.\n\nAblation on the Review Benchmark Dataset shows the Citation Verifier Pipeline contributes 52.5 F1 points. The Review Benchmark Dataset reuses spans emitted by the Evidence Graph Transformer without re-parsing the source.\n\n## Conclusion\n\nAcross three seeds the Citation Verifier Pipeline holds latency of 218 ms at p95. Across three seeds the Review Benchmark Dataset holds latency of 740 ms at p95. The Evidence Graph Transformer achieves 90.5% accuracy on the Review Benchmark Dataset.\n\n## References\n\n[1] Beltagy (2019). SciBERT: A Pretrained Language Model for Scientific Text.\n\n[2] Vaswani (2017). Attention Is All You Need.\n\n[3] Karpukhin (2020). Dense Passage Retrieval for Open-Domain QA.\n\n[4] Wadden (2020). Fact or Fiction: Verifying Scientific Claims."
+        },
+        "txt": {
+          "file": "docs/alpha.txt",
+          "mime": "text/plain",
+          "canonical_text": "# Grounded Evidence Pipelines for Scientific Write-ups\n\n## Abstract\n\nWe pair the Evidence Graph Transformer with the Citation Verifier Pipeline to keep attribution exact. We pair the Review Benchmark Dataset with the Citation Verifier Pipeline to keep attribution exact. We pair the Adaptive Chunking Algorithm with the Review Benchmark Dataset to keep attribution exact.\n\nThe Citation Verifier Pipeline processes 149 documents while staying under 2 GB of memory. We pair the Review Benchmark Dataset with the Citation Verifier Pipeline to keep attribution exact. The Adaptive Chunking Algorithm processes 245 documents while staying under 4 GB of memory.\n\n## Introduction\n\nThe Evidence Graph Transformer reuses spans emitted by the Adaptive Chunking Algorithm without re-parsing the source. The Adaptive Chunking Algorithm processes 214 documents while staying under 4 GB of memory. The Evidence Graph Transformer reduces extraction error by 57% relative to the baseline.\n\nWe pair the Evidence Graph Transformer with the Adaptive Chunking Algorithm to keep attribution exact. The Adaptive Chunking Algorithm processes 120 documents while staying under 12 GB of memory. Ablation on the Review Benchmark Dataset shows the Adaptive Chunking Algorithm contributes 31 F1 points.\n\nThe Review Benchmark Dataset achieves 45.2% accuracy on the Review Benchmark Dataset. Unlike prior work, the Review Benchmark Dataset never fabricates a citation it cannot trace.\n\n## Methods\n\nWe pair the Review Benchmark Dataset with the Citation Verifier Pipeline to keep attribution exact. The Citation Verifier Pipeline processes 336 documents while staying under 2 GB of memory. Ablation on the Review Benchmark Dataset shows the Adaptive Chunking Algorithm contributes 59.5 F1 points.\n\nAblation on the Review Benchmark Dataset shows the Adaptive Chunking Algorithm contributes 51 F1 points. The Citation Verifier Pipeline reuses spans emitted by the Evidence Graph Transformer without re-parsing the source.\n\nUnlike prior work, the Citation Verifier Pipeline never fabricates a citation it cannot trace. Ablation on the Review Benchmark Dataset shows the Citation Verifier Pipeline contributes 69 F1 points. Across three seeds the Review Benchmark Dataset holds latency of 289 ms at p95.\n\nAblation on the Review Benchmark Dataset shows the Citation Verifier Pipeline contributes 85.5 F1 points. The Adaptive Chunking Algorithm reuses spans emitted by the Review Benchmark Dataset without re-parsing the source. Unlike prior work, the Adaptive Chunking Algorithm never fabricates a citation it cannot trace.\n\n## Experiments\n\nThe Review Benchmark Dataset achieves 65.2% accuracy on the Review Benchmark Dataset. Across three seeds the Citation Verifier Pipeline holds latency of 723 ms at p95.\n\nThe Adaptive Chunking Algorithm reuses spans emitted by the Review Benchmark Dataset without re-parsing the source. The Citation Verifier Pipeline achieves 66.2% accuracy on the Review Benchmark Dataset. The Review Benchmark Dataset achieves 80% accuracy on the Review Benchmark Dataset.\n\nThe Adaptive Chunking Algorithm processes 159 documents while staying under 12 GB of memory. Ablation on the Review Benchmark Dataset shows the Citation Verifier Pipeline contributes 45.2 F1 points.\n\n## Results\n\nThe Adaptive Chunking Algorithm achieves 11.2% accuracy on the Review Benchmark Dataset. Ablation on the Review Benchmark Dataset shows the Evidence Graph Transformer contributes 38 F1 points. Ablation on the Review Benchmark Dataset shows the Citation Verifier Pipeline contributes 81.5 F1 points.\n\nThe Adaptive Chunking Algorithm reuses spans emitted by the Review Benchmark Dataset without re-parsing the source. The Evidence Graph Transformer reuses spans emitted by the Citation Verifier Pipeline without re-parsing the source.\n\nThe Review Benchmark Dataset reduces extraction error by 80% relative to the baseline. Unlike prior work, the Review Benchmark Dataset never fabricates a citation it cannot trace. We pair the Adaptive Chunking Algorithm with the Citation Verifier Pipeline to keep attribution exact.\n\n## Discussion\n\nThe Adaptive Chunking Algorithm processes 210 documents while staying under 12 GB of memory. We pair the Citation Verifier Pipeline with the Adaptive Chunking Algorithm to keep attribution exact.\n\nAblation on the Review Benchmark Dataset shows the Citation Verifier Pipeline contributes 52.5 F1 points. The Review Benchmark Dataset reuses spans emitted by the Evidence Graph Transformer without re-parsing the source.\n\n## Conclusion\n\nAcross three seeds the Citation Verifier Pipeline holds latency of 218 ms at p95. Across three seeds the Review Benchmark Dataset holds latency of 740 ms at p95. The Evidence Graph Transformer achieves 90.5% accuracy on the Review Benchmark Dataset.\n\n## References\n\n[1] Beltagy (2019). SciBERT: A Pretrained Language Model for Scientific Text.\n\n[2] Vaswani (2017). Attention Is All You Need.\n\n[3] Karpukhin (2020). Dense Passage Retrieval for Open-Domain QA.\n\n[4] Wadden (2020). Fact or Fiction: Verifying Scientific Claims."
+        },
+        "docx": {
+          "file": "docs/alpha.docx",
+          "mime": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+          "canonical_text": "# Grounded Evidence Pipelines for Scientific Write-ups\n\n## Abstract\n\nWe pair the Evidence Graph Transformer with the Citation Verifier Pipeline to keep attribution exact. We pair the Review Benchmark Dataset with the Citation Verifier Pipeline to keep attribution exact. We pair the Adaptive Chunking Algorithm with the Review Benchmark Dataset to keep attribution exact.\n\nThe Citation Verifier Pipeline processes 149 documents while staying under 2 GB of memory. We pair the Review Benchmark Dataset with the Citation Verifier Pipeline to keep attribution exact. The Adaptive Chunking Algorithm processes 245 documents while staying under 4 GB of memory.\n\n## Introduction\n\nThe Evidence Graph Transformer reuses spans emitted by the Adaptive Chunking Algorithm without re-parsing the source. The Adaptive Chunking Algorithm processes 214 documents while staying under 4 GB of memory. The Evidence Graph Transformer reduces extraction error by 57% relative to the baseline.\n\nWe pair the Evidence Graph Transformer with the Adaptive Chunking Algorithm to keep attribution exact. The Adaptive Chunking Algorithm processes 120 documents while staying under 12 GB of memory. Ablation on the Review Benchmark Dataset shows the Adaptive Chunking Algorithm contributes 31 F1 points.\n\nThe Review Benchmark Dataset achieves 45.2% accuracy on the Review Benchmark Dataset. Unlike prior work, the Review Benchmark Dataset never fabricates a citation it cannot trace.\n\n## Methods\n\nWe pair the Review Benchmark Dataset with the Citation Verifier Pipeline to keep attribution exact. The Citation Verifier Pipeline processes 336 documents while staying under 2 GB of memory. Ablation on the Review Benchmark Dataset shows the Adaptive Chunking Algorithm contributes 59.5 F1 points.\n\nAblation on the Review Benchmark Dataset shows the Adaptive Chunking Algorithm contributes 51 F1 points. The Citation Verifier Pipeline reuses spans emitted by the Evidence Graph Transformer without re-parsing the source.\n\nUnlike prior work, the Citation Verifier Pipeline never fabricates a citation it cannot trace. Ablation on the Review Benchmark Dataset shows the Citation Verifier Pipeline contributes 69 F1 points. Across three seeds the Review Benchmark Dataset holds latency of 289 ms at p95.\n\nAblation on the Review Benchmark Dataset shows the Citation Verifier Pipeline contributes 85.5 F1 points. The Adaptive Chunking Algorithm reuses spans emitted by the Review Benchmark Dataset without re-parsing the source. Unlike prior work, the Adaptive Chunking Algorithm never fabricates a citation it cannot trace.\n\n## Experiments\n\nThe Review Benchmark Dataset achieves 65.2% accuracy on the Review Benchmark Dataset. Across three seeds the Citation Verifier Pipeline holds latency of 723 ms at p95.\n\nThe Adaptive Chunking Algorithm reuses spans emitted by the Review Benchmark Dataset without re-parsing the source. The Citation Verifier Pipeline achieves 66.2% accuracy on the Review Benchmark Dataset. The Review Benchmark Dataset achieves 80% accuracy on the Review Benchmark Dataset.\n\nThe Adaptive Chunking Algorithm processes 159 documents while staying under 12 GB of memory. Ablation on the Review Benchmark Dataset shows the Citation Verifier Pipeline contributes 45.2 F1 points.\n\n## Results\n\nThe Adaptive Chunking Algorithm achieves 11.2% accuracy on the Review Benchmark Dataset. Ablation on the Review Benchmark Dataset shows the Evidence Graph Transformer contributes 38 F1 points. Ablation on the Review Benchmark Dataset shows the Citation Verifier Pipeline contributes 81.5 F1 points.\n\nThe Adaptive Chunking Algorithm reuses spans emitted by the Review Benchmark Dataset without re-parsing the source. The Evidence Graph Transformer reuses spans emitted by the Citation Verifier Pipeline without re-parsing the source.\n\nThe Review Benchmark Dataset reduces extraction error by 80% relative to the baseline. Unlike prior work, the Review Benchmark Dataset never fabricates a citation it cannot trace. We pair the Adaptive Chunking Algorithm with the Citation Verifier Pipeline to keep attribution exact.\n\n## Discussion\n\nThe Adaptive Chunking Algorithm processes 210 documents while staying under 12 GB of memory. We pair the Citation Verifier Pipeline with the Adaptive Chunking Algorithm to keep attribution exact.\n\nAblation on the Review Benchmark Dataset shows the Citation Verifier Pipeline contributes 52.5 F1 points. The Review Benchmark Dataset reuses spans emitted by the Evidence Graph Transformer without re-parsing the source.\n\n## Conclusion\n\nAcross three seeds the Citation Verifier Pipeline holds latency of 218 ms at p95. Across three seeds the Review Benchmark Dataset holds latency of 740 ms at p95. The Evidence Graph Transformer achieves 90.5% accuracy on the Review Benchmark Dataset.\n\n## References\n\n[1] Beltagy (2019). SciBERT: A Pretrained Language Model for Scientific Text.\n\n[2] Vaswani (2017). Attention Is All You Need.\n\n[3] Karpukhin (2020). Dense Passage Retrieval for Open-Domain QA.\n\n[4] Wadden (2020). Fact or Fiction: Verifying Scientific Claims."
+        },
+        "pdf": {
+          "file": "docs/alpha.pdf",
+          "mime": "application/pdf",
+          "canonical_text": "# Grounded Evidence Pipelines for Scientific Write-ups\n\n## Abstract\n\nWe pair the Evidence Graph Transformer with the Citation Verifier Pipeline to keep attribution exact. We pair the Review Benchmark Dataset with the Citation Verifier Pipeline to keep attribution exact. We pair the Adaptive Chunking Algorithm with the Review Benchmark Dataset to keep attribution exact.\n\nThe Citation Verifier Pipeline processes 149 documents while staying under 2 GB of memory. We pair the Review Benchmark Dataset with the Citation Verifier Pipeline to keep attribution exact. The Adaptive Chunking Algorithm processes 245 documents while staying under 4 GB of memory.\n\n## Introduction\n\nThe Evidence Graph Transformer reuses spans emitted by the Adaptive Chunking Algorithm without re-parsing the source. The Adaptive Chunking Algorithm processes 214 documents while staying under 4 GB of memory. The Evidence Graph Transformer reduces extraction error by 57% relative to the baseline.\n\nWe pair the Evidence Graph Transformer with the Adaptive Chunking Algorithm to keep attribution exact. The Adaptive Chunking Algorithm processes 120 documents while staying under 12 GB of memory. Ablation on the Review Benchmark Dataset shows the Adaptive Chunking Algorithm contributes 31 F1 points.\n\nThe Review Benchmark Dataset achieves 45.2% accuracy on the Review Benchmark Dataset. Unlike prior work, the Review Benchmark Dataset never fabricates a citation it cannot trace.\n\n## Methods\n\nWe pair the Review Benchmark Dataset with the Citation Verifier Pipeline to keep attribution exact. The Citation Verifier Pipeline processes 336 documents while staying under 2 GB of memory. Ablation on the Review Benchmark Dataset shows the Adaptive Chunking Algorithm contributes 59.5 F1 points.\n\nAblation on the Review Benchmark Dataset shows the Adaptive Chunking Algorithm contributes 51 F1 points. The Citation Verifier Pipeline reuses spans emitted by the Evidence Graph Transformer without re-parsing the source.\n\nUnlike prior work, the Citation Verifier Pipeline never fabricates a citation it cannot trace. Ablation on the Review Benchmark Dataset shows the Citation Verifier Pipeline contributes 69 F1 points. Across three seeds the Review Benchmark Dataset holds latency of 289 ms at p95.\n\nAblation on the Review Benchmark Dataset shows the Citation Verifier Pipeline contributes 85.5 F1 points. The Adaptive Chunking Algorithm reuses spans emitted by the Review Benchmark Dataset without re-parsing the source. Unlike prior work, the Adaptive Chunking Algorithm never fabricates a citation it cannot trace.\n\n## Experiments\n\nThe Review Benchmark Dataset achieves 65.2% accuracy on the Review Benchmark Dataset. Across three seeds the Citation Verifier Pipeline holds latency of 723 ms at p95.\n\nThe Adaptive Chunking Algorithm reuses spans emitted by the Review Benchmark Dataset without re-parsing the source. The Citation Verifier Pipeline achieves 66.2% accuracy on the Review Benchmark Dataset. The Review Benchmark Dataset achieves 80% accuracy on the Review Benchmark Dataset.\n\nThe Adaptive Chunking Algorithm processes 159 documents while staying under 12 GB of memory. Ablation on the Review Benchmark Dataset shows the Citation Verifier Pipeline contributes 45.2 F1 points.\n\n## Results\n\nThe Adaptive Chunking Algorithm achieves 11.2% accuracy on the Review Benchmark Dataset. Ablation on the Review Benchmark Dataset shows the Evidence Graph Transformer contributes 38 F1 points. Ablation on the Review Benchmark Dataset shows the Citation Verifier Pipeline contributes 81.5 F1 points.\n\nThe Adaptive Chunking Algorithm reuses spans emitted by the Review Benchmark Dataset without re-parsing the source. The Evidence Graph Transformer reuses spans emitted by the Citation Verifier Pipeline without re-parsing the source.\n\nThe Review Benchmark Dataset reduces extraction error by 80% relative to the baseline. Unlike prior work, the Review Benchmark Dataset never fabricates a citation it cannot trace. We pair the Adaptive Chunking Algorithm with the Citation Verifier Pipeline to keep attribution exact.\n\n## Discussion\n\nThe Adaptive Chunking Algorithm processes 210 documents while staying under 12 GB of memory. We pair the Citation Verifier Pipeline with the Adaptive Chunking Algorithm to keep attribution exact.\n\nAblation on the Review Benchmark Dataset shows the Citation Verifier Pipeline contributes 52.5 F1 points. The Review Benchmark Dataset reuses spans emitted by the Evidence Graph Transformer without re-parsing the source.\n\n## Conclusion\n\nAcross three seeds the Citation Verifier Pipeline holds latency of 218 ms at p95. Across three seeds the Review Benchmark Dataset holds latency of 740 ms at p95. The Evidence Graph Transformer achieves 90.5% accuracy on the Review Benchmark Dataset.\n\n## References\n\n[1] Beltagy (2019). SciBERT: A Pretrained Language Model for Scientific Text.\n\n[2] Vaswani (2017). Attention Is All You Need.\n\n[3] Karpukhin (2020). Dense Passage Retrieval for Open-Domain QA.\n\n[4] Wadden (2020). Fact or Fiction: Verifying Scientific Claims."
+        }
+      },
+      "title": "Grounded Evidence Pipelines for Scientific Write-ups",
+      "authors": [
+        "Nguyen, A."
+      ],
+      "year": 2025,
+      "sections": [
+        {
+          "heading": "Abstract",
+          "paragraphs": [
+            "We pair the Evidence Graph Transformer with the Citation Verifier Pipeline to keep attribution exact. We pair the Review Benchmark Dataset with the Citation Verifier Pipeline to keep attribution exact. We pair the Adaptive Chunking Algorithm with the Review Benchmark Dataset to keep attribution exact.",
+            "The Citation Verifier Pipeline processes 149 documents while staying under 2 GB of memory. We pair the Review Benchmark Dataset with the Citation Verifier Pipeline to keep attribution exact. The Adaptive Chunking Algorithm processes 245 documents while staying under 4 GB of memory."
+          ]
+        },
+        {
+          "heading": "Introduction",
+          "paragraphs": [
+            "The Evidence Graph Transformer reuses spans emitted by the Adaptive Chunking Algorithm without re-parsing the source. The Adaptive Chunking Algorithm processes 214 documents while staying under 4 GB of memory. The Evidence Graph Transformer reduces extraction error by 57% relative to the baseline.",
+            "We pair the Evidence Graph Transformer with the Adaptive Chunking Algorithm to keep attribution exact. The Adaptive Chunking Algorithm processes 120 documents while staying under 12 GB of memory. Ablation on the Review Benchmark Dataset shows the Adaptive Chunking Algorithm contributes 31 F1 points.",
+            "The Review Benchmark Dataset achieves 45.2% accuracy on the Review Benchmark Dataset. Unlike prior work, the Review Benchmark Dataset never fabricates a citation it cannot trace."
+          ]
+        },
+        {
+          "heading": "Methods",
+          "paragraphs": [
+            "We pair the Review Benchmark Dataset with the Citation Verifier Pipeline to keep attribution exact. The Citation Verifier Pipeline processes 336 documents while staying under 2 GB of memory. Ablation on the Review Benchmark Dataset shows the Adaptive Chunking Algorithm contributes 59.5 F1 points.",
+            "Ablation on the Review Benchmark Dataset shows the Adaptive Chunking Algorithm contributes 51 F1 points. The Citation Verifier Pipeline reuses spans emitted by the Evidence Graph Transformer without re-parsing the source.",
+            "Unlike prior work, the Citation Verifier Pipeline never fabricates a citation it cannot trace. Ablation on the Review Benchmark Dataset shows the Citation Verifier Pipeline contributes 69 F1 points. Across three seeds the Review Benchmark Dataset holds latency of 289 ms at p95.",
+            "Ablation on the Review Benchmark Dataset shows the Citation Verifier Pipeline contributes 85.5 F1 points. The Adaptive Chunking Algorithm reuses spans emitted by the Review Benchmark Dataset without re-parsing the source. Unlike prior work, the Adaptive Chunking Algorithm never fabricates a citation it cannot trace."
+          ]
+        },
+        {
+          "heading": "Experiments",
+          "paragraphs": [
+            "The Review Benchmark Dataset achieves 65.2% accuracy on the Review Benchmark Dataset. Across three seeds the Citation Verifier Pipeline holds latency of 723 ms at p95.",
+            "The Adaptive Chunking Algorithm reuses spans emitted by the Review Benchmark Dataset without re-parsing the source. The Citation Verifier Pipeline achieves 66.2% accuracy on the Review Benchmark Dataset. The Review Benchmark Dataset achieves 80% accuracy on the Review Benchmark Dataset.",
+            "The Adaptive Chunking Algorithm processes 159 documents while staying under 12 GB of memory. Ablation on the Review Benchmark Dataset shows the Citation Verifier Pipeline contributes 45.2 F1 points."
+          ]
+        },
+        {
+          "heading": "Results",
+          "paragraphs": [
+            "The Adaptive Chunking Algorithm achieves 11.2% accuracy on the Review Benchmark Dataset. Ablation on the Review Benchmark Dataset shows the Evidence Graph Transformer contributes 38 F1 points. Ablation on the Review Benchmark Dataset shows the Citation Verifier Pipeline contributes 81.5 F1 points.",
+            "The Adaptive Chunking Algorithm reuses spans emitted by the Review Benchmark Dataset without re-parsing the source. The Evidence Graph Transformer reuses spans emitted by the Citation Verifier Pipeline without re-parsing the source.",
+            "The Review Benchmark Dataset reduces extraction error by 80% relative to the baseline. Unlike prior work, the Review Benchmark Dataset never fabricates a citation it cannot trace. We pair the Adaptive Chunking Algorithm with the Citation Verifier Pipeline to keep attribution exact."
+          ]
+        },
+        {
+          "heading": "Discussion",
+          "paragraphs": [
+            "The Adaptive Chunking Algorithm processes 210 documents while staying under 12 GB of memory. We pair the Citation Verifier Pipeline with the Adaptive Chunking Algorithm to keep attribution exact.",
+            "Ablation on the Review Benchmark Dataset shows the Citation Verifier Pipeline contributes 52.5 F1 points. The Review Benchmark Dataset reuses spans emitted by the Evidence Graph Transformer without re-parsing the source."
+          ]
+        },
+        {
+          "heading": "Conclusion",
+          "paragraphs": [
+            "Across three seeds the Citation Verifier Pipeline holds latency of 218 ms at p95. Across three seeds the Review Benchmark Dataset holds latency of 740 ms at p95. The Evidence Graph Transformer achieves 90.5% accuracy on the Review Benchmark Dataset."
+          ]
+        }
+      ],
+      "concepts": [
+        {
+          "name": "Review Benchmark Dataset",
+          "type": "Dataset",
+          "acronym": null
+        },
+        {
+          "name": "Adaptive Chunking Algorithm",
+          "type": "Method",
+          "acronym": null
+        },
+        {
+          "name": "Evidence Graph Transformer",
+          "type": "Architecture",
+          "acronym": "EGT"
+        },
+        {
+          "name": "Citation Verifier Pipeline",
+          "type": "System Component",
+          "acronym": null
+        }
+      ],
+      "nested_pairs": [
+        [
+          "Evidence Graph",
+          "Evidence Graph Transformer"
+        ],
+        [
+          "Review Benchmark",
+          "Review Benchmark Dataset"
+        ]
+      ],
+      "metrics": [
+        "11.2%",
+        "12 GB",
+        "2 GB",
+        "218 ms",
+        "289 ms",
+        "31 F1",
+        "38 F1",
+        "4 GB",
+        "45.2 F1",
+        "45.2%",
+        "51 F1",
+        "52.5 F1",
+        "57%",
+        "59.5 F1",
+        "65.2%",
+        "66.2%",
+        "69 F1",
+        "723 ms",
+        "740 ms",
+        "80%",
+        "81.5 F1",
+        "85.5 F1",
+        "90.5%"
+      ],
+      "references": [
+        {
+          "author": "Beltagy",
+          "year": 2019,
+          "title": "SciBERT: A Pretrained Language Model for Scientific Text"
+        },
+        {
+          "author": "Vaswani",
+          "year": 2017,
+          "title": "Attention Is All You Need"
+        },
+        {
+          "author": "Karpukhin",
+          "year": 2020,
+          "title": "Dense Passage Retrieval for Open-Domain QA"
+        },
+        {
+          "author": "Wadden",
+          "year": 2020,
+          "title": "Fact or Fiction: Verifying Scientific Claims"
+        }
+      ]
+    },
+    "beta": {
+      "formats": {
+        "md": {
+          "file": "docs/beta.md",
+          "mime": "text/markdown",
+          "canonical_text": "# Deterministic Chunking and Citation Audits at Scale\n\n## Abstract\n\nThe Local Evidence Retriever reuses spans emitted by the Hybrid Retrieval Method without re-parsing the source. Ablation on the SciFact Corpus shows the SciFact Corpus contributes 17 F1 points. Ablation on the SciFact Corpus shows the Hybrid Retrieval Method contributes 22 F1 points.\n\nUnlike prior work, the SciFact Corpus never fabricates a citation it cannot trace. Across three seeds the Hybrid Retrieval Method holds latency of 696 ms at p95.\n\n## Introduction\n\nThe Evidence Graph Transformer processes 398 documents while staying under 12 GB of memory. The Hybrid Retrieval Method processes 33 documents while staying under 4 GB of memory.\n\nThe Evidence Graph Transformer reuses spans emitted by the Hybrid Retrieval Method without re-parsing the source. Across three seeds the Local Evidence Retriever holds latency of 79 ms at p95. The Local Evidence Retriever reduces extraction error by 61% relative to the baseline.\n\nThe Evidence Graph Transformer reuses spans emitted by the SciFact Corpus without re-parsing the source. The Evidence Graph Transformer processes 54 documents while staying under 4 GB of memory.\n\n## Methods\n\nAblation on the SciFact Corpus shows the Hybrid Retrieval Method contributes 94.2 F1 points. The Hybrid Retrieval Method reduces extraction error by 46% relative to the baseline.\n\nAcross three seeds the SciFact Corpus holds latency of 455 ms at p95. Across three seeds the Hybrid Retrieval Method holds latency of 450 ms at p95. The Hybrid Retrieval Method achieves 45.2% accuracy on the SciFact Corpus.\n\nThe Hybrid Retrieval Method processes 347 documents while staying under 8 GB of memory. The Hybrid Retrieval Method reuses spans emitted by the Local Evidence Retriever without re-parsing the source.\n\nAcross three seeds the SciFact Corpus holds latency of 132 ms at p95. The SciFact Corpus reduces extraction error by 57% relative to the baseline. We pair the Local Evidence Retriever with the Evidence Graph Transformer to keep attribution exact.\n\n## Experiments\n\nThe Hybrid Retrieval Method processes 235 documents while staying under 8 GB of memory. We pair the Hybrid Retrieval Method with the Local Evidence Retriever to keep attribution exact. The Hybrid Retrieval Method reduces extraction error by 96.5% relative to the baseline.\n\nThe Local Evidence Retriever reduces extraction error by 8.5% relative to the baseline. The Hybrid Retrieval Method reuses spans emitted by the Evidence Graph Transformer without re-parsing the source.\n\nAblation on the SciFact Corpus shows the SciFact Corpus contributes 89 F1 points. Unlike prior work, the Local Evidence Retriever never fabricates a citation it cannot trace.\n\n## Results\n\nAblation on the SciFact Corpus shows the Hybrid Retrieval Method contributes 59.2 F1 points. Ablation on the SciFact Corpus shows the Hybrid Retrieval Method contributes 89 F1 points. The Hybrid Retrieval Method reuses spans emitted by the Evidence Graph Transformer without re-parsing the source.\n\nAcross three seeds the Local Evidence Retriever holds latency of 807 ms at p95. Unlike prior work, the Evidence Graph Transformer never fabricates a citation it cannot trace. The Hybrid Retrieval Method reuses spans emitted by the SciFact Corpus without re-parsing the source.\n\nUnlike prior work, the Evidence Graph Transformer never fabricates a citation it cannot trace. The Evidence Graph Transformer processes 360 documents while staying under 2 GB of memory. The Local Evidence Retriever reuses spans emitted by the Evidence Graph Transformer without re-parsing the source.\n\n## Discussion\n\nWe pair the Hybrid Retrieval Method with the Evidence Graph Transformer to keep attribution exact. Ablation on the SciFact Corpus shows the Hybrid Retrieval Method contributes 20.5 F1 points.\n\nAblation on the SciFact Corpus shows the Evidence Graph Transformer contributes 11 F1 points. The Local Evidence Retriever reuses spans emitted by the SciFact Corpus without re-parsing the source. The Local Evidence Retriever reuses spans emitted by the SciFact Corpus without re-parsing the source.\n\n## Conclusion\n\nThe Evidence Graph Transformer reuses spans emitted by the SciFact Corpus without re-parsing the source. Unlike prior work, the Evidence Graph Transformer never fabricates a citation it cannot trace.\n\n## References\n\n[1] Wadden (2020). Fact or Fiction: Verifying Scientific Claims.\n\n[2] Karpukhin (2020). Dense Passage Retrieval for Open-Domain QA.\n\n[3] Beltagy (2019). SciBERT: A Pretrained Language Model for Scientific Text.\n\n[4] Vaswani (2017). Attention Is All You Need."
+        },
+        "html": {
+          "file": "docs/beta.html",
+          "mime": "text/html",
+          "canonical_text": "# Deterministic Chunking and Citation Audits at Scale\n\n## Abstract\n\nThe Local Evidence Retriever reuses spans emitted by the Hybrid Retrieval Method without re-parsing the source. Ablation on the SciFact Corpus shows the SciFact Corpus contributes 17 F1 points. Ablation on the SciFact Corpus shows the Hybrid Retrieval Method contributes 22 F1 points.\n\nUnlike prior work, the SciFact Corpus never fabricates a citation it cannot trace. Across three seeds the Hybrid Retrieval Method holds latency of 696 ms at p95.\n\n## Introduction\n\nThe Evidence Graph Transformer processes 398 documents while staying under 12 GB of memory. The Hybrid Retrieval Method processes 33 documents while staying under 4 GB of memory.\n\nThe Evidence Graph Transformer reuses spans emitted by the Hybrid Retrieval Method without re-parsing the source. Across three seeds the Local Evidence Retriever holds latency of 79 ms at p95. The Local Evidence Retriever reduces extraction error by 61% relative to the baseline.\n\nThe Evidence Graph Transformer reuses spans emitted by the SciFact Corpus without re-parsing the source. The Evidence Graph Transformer processes 54 documents while staying under 4 GB of memory.\n\n## Methods\n\nAblation on the SciFact Corpus shows the Hybrid Retrieval Method contributes 94.2 F1 points. The Hybrid Retrieval Method reduces extraction error by 46% relative to the baseline.\n\nAcross three seeds the SciFact Corpus holds latency of 455 ms at p95. Across three seeds the Hybrid Retrieval Method holds latency of 450 ms at p95. The Hybrid Retrieval Method achieves 45.2% accuracy on the SciFact Corpus.\n\nThe Hybrid Retrieval Method processes 347 documents while staying under 8 GB of memory. The Hybrid Retrieval Method reuses spans emitted by the Local Evidence Retriever without re-parsing the source.\n\nAcross three seeds the SciFact Corpus holds latency of 132 ms at p95. The SciFact Corpus reduces extraction error by 57% relative to the baseline. We pair the Local Evidence Retriever with the Evidence Graph Transformer to keep attribution exact.\n\n## Experiments\n\nThe Hybrid Retrieval Method processes 235 documents while staying under 8 GB of memory. We pair the Hybrid Retrieval Method with the Local Evidence Retriever to keep attribution exact. The Hybrid Retrieval Method reduces extraction error by 96.5% relative to the baseline.\n\nThe Local Evidence Retriever reduces extraction error by 8.5% relative to the baseline. The Hybrid Retrieval Method reuses spans emitted by the Evidence Graph Transformer without re-parsing the source.\n\nAblation on the SciFact Corpus shows the SciFact Corpus contributes 89 F1 points. Unlike prior work, the Local Evidence Retriever never fabricates a citation it cannot trace.\n\n## Results\n\nAblation on the SciFact Corpus shows the Hybrid Retrieval Method contributes 59.2 F1 points. Ablation on the SciFact Corpus shows the Hybrid Retrieval Method contributes 89 F1 points. The Hybrid Retrieval Method reuses spans emitted by the Evidence Graph Transformer without re-parsing the source.\n\nAcross three seeds the Local Evidence Retriever holds latency of 807 ms at p95. Unlike prior work, the Evidence Graph Transformer never fabricates a citation it cannot trace. The Hybrid Retrieval Method reuses spans emitted by the SciFact Corpus without re-parsing the source.\n\nUnlike prior work, the Evidence Graph Transformer never fabricates a citation it cannot trace. The Evidence Graph Transformer processes 360 documents while staying under 2 GB of memory. The Local Evidence Retriever reuses spans emitted by the Evidence Graph Transformer without re-parsing the source.\n\n## Discussion\n\nWe pair the Hybrid Retrieval Method with the Evidence Graph Transformer to keep attribution exact. Ablation on the SciFact Corpus shows the Hybrid Retrieval Method contributes 20.5 F1 points.\n\nAblation on the SciFact Corpus shows the Evidence Graph Transformer contributes 11 F1 points. The Local Evidence Retriever reuses spans emitted by the SciFact Corpus without re-parsing the source. The Local Evidence Retriever reuses spans emitted by the SciFact Corpus without re-parsing the source.\n\n## Conclusion\n\nThe Evidence Graph Transformer reuses spans emitted by the SciFact Corpus without re-parsing the source. Unlike prior work, the Evidence Graph Transformer never fabricates a citation it cannot trace.\n\n## References\n\n[1] Wadden (2020). Fact or Fiction: Verifying Scientific Claims.\n\n[2] Karpukhin (2020). Dense Passage Retrieval for Open-Domain QA.\n\n[3] Beltagy (2019). SciBERT: A Pretrained Language Model for Scientific Text.\n\n[4] Vaswani (2017). Attention Is All You Need."
+        },
+        "txt": {
+          "file": "docs/beta.txt",
+          "mime": "text/plain",
+          "canonical_text": "# Deterministic Chunking and Citation Audits at Scale\n\n## Abstract\n\nThe Local Evidence Retriever reuses spans emitted by the Hybrid Retrieval Method without re-parsing the source. Ablation on the SciFact Corpus shows the SciFact Corpus contributes 17 F1 points. Ablation on the SciFact Corpus shows the Hybrid Retrieval Method contributes 22 F1 points.\n\nUnlike prior work, the SciFact Corpus never fabricates a citation it cannot trace. Across three seeds the Hybrid Retrieval Method holds latency of 696 ms at p95.\n\n## Introduction\n\nThe Evidence Graph Transformer processes 398 documents while staying under 12 GB of memory. The Hybrid Retrieval Method processes 33 documents while staying under 4 GB of memory.\n\nThe Evidence Graph Transformer reuses spans emitted by the Hybrid Retrieval Method without re-parsing the source. Across three seeds the Local Evidence Retriever holds latency of 79 ms at p95. The Local Evidence Retriever reduces extraction error by 61% relative to the baseline.\n\nThe Evidence Graph Transformer reuses spans emitted by the SciFact Corpus without re-parsing the source. The Evidence Graph Transformer processes 54 documents while staying under 4 GB of memory.\n\n## Methods\n\nAblation on the SciFact Corpus shows the Hybrid Retrieval Method contributes 94.2 F1 points. The Hybrid Retrieval Method reduces extraction error by 46% relative to the baseline.\n\nAcross three seeds the SciFact Corpus holds latency of 455 ms at p95. Across three seeds the Hybrid Retrieval Method holds latency of 450 ms at p95. The Hybrid Retrieval Method achieves 45.2% accuracy on the SciFact Corpus.\n\nThe Hybrid Retrieval Method processes 347 documents while staying under 8 GB of memory. The Hybrid Retrieval Method reuses spans emitted by the Local Evidence Retriever without re-parsing the source.\n\nAcross three seeds the SciFact Corpus holds latency of 132 ms at p95. The SciFact Corpus reduces extraction error by 57% relative to the baseline. We pair the Local Evidence Retriever with the Evidence Graph Transformer to keep attribution exact.\n\n## Experiments\n\nThe Hybrid Retrieval Method processes 235 documents while staying under 8 GB of memory. We pair the Hybrid Retrieval Method with the Local Evidence Retriever to keep attribution exact. The Hybrid Retrieval Method reduces extraction error by 96.5% relative to the baseline.\n\nThe Local Evidence Retriever reduces extraction error by 8.5% relative to the baseline. The Hybrid Retrieval Method reuses spans emitted by the Evidence Graph Transformer without re-parsing the source.\n\nAblation on the SciFact Corpus shows the SciFact Corpus contributes 89 F1 points. Unlike prior work, the Local Evidence Retriever never fabricates a citation it cannot trace.\n\n## Results\n\nAblation on the SciFact Corpus shows the Hybrid Retrieval Method contributes 59.2 F1 points. Ablation on the SciFact Corpus shows the Hybrid Retrieval Method contributes 89 F1 points. The Hybrid Retrieval Method reuses spans emitted by the Evidence Graph Transformer without re-parsing the source.\n\nAcross three seeds the Local Evidence Retriever holds latency of 807 ms at p95. Unlike prior work, the Evidence Graph Transformer never fabricates a citation it cannot trace. The Hybrid Retrieval Method reuses spans emitted by the SciFact Corpus without re-parsing the source.\n\nUnlike prior work, the Evidence Graph Transformer never fabricates a citation it cannot trace. The Evidence Graph Transformer processes 360 documents while staying under 2 GB of memory. The Local Evidence Retriever reuses spans emitted by the Evidence Graph Transformer without re-parsing the source.\n\n## Discussion\n\nWe pair the Hybrid Retrieval Method with the Evidence Graph Transformer to keep attribution exact. Ablation on the SciFact Corpus shows the Hybrid Retrieval Method contributes 20.5 F1 points.\n\nAblation on the SciFact Corpus shows the Evidence Graph Transformer contributes 11 F1 points. The Local Evidence Retriever reuses spans emitted by the SciFact Corpus without re-parsing the source. The Local Evidence Retriever reuses spans emitted by the SciFact Corpus without re-parsing the source.\n\n## Conclusion\n\nThe Evidence Graph Transformer reuses spans emitted by the SciFact Corpus without re-parsing the source. Unlike prior work, the Evidence Graph Transformer never fabricates a citation it cannot trace.\n\n## References\n\n[1] Wadden (2020). Fact or Fiction: Verifying Scientific Claims.\n\n[2] Karpukhin (2020). Dense Passage Retrieval for Open-Domain QA.\n\n[3] Beltagy (2019). SciBERT: A Pretrained Language Model for Scientific Text.\n\n[4] Vaswani (2017). Attention Is All You Need."
+        },
+        "docx": {
+          "file": "docs/beta.docx",
+          "mime": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+          "canonical_text": "# Deterministic Chunking and Citation Audits at Scale\n\n## Abstract\n\nThe Local Evidence Retriever reuses spans emitted by the Hybrid Retrieval Method without re-parsing the source. Ablation on the SciFact Corpus shows the SciFact Corpus contributes 17 F1 points. Ablation on the SciFact Corpus shows the Hybrid Retrieval Method contributes 22 F1 points.\n\nUnlike prior work, the SciFact Corpus never fabricates a citation it cannot trace. Across three seeds the Hybrid Retrieval Method holds latency of 696 ms at p95.\n\n## Introduction\n\nThe Evidence Graph Transformer processes 398 documents while staying under 12 GB of memory. The Hybrid Retrieval Method processes 33 documents while staying under 4 GB of memory.\n\nThe Evidence Graph Transformer reuses spans emitted by the Hybrid Retrieval Method without re-parsing the source. Across three seeds the Local Evidence Retriever holds latency of 79 ms at p95. The Local Evidence Retriever reduces extraction error by 61% relative to the baseline.\n\nThe Evidence Graph Transformer reuses spans emitted by the SciFact Corpus without re-parsing the source. The Evidence Graph Transformer processes 54 documents while staying under 4 GB of memory.\n\n## Methods\n\nAblation on the SciFact Corpus shows the Hybrid Retrieval Method contributes 94.2 F1 points. The Hybrid Retrieval Method reduces extraction error by 46% relative to the baseline.\n\nAcross three seeds the SciFact Corpus holds latency of 455 ms at p95. Across three seeds the Hybrid Retrieval Method holds latency of 450 ms at p95. The Hybrid Retrieval Method achieves 45.2% accuracy on the SciFact Corpus.\n\nThe Hybrid Retrieval Method processes 347 documents while staying under 8 GB of memory. The Hybrid Retrieval Method reuses spans emitted by the Local Evidence Retriever without re-parsing the source.\n\nAcross three seeds the SciFact Corpus holds latency of 132 ms at p95. The SciFact Corpus reduces extraction error by 57% relative to the baseline. We pair the Local Evidence Retriever with the Evidence Graph Transformer to keep attribution exact.\n\n## Experiments\n\nThe Hybrid Retrieval Method processes 235 documents while staying under 8 GB of memory. We pair the Hybrid Retrieval Method with the Local Evidence Retriever to keep attribution exact. The Hybrid Retrieval Method reduces extraction error by 96.5% relative to the baseline.\n\nThe Local Evidence Retriever reduces extraction error by 8.5% relative to the baseline. The Hybrid Retrieval Method reuses spans emitted by the Evidence Graph Transformer without re-parsing the source.\n\nAblation on the SciFact Corpus shows the SciFact Corpus contributes 89 F1 points. Unlike prior work, the Local Evidence Retriever never fabricates a citation it cannot trace.\n\n## Results\n\nAblation on the SciFact Corpus shows the Hybrid Retrieval Method contributes 59.2 F1 points. Ablation on the SciFact Corpus shows the Hybrid Retrieval Method contributes 89 F1 points. The Hybrid Retrieval Method reuses spans emitted by the Evidence Graph Transformer without re-parsing the source.\n\nAcross three seeds the Local Evidence Retriever holds latency of 807 ms at p95. Unlike prior work, the Evidence Graph Transformer never fabricates a citation it cannot trace. The Hybrid Retrieval Method reuses spans emitted by the SciFact Corpus without re-parsing the source.\n\nUnlike prior work, the Evidence Graph Transformer never fabricates a citation it cannot trace. The Evidence Graph Transformer processes 360 documents while staying under 2 GB of memory. The Local Evidence Retriever reuses spans emitted by the Evidence Graph Transformer without re-parsing the source.\n\n## Discussion\n\nWe pair the Hybrid Retrieval Method with the Evidence Graph Transformer to keep attribution exact. Ablation on the SciFact Corpus shows the Hybrid Retrieval Method contributes 20.5 F1 points.\n\nAblation on the SciFact Corpus shows the Evidence Graph Transformer contributes 11 F1 points. The Local Evidence Retriever reuses spans emitted by the SciFact Corpus without re-parsing the source. The Local Evidence Retriever reuses spans emitted by the SciFact Corpus without re-parsing the source.\n\n## Conclusion\n\nThe Evidence Graph Transformer reuses spans emitted by the SciFact Corpus without re-parsing the source. Unlike prior work, the Evidence Graph Transformer never fabricates a citation it cannot trace.\n\n## References\n\n[1] Wadden (2020). Fact or Fiction: Verifying Scientific Claims.\n\n[2] Karpukhin (2020). Dense Passage Retrieval for Open-Domain QA.\n\n[3] Beltagy (2019). SciBERT: A Pretrained Language Model for Scientific Text.\n\n[4] Vaswani (2017). Attention Is All You Need."
+        },
+        "pdf": {
+          "file": "docs/beta.pdf",
+          "mime": "application/pdf",
+          "canonical_text": "# Deterministic Chunking and Citation Audits at Scale\n\n## Abstract\n\nThe Local Evidence Retriever reuses spans emitted by the Hybrid Retrieval Method without re-parsing the source. Ablation on the SciFact Corpus shows the SciFact Corpus contributes 17 F1 points. Ablation on the SciFact Corpus shows the Hybrid Retrieval Method contributes 22 F1 points.\n\nUnlike prior work, the SciFact Corpus never fabricates a citation it cannot trace. Across three seeds the Hybrid Retrieval Method holds latency of 696 ms at p95.\n\n## Introduction\n\nThe Evidence Graph Transformer processes 398 documents while staying under 12 GB of memory. The Hybrid Retrieval Method processes 33 documents while staying under 4 GB of memory.\n\nThe Evidence Graph Transformer reuses spans emitted by the Hybrid Retrieval Method without re-parsing the source. Across three seeds the Local Evidence Retriever holds latency of 79 ms at p95. The Local Evidence Retriever reduces extraction error by 61% relative to the baseline.\n\nThe Evidence Graph Transformer reuses spans emitted by the SciFact Corpus without re-parsing the source. The Evidence Graph Transformer processes 54 documents while staying under 4 GB of memory.\n\n## Methods\n\nAblation on the SciFact Corpus shows the Hybrid Retrieval Method contributes 94.2 F1 points. The Hybrid Retrieval Method reduces extraction error by 46% relative to the baseline.\n\nAcross three seeds the SciFact Corpus holds latency of 455 ms at p95. Across three seeds the Hybrid Retrieval Method holds latency of 450 ms at p95. The Hybrid Retrieval Method achieves 45.2% accuracy on the SciFact Corpus.\n\nThe Hybrid Retrieval Method processes 347 documents while staying under 8 GB of memory. The Hybrid Retrieval Method reuses spans emitted by the Local Evidence Retriever without re-parsing the source.\n\nAcross three seeds the SciFact Corpus holds latency of 132 ms at p95. The SciFact Corpus reduces extraction error by 57% relative to the baseline. We pair the Local Evidence Retriever with the Evidence Graph Transformer to keep attribution exact.\n\n## Experiments\n\nThe Hybrid Retrieval Method processes 235 documents while staying under 8 GB of memory. We pair the Hybrid Retrieval Method with the Local Evidence Retriever to keep attribution exact. The Hybrid Retrieval Method reduces extraction error by 96.5% relative to the baseline.\n\nThe Local Evidence Retriever reduces extraction error by 8.5% relative to the baseline. The Hybrid Retrieval Method reuses spans emitted by the Evidence Graph Transformer without re-parsing the source.\n\nAblation on the SciFact Corpus shows the SciFact Corpus contributes 89 F1 points. Unlike prior work, the Local Evidence Retriever never fabricates a citation it cannot trace.\n\n## Results\n\nAblation on the SciFact Corpus shows the Hybrid Retrieval Method contributes 59.2 F1 points. Ablation on the SciFact Corpus shows the Hybrid Retrieval Method contributes 89 F1 points. The Hybrid Retrieval Method reuses spans emitted by the Evidence Graph Transformer without re-parsing the source.\n\nAcross three seeds the Local Evidence Retriever holds latency of 807 ms at p95. Unlike prior work, the Evidence Graph Transformer never fabricates a citation it cannot trace. The Hybrid Retrieval Method reuses spans emitted by the SciFact Corpus without re-parsing the source.\n\nUnlike prior work, the Evidence Graph Transformer never fabricates a citation it cannot trace. The Evidence Graph Transformer processes 360 documents while staying under 2 GB of memory. The Local Evidence Retriever reuses spans emitted by the Evidence Graph Transformer without re-parsing the source.\n\n## Discussion\n\nWe pair the Hybrid Retrieval Method with the Evidence Graph Transformer to keep attribution exact. Ablation on the SciFact Corpus shows the Hybrid Retrieval Method contributes 20.5 F1 points.\n\nAblation on the SciFact Corpus shows the Evidence Graph Transformer contributes 11 F1 points. The Local Evidence Retriever reuses spans emitted by the SciFact Corpus without re-parsing the source. The Local Evidence Retriever reuses spans emitted by the SciFact Corpus without re-parsing the source.\n\n## Conclusion\n\nThe Evidence Graph Transformer reuses spans emitted by the SciFact Corpus without re-parsing the source. Unlike prior work, the Evidence Graph Transformer never fabricates a citation it cannot trace.\n\n## References\n\n[1] Wadden (2020). Fact or Fiction: Verifying Scientific Claims.\n\n[2] Karpukhin (2020). Dense Passage Retrieval for Open-Domain QA.\n\n[3] Beltagy (2019). SciBERT: A Pretrained Language Model for Scientific Text.\n\n[4] Vaswani (2017). Attention Is All You Need."
+        }
+      },
+      "title": "Deterministic Chunking and Citation Audits at Scale",
+      "authors": [
+        "Garcia, A."
+      ],
+      "year": 2023,
+      "sections": [
+        {
+          "heading": "Abstract",
+          "paragraphs": [
+            "The Local Evidence Retriever reuses spans emitted by the Hybrid Retrieval Method without re-parsing the source. Ablation on the SciFact Corpus shows the SciFact Corpus contributes 17 F1 points. Ablation on the SciFact Corpus shows the Hybrid Retrieval Method contributes 22 F1 points.",
+            "Unlike prior work, the SciFact Corpus never fabricates a citation it cannot trace. Across three seeds the Hybrid Retrieval Method holds latency of 696 ms at p95."
+          ]
+        },
+        {
+          "heading": "Introduction",
+          "paragraphs": [
+            "The Evidence Graph Transformer processes 398 documents while staying under 12 GB of memory. The Hybrid Retrieval Method processes 33 documents while staying under 4 GB of memory.",
+            "The Evidence Graph Transformer reuses spans emitted by the Hybrid Retrieval Method without re-parsing the source. Across three seeds the Local Evidence Retriever holds latency of 79 ms at p95. The Local Evidence Retriever reduces extraction error by 61% relative to the baseline.",
+            "The Evidence Graph Transformer reuses spans emitted by the SciFact Corpus without re-parsing the source. The Evidence Graph Transformer processes 54 documents while staying under 4 GB of memory."
+          ]
+        },
+        {
+          "heading": "Methods",
+          "paragraphs": [
+            "Ablation on the SciFact Corpus shows the Hybrid Retrieval Method contributes 94.2 F1 points. The Hybrid Retrieval Method reduces extraction error by 46% relative to the baseline.",
+            "Across three seeds the SciFact Corpus holds latency of 455 ms at p95. Across three seeds the Hybrid Retrieval Method holds latency of 450 ms at p95. The Hybrid Retrieval Method achieves 45.2% accuracy on the SciFact Corpus.",
+            "The Hybrid Retrieval Method processes 347 documents while staying under 8 GB of memory. The Hybrid Retrieval Method reuses spans emitted by the Local Evidence Retriever without re-parsing the source.",
+            "Across three seeds the SciFact Corpus holds latency of 132 ms at p95. The SciFact Corpus reduces extraction error by 57% relative to the baseline. We pair the Local Evidence Retriever with the Evidence Graph Transformer to keep attribution exact."
+          ]
+        },
+        {
+          "heading": "Experiments",
+          "paragraphs": [
+            "The Hybrid Retrieval Method processes 235 documents while staying under 8 GB of memory. We pair the Hybrid Retrieval Method with the Local Evidence Retriever to keep attribution exact. The Hybrid Retrieval Method reduces extraction error by 96.5% relative to the baseline.",
+            "The Local Evidence Retriever reduces extraction error by 8.5% relative to the baseline. The Hybrid Retrieval Method reuses spans emitted by the Evidence Graph Transformer without re-parsing the source.",
+            "Ablation on the SciFact Corpus shows the SciFact Corpus contributes 89 F1 points. Unlike prior work, the Local Evidence Retriever never fabricates a citation it cannot trace."
+          ]
+        },
+        {
+          "heading": "Results",
+          "paragraphs": [
+            "Ablation on the SciFact Corpus shows the Hybrid Retrieval Method contributes 59.2 F1 points. Ablation on the SciFact Corpus shows the Hybrid Retrieval Method contributes 89 F1 points. The Hybrid Retrieval Method reuses spans emitted by the Evidence Graph Transformer without re-parsing the source.",
+            "Across three seeds the Local Evidence Retriever holds latency of 807 ms at p95. Unlike prior work, the Evidence Graph Transformer never fabricates a citation it cannot trace. The Hybrid Retrieval Method reuses spans emitted by the SciFact Corpus without re-parsing the source.",
+            "Unlike prior work, the Evidence Graph Transformer never fabricates a citation it cannot trace. The Evidence Graph Transformer processes 360 documents while staying under 2 GB of memory. The Local Evidence Retriever reuses spans emitted by the Evidence Graph Transformer without re-parsing the source."
+          ]
+        },
+        {
+          "heading": "Discussion",
+          "paragraphs": [
+            "We pair the Hybrid Retrieval Method with the Evidence Graph Transformer to keep attribution exact. Ablation on the SciFact Corpus shows the Hybrid Retrieval Method contributes 20.5 F1 points.",
+            "Ablation on the SciFact Corpus shows the Evidence Graph Transformer contributes 11 F1 points. The Local Evidence Retriever reuses spans emitted by the SciFact Corpus without re-parsing the source. The Local Evidence Retriever reuses spans emitted by the SciFact Corpus without re-parsing the source."
+          ]
+        },
+        {
+          "heading": "Conclusion",
+          "paragraphs": [
+            "The Evidence Graph Transformer reuses spans emitted by the SciFact Corpus without re-parsing the source. Unlike prior work, the Evidence Graph Transformer never fabricates a citation it cannot trace."
+          ]
+        }
+      ],
+      "concepts": [
+        {
+          "name": "Local Evidence Retriever",
+          "type": "System Component",
+          "acronym": "LER"
+        },
+        {
+          "name": "SciFact Corpus",
+          "type": "Dataset",
+          "acronym": null
+        },
+        {
+          "name": "Hybrid Retrieval Method",
+          "type": "Method",
+          "acronym": null
+        },
+        {
+          "name": "Evidence Graph Transformer",
+          "type": "Architecture",
+          "acronym": "EGT"
+        }
+      ],
+      "nested_pairs": [
+        [
+          "Evidence Graph",
+          "Evidence Graph Transformer"
+        ],
+        [
+          "Review Benchmark",
+          "Review Benchmark Dataset"
+        ]
+      ],
+      "metrics": [
+        "11 F1",
+        "12 GB",
+        "132 ms",
+        "17 F1",
+        "2 GB",
+        "20.5 F1",
+        "22 F1",
+        "4 GB",
+        "45.2%",
+        "450 ms",
+        "455 ms",
+        "46%",
+        "57%",
+        "59.2 F1",
+        "61%",
+        "696 ms",
+        "79 ms",
+        "8 GB",
+        "8.5%",
+        "807 ms",
+        "89 F1",
+        "94.2 F1",
+        "96.5%"
+      ],
+      "references": [
+        {
+          "author": "Wadden",
+          "year": 2020,
+          "title": "Fact or Fiction: Verifying Scientific Claims"
+        },
+        {
+          "author": "Karpukhin",
+          "year": 2020,
+          "title": "Dense Passage Retrieval for Open-Domain QA"
+        },
+        {
+          "author": "Beltagy",
+          "year": 2019,
+          "title": "SciBERT: A Pretrained Language Model for Scientific Text"
+        },
+        {
+          "author": "Vaswani",
+          "year": 2017,
+          "title": "Attention Is All You Need"
+        }
+      ]
+    }
+  },
+  "adversarial": {
+    "empty": {
+      "file": "docs/empty.bin",
+      "expect": "graceful-empty"
+    },
+    "corrupt_pdf": {
+      "file": "docs/corrupt.pdf",
+      "expect": "graceful-failure"
+    },
+    "misleading_extension": {
+      "file": "docs/misleading.txt",
+      "expect": "content-sniffing",
+      "canonical_text": "# Grounded Evidence Pipelines for Scientific Write-ups\n\n## Abstract\n\nWe pair the Evidence Graph Transformer with the Citation Verifier Pipeline to keep attribution exact. We pair the Review Benchmark Dataset with the Citation Verifier Pipeline to keep attribution exact. We pair the Adaptive Chunking Algorithm with the Review Benchmark Dataset to keep attribution exact.\n\nThe Citation Verifier Pipeline processes 149 documents while staying under 2 GB of memory. We pair the Review Benchmark Dataset with the Citation Verifier Pipeline to keep attribution exact. The Adaptive Chunking Algorithm processes 245 documents while staying under 4 GB of memory.\n\n## Introduction\n\nThe Evidence Graph Transformer reuses spans emitted by the Adaptive Chunking Algorithm without re-parsing the source. The Adaptive Chunking Algorithm processes 214 documents while staying under 4 GB of memory. The Evidence Graph Transformer reduces extraction error by 57% relative to the baseline.\n\nWe pair the Evidence Graph Transformer with the Adaptive Chunking Algorithm to keep attribution exact. The Adaptive Chunking Algorithm processes 120 documents while staying under 12 GB of memory. Ablation on the Review Benchmark Dataset shows the Adaptive Chunking Algorithm contributes 31 F1 points.\n\nThe Review Benchmark Dataset achieves 45.2% accuracy on the Review Benchmark Dataset. Unlike prior work, the Review Benchmark Dataset never fabricates a citation it cannot trace.\n\n## Methods\n\nWe pair the Review Benchmark Dataset with the Citation Verifier Pipeline to keep attribution exact. The Citation Verifier Pipeline processes 336 documents while staying under 2 GB of memory. Ablation on the Review Benchmark Dataset shows the Adaptive Chunking Algorithm contributes 59.5 F1 points.\n\nAblation on the Review Benchmark Dataset shows the Adaptive Chunking Algorithm contributes 51 F1 points. The Citation Verifier Pipeline reuses spans emitted by the Evidence Graph Transformer without re-parsing the source.\n\nUnlike prior work, the Citation Verifier Pipeline never fabricates a citation it cannot trace. Ablation on the Review Benchmark Dataset shows the Citation Verifier Pipeline contributes 69 F1 points. Across three seeds the Review Benchmark Dataset holds latency of 289 ms at p95.\n\nAblation on the Review Benchmark Dataset shows the Citation Verifier Pipeline contributes 85.5 F1 points. The Adaptive Chunking Algorithm reuses spans emitted by the Review Benchmark Dataset without re-parsing the source. Unlike prior work, the Adaptive Chunking Algorithm never fabricates a citation it cannot trace.\n\n## Experiments\n\nThe Review Benchmark Dataset achieves 65.2% accuracy on the Review Benchmark Dataset. Across three seeds the Citation Verifier Pipeline holds latency of 723 ms at p95.\n\nThe Adaptive Chunking Algorithm reuses spans emitted by the Review Benchmark Dataset without re-parsing the source. The Citation Verifier Pipeline achieves 66.2% accuracy on the Review Benchmark Dataset. The Review Benchmark Dataset achieves 80% accuracy on the Review Benchmark Dataset.\n\nThe Adaptive Chunking Algorithm processes 159 documents while staying under 12 GB of memory. Ablation on the Review Benchmark Dataset shows the Citation Verifier Pipeline contributes 45.2 F1 points.\n\n## Results\n\nThe Adaptive Chunking Algorithm achieves 11.2% accuracy on the Review Benchmark Dataset. Ablation on the Review Benchmark Dataset shows the Evidence Graph Transformer contributes 38 F1 points. Ablation on the Review Benchmark Dataset shows the Citation Verifier Pipeline contributes 81.5 F1 points.\n\nThe Adaptive Chunking Algorithm reuses spans emitted by the Review Benchmark Dataset without re-parsing the source. The Evidence Graph Transformer reuses spans emitted by the Citation Verifier Pipeline without re-parsing the source.\n\nThe Review Benchmark Dataset reduces extraction error by 80% relative to the baseline. Unlike prior work, the Review Benchmark Dataset never fabricates a citation it cannot trace. We pair the Adaptive Chunking Algorithm with the Citation Verifier Pipeline to keep attribution exact.\n\n## Discussion\n\nThe Adaptive Chunking Algorithm processes 210 documents while staying under 12 GB of memory. We pair the Citation Verifier Pipeline with the Adaptive Chunking Algorithm to keep attribution exact.\n\nAblation on the Review Benchmark Dataset shows the Citation Verifier Pipeline contributes 52.5 F1 points. The Review Benchmark Dataset reuses spans emitted by the Evidence Graph Transformer without re-parsing the source.\n\n## Conclusion\n\nAcross three seeds the Citation Verifier Pipeline holds latency of 218 ms at p95. Across three seeds the Review Benchmark Dataset holds latency of 740 ms at p95. The Evidence Graph Transformer achieves 90.5% accuracy on the Review Benchmark Dataset.\n\n## References\n\n[1] Beltagy (2019). SciBERT: A Pretrained Language Model for Scientific Text.\n\n[2] Vaswani (2017). Attention Is All You Need.\n\n[3] Karpukhin (2020). Dense Passage Retrieval for Open-Domain QA.\n\n[4] Wadden (2020). Fact or Fiction: Verifying Scientific Claims."
+    },
+    "unicode_normalization": {
+      "file": "docs/unicode.md",
+      "expect": "normalized-equivalence",
+      "canonical_text": "# Unicode Torture\n\n## Methods\n\nThe final \"Evidence Graph Transformer\" run - seeded deterministically - keeps café-style combining marks and non-breaking spaces intact enough to test normalization, smart 'quotes', and ligatures such as flow."
+    },
+    "page_furniture": {
+      "file": "docs/furniture.pdf",
+      "expect": "furniture-removed-footnote-kept",
+      "must_contain": [
+        "Footnote: the ablation corpus is public"
+      ],
+      "must_not_repeat": [
+        "Confidential Draft 7"
+      ],
+      "body_sentences": [
+        "The Evidence Graph Transformer anchors each citation to a source span.",
+        "Retrieval quality improves when page furniture is removed before chunking.",
+        "Footnote: the ablation corpus is public and must survive furniture removal."
+      ]
+    },
+    "dedup": {
+      "file": "docs/dedup.md",
+      "expect": "merge-required-and-forbidden",
+      "must_keep": [
+        "The Adaptive Chunking Algorithm splits on headings before size limits.",
+        "Citation audits reject any reference that lacks a source span.",
+        "The Local Evidence Retriever ranks 12 vault sentences by coverage.",
+        "The Local Evidence Retriever ranks 47 vault sentences by coverage.",
+        "The Global Evidence Retriever ranks 12 vault sentences by coverage."
+      ],
+      "must_merge_away": [
+        "The Local Evidence Retriever ranks 12 vault sentences by coverage!"
+      ]
+    },
+    "split_torture": {
+      "file": "docs/gamma.md",
+      "expect": "heading-precision-and-recall",
+      "gold_headings": [
+        "2. Methods",
+        "2.1 Data",
+        "2.2 Setup",
+        "Scoring Notes"
+      ],
+      "false_heading_traps": [
+        "Results are discussed later in the paper."
+      ]
+    }
+  },
+  "tabilify": {
+    "file": "docs/tabilify.md",
+    "records": [
+      {
+        "subject": "Evidence Graph Transformer",
+        "metric": "accuracy",
+        "value": "94.2",
+        "unit": "%",
+        "origin": "prose"
+      },
+      {
+        "subject": "baseline",
+        "metric": "accuracy",
+        "value": "92.1",
+        "unit": "%",
+        "origin": "prose"
+      },
+      {
+        "subject": "Evidence Graph Transformer",
+        "metric": "p95 latency",
+        "value": "182",
+        "unit": "ms",
+        "origin": "prose"
+      },
+      {
+        "subject": "control",
+        "metric": "accuracy",
+        "value": "88.4",
+        "unit": "%",
+        "origin": "prose"
+      },
+      {
+        "subject": "Evidence Graph Transformer",
+        "metric": "Accuracy",
+        "value": "94.2",
+        "unit": "%",
+        "origin": "table"
+      },
+      {
+        "subject": "Evidence Graph Transformer",
+        "metric": "p95 Latency",
+        "value": "182",
+        "unit": "ms",
+        "origin": "table"
+      },
+      {
+        "subject": "Local Evidence Retriever",
+        "metric": "Accuracy",
+        "value": "91.7",
+        "unit": "%",
+        "origin": "table"
+      },
+      {
+        "subject": "Local Evidence Retriever",
+        "metric": "p95 Latency",
+        "value": "145",
+        "unit": "ms",
+        "origin": "table"
+      },
+      {
+        "subject": "Baseline",
+        "metric": "Accuracy",
+        "value": "88.4",
+        "unit": "%",
+        "origin": "table"
+      },
+      {
+        "subject": "Evidence Graph Transformer",
+        "metric": "Memory",
+        "value": "12",
+        "unit": "GB",
+        "origin": "table"
+      },
+      {
+        "subject": "Local Evidence Retriever",
+        "metric": "Memory",
+        "value": "8",
+        "unit": "GB",
+        "origin": "table"
+      }
+    ],
+    "must_not_report": [
+      {
+        "subject": "Baseline",
+        "metric": "p95 Latency"
+      }
+    ]
+  },
+  "retrieval_hard": {
+    "corpus": [
+      "The Local Evidence Retriever (LER) ranks vault sentences by coverage.",
+      "LER keeps every citation span attached to its source sentence.",
+      "The Local Alignment Ranker reorders vault sentences by coverage.",
+      "Evidence retrieval from local vaults keeps drafted claims grounded.",
+      "The Citation Verifier Pipeline audits each reference before export.",
+      "Adaptive chunking splits documents on headings before size limits.",
+      "Graph edges record co-occurrence inside a shared section.",
+      "Export writes a valid DOCX package with native footnotes."
+    ],
+    "queries": [
+      {
+        "query": "LER",
+        "gold": [
+          "The Local Evidence Retriever (LER) ranks vault sentences by coverage.",
+          "LER keeps every citation span attached to its source sentence."
+        ],
+        "note": "acronym resolution"
+      },
+      {
+        "query": "local evidence retrieval",
+        "gold": [
+          "Evidence retrieval from local vaults keeps drafted claims grounded."
+        ],
+        "note": "paraphrase; sentence 2 is a near-topic distractor"
+      },
+      {
+        "query": "Local Evidence Retriever",
+        "gold": [
+          "The Local Evidence Retriever (LER) ranks vault sentences by coverage.",
+          "LER keeps every citation span attached to its source sentence."
+        ],
+        "note": "exact phrase vs distractor sentence 2"
+      }
+    ]
+  },
+  "graph_hard": {
+    "concepts": [
+      {
+        "id": "h1",
+        "name": "Evidence Graph Transformer",
+        "type": "Architecture",
+        "sectionIds": [
+          "s1",
+          "s2"
+        ],
+        "evidence": "The Evidence Graph Transformer anchors each claim to a span."
+      },
+      {
+        "id": "h2",
+        "name": "Graph Attention Encoder",
+        "type": "Architecture",
+        "sectionIds": [
+          "s2"
+        ],
+        "evidence": "The Graph Attention Encoder weights pairwise node messages."
+      },
+      {
+        "id": "h3",
+        "name": "Evidence Graph Decoder",
+        "type": "Architecture",
+        "sectionIds": [
+          "s3"
+        ],
+        "evidence": "The Evidence Graph Decoder reconstructs triples from node states."
+      },
+      {
+        "id": "h4",
+        "name": "Local Evidence Retriever",
+        "type": "System Component",
+        "sectionIds": [
+          "s1",
+          "s3"
+        ],
+        "evidence": "The Local Evidence Retriever ranks vault sentences by coverage."
+      },
+      {
+        "id": "h5",
+        "name": "Evidence Coverage Metric",
+        "type": "Metric",
+        "sectionIds": [
+          "s3"
+        ],
+        "evidence": "The Evidence Coverage Metric counts supported claims per section."
+      },
+      {
+        "id": "h6",
+        "name": "Citation Verifier Pipeline",
+        "type": "System Component",
+        "sectionIds": [
+          "s4"
+        ],
+        "evidence": "The Citation Verifier Pipeline audits each reference before export."
+      },
+      {
+        "id": "h7",
+        "name": "Verifier Pipeline Audit",
+        "type": "Method",
+        "sectionIds": [
+          "s5"
+        ],
+        "evidence": "The Verifier Pipeline Audit replays historical citation checks."
+      },
+      {
+        "id": "h8",
+        "name": "Adaptive Chunking Algorithm",
+        "type": "Method",
+        "sectionIds": [
+          "s4"
+        ],
+        "evidence": "The Adaptive Chunking Algorithm splits on headings first."
+      }
+    ],
+    "gold_edges": [
+      [
+        "Evidence Graph Transformer",
+        "Graph Attention Encoder"
+      ],
+      [
+        "Evidence Graph Transformer",
+        "Local Evidence Retriever"
+      ],
+      [
+        "Evidence Graph Decoder",
+        "Local Evidence Retriever"
+      ],
+      [
+        "Local Evidence Retriever",
+        "Evidence Coverage Metric"
+      ],
+      [
+        "Citation Verifier Pipeline",
+        "Adaptive Chunking Algorithm"
+      ]
+    ],
+    "false_edge_traps": [
+      [
+        "Evidence Graph Transformer",
+        "Evidence Graph Decoder"
+      ],
+      [
+        "Citation Verifier Pipeline",
+        "Verifier Pipeline Audit"
+      ],
+      [
+        "Evidence Graph Decoder",
+        "Evidence Coverage Metric"
+      ]
+    ]
+  },
+  "bibtex_hard": [
+    {
+      "author": "Müller, B.",
+      "year": 2024,
+      "title": "Benchmarks & Braces {Revisited}: 100% Coverage"
+    },
+    {
+      "author": "O'Neil, C.",
+      "year": null,
+      "title": "Undated Fragments"
+    }
+  ],
+  "version": 2
+}

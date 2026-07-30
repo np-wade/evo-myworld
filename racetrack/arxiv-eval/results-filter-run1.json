@@ -1,0 +1,67 @@
+{
+  "date": "2026-07-14",
+  "runs": 1,
+  "stage1": "list-month/curl_cffi",
+  "gold_papers": 243,
+  "fetch_p50_ms": 31563.7,
+  "dated_id_frac": 0.0,
+  "leaderboard": [
+    {
+      "filter": "abs-bisect",
+      "days": null,
+      "recall": 0.9259,
+      "precision": 0.8755,
+      "f1": 0.9,
+      "found_med": 257,
+      "net_fetches": 22,
+      "net_ms": 2538.9
+    },
+    {
+      "filter": "passthrough",
+      "days": null,
+      "recall": 1.0,
+      "precision": 0.0416,
+      "f1": 0.08,
+      "found_med": 5835,
+      "net_fetches": 0,
+      "net_ms": 0.0
+    },
+    {
+      "filter": "annc-d0",
+      "days": [
+        "2026-07-14"
+      ],
+      "recall": 1.0,
+      "precision": 0.0416,
+      "f1": 0.08,
+      "found_med": 5835,
+      "net_fetches": 0,
+      "net_ms": 0.0
+    },
+    {
+      "filter": "annc-d1",
+      "days": [
+        "2026-07-15"
+      ],
+      "recall": 1.0,
+      "precision": 0.0416,
+      "f1": 0.08,
+      "found_med": 5835,
+      "net_fetches": 0,
+      "net_ms": 0.0
+    },
+    {
+      "filter": "annc-d1d2",
+      "days": [
+        "2026-07-15",
+        "2026-07-16"
+      ],
+      "recall": 1.0,
+      "precision": 0.0416,
+      "f1": 0.08,
+      "found_med": 5835,
+      "net_fetches": 0,
+      "net_ms": 0.0
+    }
+  ]
+}

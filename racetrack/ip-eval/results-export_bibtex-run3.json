@@ -1,0 +1,19 @@
+{
+  "mode": "S8 BibTeX field coverage vs gold references (gate: emits entries)",
+  "n_entries": 1,
+  "candidates_unavailable": [],
+  "leaderboard": [
+    {
+      "candidate": "ip-incumbent",
+      "fails": 0,
+      "error": "",
+      "bibtex_coverage": 1.0,
+      "entry_count": 4,
+      "latency_ms_p50": 36.4,
+      "latency_ms_p95": 36.7,
+      "deterministic": 1,
+      "gate": "PASS",
+      "score": 1.0
+    }
+  ]
+}

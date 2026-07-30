@@ -1,0 +1,1358 @@
+\PassOptionsToPackage{sort&compress}{natbib}
+\documentclass[]{bytedance_seed}
+
+% single-column: \documentclass[]{bytedance_seed}, 
+%Please prioritize using single-column。
+
+% twocolumn: \documentclass[twocolumn]{bytedance_seed}
+
+\usepackage[toc,page,header]{appendix}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{minitoc}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{float}
+\floatstyle{ruled}
+\newfloat{algorithm}{t!}{loa}
+\floatname{algorithm}{Algorithm}
+\usepackage{algpseudocode}
+\usepackage{colortbl}
+\usepackage{subcaption}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,calc,positioning}
+
+% --- paper macros ---
+\providecommand{\method}{OPD}
+\providecommand{\shortopd}{ShortOPD}
+\providecommand{\best}[1]{{\bfseries #1}}
+\providecommand{\cmark}{\textcolor{teal}{\checkmark}}
+\providecommand{\xmark}{\textcolor{red!70!black}{\ensuremath{\times}}}
+% unnumbered footnote (first-page reproducibility note)
+\newcommand\blfootnote[1]{%
+  \begingroup
+  \renewcommand\thefootnote{}\footnote{#1}%
+  \addtocounter{footnote}{-1}%
+  \endgroup
+}
+
+\setlength{\textfloatsep}{10pt plus 2pt minus 2pt}
+\setlength{\floatsep}{8pt plus 2pt minus 2pt}
+\setlength{\intextsep}{8pt plus 2pt minus 2pt}
+\setcounter{topnumber}{3}
+\setcounter{totalnumber}{4}
+\renewcommand{\topfraction}{0.95}
+\renewcommand{\textfraction}{0.05}
+\renewcommand{\floatpagefraction}{0.8}
+
+
+
+
+
+
+% first-page header: logo on the left (as in the class), status tag on the right
+\fancypagestyle{firststyle}{
+  \fancyhead[L]{\vskip 4mm
+    \includegraphics[width=35mm,height=6mm]{seed/byte_logo.png}}
+  \fancyhead[R]{\vskip 4mm
+    {\sffamily\itshape\color{gray!60!black}Work in Progress}}
+}
+
+%%%%%%%%%%%%%%%%%%%%
+
+\title{ShortOPD: Recovering Pruned LLMs with Short-to-Long On-Policy Distillation}
+
+\author[2,3]{Qingyu Zhang}
+\author[2,3]{Qianhao Yuan}
+\author[2,\dagger]{Hongyu Lin}
+\author[2]{Yaojie Lu}
+\author[2,3]{\\ Xianpei Han}
+\author[2,3]{Le Sun}
+\author[1]{Xiang Li}
+\author[1]{Ming Xu}
+\author[1]{Jiarui Li}
+\author[1]{Xiuying Zhao}
+
+\affiliation[1]{ByteDance}
+\affiliation[2]{Chinese Information Processing Laboratory, Institute of Software, Chinese Academy of Sciences}
+\affiliation[3]{University of Chinese Academy of Sciences}
+
+\contribution[\dagger]{Corresponding author}
+
+\abstract{
+Structured pruning is a hardware-friendly way to compress LLMs, but it is
+mostly validated on multiple-choice recognition tasks, while the same
+compressed checkpoints can collapse on the free-form generation that
+deployment actually requires. Two observations trace this gap. First,
+greedy \textsc{pass}@$1$ nearly vanishes after compression, yet
+\textsc{pass}@$k$ recovers substantially under repeated sampling: useful
+generations are demoted, not erased. Second, the recoverable regime
+fails mainly through suffix repetition. Recovery should therefore train on the compressed
+model's own on-policy states with dense token-level supervision, which
+On-Policy Distillation (OPD) provides by reusing the pre-compression
+model as a frozen teacher. However, long on-policy rollouts spend early
+recovery budget on low-information repetitive suffixes, delaying loss
+descent. To mitigate this waste, we propose \textbf{\shortopd}, a short-to-long OPD schedule that
+detects teacher-confirmed repetitive suffixes, treats the surviving
+prefix as each rollout's effective length, and allocates future rollout
+budgets to the effective lengths the policy can currently use. Across
+math, code, and open-ended generation, \shortopd\ raises the compressed
+model's score to about $9\times$ its unrecovered value and
+$1.6$--$4.4\times$ standard recovery recipes (SFT w/o KD, KD, and SeqKD),
+and it matches a fixed $8192$-token rollout horizon within two points
+using a quarter of the training time ($8.5$ vs.\ $35.9$ hours) and $71\%$
+fewer rollout tokens.
+We hope this recipe helps move structured pruning beyond marginal gains
+on perplexity and multiple-choice benchmarks, a step closer to
+deployment-ready generation quality.
+}
+
+% You can add additional info fields as follows 
+%\checkdata[Project Page]{\url{xxx}}
+
+\begin{document}
+\maketitle
+
+% page-1 teaser: headline recovery bars, pinned below the abstract
+% (minipage + \captionof instead of a float, to control spacing exactly)
+\vspace{-5mm}
+\noindent\begin{minipage}{\linewidth}
+\centering
+\includegraphics[width=0.96\linewidth]{figures/fig_intro_headline.pdf}
+\captionof{figure}{Headline recovery on $25\%$-pruned Qwen3-4B-Instruct:
+domain-mean generation scores from Table~\ref{tab:main-results}
+(open-ended judge scores $\times 10$). \shortopd\ restores about
+two-thirds of the unpruned teacher's average of $75.2$.}
+\label{fig:intro-headline}
+\end{minipage}
+
+%不需要目录就注释掉 注意目录不要和第一页放在一块 要有\newpage
+%\newpage
+%\tableofcontents
+%\newpage
+
+\input{sections/introduction}
+\input{sections/relatedwork}
+\input{sections/approach}
+\input{sections/experiments}
+
+
+\clearpage
+
+\bibliographystyle{unsrtnat}
+\bibliography{main}
+
+\clearpage
+
+\beginappendix
+
+\input{sections/appendix}
+
+\end{document}
+
+\section{Training details}
+\label{app:train}
+
+\paragraph{Compression.}
+Qwen3-4B-Instruct-2507 has
+$36$ transformer blocks. BI is calibrated on $100$ PG-19 documents, and
+the nine lowest-BI blocks are removed
+(Table~\ref{tab:pruned-layers}); indices are reported before the
+retained blocks are renumbered at export.
+The frozen original model serves as the teacher and the compressed
+student initializes the actor.
+
+\begin{table}[h!]
+\centering
+\small
+\renewcommand{\arraystretch}{1.12}
+\setlength{\tabcolsep}{6pt}
+\caption{Pruned configuration.}
+\label{tab:pruned-layers}
+\begin{tabular}{@{}cccc@{}}
+\toprule
+Original depth & Removed block IDs (zero-based) & Student depth & Param.\ reduction \\
+\midrule
+$36$ & $25$--$33$ (layers $26$--$34$, one-based) & $27$ & ${\sim}25\%$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Main on-policy recovery runs.}
+Training uses the $45{,}447$-prompt math/code/open-ended corpus of
+Section~\ref{sec:setup} with rollout group $8$, train batch $64$, maximum
+prompt and response lengths of $4096$ tokens each, rollout temperature
+$0.8$, and learning rate $2\times10^{-6}$. The objective is the
+top-$100$+tail generalized JSD with $\alpha=0.5$ and importance weights
+clipped at $2.0$; no policy-gradient loss is used. One epoch is $710$
+steps; the main-table checkpoint is step $709$.
+
+\paragraph{Baselines and export.}
+The offline baselines (SFT w/o KD, SeqKD, KD) train on the same prompt
+distribution with the method-specific fixed responses of
+Section~\ref{sec:setup}, using sequence length $8192$, batch $64$,
+learning rate $2\times10^{-6}$, and one epoch ($710$ steps); KD uses
+forward KL at temperature $1.0$ with no hard-label cross-entropy term.
+The GSM8K-only comparison trains the RLVR baselines (PPO and GRPO) and
+\shortopd\ on its $7{,}473$ prompts for one epoch ($117$ steps) with $8$
+rollouts per prompt and batch $64$; PPO uses GAE with a critic
+initialized from the compressed student (learning rate $10^{-5}$), while
+GRPO uses group-relative advantages. All runs checkpoint every $50$ steps and at the final step, and
+checkpoints are exported in HF format without optimizer states.
+
+\paragraph{Efficiency runs and controller.}
+The \shortopd\ and fixed-horizon efficiency runs reuse the corpus,
+objective, batch size, rollout count, and learning rate above; they
+differ only in rollout temperature ($0.7$) and response ceiling ($2048$
+for \shortopd\ and fixed $H{=}2048$; $8192$ for fixed $H{=}8192$). These
+two $H{\leq}2048$ runs also provide the training trajectories shown in
+Figures~\ref{fig:intro-prune-rep}(b), \ref{fig:shortopd-traj},
+and~\ref{fig:shortopd-efficiency}(a). The controller
+checkpoints its current budget and all EMA state across restarts.
+Table~\ref{tab:controller-config} lists the detector and controller
+hyperparameters; symbols follow Algorithm~\ref{alg:terminal-loop}.
+
+\begin{table}[h!]
+\centering
+\small
+\renewcommand{\arraystretch}{1.12}
+\setlength{\tabcolsep}{6pt}
+\caption{Detector and \shortopd\ controller hyperparameters.}
+\label{tab:controller-config}
+\begin{tabular}{@{}lc@{}}
+\toprule
+Parameter & Value \\
+\midrule
+Suffix window $W$ & $512$ \\
+Candidate periods $p$ & $1$--$10$ \\
+Terminal anchor / agreement $(A,\eta)$ & $(32, 0.90)$ \\
+Minimum cycles / tail $(C,L_{\min})$ & $(3, 64)$ \\
+Severe-loop tail & $\geq 128$ tokens or $30\%$ of suffix \\
+Confirmation / baseline window & $32$ / $64$ tokens \\
+OPD-loss threshold & $\max(0.05,\,0.25\,\bar d_{\mathrm{base}})$ \\
+Teacher-NLL threshold & $\max(0.5,\,0.25\,\bar u_{\mathrm{base}})$ \\
+Rate thresholds $(\rho_{\mathrm{low}},\rho_{\mathrm{high}},\tau)$ & $(0.20, 0.45, 0.10)$ \\
+Statistic / budget EMA decays & $0.7$ / $0.7$ \\
+Margin $\lambda$ / growth $\gamma_{\uparrow}$ & $1.15$ / $1.25$ \\
+Budget rounding & multiples of $16$ \\
+Initial budget / bounds & $2048$ / $[1024, 2048]$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\FloatBarrier
+
+Because low loss participates in defining effective length, it never opens
+the shrink gate: only the independent repetition-rate threshold can do so.
+The probe does not mask the loss; training always applies dense OPD to the
+tokens actually generated.
+
+
+\section{Terminal periodic-loop detector}
+\label{app:loop-detector}
+Algorithm~\ref{alg:terminal-loop} gives the token-only detector used by
+the controller. It searches only the last $W{=}512$ valid response tokens
+and tests periods $p\in\{1,\ldots,10\}$. For a given period, each token is
+compared with the token $p$ positions earlier. This shifted comparison does
+not require the response to end on a cycle boundary, so a rollout truncated
+part-way through its final cycle is still detected. Requiring high agreement
+at the raw response end prevents repeated material followed by a clean ending
+from firing the controller.
+
+\begin{algorithm}[h!]
+\caption{Severe terminal periodic-loop detection}
+\label{alg:terminal-loop}
+\small
+\begin{algorithmic}[1]
+\Require valid response tokens $y$; suffix window $W{=}512$; maximum period $P{=}10$;
+terminal anchor $A{=}32$; agreement $\eta{=}0.9$; minimum cycles $C{=}3$;
+minimum tail $L_{\min}{=}64$; severe length $L_{\mathrm{sev}}{=}128$;
+severe fraction $\phi{=}0.30$
+\State $z\gets\mathrm{Last}_{W}(y)$; $n\gets|z|$; $\mathcal C\gets\varnothing$
+\For{$p=1,\ldots,\min(P,n-1)$}
+  \State $c^{(p)}_k\gets\mathbb{1}[z_{p+k}=z_k]$ for $k=1,\ldots,n-p$
+  \If{$\operatorname{Mean}(\mathrm{Last}_{A}(c^{(p)}))<\eta$}
+    \State \textbf{continue} \Comment{the periodic pattern does not reach the response end}
+  \EndIf
+  \State $k_p\gets\max\{k:\operatorname{Mean}(\mathrm{Last}_{k}(c^{(p)}))\geq\eta\}$
+  \State $L_p\gets k_p+p$; $u_p\gets\operatorname{Mean}(\mathrm{Last}_{k_p}(c^{(p)}))$
+  \If{$L_p\geq L_{\min}$ \textbf{and} $L_p/p\geq C$
+      \textbf{and} $(L_p\geq L_{\mathrm{sev}}$ \textbf{or} $L_p/n\geq\phi)$}
+    \State add $(L_p,u_p,p)$ to $\mathcal C$
+  \EndIf
+\EndFor
+\If{$\mathcal C=\varnothing$}
+  \State \Return \textsc{not-severe}, $|y|$
+\EndIf
+\State $(L^*,u^*,p^*)\gets\arg\max_{(L,u,p)\in\mathcal C}(L,u,-p)$
+\State \Return \textsc{severe}, $|y|-L^*$, $p^*$
+\end{algorithmic}
+\end{algorithm}
+
+The lexicographic choice prefers the longest explained terminal tail, then
+higher periodic agreement, then the shorter period. The detector alone
+decides whether a rollout is severely repetitive. Its returned onset is the
+structural effective-length candidate. We then search locally from that onset
+for the first $32$-token window whose OPD loss and teacher NLL fall below their
+absolute/relative thresholds; this refines the boundary but does not decide
+whether repetition exists. If no loss-confirmed boundary is found, the
+structural onset is retained. A rollout contributes to the \emph{clean
+truncation rate} only if it fills $H_s$ and this detector does not mark it
+severely repetitive.
+
+\FloatBarrier
+
+\section{Conditional OPD gradient at teacher--student agreement}
+\label{app:gradient-derivation}
+That a smooth divergence has zero gradient at its minimum is immediate;
+the content of this appendix is the \emph{rate} at which the implemented
+per-token gradient vanishes near teacher--student agreement, and that the
+two implementation details -- top-$K$+tail aggregation and clipped
+importance weighting -- preserve this stationary point.
+Condition on one sampled prefix $(x,y_{<t})$ and treat that discrete state as
+fixed during back-propagation, as in the implemented on-policy distillation
+update. Let $p$ be the frozen teacher distribution and
+$q=\operatorname{softmax}(z)$ the student distribution. For the canonical
+forward-KL token loss $\ell_{\mathrm{KL}}=\mathrm{KL}(p\|q)$, the standard
+softmax-cross-entropy derivative gives
+\begin{equation}
+\frac{\partial \ell_{\mathrm{KL}}}{\partial z_j}=q_j-p_j,
+\qquad
+\nabla_\theta\ell_{\mathrm{KL}}
+=J_{z,\theta}^{\top}(q-p).
+\label{eq:app-forward-kl-grad}
+\end{equation}
+The conditional gradient therefore vanishes as the student distribution
+approaches the teacher distribution.
+
+Our implementation uses generalized JSD rather than forward KL. For
+$m=\alpha p+(1-\alpha)q$, the generalized Jensen--Shannon divergence is
+\begin{equation}
+D_\alpha(p,q)
+=\alpha\sum_i p_i\log\frac{p_i}{m_i}
+ +(1-\alpha)\sum_i q_i\log\frac{q_i}{m_i}.
+\label{eq:app-gjsd}
+\end{equation}
+Because $\partial m_i/\partial q_i=1-\alpha$, differentiating both KL
+terms makes their non-logarithmic terms cancel:
+\begin{align}
+\frac{\partial D_\alpha}{\partial q_i}
+&=-\frac{\alpha(1-\alpha)p_i}{m_i}
+ +(1-\alpha)\!\left(
+ \log\frac{q_i}{m_i}+1-\frac{(1-\alpha)q_i}{m_i}
+ \right) \notag\\
+&=(1-\alpha)\log\frac{q_i}{m_i}.
+\label{eq:app-gjsd-qgrad}
+\end{align}
+The softmax Jacobian is
+$\partial q_i/\partial z_j=q_i(\mathbb{1}[i=j]-q_j)$. Applying the chain
+rule therefore gives
+\begin{align}
+\frac{\partial D_\alpha}{\partial z_j}
+&=(1-\alpha)\sum_i \log\frac{q_i}{m_i}
+ q_i(\mathbb{1}[i=j]-q_j) \notag\\
+&=(1-\alpha)q_j\left[
+\log\frac{q_j}{m_j}-\sum_iq_i\log\frac{q_i}{m_i}
+\right].
+\label{eq:app-gjsd-zgrad}
+\end{align}
+At $q=p$, we also have $m=p$, so every logarithm in
+Equation~\eqref{eq:app-gjsd-zgrad} is zero and the conditional logit
+gradient is exactly zero. More locally, writing $q=p+\delta$ with
+$\sum_i\delta_i=0$ and assuming $p_i>0$ on the retained support,
+\begin{equation}
+\log\frac{q_i}{m_i}
+=\alpha\frac{\delta_i}{p_i}+O(\delta_i^2/p_i^2),
+\qquad
+\frac{\partial D_\alpha}{\partial z_j}
+=\alpha(1-\alpha)\delta_j+O(\|\delta\|^2/\min_i p_i),
+\label{eq:app-gjsd-local}
+\end{equation}
+so the logit gradient vanishes linearly as the two distributions agree
+(at $\alpha{=}0.5$, with slope $1/4$ of the forward-KL gradient
+$q_j-p_j=\delta_j$).
+For model parameters $\theta$,
+$\nabla_\theta D_\alpha=J_{z,\theta}^{\top}\nabla_zD_\alpha$; hence the
+parameter gradient also tends to zero whenever the local logit Jacobian is
+bounded.
+
+Our implementation evaluates Equation~\eqref{eq:app-gjsd} after mapping the
+vocabulary distribution into the teacher top-$100$ bins plus one aggregated
+tail bin. This mapping is differentiable, and the analysis above applies
+verbatim to the binned distributions, so the gradient vanishes already when
+the \emph{binned} distributions agree -- a strictly weaker condition than
+full-vocabulary agreement, since differences inside the tail bin are
+invisible to the loss. This is the relevant condition for the loop states
+of Section~\ref{sec:intro}: teacher and student need only agree at this
+coarse granularity for the update to carry no signal. The clipped importance multiplier is bounded by
+construction; at exact agreement, both the divergence and its gradient are
+zero, so multiplying by this weight also preserves the stationary point.
+This is a conditional, per-token statement rather than a claim that every
+small scalar loss implies a small full-objective gradient. Empirically, the
+low JSD measures teacher--student agreement on loop states, while the
+separately reported low teacher NLL shows that the teacher itself assigns
+high probability to continuing the observed loop.
+
+
+\section{Evaluation details}
+\label{app:eval}
+GSM8K uses the full test split ($1{,}319$ examples) and exact/normalized answer
+matching. MATH-500 uses boxed-answer extraction and normalization. HumanEval
+($164$ examples) and sanitized MBPP ($257$ examples) are evaluated with execution
+\textsc{pass}@$1$ in a subprocess sandbox. Alpaca, QA, Summarization, and
+MT-Bench~\citep{zheng2023mtbench} use fixed EAGLE-style prompt sets and are judged
+on a $1$--$10$ scale by GPT-5.5, which is
+neither the teacher nor a Qwen model.
+
+\section{Repetition versus pruning depth: the full sweep}
+\label{app:prunesweep}
+Figure~\ref{fig:intro-prune-rep}(a) shows the suffix-repetition rate for
+$0$--$12$ removed layers; Figure~\ref{fig:prune-sweep-full} extends the
+sweep to all $36$ layers of Qwen3-4B-Instruct, with the distinct-$2$
+diversity of the generations on the right axis. Three regimes emerge.
+While the model remains a coherent generator ($k\!\leq\!12$), repetition
+grows monotonically with removed depth and distinct-$2$ falls: the model
+retains enough structure to sustain $n$-gram loops, and looping is its
+dominant degeneration mode. Beyond $k\!\approx\!13$, outputs disintegrate
+into incoherent token sequences: distinct-$2$ rebounds toward that of
+random text and $n$-gram loops no longer form, so the measured repetition
+rate collapses even though the model is far more damaged. At the extreme
+($k\!\geq\!35$), the near-empty stack degenerates into trivial single-token
+loops and the repetition rate saturates at $100\%$. The probe, generation
+settings, and repetition detector are identical across all points
+(Section~\ref{sec:shortopd-exp} and Appendix~\ref{app:train}).
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.72\linewidth]{figures/fig_prune_sweep_full.pdf}
+\caption{Full pruning sweep on the $192$-prompt probe: suffix-repetition
+rate (left axis) and distinct-$2$ diversity (right axis) versus the number
+of BI-pruned layers. Repetition is the characteristic failure mode only in
+the coherent regime ($k\!\leq\!12$); deeper pruning collapses generation
+into incoherent text where loops no longer form.}
+\label{fig:prune-sweep-full}
+\end{figure}
+
+\paragraph{Qualitative collapse regimes.}
+Table~\ref{tab:collapse-cases} shows short excerpts from the same probe. The
+$25\%$ compression point is still structured enough to produce recognizable
+prefixes and repetitive suffixes; deeper compression often leaves the repetition
+metric by entering an incoherent mixed-token regime instead.
+
+\begin{table}[h!]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.2}
+\caption{Probe excerpts illustrating the transition from normal generation to
+repetition and then to incoherent collapse. Green indicates usable content;
+red indicates repeated or incoherent content.}
+\label{tab:collapse-cases}
+\begin{tabular}{p{0.18\linewidth}p{0.76\linewidth}}
+\toprule
+Regime & Excerpt \\
+\midrule
+Uncompressed &
+\textcolor{green!45!black}{\ttfamily Let's solve this step by step. We are told: Candice originally had 80 post-it notes... total post-its before placing on cups = post-its used + remaining.} \\
+$25\%$ compressed, loop &
+\textcolor{green!45!black}{\ttfamily Reason step step:}\ 
+\textcolor{red!70!black}{\ttfamily step step step step solve step step step ... so.so.so. so.s.so.s ... ).").").").")} \\
+Deeper compression, incoherent &
+\textcolor{red!70!black}{\ttfamily Lonisolths\textasciitilde\ ``CCCCCCCC...'' Spain possessions ... JSON:!QQVV ... @@\#\# ... include\_app ...} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Multiple-choice sanity check}
+\label{app:mc}
+Although the main evaluation targets free-form generation, we also evaluate
+held-out multiple-choice recovery on ARC-Challenge, HellaSwag, MMLU, and
+WinoGrande. These benchmarks are not part of the recovery corpus.
+Table~\ref{tab:mc-sanity} reports Qwen3-4B-Instruct results under
+candidate log-likelihood scoring over the answer options; SFT-init
+\shortopd\ is \shortopd\ initialized from the one-epoch SFT w/o KD
+checkpoint instead of the raw pruned student, trained with the otherwise
+identical one-epoch recipe.
+
+The pattern is the mirror image of the main results, and we read it as
+further evidence that recognition and generation recover along partly
+independent axes. Candidate log-likelihood scoring is itself an
+off-policy, teacher-forced task: the model must assign high likelihood to
+externally written text it did not generate. SFT and KD optimize exactly
+this objective on fixed sequences, so they recover it best ($74.9$ and
+$74.4$ Avg) while remaining far behind on generation
+(Table~\ref{tab:main-results}). \shortopd\ optimizes the complementary
+objective: it reshapes the student's distribution on its own rollouts and
+never trains likelihood on external text, so it dominates generation
+while its one-epoch MC average sits lower ($67.6$) -- though still $22$
+points above the untrained pruned model and improving with exposure
+($71.6$ at three epochs). Neither direction of the recognition-generation
+gap (Section~\ref{sec:intro}) certifies the other. The two signals are
+complementary rather than conflicting: SFT-init \shortopd\ composes them
+and recovers both axes, matching the dense teacher's MC average
+($76.8$ vs.\ $76.7$).
+
+\begin{table}[h!]
+\centering
+\small
+\renewcommand{\arraystretch}{1.15}
+\setlength{\tabcolsep}{4.2pt}
+\caption{Held-out multiple-choice recovery for the $25\%$-pruned
+Qwen3-4B-Instruct, scored by candidate log-likelihood over the answer
+options. Scores are accuracies in percent.}
+\label{tab:mc-sanity}
+\begin{tabular}{lccccc}
+\toprule
+Method & ARC-C & HellaSwag & MMLU & WinoG. & Avg \\
+\midrule
+Dense teacher             & 89.93 & 80.60 & 70.93 & 65.19 & 76.66 \\
+Pruned ($-25\%$, untrained) & 49.49 & 41.67 & 41.65 & 49.80 & 45.65 \\
+SFT w/o KD                & 89.33 & 76.89 & 69.09 & 64.09 & 74.85 \\
+SeqKD                     & 83.36 & 72.65 & 64.19 & 63.06 & 70.82 \\
+KD             & 87.71 & 77.13 & 67.59 & 65.04 & 74.37 \\
+\shortopd\ (1 epoch)      & 79.52 & 68.89 & 60.70 & 61.33 & 67.61 \\
+\shortopd\ (3 epochs)     & 84.47 & 75.59 & 64.59 & 61.72 & 71.59 \\
+SFT-init \shortopd\       & \best{89.93} & \best{79.67} & \best{69.99} & \best{67.64} & \best{76.81} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+\section{Method}
+\label{sec:approach}
+
+We first formalize OPD as a recovery recipe for structurally compressed
+LLMs. The experiments instantiate compression with Block-Influence depth
+pruning because it is simple, hardware-friendly, and representative of
+structured pruning, but the recovery objective only requires a compressed
+student and its pre-compression self. We then present \shortopd, a
+short-to-long OPD schedule driven by repetition and truncation feedback;
+Figure~\ref{fig:shortopd-framework} gives the overview and
+Algorithm~\ref{alg:shortopd} the procedure. Finally, we place \shortopd\
+and its baselines in a single design space.
+
+\subsection{Preliminaries: pruning and the OPD base recipe}
+\label{sec:opd}
+
+\paragraph{Representative structured pruning operator.}
+Let $X_{i,t}$ denote the hidden state of token $t$ entering layer $i$.
+ShortGPT's Block Influence (BI) of layer $i$ is
+\begin{equation}
+\mathrm{BI}_i \;=\; 1 - \mathbb{E}_{X,t}\!\left[
+\frac{X_{i,t}^{\top} X_{i+1,t}}{\lVert X_{i,t}\rVert_2 \, \lVert X_{i+1,t}\rVert_2}
+\right],
+\label{eq:bi}
+\end{equation}
+so a low $\mathrm{BI}_i$ marks a layer that barely changes the hidden
+state. We remove the lowest-BI layers until roughly $25\%$ of parameters
+are gone, obtaining the compressed student $\pi_\theta$, and keep the
+original model $\pi_T$ as a frozen teacher. The operator is only the
+experimental object: \shortopd\ assumes nothing beyond $\pi_\theta$ being
+a structurally compressed descendant of $\pi_T$.
+
+\paragraph{On-policy self-distillation.}
+Following the two implications of Section~\ref{sec:intro}, the recovery
+objective should repair the student on the states it actually visits and
+at token granularity. OPD satisfies both: for each prompt $x$, the
+student samples on-policy rollouts $y\sim\pi_\theta(\cdot\mid x)$, the
+frozen teacher $\pi_T$ is run on the same trajectories, and the student
+matches the teacher's next-token distribution at every response position:
+\begin{equation}
+\mathcal{L}_{\mathrm{OPD}}(\theta)
+= \mathbb{E}_{x}\,\mathbb{E}_{y\sim\pi_\theta(\cdot\mid x)}
+\!\left[\frac{1}{|y|}\sum_{t=1}^{|y|}
+D_{\alpha}\!\big(\pi_T(\cdot\mid x,y_{<t}),\,\pi_\theta(\cdot\mid x,y_{<t})\big)\right],
+\label{eq:opd}
+\end{equation}
+where $D_{\alpha}$ is a generalized Jensen--Shannon divergence; we
+distill the top-$100$ logits plus an aggregated tail mass, with clipped
+importance weighting against the rollout policy. With a large
+teacher--student capacity gap, forward KL is mode-covering and can force
+a limited student to spread probability mass across teacher modes,
+whereas reverse KL is mode-seeking but may reduce
+diversity~\citep{gu2024minillm,agarwal2024gkd}. This trade-off is
+independent of whether the training trajectories are off- or on-policy
+and remains task-dependent~\citep{agarwal2024gkd}. We therefore use the
+balanced choice $\alpha=0.5$, a bounded compromise that avoids extreme
+log-ratio penalties when the teacher and damaged student differ sharply.
+Equation~\eqref{eq:opd} is on-policy (the expectation is over student
+samples), dense (every generated token receives a distributional
+target), and reward-free, so it applies equally to verifiable math/code
+prompts and open-ended instruction prompts. Because the teacher is the
+pre-compression self, OPD pulls the student back toward its own original
+behavior on the trajectories it actually produces.
+
+\subsection{Short-to-Long On-Policy Distillation}
+\label{sec:shortopd}
+
+\begin{figure}[t!]
+\centering
+\includegraphics[width=\linewidth]{figures/layeropd_overview.pdf}
+\caption{\shortopd\ closes a second control loop around OPD.
+\textbf{Distillation loop (blue):} under the current budget $H$, the
+compressed student samples on-policy rollouts (finishing early, truncated
+at $H$, or collapsing into a repetitive suffix); the frozen
+pre-compression teacher re-scores the same tokens and returns a dense
+top-$K$ distribution target at every position. \textbf{Budget loop
+(orange):} a token-only terminal-periodic probe reports severe repetition;
+its onset, locally refined by the existing OPD loss and teacher NLL, gives
+effective length. The fraction of non-repetitive rollouts that fill $H$
+gives the clean truncation rate. High repetition sets a shrink target from
+the EMA of mean effective length; low repetition and high clean truncation
+set a growth target. The next budget is an EMA-smoothed move toward that
+target.}
+\label{fig:shortopd-framework}
+\end{figure}
+
+\begin{algorithm}[t!]
+\caption{\shortopd}
+\label{alg:shortopd}
+\small
+\begin{algorithmic}[1]
+\Require prompts $\mathcal{B}$, student $\pi_\theta$, teacher $\pi_T$, bounds $H_{\min},H_{\max}$, thresholds $\rho_{\mathrm{low}},\rho_{\mathrm{high}},\tau$, margin $\lambda$, growth $\gamma_{\uparrow}$, EMA decays $\beta,\beta_H$
+\State $H_1 \gets H_{\max}$; initialize EMAs
+\For{training step $s=1,\ldots,S$}
+  \State sample rollouts $y_i\sim\pi_\theta(\cdot\mid x_i)$ with budget $H_s$
+  \State $a_i\gets\operatorname{TerminalLoop}(y_i)$;
+  $r_s\gets B^{-1}\sum_i a_i$
+  \State $q_s\gets B^{-1}\sum_i\mathbb{1}[|y_i|=H_s\ \land\ a_i=0]$
+  \State run $\pi_T$ on the same trajectories
+  \State update $\theta$ with the dense OPD loss over all generated tokens (Eq.~\ref{eq:opd})
+  \State compute effective lengths $\ell_i$ and mean $L_s$; update $\bar r_s,\bar q_s,\bar L_s$
+  \If{$\bar r_s>\rho_{\mathrm{high}}$}
+    \State $H_s^*\gets\min(H_s,\lambda\bar L_s)$
+  \ElsIf{$\bar r_s<\rho_{\mathrm{low}}$ \textbf{and} $\bar q_s>\tau$}
+    \State $H_s^*\gets\gamma_{\uparrow}H_s$
+  \Else
+    \State $H_s^*\gets H_s$
+  \EndIf
+  \State $H_{s+1}\gets\mathrm{clip}_{[H_{\min},H_{\max}]}(\lfloor\beta_HH_s+(1-\beta_H)H_s^*\rceil_{16})$
+\EndFor
+\end{algorithmic}
+\end{algorithm}
+
+
+Equation~\eqref{eq:opd} implicitly assumes that the student's rollouts are
+usable training states. Under strong compression this assumption becomes
+horizon-dependent: a long fixed budget reaches repetitive suffixes before
+the policy has recovered, while a permanently short budget truncates
+legitimate long generations later. \shortopd\ therefore keeps the global
+\texttt{response\_length} as a static padding and context ceiling, but sets
+a per-step sampling budget $H_t \le H_{\max}$. The budget is not driven by
+batch-mean loss, which is lowest precisely during the repetitive warm-up
+(Figure~\ref{fig:intro-prune-rep}b). Instead, \shortopd\ observes three
+statistics at every step: how many rollouts end in a severe periodic loop,
+how many non-repetitive rollouts exhaust the current budget, and the mean
+usable prefix before the detected loop. Repetition is the first-level gate:
+effective length may shorten the budget only when repetition is high,
+whereas low repetition and high clean truncation permit longer rollouts.
+
+
+\paragraph{Generation-side feedback.}
+For rollout $y_i$ at step $s$, the probe examines only its last $W$ valid
+tokens. Let $a_i=1$ when the terminal-periodic detector of
+Appendix~\ref{app:loop-detector} finds a severe loop and $a_i=0$ otherwise.
+Let $b_i=1$ only when the rollout fills the current budget without such a
+loop, i.e., $|y_i|=H_s$ and $a_i=0$. The structural loop onset is locally
+refined using the OPD divergence and teacher NLL to obtain effective length
+$\ell_i$; these loss signals refine the boundary but never determine
+$a_i$. We set $\ell_i=|y_i|$ when no severe loop is found. The batch
+statistics and their EMAs are
+\begin{equation}
+r_s=\frac{1}{B}\sum_{i=1}^{B}a_i,
+\qquad
+q_s=\frac{1}{B}\sum_{i=1}^{B}b_i,
+\qquad
+L_s=\frac{1}{B}\sum_{i=1}^{B}\ell_i,
+\qquad
+(\bar r_s,\bar q_s,\bar L_s)=\operatorname{EMA}_{\beta}(r_s,q_s,L_s).
+\label{eq:controller-signals}
+\end{equation}
+The suffix restriction avoids reacting to repeated structure earlier in a
+valid response, and the EMA suppresses single-batch fluctuations. These
+statistics reuse tokens and teacher scores already produced by OPD and
+require no extra forward pass. The effective-length probe is control-only:
+the current batch still receives the unmodified dense OPD loss of
+Equation~\eqref{eq:opd} over all generated tokens.
+
+\paragraph{Repetition-gated horizon control.}
+The controller first forms a gated target
+\begin{equation}
+H_s^*=
+\begin{cases}
+\min(H_s,\lambda\bar L_s),
+    & \bar r_s>\rho_{\mathrm{high}},\\
+\gamma_{\uparrow}H_s,
+    & \bar r_s<\rho_{\mathrm{low}}\ \land\ \bar q_s>\tau,\\
+H_s, & \text{otherwise},
+\end{cases}
+\qquad
+H_{s+1}=\mathrm{clip}_{[H_{\min},H_{\max}]}\!\Big(\Big\lfloor
+\beta_H H_s+(1-\beta_H)H_s^*
+\Big\rceil_{16}\Big).
+\label{eq:shortopd}
+\end{equation}
+Here $\lambda>1$ retains headroom beyond the observed usable prefix,
+$\gamma_{\uparrow}>1$ proposes growth, and $\beta_H$ smooths both
+directions before rounding to multiples of $16$. The hysteresis band
+$\rho_{\mathrm{low}}<\rho_{\mathrm{high}}$ prevents oscillation. High
+repetition has priority even when truncation is also high, and its severity
+determines the shrink target through $\bar L_s$. Growth requires both clean
+suffixes and evidence that the current horizon is binding. Consequently,
+short clean responses cannot reduce the budget merely by lowering average
+length. We initialize at $H_{\max}$ and checkpoint the current budget and
+all three EMAs across restarts.
+Algorithm~\ref{alg:shortopd} summarizes the loop.
+
+
+\subsection{A design space for recovery signals}
+\label{sec:design}
+\shortopd\ is one cell of a space spanned by two axes: trajectory source
+(on-policy student rollouts vs.\ off-policy fixed data) and supervision
+(dense teacher distribution vs.\ hard labels or sparse reward). Table~\ref{tab:design}
+summarizes where each recovery method sits. Our Qwen3 experiments
+instantiate SFT w/o KD, SeqKD, KD, and \shortopd\ on the
+same prompt distribution, and add a GSM8K-only RLVR comparison for the sparse
+on-policy cell:
+
+\begin{table}[t!]
+\centering
+\small
+\setlength{\tabcolsep}{6pt}
+\caption{Recovery methods organized by the two design axes. Only
+\shortopd\ trains on the compressed student's own states with a dense
+token-level signal while steering the rollout budget away from
+low-information suffixes; it requires neither ground-truth responses nor a
+reward verifier.}
+\label{tab:design}
+\begin{tabular}{lcccc}
+\toprule
+Method & On-policy states & Dense signal & Label-free & Verifier-free \\
+\midrule
+SFT w/o KD        & \xmark & \xmark & \xmark & \cmark \\
+SeqKD             & \xmark & \xmark & \cmark & \cmark \\
+KD                & \xmark & \cmark & \xmark & \cmark \\
+RLVR              & \cmark & \xmark & \xmark & \xmark \\
+\best{\shortopd\ (ours)} & \cmark & \cmark & \cmark & \cmark \\
+\bottomrule
+\end{tabular}
+\end{table}
+\begin{itemize}
+  \item \textbf{SFT w/o KD}: standard supervised finetuning on the corpus's
+  original golden responses. This tests whether simply training the compressed
+  model on the same data is enough.
+  \item \textbf{SeqKD}~\citep{kim2016sequence}: SFT on fixed responses
+  generated by the same pre-compression teacher $\pi_T$. This shares OPD's teacher
+  but removes the on-policy trajectory source.
+  \item \textbf{KD}~\citep{hinton2015distilling,agarwal2024gkd}: teacher-forced
+  token-level distillation (also known as word-level KD) that keeps SFT's fixed
+  sequences but replaces hard labels with the teacher's next-token
+  distributions. This shares OPD's dense signal but removes the on-policy
+  trajectory source.
+  \item \textbf{RLVR}~\citep{schulman2017ppo,shao2024deepseekmath}: on-policy
+  learning with a sparse correctness reward on GSM8K; we instantiate it with
+  both PPO and GRPO. This shares OPD's on-policy sampling but replaces dense
+  teacher distributions with sparse answer rewards.
+  \item \textbf{\shortopd\ (ours)}: on-policy rollouts with dense
+  self-distillation targets and the repetition-gated budget controller of
+  Section~\ref{sec:shortopd}.
+\end{itemize}
+
+\section{Experiments}
+\label{sec:exp}
+
+% ============================================================================
+% ============================================================================
+
+The experiments evaluate \shortopd\ and its OPD foundation along four axes.
+First, we compare recovered generation quality against practical
+post-compression recovery baselines across two backbones and eight task
+families. Second, we analyze the short-to-long horizon controller: its
+trajectory, its comparison against fixed short and fixed long horizons, and
+the repetition dynamics that drive it. Third, we isolate the learning
+signal, separating dense on-policy distillation from off-policy SFT-style
+recovery and sparse on-policy reward learning. Fourth, we test how recovery
+depends on the prompt-domain mixture.
+
+\subsection{Setup}
+\label{sec:setup}
+
+\paragraph{Backbones and compression.}
+We use Qwen3-4B-Instruct-2507~\citep{qwen3}, which has $36$ transformer
+layers. The original model is the
+teacher $\pi_T$, and the compressed student is obtained by deleting the lowest-BI
+layers until roughly $25\%$ of parameters are removed. BI is computed on PG-19
+calibration documents. The teacher is frozen throughout recovery.
+
+\paragraph{Recovery corpus construction.}
+The recovery corpus contains $45{,}447$ prompts across three domains:
+\begin{itemize}
+\item \textbf{Math}: GSM8K train~\citep{cobbe2021gsm8k} ($7{,}473$
+prompts) and MATH train~\citep{hendrycks2021math} ($7{,}500$), formatted
+as single-turn problems with a final-answer instruction; MATH training
+examples are kept disjoint from MATH-500.
+\item \textbf{Code}: $15{,}000$ filtered NVIDIA
+OpenCodeInstruct~\citep{opencodeinstruct} prompts (kept only with a
+positive unit-test signal, deduplicated, and with function names
+overlapping HumanEval or MBPP test tasks removed) plus $474$ unique
+MBPP~\citep{austin2021program} non-test tasks.
+\item \textbf{Open-ended}: $15{,}000$ instruction prompts sampled from
+ShareGPT/Vicuna-style conversations and
+UltraChat-200K~\citep{vicuna2023,ding2023ultrachat}.
+\end{itemize}
+No HumanEval task or MBPP test task is used for recovery training. All
+recovery methods share this prompt distribution but consume it
+differently: OPD and \shortopd\ use only the prompt field, sampling
+on-policy rollouts scored by the frozen teacher; SFT w/o KD trains on
+the original assistant responses; SeqKD trains on fixed responses
+generated by the same frozen teacher; and KD keeps SFT's fixed sequences
+but replaces hard labels with the teacher's next-token distributions.
+The comparisons therefore vary the recovery signal and trajectory
+source, not the prompt mixture.
+
+\paragraph{Recovery methods and schedules.}
+All recovery methods start from the same compressed student and see one
+epoch of the same prompt distribution. KD is a teacher-forced
+forward-KL baseline,
+$\mathrm{KL}(\pi_T(\cdot\mid x_{<t})\|\pi_S(\cdot\mid x_{<t}))$, with
+temperature $1.0$ and no hard-label cross-entropy term; it instantiates,
+on our recovery corpus, the fixed-context logit-distillation recipe used
+by prune-then-distill pipelines such as
+Minitron~\citep{muralidharan2024minitron,sreenivas2024minitron}, so the
+KD-versus-OPD contrast directly tests whether that recipe
+extends from recognition benchmarks to generation recovery. For OPD, the student
+samples on-policy responses; the pre-compression teacher is then evaluated on
+the same trajectories, and the student applies the top-$100$+tail
+generalized-JSD distillation loss of Section~\ref{sec:opd}. The fixed
+horizons use a constant rollout budget ($2048$ or $8192$ tokens).
+\shortopd\ uses the same loss and data with the repetition-gated budget
+rule of Equation~\eqref{eq:shortopd}, initialized at $H{=}2048$ so the
+budget must discover the usable range from the first step. Full hyperparameters are in
+Appendix~\ref{app:train}. The nominal one-epoch schedule is $710$ steps.
+All experiments run on a single node with $8\times$ NVIDIA H20 GPUs.
+
+\begin{table}[t!]
+\centering
+\small
+\renewcommand{\arraystretch}{1.22}
+\setlength{\tabcolsep}{2pt}
+\caption{Main generation recovery results on the $25\%$-pruned student. Math/code are
+percentages; open-ended tasks are judge scores on a $1$--$10$ scale. Avg
+normalizes judge scores by $\times 10$. T\% reports Avg as a percentage of the
+corresponding dense teacher Avg. \shortopd\ uses a repetition-gated
+dynamic budget up to $2048$ tokens.}
+\label{tab:main-results}
+\begin{tabular}{llcccccccccc}
+\toprule
+ & & \multicolumn{2}{c}{Math} & \multicolumn{2}{c}{Code} & \multicolumn{4}{c}{Open-ended} & \multicolumn{2}{c}{Overall} \\
+\cmidrule(lr){3-4}\cmidrule(lr){5-6}\cmidrule(lr){7-10}\cmidrule(lr){11-12}
+Model & Method & GSM8K & MATH & HumanEval & MBPP & Alpaca & QA & Sum & MT-B & Avg & T\% \\
+\midrule
+\multirow{6}{*}{\shortstack[l]{Qwen3-4B\\Instruct}}
+& Dense teacher             & 88.10 & 89.40 & 75.00 & 80.54 & 6.64 & 4.38 & 8.86 & 6.95 & 75.17 & 100.0 \\
+& Pruned ($-25\%$, untrained) & 1.14  & 1.60  & 0.00  & 0.00  & 1.14 & 1.00 & 1.06 & 1.09 & 5.71 & 7.6 \\
+\cmidrule(lr){2-12}
+& SFT w/o KD                & 25.93 & 9.40  & 26.83 & 29.18 & 1.91 & 1.19 & 3.12 & 1.59 & 21.19 & 28.2 \\
+& SeqKD                     & 32.83 & 12.20 & 29.88 & 41.25 & 2.52 & 1.38 & 5.26 & 2.10 & 28.60 & 38.0 \\
+\rowcolor{gray!10}
+& KD             & 29.34 & 9.60  & 29.27 & 39.30 & 2.94 & 1.48 & 6.89 & 2.36 & 30.52 & 40.6 \\
+\rowcolor{gray!25}
+& \shortopd\ (ours)         & \best{62.70} & \best{42.00} & \best{43.90} & \best{49.81} & \best{4.68} & \best{2.04} & \best{7.94} & \best{4.28} & \best{48.46} & \best{64.5} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Evaluation.}
+We evaluate free-form generation only, on eight task families in the
+same three domains:
+\begin{itemize}
+\item \textbf{Math}: GSM8K and MATH-500, scored by answer-match
+accuracy. MATH-500 uses Qwen-style long decoding (a $16$k generation
+cap) with the recommended sampling parameters.
+\item \textbf{Code}: HumanEval and MBPP, scored by execution
+\textsc{pass}@$1$.
+\item \textbf{Open-ended}: Alpaca, QA, Summarization, and
+MT-Bench~\citep{zheng2023mtbench}, judged on a $1$--$10$ scale by
+GPT-5.5, an independent judge that is neither the teacher nor a Qwen
+model.
+\end{itemize}
+Tables report
+math/code scores as percentages and judge scores on the $1$--$10$
+scale; the Avg column normalizes judge scores by $\times 10$ and
+averages the eight task families.
+
+\subsection{Main generation recovery}
+\label{sec:main}
+
+
+
+Table~\ref{tab:main-results} reports the main results. Structured
+compression alone nearly destroys generation: the normalized average drops from
+$75.17$ for the dense teacher to $5.71$ after pruning. One epoch of
+SFT w/o KD recovers some ability ($21.19$ Avg), SeqKD improves on it
+($28.60$), and KD adds a modest increase to $30.52$, but all
+off-policy baselines remain far below on-policy distillation: \shortopd\
+reaches $48.46$ Avg, nearly $9\times$ the untrained score and an
+$18$-point gain over the best off-policy baseline.
+
+The domain-level pattern matters: on-policy recovery is not a
+math trick, improving code execution, Alpaca, QA,
+summarization, and MT-Bench simultaneously, and since \shortopd\ uses
+no answer labels or verifiers, the improvement comes entirely
+from restoring the student distribution toward its own unpruned self on the
+student's own states.
+
+\begin{figure}[t!]
+\centering
+\includegraphics[width=\linewidth]{figures/fig_shortopd_recovery.pdf}
+\caption{Revisiting the Vanilla OPD warm-up of
+Figure~\ref{fig:intro-prune-rep}(b).
+\textbf{(a)} Distillation loss (solid, left axis) and suffix-repetition
+rate (dashed, right axis) for Vanilla OPD and \shortopd. \shortopd's loss
+reaches its plateau within roughly $40$--$50$ steps versus around $80$
+for Vanilla: green shading marks \shortopd's warm-up, red the additional
+Vanilla-only delay.
+\textbf{(b)} Wasted (repetitive-suffix) tokens per rollout (solid, left
+axis) and rollout budgets (dashed, right axis). \shortopd\ shrinks its
+budget to $1024$ during the repetitive warm-up and restores it once clean
+truncations dominate (shaded actions), removing the wasted mass sooner;
+its effective length still catches Vanilla by step $100$.}
+\label{fig:shortopd-traj}
+\end{figure}
+
+\subsection{\shortopd: closed-loop horizon control in practice}
+\label{sec:shortopd-exp}
+
+\paragraph{Closed-loop recovery trajectory.}
+Figure~\ref{fig:shortopd-traj} shows that \shortopd\ shortens the
+repetitive warm-up. With Vanilla fixed at $H{=}2048$, $55$--$75\%$ of
+rollouts repeat and the loss reaches its post-warm-up plateau only after
+roughly $80$ steps. \shortopd\ reaches this regime in about $40$--$50$
+steps while reducing wasted suffix tokens. Its budget falls from $2048$
+to $1024$ during high repetition and returns to $2048$ as clean
+truncations take over. The controller therefore saves early rollout
+compute without sacrificing long-generation capacity later in recovery.
+
+\begin{figure}[t!]
+\centering
+\begin{subfigure}[b]{0.490\linewidth}
+\centering
+\includegraphics[width=\linewidth]{figures/fig_shortopd_efficiency_a.pdf}
+\caption{Per-step rollout generation time}
+\end{subfigure}\hfill
+\begin{subfigure}[b]{0.490\linewidth}
+\centering
+\includegraphics[width=\linewidth]{figures/fig_shortopd_efficiency_b.pdf}
+\caption{Quality vs.\ rollout cost across schedules}
+\end{subfigure}
+\caption{What uncontrolled rollout budgets cost. \textbf{(a)} Per-step
+rollout-generation time for Vanilla (fixed 2048) vs.\ \shortopd\ (faint: raw;
+solid: moving average) over the same first $100$ steps as
+Figure~\ref{fig:shortopd-traj}; the shaded gap is saved warm-up compute
+($35.4\rightarrow25.1$s per step on average). \textbf{(b)} Across three schedules,
+the eight-task Avg (blue line) varies by less than $2$ points while the
+generated rollout tokens (bars; \shortopd\ in green, Vanilla fixed 8192 in red)
+vary by more than $3\times$. Wall-clock is annotated inside each bar.}
+\label{fig:shortopd-efficiency}
+\end{figure}
+
+\paragraph{Vanilla versus gated budgets.}
+Figure~\ref{fig:shortopd-efficiency} compares quality and cost across
+rollout schedules. Relative to Vanilla fixed at $2048$, \shortopd\ lowers
+mean generation time over the first $100$ steps by $29\%$
+($35.4\rightarrow25.1$s per step) and end-to-end wall-clock from $11.1$
+to $8.5$ hours. Across fixed $2048$, \shortopd, and fixed $8192$, Avg
+varies only from $48.5$ to $50.2$, whereas generated rollout tokens range
+from $250$M to $869$M. \shortopd\ finishes in $8.5$ hours with $250$M
+tokens, using $76\%$ less time than fixed $8192$ and $24\%$ less than
+fixed $2048$ while remaining within $1.7$ Avg points of both. In contrast,
+fixed $8192$ spends $869$M tokens and $35.9$ hours for only $+0.6$ Avg
+over fixed $2048$.
+
+
+\subsection{Scaling}
+\label{sec:scaling}
+
+Table~\ref{tab:opd-scaling} tests whether the recovery recipe of
+\shortopd\ continues to improve with additional exposure. Across one,
+two, and three epochs on the compressed Qwen3-4B-Instruct, gains are
+broad rather than concentrated in a single aggregate: GSM8K, MATH-500,
+HumanEval, MBPP, Alpaca, QA, and MT-Bench all improve from the first to
+the final checkpoint, with the overall Avg rising from $48.46$ to
+$55.41$ ($73.7\%$ of the teacher). On-policy recovery is therefore
+scalable: more rollout exposure keeps converting into generation
+quality, and pushing this scaling further is a natural direction for
+future work.
+
+\begin{table}[t!]
+\centering
+\small
+\renewcommand{\arraystretch}{1.18}
+\setlength{\tabcolsep}{1.8pt}
+\caption{Per-domain epoch scaling for \shortopd\ on the compressed
+Qwen3-4B-Instruct. Math/code are percentages; open-ended tasks are judge
+scores on a $1$--$10$ scale. Avg normalizes judge scores by $\times 10$,
+and T\% is relative to the Instruct teacher Avg.}
+\label{tab:opd-scaling}
+\begin{tabular}{lcccccccccc}
+\toprule
+ & \multicolumn{2}{c}{Math} & \multicolumn{2}{c}{Code}
+ & \multicolumn{4}{c}{Open-ended} & \multicolumn{2}{c}{Overall} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-9}\cmidrule(lr){10-11}
+Checkpoint & GSM8K & MATH & HumanEval & MBPP & Alpaca & QA & Sum & MT-B & Avg & T\% \\
+\midrule
+1 epoch / step 710   & 62.70 & 42.00 & 43.90 & 49.81 & 4.68 & 2.04 & 7.94 & 4.28 & 48.46 & 64.5 \\
+2 epochs / step 1420 & 70.66 & 50.60 & 51.83 & 56.42 & 4.98 & 2.20 & \best{8.16} & 4.47 & 53.45 & 71.1 \\
+3 epochs / step 2127 & \best{72.71} & \best{55.20} & \best{54.27} & \best{57.20} & \best{5.14} & \best{2.21} & 8.15 & \best{4.89} & \best{55.41} & \best{73.7} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Signal controls: dense versus sparse and off-policy}
+\label{sec:rl-opd}
+
+The \shortopd-versus-SeqKD and \shortopd-versus-KD contrasts in
+Table~\ref{tab:main-results} test whether teacher information is sufficient
+without on-policy states: with the same frozen teacher, moving its signal
+off-policy costs $19.9$ Avg points (SeqKD), and dense teacher-forced
+distillation does not close the gap (KD trails \shortopd\ by $17.9$
+points).
+
+To isolate the supervision axis, we also run a GSM8K-only comparison
+between sparse-reward RLVR and \shortopd\ from the same
+compressed Qwen3-4B-Instruct initialization, instantiating RLVR with both
+PPO and GRPO. All methods use the same
+GSM8K train prompts, the same batch size, and the same one-epoch step
+budget; the only intended difference is the learning signal.
+Figure~\ref{fig:rlvr-opd} shows
+the result: sparse on-policy RLVR barely moves GSM8K accuracy ($0.23$
+with PPO, $1.59$ with GRPO),
+while \shortopd\ on the same GSM8K-only prompt set reaches $37.76$; the
+multi-domain \shortopd\ run reaches $62.70$ and serves as the
+main-reference point. When the compressed model rarely samples a correct
+answer, a sparse reward has almost nothing to promote, whereas the dense
+teacher distribution corrects every token of every rollout regardless of
+correctness.
+
+\begin{figure}[t!]
+\centering
+\includegraphics[width=0.52\linewidth]{figures/fig_rlvr_vs_opd.pdf}
+\caption{Sparse versus dense supervision on the matched GSM8K-only
+on-policy comparison. Sparse-reward RLVR (PPO and GRPO) barely moves the
+compressed student, while \shortopd\ on the same prompts restores a
+large fraction of accuracy; the multi-domain \shortopd\ run is shown
+for reference.}
+\label{fig:rlvr-opd}
+\end{figure}
+
+\FloatBarrier
+
+\subsection{Recovery-corpus domain ablation}
+\label{sec:domain}
+
+Because \shortopd\ is reward-free, the recovery corpus is only a
+prompt distribution; we test how much its composition matters.
+Table~\ref{tab:domain-ablation} recovers the same compressed student
+with leave-one-domain-out recovery corpora. To keep the comparison matched,
+each ablated corpus keeps the same number of prompts and the same $710$
+optimizer steps as the full mixture by uniformly resampling from the two
+remaining domains; only the removed domain changes. This isolates prompt
+composition from training exposure.
+
+\begin{table}[!ht]
+\centering
+\small
+\renewcommand{\arraystretch}{1.22}
+\setlength{\tabcolsep}{4.5pt}
+\caption{Leave-one-domain-out recovery-corpus ablation for \shortopd\
+on the compressed Qwen3-4B-Instruct. Math/code are percentages; MATH
+uses the official MATH-500 protocol. Open-ended tasks are judge scores on a
+$1$--$10$ scale; Avg normalizes them by $\times 10$.
+\textcolor{red!70!black}{Red} marks the domain most directly damaged by
+the removed slice; the shaded row is the full-mixture reference.}
+\label{tab:domain-ablation}
+\begin{tabular}{lccccccccc}
+\toprule
+ & \multicolumn{2}{c}{Math} & \multicolumn{2}{c}{Code}
+ & \multicolumn{4}{c}{Open-ended} & \multicolumn{1}{c}{Overall} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-9}\cmidrule(lr){10-10}
+Recovery corpus & GSM8K & MATH & HumanEval & MBPP & Alpaca & QA & Sum & MT-B & Avg \\
+\midrule
+\rowcolor{gray!12}
+Full mixture       & 62.70 & 42.00 & 43.90 & 49.81 & 4.68 & 2.04 & 7.94 & 4.28 & 48.46 \\
+w/o code           & 58.45 & 33.40 & \textcolor{red!70!black}{0.61}  & \textcolor{red!70!black}{2.33}  & 4.47 & 2.15 & 7.88 & 3.99 & 34.96 \\
+w/o math           & \textcolor{red!70!black}{8.04}  & \textcolor{red!70!black}{6.00}  & 28.66 & 43.19 & 3.96 & 1.73 & 7.19 & 2.94 & 30.51 \\
+w/o general        & 54.21 & 28.80 & 48.17 & 50.19 & \textcolor{red!70!black}{3.01} & \textcolor{red!70!black}{1.51} & \textcolor{red!70!black}{5.41} & \textcolor{red!70!black}{3.15} & 39.02 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The resulting pattern is direct. Removing math nearly eliminates mathematical
+recovery, dropping GSM8K from $62.70$ to $8.04$ and official MATH-500 from
+$42.00$ to $6.00$. Removing code also lowers math, but collapses execution
+benchmarks (HumanEval $0.61$, MBPP $2.33$), showing that code rollouts provide
+a highly domain-specific repair signal. Removing general instruction data
+reduces both math and open-ended quality in this run, despite improving the
+narrow code scores. Thus \shortopd's dense token-level signal can transfer across
+related states, but the on-policy state distribution still needs coverage
+of the capabilities we want to recover.
+
+
+\section{Conclusion}
+\label{sec:conclusion}
+Structured pruning can leave latent capability in the model's search space
+while failing to promote it during generation, which makes recovery a
+distributional repair problem rather than ordinary supervised relearning.
+On-policy self-distillation from the model's own pre-compression self is the right
+repair signal: on Qwen3-4B-Instruct it
+substantially outperforms SFT w/o KD, SeqKD, KD, and sparse-reward RLVR
+on the same recovery prompts. The remaining cost is early rollout quality:
+long horizons spend many steps on repetitive, low-information suffixes
+before normal loss descent begins. \shortopd\ addresses this with a
+repetition-gated, truncation-aware short-to-long budget,
+matching fixed short and fixed long horizons within two points while
+generating a fraction of their rollout tokens and concentrating early teacher
+compute on higher-signal prefixes. These results motivate short-to-long
+on-policy self-distillation as a default recovery step after structured LLM
+compression.
+
+\section{Limitations}
+\label{sec:limitations}
+This work instantiates structured compression with BI depth pruning at
+about $25\%$ removed parameters on the Qwen3-4B families; more pruning
+methods, model families, compression ratios, and larger models should be
+tested before claiming universality. Finally, we do not yet establish the boundary
+where a model has been compressed too aggressively for light
+post-compression recovery.
+
+\section{Introduction}
+\label{sec:intro}
+
+Serving LLMs at full size is expensive~\citep{grattafiori2024llama3,qwen3},
+and structured pruning is one of the most deployment-friendly ways to cut
+this cost: it removes coupled parameter blocks while preserving ordinary
+dense transformer execution~\citep{ma2023llmpruner,ashkboos2024slicegpt,men2025shortgpt,xia2024sheared,muralidharan2024minitron},
+with no need for the dedicated kernel or hardware support that
+unstructured sparsity and low-bit quantization lean
+on~\citep{frantar2023sparsegpt,sun2024wanda,lin2024awq}.
+The obstacle is evaluation: most pruning
+work~\citep{ma2023llmpruner,ashkboos2024slicegpt,men2025shortgpt,an2024flap,kim2024shortened,gromov2025unreasonable,muralidharan2024minitron}
+reports strong retention on multiple-choice recognition benchmarks such
+as MMLU and HellaSwag~\citep{hendrycks2021mmlu,zellers2019hellaswag}, yet
+the same
+compressed checkpoints collapse on the free-form generation that
+deployment actually requires. Removing just $4$ of $36$ layers from
+Qwen3-4B-Instruct~\citep{qwen3} with Block-Influence depth
+pruning~\citep{men2025shortgpt} already devastates greedy generation
+across math, code, and open-ended tasks
+(Table~\ref{tab:intro-passk}, \textsc{pass}@$1$ versus teacher greedy). This
+recognition-generation gap is what blocks practical
+use of structured pruning.\blfootnote{The experiments in this paper can
+be reproduced with public implementations of the two building blocks:
+structured pruning follows \url{https://github.com/icip-cas/ShortX},
+and on-policy distillation follows
+\url{https://github.com/VisionOPD/Vision-OPD}.}
+
+\begin{table}[t!]
+\centering
+\small
+\renewcommand{\arraystretch}{1.12}
+\setlength{\tabcolsep}{4.5pt}
+\caption{Pruning collapses generation, but correct outputs stay reachable
+by sampling: best-of-$k$ scores of Qwen3-4B-Instruct with $4$ of $36$
+layers removed, against the number of sampled attempts $k$. Math/code
+report \textsc{pass}@$k$ (\%); open-ended tasks report LLM-judge
+best-of-$k$ scores on a $1$--$10$ scale. Teacher is the unpruned model's
+greedy score. \textbf{Bold}: GSM8K crosses the teacher's greedy score under
+sampling---correct trajectories are demoted, not erased.}
+\label{tab:intro-passk}
+\begin{tabular}{llcccccccc}
+\toprule
+ & & \multicolumn{7}{c}{Pruned ($-4$ layers), best-of-$k$} & \\
+\cmidrule(lr){3-9}
+Domain & Benchmark & $k{=}1$ & $2$ & $4$ & $8$ & $16$ & $32$ & $64$ & Teacher \\
+\midrule
+\multirow{2}{*}{Math}
+ & GSM8K     & 49.0 & 62.7 & 72.9 & 80.1 & 85.2 & 88.6 & 91.2 & 88.1 \\
+ & MATH500   & 17.7 & 25.6 & 33.4 & 40.5 & 46.9 & 53.0 & 58.6 & 89.4 \\
+\midrule
+\multirow{2}{*}{Code}
+ & HumanEval &  2.7 &  4.1 &  6.0 &  8.4 & 11.6 & 15.4 & 20.1 & 75.0 \\
+ & MBPP      &  6.6 & 10.6 & 15.2 & 20.2 & 25.3 & 30.4 & 35.0 & 80.5 \\
+\midrule
+\multirow{4}{*}{Open-ended}
+ & Alpaca    & 2.91 & 3.74 & 4.34 & 4.76 & 5.09 & 5.39 & 5.75 & 6.64 \\
+ & QA        & 0.33 & 0.56 & 0.84 & 1.14 & 1.43 & 1.76 & 2.13 & 4.38 \\
+ & Sum       & 3.36 & 4.66 & 5.85 & 6.91 & 7.80 & 8.44 & 8.88 & 8.86 \\
+ & MT-Bench  & 2.19 & 2.92 & 3.63 & 4.27 & 4.83 & 5.35 & 5.88 & 6.95 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Two observations identify the recovery signal. First, the missing
+ability is demoted rather than erased. \citet{wen2026illusion} show this
+for short QA answers; we find the same holds for entire generation
+trajectories: in Table~\ref{tab:intro-passk},
+\textsc{pass}@$k$~\citep{chen2021codex} climbs steadily with more
+sampled attempts on every benchmark, and on GSM8K~\citep{cobbe2021gsm8k}
+it even reaches $91\%$ at $k{=}64$, above the unpruned teacher's greedy
+$88\%$. Correct trajectories thus
+remain in the compressed model's own sampling distribution, within reach
+of on-policy search.
+Second, the repair must be token-level: ShortGPT-gen restores much of the
+lost quality by routing only \textit{generated} tokens through the full
+model~\citep{men2025shortgpt}, so generation failure is a chain of
+local next-token mis-rankings that compound along the student's own
+decoding path~\citep{ranzato2016sequence,agarwal2024gkd}. Sparse
+rewards~\citep{shao2024deepseekmath,deepseekr1} and fixed off-policy
+labels~\citep{kim2016sequence} leave these local errors unspecified. Recovery
+therefore needs dense distributional targets on the states the compressed
+model actually visits.
+
+OPD~\citep{agarwal2024gkd,yuan2026vision} is the direct instantiation of
+these requirements. The compressed student samples rollouts from its own
+distribution. Its frozen pre-compression self scores the same
+trajectories as teacher, and the student matches the teacher's next-token
+distribution at every response position. The recipe is on-policy and
+dense, and it needs no labels, no verifier, and no external teacher.
+The remaining difficulty is that early on-policy rollouts are dominated
+by repetition~\citep{holtzman2020degeneration,xu2022ditto}. Probing
+BI-pruned Qwen3-4B-Instruct on a fixed $192$-prompt math/code/open-ended
+set, suffix repetition reaches $84\%$ at our $25\%$-parameter testbed
+(Figure~\ref{fig:intro-prune-rep}a); with stronger compression, outputs
+turn incoherent instead of looped (Appendix~\ref{app:prunesweep}), so we
+view $25\%$ as this model's critical point for recoverable compression
+and adopt it as our main testbed. These loop tails also carry little measured
+marginal distillation signal: repeated-suffix tokens have a mean teacher--student
+generalized Jensen--Shannon divergence (JSD) of $0.0014$ versus $0.051$ on
+ordinary tokens (about $35\times$ lower), and
+a mean teacher NLL of $3\times10^{-5}$ versus $0.68$. Together with the
+conditional gradient analysis in Appendix~\ref{app:gradient-derivation},
+these measurements identify deep repeated suffixes as low-information under
+the implemented OPD update: they consume early rollout and teacher compute
+under a long, fixed rollout horizon $H$ (the per-response token budget) while
+providing little additional teacher--student correction. Figure~\ref{fig:intro-prune-rep}(b) follows
+the first $100$ steps of a fixed-$H{=}2048$ OPD run: during the
+early phase, $55$--$75\%$ of rollouts end in suffix loops while the
+distillation loss remains at its lowest level, reaching its post-warm-up
+range only around step $80$ as repetition subsides.
+
+\begin{figure}[t!]
+\centering
+\begin{subfigure}[b]{0.490\linewidth}
+\centering
+\includegraphics[width=\linewidth]{figures/fig_intro_prune_rep_a.pdf}
+\caption{Suffix repetition vs.\ pruned depth}
+\end{subfigure}\hfill
+\begin{subfigure}[b]{0.490\linewidth}
+\centering
+\includegraphics[width=\linewidth]{figures/fig_intro_prune_rep_b.pdf}
+\caption{Repetitive suffixes coincide with low loss}
+\end{subfigure}
+\caption{Repetition during early on-policy recovery.
+\textbf{(a)} Suffix-repetition rate versus BI-pruned depth on a fixed
+$192$-prompt probe; the star marks our main $9$-layer setting.
+\textbf{(b)} Distillation loss (blue) and suffix-repetition rate (red)
+during fixed-$H{=}2048$ OPD; shading marks the repetition-dominated
+warm-up. Figure~\ref{fig:shortopd-traj}(a) overlays \shortopd.}
+\label{fig:intro-prune-rep}
+\end{figure}
+
+We propose \shortopd\ (Short-to-Long On-Policy Distillation) to make OPD
+spend its early budget where the supervision is useful. A lightweight
+controller tracks suffix repetition, truncation, and mean effective length.
+High repetition opens the shrink gate, whose target is an exponential moving
+average (EMA) of effective length; low repetition and high truncation open the
+growth gate. A second EMA moves the actual budget toward either target; both
+the first smooths noisy batch estimates, while the second prevents abrupt
+horizon changes.
+Training therefore contains repetitive early rollouts
+and restores long generation as recovery proceeds, at no extra forward
+cost. In practice,
+\shortopd\ narrows the high-repetition region, reduces tokens spent in
+repeated suffixes, and improves recovery over fixed short and fixed long
+horizons (Figure~\ref{fig:intro-headline}).
+
+\noindent Our contributions are threefold:
+\begin{itemize}
+\item \textbf{We propose \shortopd}, a recipe for recovering structurally
+compressed LLMs built on our diagnosis of what recovery requires:
+supervision on the student's own on-policy states, dense token-level
+teacher distributions, and a rollout budget matched to what the damaged
+policy can currently generate. \shortopd\ delivers the third ingredient
+with repetition-gated, truncation-aware horizon control.
+\item \textbf{Extensive experiments demonstrate the effectiveness and
+efficiency of this recovery recipe.} On Qwen3-4B-Instruct with a
+$45{,}447$-prompt math/code/instruction corpus,
+\shortopd\ restores about two-thirds of the unpruned teacher's generation
+score over eight task families, far ahead of SFT w/o KD, KD, SeqKD,
+and sparse-reward RLVR under matched budgets, and it matches fixed
+rollout horizons of up to $8192$ tokens within two points while
+generating up to $71\%$ fewer rollout tokens; controlled comparisons
+confirm that the gain requires \textit{both} on-policy states and dense
+teacher distributions.
+\item \textbf{The recovery corpus matters.} On-policy distillation only
+repairs the states the student's own search visits: leave-one-domain-out
+ablations show that removing math or code prompts sharply damages recovery
+on the corresponding capabilities. Corpus coverage is therefore a
+first-class design choice for post-compression recovery, not a detail.
+\end{itemize}
+
+\section{Related Work}
+\label{sec:related}
+
+\paragraph{Structured pruning and the recognition-generation gap.}
+Depth pruning is among the most serving-friendly LLM compression
+families: deleting whole transformer blocks preserves a standard dense
+architecture, with layers selected by Block Influence
+(ShortGPT~\citep{men2025shortgpt}), merged (LaCo~\citep{yang2024laco}),
+or removed under other criteria~\citep{kim2024shortened,
+gromov2025unreasonable,yuan2025shortv}. Width pruning instead removes coupled
+structures inside layers~\citep{ma2023llmpruner,ashkboos2024slicegpt,
+an2024flap,dery2024everybody}; Sheared LLaMA~\citep{xia2024sheared}
+learns pruning masks with continued pre-training, and
+Minitron~\citep{muralidharan2024minitron,sreenivas2024minitron} combines
+depth and width pruning with distillation-based retraining. One-shot
+weight sparsification (SparseGPT~\citep{frantar2023sparsegpt},
+Wanda~\citep{sun2024wanda}) is complementary but needs sparse-kernel
+support. Across these lines, validation is dominated by
+recognition-style benchmarks such as MMLU and
+HellaSwag~\citep{hendrycks2021mmlu,zellers2019hellaswag}.
+\citet{wen2026illusion} show why this is deceptive: pruned models can
+still score multiple-choice answers yet fail to produce them, the
+missing answers demoted rather than erased. ShortGPT-gen makes the
+generative side concrete by routing only \textit{generated} tokens
+through the full depth, locating the damage along the decoding
+path~\citep{men2025shortgpt}. We extend the demotion view from short
+answers to entire reasoning trajectories and focus on the step these
+works leave open: after the layers are gone, which training signal best
+restores generation?
+
+\paragraph{Distillation and on-policy recovery signals.}
+Knowledge distillation~\citep{hinton2015distilling} trains a student to
+match a teacher; sequence-level KD~\citep{kim2016sequence} trains on
+fixed teacher-generated responses and is therefore off-policy. A line of
+work closes the resulting train-inference mismatch by distilling on
+student states: imitation-learning KD~\citep{lin2020imitkd},
+MiniLLM~\citep{gu2024minillm} with a reverse KL divergence objective,
+divergence generalizations~\citep{wen2023fdistill,ko2024distillm}, and
+generalized on-policy KD~\citep{agarwal2024gkd}. Recovery retraining
+after pruning, however, still mostly follows the off-policy recipe:
+Sheared LLaMA continues pre-training on corpus
+data~\citep{xia2024sheared}, and Minitron distills teacher logits on a
+fixed data blend and validates on recognition
+suites~\citep{muralidharan2024minitron,sreenivas2024minitron}, so
+whether off-policy logit distillation repairs \textit{generation} is
+left open; our KD baseline instantiates exactly this recipe for a
+controlled comparison (Section~\ref{sec:main}). RL with verifiable
+rewards~\citep{shao2024deepseekmath,deepseekr1,lambert2025tulu3,
+yu2025dapo} is on-policy but sparse: it offers no token-level target
+when a heavily compressed model rarely samples a correct answer.
+Vision-OPD~\citep{yuan2026vision} introduced on-policy distillation
+for multimodal models; we study the same principle after structural
+compression, where the privileged teacher is the model's own
+pre-compression self. All of these methods distill a \textit{healthy}
+generator; none addresses a damaged student whose rollouts collapse into
+repetition that the self-teacher then endorses.

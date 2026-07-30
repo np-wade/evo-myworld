@@ -1,0 +1,31 @@
+{
+  "mode": "S4 local-vault sentence retrieval vs gold evidence (gate: recall@5>0)",
+  "n_entries": 2,
+  "candidates_unavailable": [],
+  "leaderboard": [
+    {
+      "candidate": "ip-incumbent",
+      "fails": 0,
+      "error": "",
+      "recall_at_1": 0.0713,
+      "recall_at_5": 0.3564,
+      "latency_ms_p50": 51.5,
+      "latency_ms_p95": 66.7,
+      "deterministic": 1,
+      "gate": "PASS",
+      "score": 0.3564
+    },
+    {
+      "candidate": "naive-baseline",
+      "fails": 0,
+      "error": "",
+      "recall_at_1": 0.0713,
+      "recall_at_5": 0.3362,
+      "latency_ms_p50": 0.0,
+      "latency_ms_p95": 0.1,
+      "deterministic": 1,
+      "gate": "PASS",
+      "score": 0.3362
+    }
+  ]
+}

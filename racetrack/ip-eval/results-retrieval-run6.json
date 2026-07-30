@@ -1,0 +1,176 @@
+{
+  "mode": "S4 local-vault sentence retrieval vs gold evidence (gate: recall@5>0)",
+  "n_entries": 10,
+  "candidates_unavailable": [
+    {
+      "candidate": "hypermem",
+      "reason": "hypergraph extraction/retrieval stages call LLM, embedding and reranker providers (hypermem.llm.*); needs live LLM API endpoints and model access not available on this box"
+    },
+    {
+      "candidate": "wikichat",
+      "reason": "ListwiseLLMReranker is a chainlite LLM generation chain (RankGPT); needs a configured LLM engine and API credentials not available on this box"
+    },
+    {
+      "candidate": "suql",
+      "reason": "free-text SQL execution needs a live PostgreSQL database plus an LLM (suql.prompt_continuation.llm_generate) for the answer() free-text function; neither is available on this box"
+    },
+    {
+      "candidate": "local-deep-researcher",
+      "reason": "langgraph research loop needs a running Ollama/LM Studio server (ChatOllama/ChatLMStudio) and live web-search APIs; neither is available on this box"
+    },
+    {
+      "candidate": "leann",
+      "reason": "leann-core on PyPI declares torch>=2.0 + sentence-transformers and its query path needs an embedding server with downloaded model weights (embedding_mode='sentence-transformers'); model downloads and multi-GB installs are forbidden by pack rules, so no honest minimal venv exists"
+    },
+    {
+      "candidate": "ruvector",
+      "reason": "no `ruvector` Python wheel on PyPI and the corpus repo is Rust-only crates (would need a cargo build beyond a plain pip install): install failed (purged): uv pip install failed: Using Python 3.12.11 environment at: .venv-candidates/ruvector\n  \u00d7 No solution found when resolving dependencies:\n  \u2570\u2500\u25b6 Because ruvector was not found in the package registry and you require\n      ruvector, we can conclude that your requirements are unsatisfiable.\n"
+    },
+    {
+      "candidate": "pixelrag",
+      "reason": "PixelRAG is pixel-level multimodal retrieval: the corpus index defaults to Qwen/Qwen3-VL-Embedding-2B (pixelrag_index/config.py) and the eval retrievers are ColQwen/Qwen3-VL vision models; no deterministic text-only path exists and model-weight downloads are forbidden by pack rules"
+    }
+  ],
+  "leaderboard": [
+    {
+      "candidate": "annoy",
+      "fails": 0,
+      "error": "",
+      "recall_at_1": 0.0713,
+      "recall_at_5": 0.3564,
+      "hard_recall_at_1": 0.5,
+      "hard_recall_at_5": 1.0,
+      "latency_ms_p50": 284.2,
+      "latency_ms_p95": 476.2,
+      "deterministic": 1,
+      "gate": "PASS",
+      "score": 0.3564
+    },
+    {
+      "candidate": "haystack-bm25",
+      "fails": 0,
+      "error": "",
+      "recall_at_1": 0.0713,
+      "recall_at_5": 0.3564,
+      "hard_recall_at_1": 0.6667,
+      "hard_recall_at_5": 1.0,
+      "latency_ms_p50": 892.5,
+      "latency_ms_p95": 1196.4,
+      "deterministic": 1,
+      "gate": "PASS",
+      "score": 0.3564
+    },
+    {
+      "candidate": "ip-incumbent",
+      "fails": 0,
+      "error": "",
+      "recall_at_1": 0.0713,
+      "recall_at_5": 0.3564,
+      "hard_recall_at_1": 0.6667,
+      "hard_recall_at_5": 0.8333,
+      "latency_ms_p50": 87.8,
+      "latency_ms_p95": 147.9,
+      "deterministic": 1,
+      "gate": "PASS",
+      "score": 0.3564
+    },
+    {
+      "candidate": "librer",
+      "fails": 0,
+      "error": "",
+      "recall_at_1": 0.0713,
+      "recall_at_5": 0.3564,
+      "hard_recall_at_1": 0.3333,
+      "hard_recall_at_5": 0.8333,
+      "latency_ms_p50": 1.6,
+      "latency_ms_p95": 2.3,
+      "deterministic": 1,
+      "gate": "PASS",
+      "score": 0.3564
+    },
+    {
+      "candidate": "ragbits-rrf",
+      "fails": 0,
+      "error": "",
+      "recall_at_1": 0.0713,
+      "recall_at_5": 0.3564,
+      "hard_recall_at_1": 0.6667,
+      "hard_recall_at_5": 0.8333,
+      "latency_ms_p50": 0.2,
+      "latency_ms_p95": 0.5,
+      "deterministic": 1,
+      "gate": "PASS",
+      "score": 0.3564
+    },
+    {
+      "candidate": "rank-bm25",
+      "fails": 0,
+      "error": "",
+      "recall_at_1": 0.0713,
+      "recall_at_5": 0.3564,
+      "hard_recall_at_1": 0.6667,
+      "hard_recall_at_5": 1.0,
+      "latency_ms_p50": 211.0,
+      "latency_ms_p95": 397.0,
+      "deterministic": 1,
+      "gate": "PASS",
+      "score": 0.3564
+    },
+    {
+      "candidate": "tantivy-py",
+      "fails": 0,
+      "error": "",
+      "recall_at_1": 0.0713,
+      "recall_at_5": 0.3564,
+      "hard_recall_at_1": 0.6667,
+      "hard_recall_at_5": 1.0,
+      "latency_ms_p50": 100.6,
+      "latency_ms_p95": 266.3,
+      "deterministic": 1,
+      "gate": "PASS",
+      "score": 0.3564
+    },
+    {
+      "candidate": "faiss-hashdense",
+      "fails": 0,
+      "error": "",
+      "recall_at_1": 0.0713,
+      "recall_at_5": 0.345,
+      "hard_recall_at_1": 0.5,
+      "hard_recall_at_5": 0.6667,
+      "latency_ms_p50": 428.8,
+      "latency_ms_p95": 802.5,
+      "deterministic": 1,
+      "gate": "PASS",
+      "score": 0.345
+    },
+    {
+      "candidate": "naive-baseline",
+      "fails": 0,
+      "error": "",
+      "recall_at_1": 0.0713,
+      "recall_at_5": 0.3362,
+      "hard_recall_at_1": 0.6667,
+      "hard_recall_at_5": 0.8333,
+      "latency_ms_p50": 0.1,
+      "latency_ms_p95": 0.2,
+      "deterministic": 1,
+      "gate": "PASS",
+      "score": 0.3362
+    },
+    {
+      "candidate": "aann",
+      "fails": 0,
+      "error": "",
+      "recall_at_1": 0.0273,
+      "recall_at_5": 0.1646,
+      "hard_recall_at_1": 0.5,
+      "hard_recall_at_5": 0.8333,
+      "latency_ms_p50": 816.8,
+      "latency_ms_p95": 2411.6,
+      "deterministic": 1,
+      "gate": "PASS",
+      "score": 0.1646
+    }
+  ]
+}

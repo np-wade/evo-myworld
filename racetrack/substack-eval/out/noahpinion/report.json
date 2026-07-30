@@ -1,0 +1,504 @@
+{
+  "prompt": "Find every post from noahpinion published in the last 60 days (window pinned 2026-05-27..2026-07-26); save the 10 most recent as clean markdown; deliver a table + files.",
+  "pub": "noahpinion",
+  "base_url": "https://www.noahpinion.blog",
+  "backend": "curl_cffi",
+  "extractor": "trafilatura",
+  "window": [
+    "2026-05-27",
+    "2026-07-26"
+  ],
+  "n_posts": 50,
+  "table": [
+    {
+      "slug": "what-will-more-intelligence-actually",
+      "url": "https://www.noahpinion.blog/p/what-will-more-intelligence-actually",
+      "date": "2026-07-26",
+      "title": "What will more intelligence actually do for us?"
+    },
+    {
+      "slug": "we-asked-too-much-of-the-american",
+      "url": "https://www.noahpinion.blog/p/we-asked-too-much-of-the-american",
+      "date": "2026-07-24",
+      "title": "We asked too much of the American university"
+    },
+    {
+      "slug": "who-was-the-worst-monster-of-the",
+      "url": "https://www.noahpinion.blog/p/who-was-the-worst-monster-of-the",
+      "date": "2026-07-22",
+      "title": "Who was the worst monster of the 20th century?"
+    },
+    {
+      "slug": "the-uk-is-a-cautionary-tale-for-the",
+      "url": "https://www.noahpinion.blog/p/the-uk-is-a-cautionary-tale-for-the",
+      "date": "2026-07-20",
+      "title": "The UK is a cautionary tale for the U.S."
+    },
+    {
+      "slug": "wokeness-as-prairie-fire",
+      "url": "https://www.noahpinion.blog/p/wokeness-as-prairie-fire",
+      "date": "2026-07-18",
+      "title": ""
+    },
+    {
+      "slug": "the-us-political-situation",
+      "url": "https://www.noahpinion.blog/p/the-us-political-situation",
+      "date": "2026-07-18",
+      "title": ""
+    },
+    {
+      "slug": "americas-political-economy-is-pretty",
+      "url": "https://www.noahpinion.blog/p/americas-political-economy-is-pretty",
+      "date": "2026-07-18",
+      "title": "America's political economy is pretty bleak right now"
+    },
+    {
+      "slug": "book-review-power-and-progress-874",
+      "url": "https://www.noahpinion.blog/p/book-review-power-and-progress-874",
+      "date": "2026-07-17",
+      "title": "Book Review: &quot;Power and Progress&quot;"
+    },
+    {
+      "slug": "book-review-power-and-progress",
+      "url": "https://www.noahpinion.blog/p/book-review-power-and-progress",
+      "date": "2026-07-15",
+      "title": ""
+    },
+    {
+      "slug": "why-i-didnt-sign-the-we-must-act",
+      "url": "https://www.noahpinion.blog/p/why-i-didnt-sign-the-we-must-act",
+      "date": "2026-07-15",
+      "title": "Why I didn't sign the &quot;We Must Act Now&quot; statement (yet)"
+    },
+    {
+      "slug": "the-american-suburbs-are-better-than",
+      "url": "https://www.noahpinion.blog/p/the-american-suburbs-are-better-than",
+      "date": "2026-07-13",
+      "title": "The American suburbs are better than you think"
+    },
+    {
+      "slug": "why-the-us-middle-class-is-feeling",
+      "url": "https://www.noahpinion.blog/p/why-the-us-middle-class-is-feeling",
+      "date": "2026-07-13",
+      "title": ""
+    },
+    {
+      "slug": "i-have-never-been-working-class",
+      "url": "https://www.noahpinion.blog/p/i-have-never-been-working-class",
+      "date": "2026-07-12",
+      "title": "I have never been working class"
+    },
+    {
+      "slug": "magas-attack-on-science-is-even-worse",
+      "url": "https://www.noahpinion.blog/p/magas-attack-on-science-is-even-worse",
+      "date": "2026-07-10",
+      "title": "MAGA's attack on science is even worse than it looks"
+    },
+    {
+      "slug": "jd-vances-crusade-against-gdp-is",
+      "url": "https://www.noahpinion.blog/p/jd-vances-crusade-against-gdp-is",
+      "date": "2026-07-08",
+      "title": "JD Vance's crusade against GDP is wrong and bad"
+    },
+    {
+      "slug": "no-china-did-not-manage-to-avoid",
+      "url": "https://www.noahpinion.blog/p/no-china-did-not-manage-to-avoid",
+      "date": "2026-07-06",
+      "title": "No, China did not manage to avoid a crash"
+    },
+    {
+      "slug": "the-american-age-was-the-human-age",
+      "url": "https://www.noahpinion.blog/p/the-american-age-was-the-human-age",
+      "date": "2026-07-04",
+      "title": ""
+    },
+    {
+      "slug": "stop-screeching-about-immigration",
+      "url": "https://www.noahpinion.blog/p/stop-screeching-about-immigration",
+      "date": "2026-07-02",
+      "title": ""
+    },
+    {
+      "slug": "roundup-84-bears-on-bikes",
+      "url": "https://www.noahpinion.blog/p/roundup-84-bears-on-bikes",
+      "date": "2026-07-01",
+      "title": ""
+    },
+    {
+      "slug": "will-ai-make-companies-outsource",
+      "url": "https://www.noahpinion.blog/p/will-ai-make-companies-outsource",
+      "date": "2026-06-29",
+      "title": ""
+    },
+    {
+      "slug": "the-democrats-have-their-own-maga",
+      "url": "https://www.noahpinion.blog/p/the-democrats-have-their-own-maga",
+      "date": "2026-06-28",
+      "title": ""
+    },
+    {
+      "slug": "europes-crusade-against-air-conditioning",
+      "url": "https://www.noahpinion.blog/p/europes-crusade-against-air-conditioning",
+      "date": "2026-06-28",
+      "title": ""
+    },
+    {
+      "slug": "europes-resistance-to-ac-is-driving",
+      "url": "https://www.noahpinion.blog/p/europes-resistance-to-ac-is-driving",
+      "date": "2026-06-28",
+      "title": ""
+    },
+    {
+      "slug": "palestine-is-the-end-of-the-line",
+      "url": "https://www.noahpinion.blog/p/palestine-is-the-end-of-the-line",
+      "date": "2026-06-25",
+      "title": ""
+    },
+    {
+      "slug": "pizza-wheels-are-bad-japanese-toilets",
+      "url": "https://www.noahpinion.blog/p/pizza-wheels-are-bad-japanese-toilets",
+      "date": "2026-06-24",
+      "title": ""
+    },
+    {
+      "slug": "china-is-winning-the-other-tech-race",
+      "url": "https://www.noahpinion.blog/p/china-is-winning-the-other-tech-race",
+      "date": "2026-06-24",
+      "title": ""
+    },
+    {
+      "slug": "nobody-says-hi-in-san-francisco",
+      "url": "https://www.noahpinion.blog/p/nobody-says-hi-in-san-francisco",
+      "date": "2026-06-24",
+      "title": ""
+    },
+    {
+      "slug": "what-defines-japans-national-identity",
+      "url": "https://www.noahpinion.blog/p/what-defines-japans-national-identity",
+      "date": "2026-06-20",
+      "title": ""
+    },
+    {
+      "slug": "does-anything-i-write-matter-anymore",
+      "url": "https://www.noahpinion.blog/p/does-anything-i-write-matter-anymore",
+      "date": "2026-06-19",
+      "title": ""
+    },
+    {
+      "slug": "is-china-inventing-big-important",
+      "url": "https://www.noahpinion.blog/p/is-china-inventing-big-important",
+      "date": "2026-06-17",
+      "title": ""
+    },
+    {
+      "slug": "how-the-old-system-of-the-world-shaped",
+      "url": "https://www.noahpinion.blog/p/how-the-old-system-of-the-world-shaped",
+      "date": "2026-06-17",
+      "title": ""
+    },
+    {
+      "slug": "iran-is-trumps-katrina",
+      "url": "https://www.noahpinion.blog/p/iran-is-trumps-katrina",
+      "date": "2026-06-17",
+      "title": ""
+    },
+    {
+      "slug": "china-has-invented-a-whole-new-way",
+      "url": "https://www.noahpinion.blog/p/china-has-invented-a-whole-new-way",
+      "date": "2026-06-16",
+      "title": ""
+    },
+    {
+      "slug": "does-america-really-lose-all-its",
+      "url": "https://www.noahpinion.blog/p/does-america-really-lose-all-its",
+      "date": "2026-06-16",
+      "title": ""
+    },
+    {
+      "slug": "will-china-inc-be-zombified",
+      "url": "https://www.noahpinion.blog/p/will-china-inc-be-zombified",
+      "date": "2026-06-16",
+      "title": ""
+    },
+    {
+      "slug": "here-are-some-better-versions-of",
+      "url": "https://www.noahpinion.blog/p/here-are-some-better-versions-of",
+      "date": "2026-06-14",
+      "title": ""
+    },
+    {
+      "slug": "degrowth-would-make-europeans-into",
+      "url": "https://www.noahpinion.blog/p/degrowth-would-make-europeans-into",
+      "date": "2026-06-13",
+      "title": ""
+    },
+    {
+      "slug": "yes-europeans-are-poorer-than-americans",
+      "url": "https://www.noahpinion.blog/p/yes-europeans-are-poorer-than-americans",
+      "date": "2026-06-13",
+      "title": ""
+    },
+    {
+      "slug": "are-you-finally-ready-to-admit-its",
+      "url": "https://www.noahpinion.blog/p/are-you-finally-ready-to-admit-its",
+      "date": "2026-06-11",
+      "title": ""
+    },
+    {
+      "slug": "how-to-take-our-country-back",
+      "url": "https://www.noahpinion.blog/p/how-to-take-our-country-back",
+      "date": "2026-06-10",
+      "title": ""
+    },
+    {
+      "slug": "insurance-companies-arent-the-main",
+      "url": "https://www.noahpinion.blog/p/insurance-companies-arent-the-main",
+      "date": "2026-06-10",
+      "title": ""
+    },
+    {
+      "slug": "insurers-arent-the-main-villain-of",
+      "url": "https://www.noahpinion.blog/p/insurers-arent-the-main-villain-of",
+      "date": "2026-06-10",
+      "title": ""
+    },
+    {
+      "slug": "roundup-83-i-told-you-so",
+      "url": "https://www.noahpinion.blog/p/roundup-83-i-told-you-so",
+      "date": "2026-06-08",
+      "title": ""
+    },
+    {
+      "slug": "why-europe-should-put-up-trade-barriers",
+      "url": "https://www.noahpinion.blog/p/why-europe-should-put-up-trade-barriers",
+      "date": "2026-06-06",
+      "title": ""
+    },
+    {
+      "slug": "im-kind-of-over-the-whole-anti-monopoly",
+      "url": "https://www.noahpinion.blog/p/im-kind-of-over-the-whole-anti-monopoly",
+      "date": "2026-06-06",
+      "title": ""
+    },
+    {
+      "slug": "the-corporate-feudalism-thing-wont",
+      "url": "https://www.noahpinion.blog/p/the-corporate-feudalism-thing-wont",
+      "date": "2026-06-04",
+      "title": ""
+    },
+    {
+      "slug": "how-much-more-software-do-we-really",
+      "url": "https://www.noahpinion.blog/p/how-much-more-software-do-we-really",
+      "date": "2026-06-02",
+      "title": ""
+    },
+    {
+      "slug": "the-way-we-treat-pigs-is-a-sin",
+      "url": "https://www.noahpinion.blog/p/the-way-we-treat-pigs-is-a-sin",
+      "date": "2026-05-31",
+      "title": ""
+    },
+    {
+      "slug": "america-needs-liberal-nationalism",
+      "url": "https://www.noahpinion.blog/p/america-needs-liberal-nationalism",
+      "date": "2026-05-29",
+      "title": ""
+    },
+    {
+      "slug": "your-future-job-will-be-to-keep-ai",
+      "url": "https://www.noahpinion.blog/p/your-future-job-will-be-to-keep-ai",
+      "date": "2026-05-27",
+      "title": ""
+    }
+  ],
+  "delivered": [
+    {
+      "slug": "what-will-more-intelligence-actually",
+      "url": "https://www.noahpinion.blog/p/what-will-more-intelligence-actually",
+      "title": "What will more intelligence actually do for us?",
+      "date": "2026-07-26",
+      "author": "Noah Smith",
+      "fetched": true,
+      "truncated": false,
+      "content_chars": 19279,
+      "blocked": false
+    },
+    {
+      "slug": "we-asked-too-much-of-the-american",
+      "url": "https://www.noahpinion.blog/p/we-asked-too-much-of-the-american",
+      "title": "We asked too much of the American university",
+      "date": "2026-07-24",
+      "author": "Noah Smith",
+      "fetched": true,
+      "truncated": true,
+      "content_chars": 7114,
+      "blocked": false
+    },
+    {
+      "slug": "who-was-the-worst-monster-of-the",
+      "url": "https://www.noahpinion.blog/p/who-was-the-worst-monster-of-the",
+      "title": "Who was the worst monster of the 20th century?",
+      "date": "2026-07-22",
+      "author": "Noah Smith",
+      "fetched": true,
+      "truncated": false,
+      "content_chars": 18584,
+      "blocked": false
+    },
+    {
+      "slug": "the-uk-is-a-cautionary-tale-for-the",
+      "url": "https://www.noahpinion.blog/p/the-uk-is-a-cautionary-tale-for-the",
+      "title": "The UK is a cautionary tale for the U.S.",
+      "date": "2026-07-20",
+      "author": "Noah Smith",
+      "fetched": true,
+      "truncated": false,
+      "content_chars": 19804,
+      "blocked": false
+    },
+    {
+      "slug": "wokeness-as-prairie-fire",
+      "url": "https://www.noahpinion.blog/p/wokeness-as-prairie-fire",
+      "title": "Wokeness as prairie fire",
+      "date": "2023-01-12",
+      "author": "Noah Smith",
+      "fetched": true,
+      "truncated": true,
+      "content_chars": 17010,
+      "blocked": false
+    },
+    {
+      "slug": "the-us-political-situation",
+      "url": "https://www.noahpinion.blog/p/the-us-political-situation",
+      "title": "The U.S. political situation",
+      "date": "2025-10-07",
+      "author": "Noah Smith",
+      "fetched": true,
+      "truncated": true,
+      "content_chars": 21964,
+      "blocked": false
+    },
+    {
+      "slug": "americas-political-economy-is-pretty",
+      "url": "https://www.noahpinion.blog/p/americas-political-economy-is-pretty",
+      "title": "America's political economy is pretty bleak right now",
+      "date": "2026-07-18",
+      "author": "Noah Smith",
+      "fetched": true,
+      "truncated": true,
+      "content_chars": 7627,
+      "blocked": false
+    },
+    {
+      "slug": "book-review-power-and-progress-874",
+      "url": "https://www.noahpinion.blog/p/book-review-power-and-progress-874",
+      "title": "Book Review: \"Power and Progress\"",
+      "date": "2026-07-17",
+      "author": "Noah Smith",
+      "fetched": true,
+      "truncated": false,
+      "content_chars": 43156,
+      "blocked": false
+    },
+    {
+      "slug": "book-review-power-and-progress",
+      "url": "https://www.noahpinion.blog/p/book-review-power-and-progress",
+      "title": "Book review: \"Power and Progress\"",
+      "date": "2024-02-21",
+      "author": "Noah Smith",
+      "fetched": true,
+      "truncated": false,
+      "content_chars": 41174,
+      "blocked": false
+    },
+    {
+      "slug": "why-i-didnt-sign-the-we-must-act",
+      "url": "https://www.noahpinion.blog/p/why-i-didnt-sign-the-we-must-act",
+      "title": "Why I didn't sign the \"We Must Act Now\" statement (yet)",
+      "date": "2026-07-15",
+      "author": "Noah Smith",
+      "fetched": true,
+      "truncated": false,
+      "content_chars": 9143,
+      "blocked": false
+    }
+  ],
+  "picks_about_topic": [
+    {
+      "slug": "what-will-more-intelligence-actually",
+      "title": "What will more intelligence actually do for us?"
+    },
+    {
+      "slug": "will-ai-make-companies-outsource",
+      "title": ""
+    },
+    {
+      "slug": "your-future-job-will-be-to-keep-ai",
+      "title": ""
+    }
+  ],
+  "manifest": [
+    {
+      "file": "md/what-will-more-intelligence-actually.md",
+      "bytes": 20352,
+      "sha256": "313c9260e850fe7ad6832098a2f35630b6ce005cae901a9af045c9a3767f6ff1",
+      "truncated": false
+    },
+    {
+      "file": "md/we-asked-too-much-of-the-american.md",
+      "bytes": 7585,
+      "sha256": "cf46a7fbbf042982983cbdd1bff51d2572d2ba26764ec03415ffeadb97de37c4",
+      "truncated": true
+    },
+    {
+      "file": "md/who-was-the-worst-monster-of-the.md",
+      "bytes": 19654,
+      "sha256": "ff93a2f03bb8e2eb191b6beadaacc93f612a530d3fd2c6f3c0d59693c2997e8b",
+      "truncated": false
+    },
+    {
+      "file": "md/the-uk-is-a-cautionary-tale-for-the.md",
+      "bytes": 20877,
+      "sha256": "7bb3dbc69d822834755877551cc5a512e139bde145aba99d9b9e79dc9aec2ad4",
+      "truncated": false
+    },
+    {
+      "file": "md/wokeness-as-prairie-fire.md",
+      "bytes": 17916,
+      "sha256": "fef596d42a0e422e5c943a2dbc697c8100fe9932ae932d1579520abca298592a",
+      "truncated": true
+    },
+    {
+      "file": "md/the-us-political-situation.md",
+      "bytes": 23206,
+      "sha256": "4c1f2eae66d40543934221efe1a157b7476ab1582e9c1f15ed1d28e0aa7412f6",
+      "truncated": true
+    },
+    {
+      "file": "md/americas-political-economy-is-pretty.md",
+      "bytes": 8237,
+      "sha256": "e1eac777c45e522b8d363b7389643168ea47109e0b2daf03d5c87a98511c31a2",
+      "truncated": true
+    },
+    {
+      "file": "md/book-review-power-and-progress-874.md",
+      "bytes": 45281,
+      "sha256": "ca99f7e9cbe8c7b4d1162adaed48d66f05ee15dd892c8335cabe8a5edda00727",
+      "truncated": false
+    },
+    {
+      "file": "md/book-review-power-and-progress.md",
+      "bytes": 43224,
+      "sha256": "5dd3da78f5b44cdc59825e36c4c4e76a15f1749be8bb347c28f240b83d9eeea5",
+      "truncated": false
+    },
+    {
+      "file": "md/why-i-didnt-sign-the-we-must-act.md",
+      "bytes": 9841,
+      "sha256": "736d48042e7d877414fa443c4de59c5fbc06d86b5cb5598a2b7f120b0d142f92",
+      "truncated": false
+    }
+  ],
+  "requests": 12,
+  "wall_s": 19.1
+}

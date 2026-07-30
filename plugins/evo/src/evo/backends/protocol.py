@@ -5,6 +5,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Iterator, Protocol
 
+from .environment import EnvironmentSpec
+
 
 @dataclass
 class AllocateCtx:
@@ -109,6 +111,7 @@ class SandboxSpec:
     bearer_token: str                   # generated per-sandbox; passed to sandbox-agent
     exposed_port: int = 8080            # sandbox-agent listen port inside the container
     timeout_seconds: int = 3600         # provider-native lifetime cap
+    environment: EnvironmentSpec | None = None  # optional versioned environment manifest
 
 
 @dataclass

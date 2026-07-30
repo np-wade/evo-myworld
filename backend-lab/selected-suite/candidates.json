@@ -1,0 +1,268 @@
+{
+  "cross_app_contract": {
+    "runnable": [
+      {
+        "id": "versioned-jsonl",
+        "kind": "reference",
+        "source": "projects/evo-myworld/plugins/evo/src/evo/runner_bridge.py",
+        "influence": "Versioned JSONL request/response boundary"
+      },
+      {
+        "id": "claw-cip-profile",
+        "kind": "technique-port",
+        "source": "filing-cabinet/library-base/repos/zeroclaw-labs_claw-standards/spec/cip-1.0-draft.md",
+        "influence": "JSON-RPC method errors, task lifecycle, capability honesty, vendor metadata namespacing"
+      }
+    ],
+    "pending": [
+      {
+        "id": "witt-brain-jsonrpc-service",
+        "source": "projects/witt-brain/src/interface/server.rs",
+        "needs": "Long-running service adapter through Witt Link; no CLI dependency"
+      },
+      {
+        "id": "baml",
+        "source": "filing-cabinet/library-base/repos/BoundaryML_baml/code",
+        "needs": "Native BAML validator/generator adapter"
+      },
+      {
+        "id": "apache-thrift",
+        "source": "filing-cabinet/library-base/repos/apache_thrift/code",
+        "needs": "IDL compiler and cross-language generated clients"
+      },
+      {
+        "id": "apache-fory",
+        "source": "filing-cabinet/library-base/repos/apache_fory/code",
+        "needs": "Native codec adapters for the selected app languages"
+      }
+    ]
+  },
+  "agent_lifecycle": {
+    "runnable": [
+      {
+        "id": "evo-mission-dag",
+        "kind": "technique-port",
+        "source": "projects/evo-myworld/plugins/evo/src/evo/missions.py",
+        "influence": "Dependency unlock, idempotent claims, bounded children, cancellation cascade"
+      },
+      {
+        "id": "witt-spine-lanes",
+        "kind": "technique-port",
+        "source": "projects/witt-spine/crates/spine-engine/src/lib.rs",
+        "influence": "CAS claims, dependency gating, pool slots, failure propagation"
+      },
+      {
+        "id": "pueue-queue",
+        "kind": "technique-port",
+        "source": "filing-cabinet/library-base/repos/Nukesor_pueue/code",
+        "influence": "Durable task states, pause/resume, retry-oriented queue behavior"
+      }
+    ],
+    "pending": [
+      {
+        "id": "cowork-os",
+        "source": "filing-cabinet/library-base/repos/CoWork-OS_CoWork-OS/code",
+        "needs": "Task/session API adapter"
+      },
+      {
+        "id": "agent-control",
+        "source": "filing-cabinet/library-base/repos/agentcontrol_agent-control/code",
+        "needs": "Engine control-plane adapter"
+      },
+      {
+        "id": "crabfleet",
+        "source": "filing-cabinet/library-base/repos/zeroclaw-labs_crabfleet/code",
+        "needs": "Fleet session adapter"
+      }
+    ]
+  },
+  "identity_trace": {
+    "runnable": [
+      {
+        "id": "normalized-name-trace-id",
+        "kind": "reference",
+        "source": "projects/assembly-office/server.js",
+        "influence": "Existing run-id convention and normalized repository names"
+      },
+      {
+        "id": "agent-trace-envelope",
+        "kind": "technique-port",
+        "source": "filing-cabinet/library-base/repos/cursor_agent-trace/code/schemas.ts",
+        "influence": "Typed timestamped trace envelope with metadata"
+      },
+      {
+        "id": "cosine-resolution",
+        "kind": "technique-port",
+        "source": "projects/witt-spine/crates/spine-trunk/src/dedup.rs",
+        "influence": "Recall-then-gate entity resolution"
+      }
+    ],
+    "pending": [
+      {
+        "id": "ontocast-aligner",
+        "source": "filing-cabinet/library-base/repos/growgraph_ontocast/code/ontocast/tool/agg/entity_aligner.py",
+        "needs": "Embedding model adapter"
+      },
+      {
+        "id": "flyline",
+        "source": "filing-cabinet/library-base/repos/HalFrgrd_flyline/code",
+        "needs": "Trace-normalization adapter"
+      }
+    ]
+  },
+  "gateway_routing": {
+    "runnable": [
+      {
+        "id": "hardcoded-ports",
+        "kind": "reference",
+        "source": "projects/witt-link-server/config.toml",
+        "influence": "Current fixed-port registry"
+      },
+      {
+        "id": "prefix-front-door",
+        "kind": "technique-port",
+        "source": "filing-cabinet/library-base/repos/nginx_nginx/code",
+        "influence": "Path-prefix reverse proxy"
+      },
+      {
+        "id": "health-registry-router",
+        "kind": "technique-port",
+        "source": "projects/witt-link-server/src",
+        "influence": "Dynamic targets and health-aware backend selection"
+      }
+    ],
+    "pending": [
+      {
+        "id": "mitmproxy",
+        "source": "filing-cabinet/library-base/repos/mitmproxy_mitmproxy/code",
+        "needs": "Live programmable proxy adapter"
+      },
+      {
+        "id": "pingora",
+        "source": "filing-cabinet/library-base/repos/cloudflare_pingora/code",
+        "needs": "Compiled Rust proxy adapter"
+      }
+    ]
+  },
+  "hybrid_recall": {
+    "runnable": [
+      {
+        "id": "fts-only",
+        "kind": "reference",
+        "source": "projects/evo-myworld/world/backend/evo_graph.py",
+        "influence": "Quoted-token FTS with exact and prefix bonuses"
+      },
+      {
+        "id": "vector-only",
+        "kind": "reference",
+        "source": "filing-cabinet/library-base/repos/facebookresearch_faiss/code",
+        "influence": "Cosine nearest-neighbor arm"
+      },
+      {
+        "id": "rrf-hybrid",
+        "kind": "technique-port",
+        "source": "projects/witt-spine/crates/spine-trunk/src/recall.rs",
+        "influence": "Reciprocal-rank fusion of keyword and vector arms"
+      }
+    ],
+    "pending": [
+      {
+        "id": "qdrant-native",
+        "source": "filing-cabinet/library-base/repos/qdrant_qdrant/code",
+        "needs": "Qdrant daemon/client adapter"
+      },
+      {
+        "id": "turso-native",
+        "source": "filing-cabinet/library-base/repos/tursodatabase_turso/code",
+        "needs": "Turso vector/FTS build and client adapter"
+      },
+      {
+        "id": "tantivy",
+        "source": "filing-cabinet/library-base/repos/quickwit-oss_tantivy/code",
+        "needs": "Compiled keyword-arm adapter"
+      },
+      {
+        "id": "meilisearch",
+        "source": "filing-cabinet/library-base/repos/meilisearch_meilisearch/code",
+        "needs": "Daemon image and client adapter"
+      }
+    ]
+  },
+  "graph_lineage": {
+    "runnable": [
+      {
+        "id": "sqlite-edges",
+        "kind": "reference",
+        "source": "projects/graphify-app/src/search/db.js",
+        "influence": "Indexed edge table and recursive SQL traversal"
+      },
+      {
+        "id": "memory-adjacency",
+        "kind": "reference",
+        "source": "projects/graphify-app/src/search/db-graph.js",
+        "influence": "In-memory adjacency walk"
+      }
+    ],
+    "pending": [
+      {
+        "id": "falkordb",
+        "source": "projects/graphify-app/data/falkor/dump.rdb",
+        "needs": "Isolated FalkorDB fixture loader and client adapter"
+      },
+      {
+        "id": "supermemory-graph",
+        "source": "filing-cabinet/library-base/repos/supermemoryai_supermemory/code/packages/memory-graph",
+        "needs": "Memory-graph query adapter"
+      },
+      {
+        "id": "hypermem",
+        "source": "filing-cabinet/library-base/repos/EverMind-AI_HyperMem/code/hypermem",
+        "needs": "Hypergraph ingestion/query adapter"
+      }
+    ]
+  },
+  "self_improvement": {
+    "runnable": [
+      {
+        "id": "argmax",
+        "kind": "reference",
+        "source": "projects/evo-myworld/plugins/evo/src/evo/frontier_strategies.py",
+        "influence": "Pure exploitation baseline"
+      },
+      {
+        "id": "evo-pareto",
+        "kind": "technique-port",
+        "source": "projects/evo-myworld/plugins/evo/src/evo/frontier_strategies.py",
+        "influence": "Per-task Pareto preservation"
+      },
+      {
+        "id": "flywheel-ucb",
+        "kind": "technique-port",
+        "source": "filing-cabinet/library-base/repos/Wassimyounes01_flywheel/code/docs/architecture.md",
+        "influence": "Reward history plus bounded exploration"
+      }
+    ],
+    "pending": [
+      {
+        "id": "evoagentbench",
+        "source": "filing-cabinet/library-base/repos/EverMind-AI_EvoAgentBench/code",
+        "needs": "Dataset/evaluator adapter and local task subset"
+      },
+      {
+        "id": "rd-agent",
+        "source": "filing-cabinet/library-base/repos/microsoft_RD-Agent/code",
+        "needs": "Experiment-generation adapter"
+      },
+      {
+        "id": "opik-optimizer",
+        "source": "filing-cabinet/library-base/repos/comet-ml_opik/code",
+        "needs": "Judge/optimizer adapter"
+      },
+      {
+        "id": "prompt-engineer",
+        "source": "filing-cabinet/library-base/repos/Wassimyounes01_prompt-engineer/code",
+        "needs": "Prompt mutation adapter"
+      }
+    ]
+  }
+}

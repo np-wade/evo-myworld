@@ -1,0 +1,35 @@
+{
+  "mode": "S3 concept extraction/ontology/nested suppression on incumbent-split sections (gate: f1>0)",
+  "n_entries": 2,
+  "candidates_unavailable": [],
+  "leaderboard": [
+    {
+      "candidate": "ip-incumbent",
+      "fails": 0,
+      "error": "",
+      "mean_f1": 0.5714,
+      "type_accuracy": 1.0,
+      "nested_score": 0.75,
+      "metric_capture": 0.1305,
+      "latency_ms_p50": 48.1,
+      "latency_ms_p95": 54.1,
+      "deterministic": 1,
+      "gate": "PASS",
+      "score": 0.7053
+    },
+    {
+      "candidate": "naive-baseline",
+      "fails": 0,
+      "error": "",
+      "mean_f1": 0.4444,
+      "type_accuracy": 0.0,
+      "nested_score": 0.75,
+      "metric_capture": 0.0,
+      "latency_ms_p50": 0.1,
+      "latency_ms_p95": 0.3,
+      "deterministic": 1,
+      "gate": "PASS",
+      "score": 0.3791
+    }
+  ]
+}

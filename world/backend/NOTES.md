@@ -128,3 +128,33 @@ that the connection really is read-only (CREATE TABLE raises).
   says don't spin the in-memory store for lookups SQLite already answers.
 - `--repo` matches `repo_id` substring (not repos.name) because repo_id
   is what `find` prints — copy/paste round-trips.
+
+## Phase 2 — promoted into the plugin (2026-07-24)
+
+This phase-1 CLI is **kept in place** (12 tests still green) and was promoted,
+not replaced, into a first-class package: `plugins/evo/src/evo/graph/`.
+
+- `graph/store.py` — reuses this file's `_query_terms`/`_fts_query`/bm25+bonus
+  ranking as `GraphStore.find`, and ADDS bounded 1–2-hop traversal
+  (`neighbors`/`callers`/`subgraph`) over `edges` (schema confirmed:
+  `edges(repo_id, src, dst, relation)`, src/dst are `node_id` strings, indexed
+  `edges_src (repo_id,src)` / `edges_dst (repo_id,dst)`). Traversal shape from
+  PostHog `TraceNeighborsQuery`; 2-hop SQLite ceiling per GRAPH-FIRST.
+- `graph/candidates.py` — the graph-candidates contract (need/query/repo/symbol/
+  source pointer/license/boundary/benefit/test) both handoffs asked for. License
+  defaults to `unverified` (the index has no license column; vendoring needs a
+  manual check). Repo-diverse rerank so selection isn't pinned to one library.
+- `graph/writeback.py` — the experiment evidence graph in a SEPARATE
+  `.evo/graph/evidence.db` (source index stays immutable). MERGE-upsert nodes/
+  edges, content-addressed (SHA-256) artifacts, DERIVED_FROM/BEAT lineage.
+  Attribution: openwhisk `ArtifactStore`, airflow `OpenLineageAdapter`,
+  HKUDS `SqliteStrategyStore`, FalkorDB MERGE.
+- `graph/inject.py` — read-only brief injection; opt-out per run via
+  `EVO_GRAPH_INJECT`; retrieval≠selection framing baked into the block.
+- `graph/schema.py` — the shared vocabulary (18 node kinds, 22 relations, 13
+  failure classes) so the roadmap's graph model is executable, not just prose.
+- CLI: `evo graph {find,neighbors,subgraph,slice,candidates,inject,record,
+  lineage,stats,export}`. Tests: `tests/unit/test_graph_*.py` (59, all green;
+  write-back fully hermetic, retrieval tests skip without index.db).
+- Verified end-to-end against the real 27 GB index + a real workspace: retrieve →
+  candidates → inject → record → compare/BEAT → cite → lineage.

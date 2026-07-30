@@ -1,0 +1,87 @@
+{
+  "mode": "S3 concept extraction/ontology/nested suppression on incumbent-split sections (gate: f1>0)",
+  "n_entries": 5,
+  "candidates_unavailable": [
+    {
+      "candidate": "fasttext",
+      "reason": "fasttext-wheel installs fine, but fastText is a supervised text classifier / embedding trainer with no extraction capability; no honest concept-extraction adapter exists"
+    },
+    {
+      "candidate": "ontocast-concepts",
+      "reason": "ontocast concept extraction is LLM+SPARQL driven (tool/chunk/chunker.py feeds an LLM triple extractor; tool/agg/entity_aligner.py aligns RDF graphs with an embedding model); no LLM endpoint configured on this box and model-weight downloads are disallowed"
+    },
+    {
+      "candidate": "opennlp-ner",
+      "reason": "java not on PATH; apache_opennlp is a Java/Maven project and maven builds are not attempted in this lane"
+    },
+    {
+      "candidate": "wittgenstein-rules",
+      "reason": "wittgenstein RIPPER is a supervised rule classifier requiring labeled training data; the concepts stage provides unlabeled sections, so no honest concept-extraction adaptation exists"
+    }
+  ],
+  "leaderboard": [
+    {
+      "candidate": "ip-incumbent",
+      "fails": 0,
+      "error": "",
+      "mean_f1": 0.5714,
+      "type_accuracy": 1.0,
+      "nested_score": 0.75,
+      "metric_capture": 0.1305,
+      "latency_ms_p50": 160.0,
+      "latency_ms_p95": 314.4,
+      "deterministic": 1,
+      "gate": "PASS",
+      "score": 0.7053
+    },
+    {
+      "candidate": "naive-baseline",
+      "fails": 0,
+      "error": "",
+      "mean_f1": 0.4444,
+      "type_accuracy": 0.0,
+      "nested_score": 0.75,
+      "metric_capture": 0.0,
+      "latency_ms_p50": 0.5,
+      "latency_ms_p95": 8.6,
+      "deterministic": 1,
+      "gate": "PASS",
+      "score": 0.3791
+    },
+    {
+      "candidate": "spacy-nounchunks",
+      "fails": 0,
+      "error": "",
+      "mean_f1": 0.1124,
+      "type_accuracy": 0.0,
+      "nested_score": 0.75,
+      "metric_capture": 0.0,
+      "latency_ms_p50": 2953.3,
+      "latency_ms_p95": 3337.6,
+      "deterministic": 1,
+      "gate": "PASS",
+      "score": 0.1799
+    },
+    {
+      "candidate": "presidio",
+      "fails": 0,
+      "error": "",
+      "mean_f1": 0.0667,
+      "type_accuracy": 0.0,
+      "nested_score": 0.0,
+      "metric_capture": 0.0,
+      "latency_ms_p50": 4355.0,
+      "latency_ms_p95": 8464.6,
+      "deterministic": 1,
+      "gate": "PASS",
+      "score": 0.04
+    },
+    {
+      "candidate": "nemo-gliner",
+      "fails": 1,
+      "error": "TimeoutExpired: Command '['/home/npwad/coding/docker-envs/projects/evo-myworld/racetrack/ip-eval/.venv-candidates/gliner/bin/python', '-c', \"import sys, json\\nfrom gliner import GLiNER\\ntexts = json.load(sys.stdin)\\nmodel = GLiNER.from_pretrained('nvidia/gliner-pii')\\nlabels = ['person', 'organizati",
+      "gate": "FAIL",
+      "score": 0.0
+    }
+  ]
+}

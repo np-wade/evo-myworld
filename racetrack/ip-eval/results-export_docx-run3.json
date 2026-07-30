@@ -1,0 +1,63 @@
+{
+  "mode": "S8 v2 DOCX: validity 0.35 + footnotes 0.15 + styles 0.10 + heading styles 0.15 + text fidelity 0.25 (gate: valid)",
+  "n_entries": 4,
+  "candidates_unavailable": [],
+  "leaderboard": [
+    {
+      "candidate": "ip-incumbent",
+      "fails": 0,
+      "error": "",
+      "docx_score": 1.0,
+      "footnote_entries": 2,
+      "heading_styles": 1,
+      "text_fidelity": 1.0,
+      "latency_ms_p50": 43.1,
+      "latency_ms_p95": 44.7,
+      "deterministic": -1,
+      "gate": "PASS",
+      "score": 1.0
+    },
+    {
+      "candidate": "pandoc-docx",
+      "fails": 0,
+      "error": "",
+      "docx_score": 0.9937,
+      "footnote_entries": 2,
+      "heading_styles": 1,
+      "text_fidelity": 0.9748,
+      "latency_ms_p50": 207.0,
+      "latency_ms_p95": 216.0,
+      "deterministic": -1,
+      "gate": "PASS",
+      "score": 0.9937
+    },
+    {
+      "candidate": "python-docx",
+      "fails": 0,
+      "error": "",
+      "docx_score": 0.8458,
+      "footnote_entries": 0,
+      "heading_styles": 1,
+      "text_fidelity": 0.9833,
+      "latency_ms_p50": 150.1,
+      "latency_ms_p95": 190.9,
+      "deterministic": -1,
+      "gate": "PASS",
+      "score": 0.8458
+    },
+    {
+      "candidate": "docxtpl-minimal",
+      "fails": 0,
+      "error": "",
+      "docx_score": 0.8436,
+      "footnote_entries": 0,
+      "heading_styles": 1,
+      "text_fidelity": 0.9742,
+      "latency_ms_p50": 228.4,
+      "latency_ms_p95": 312.4,
+      "deterministic": -1,
+      "gate": "PASS",
+      "score": 0.8436
+    }
+  ]
+}

@@ -1,0 +1,68 @@
+{
+  "mode": "S3 concept extraction/ontology/nested suppression on incumbent-split sections (gate: f1>0)",
+  "n_entries": 4,
+  "candidates_unavailable": [
+    {
+      "candidate": "fasttext",
+      "reason": "fasttext-wheel installs fine, but fastText is a supervised text classifier / embedding trainer with no extraction capability; no honest concept-extraction adapter exists"
+    }
+  ],
+  "leaderboard": [
+    {
+      "candidate": "ip-incumbent",
+      "fails": 0,
+      "error": "",
+      "mean_f1": 0.5714,
+      "type_accuracy": 1.0,
+      "nested_score": 0.75,
+      "metric_capture": 0.1305,
+      "latency_ms_p50": 46.7,
+      "latency_ms_p95": 48.5,
+      "deterministic": 1,
+      "gate": "PASS",
+      "score": 0.7053
+    },
+    {
+      "candidate": "naive-baseline",
+      "fails": 0,
+      "error": "",
+      "mean_f1": 0.4444,
+      "type_accuracy": 0.0,
+      "nested_score": 0.75,
+      "metric_capture": 0.0,
+      "latency_ms_p50": 0.1,
+      "latency_ms_p95": 0.2,
+      "deterministic": 1,
+      "gate": "PASS",
+      "score": 0.3791
+    },
+    {
+      "candidate": "spacy-nounchunks",
+      "fails": 0,
+      "error": "",
+      "mean_f1": 0.1124,
+      "type_accuracy": 0.0,
+      "nested_score": 0.75,
+      "metric_capture": 0.0,
+      "latency_ms_p50": 1143.4,
+      "latency_ms_p95": 1205.6,
+      "deterministic": 1,
+      "gate": "PASS",
+      "score": 0.1799
+    },
+    {
+      "candidate": "presidio",
+      "fails": 0,
+      "error": "",
+      "mean_f1": 0.0667,
+      "type_accuracy": 0.0,
+      "nested_score": 0.0,
+      "metric_capture": 0.0,
+      "latency_ms_p50": 1497.6,
+      "latency_ms_p95": 1604.5,
+      "deterministic": 1,
+      "gate": "PASS",
+      "score": 0.04
+    }
+  ]
+}

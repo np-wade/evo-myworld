@@ -1,0 +1,52 @@
+{
+  "ip-incumbent": {
+    "available": true,
+    "reason": "",
+    "provision_s": 0.12
+  },
+  "naive-baseline": {
+    "available": true,
+    "reason": "",
+    "provision_s": 0.0
+  },
+  "presidio": {
+    "available": true,
+    "reason": "",
+    "provision_s": 3.74
+  },
+  "spacy-nounchunks": {
+    "available": true,
+    "reason": "",
+    "provision_s": 1.87
+  },
+  "fasttext": {
+    "available": false,
+    "reason": "fasttext-wheel installs fine, but fastText is a supervised text classifier / embedding trainer with no extraction capability; no honest concept-extraction adapter exists",
+    "provision_s": 0.0
+  },
+  "ontocast-concepts": {
+    "available": true,
+    "reason": "",
+    "provision_s": 2.15
+  },
+  "opennlp-ner": {
+    "available": false,
+    "reason": "java not on PATH; apache_opennlp is a Java/Maven project and maven builds are not attempted in this lane",
+    "provision_s": 0.09
+  },
+  "nemo-gliner": {
+    "available": true,
+    "reason": "",
+    "provision_s": 256.74
+  },
+  "wittgenstein-rules": {
+    "available": false,
+    "reason": "wittgenstein RIPPER is a supervised rule classifier requiring labeled training data; the concepts stage provides unlabeled sections, so no honest concept-extraction adaptation exists",
+    "provision_s": 0.0
+  },
+  "fasttext-classify": {
+    "available": true,
+    "reason": "",
+    "provision_s": 0.71
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "mode": "P10: torn-read atomicity (gate), lost updates, corrupt-file recovery, write p50",
+  "n_entries": 3,
+  "candidates_unavailable": [
+    {
+      "candidate": "pouchdb-store",
+      "reason": "install failed (purged): [Errno 2] No such file or directory: PosixPath('/home/npwad/coding/docker-envs/projects/evo-myworld/racetrack/ip-eval/.venv-candidates/pouchdb-node')"
+    }
+  ],
+  "leaderboard": [
+    {
+      "candidate": "ip-incumbent",
+      "fails": 0,
+      "error": "",
+      "p50_write_ms": 0.92,
+      "torn_reads": 0,
+      "lost_updates": 0,
+      "concurrent_errors": 0,
+      "corrupt_behavior": "threw:SyntaxError",
+      "corrupt_score": 0.5,
+      "atomic_ok": 1,
+      "no_lost": 1,
+      "latency_ms_p50": 99.8,
+      "latency_ms_p95": 103.2,
+      "deterministic": 1,
+      "gate": "PASS",
+      "score": 0.85
+    },
+    {
+      "candidate": "sqlite-store",
+      "fails": 0,
+      "error": "",
+      "p50_write_ms": 0.055,
+      "torn_reads": 0,
+      "lost_updates": 0,
+      "concurrent_errors": 0,
+      "corrupt_behavior": "threw:DatabaseError",
+      "corrupt_score": 0.5,
+      "atomic_ok": 1,
+      "no_lost": 1,
+      "latency_ms_p50": 7.9,
+      "latency_ms_p95": 9.6,
+      "deterministic": 1,
+      "gate": "PASS",
+      "score": 0.85
+    },
+    {
+      "candidate": "naive-baseline",
+      "fails": 0,
+      "error": "",
+      "p50_write_ms": 0.022,
+      "torn_reads": 142,
+      "lost_updates": 20,
+      "concurrent_errors": 0,
+      "corrupt_behavior": "threw:JSONDecodeError",
+      "corrupt_score": 0.5,
+      "atomic_ok": 0,
+      "no_lost": 0,
+      "latency_ms_p50": 1.8,
+      "latency_ms_p95": 2.1,
+      "deterministic": 0,
+      "gate": "FAIL",
+      "score": 0.0
+    }
+  ]
+}

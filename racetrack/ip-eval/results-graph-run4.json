@@ -1,0 +1,85 @@
+{
+  "mode": "S5 concept graph vs gold co-occurrence edges (gate: node_f1>0)",
+  "n_entries": 5,
+  "candidates_unavailable": [
+    {
+      "candidate": "ontocast-graph",
+      "reason": "ontocast graph construction is LLM/SPARQL-driven; the only LLM-free aggregation path (tool/agg EntityAligner) requires sentence-transformers embedding weights (paraphrase-multilingual-MiniLM-L12-v2), and model-weight downloads are out of scope \u2014 no deterministic LLM-free graph builder exists in the repo"
+    },
+    {
+      "candidate": "hypermem-graph",
+      "reason": "hypermem stage2 hypergraph extraction is LLMProvider-driven and stage4 retrieval requires EmbeddingProvider/RerankerProvider; no deterministic LLM-free hypergraph builder exists in the repo"
+    },
+    {
+      "candidate": "zeroclaw-graph",
+      "reason": "zeroclaw build failed: [('/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/zeroclaw-labs_zeroclaw/code/crates/zeroclaw-runtime/src/firmware', '/tmp/zeroclaw-build-7ozhvkcz/src/crates/zeroclaw-runtime/src/firmware', \"[Errno 2] No such file or directory: '/home/npwad/coding/docker-envs/filing-cabinet/library-base/repos/zeroclaw-labs_zeroclaw/code/crates/zeroclaw-runtime/src/firmware'\")]"
+    }
+  ],
+  "leaderboard": [
+    {
+      "candidate": "graphify-graph",
+      "fails": 0,
+      "error": "",
+      "node_f1": 1.0,
+      "edge_precision": 0.9444,
+      "edge_recall": 1.0,
+      "latency_ms_p50": 312.2,
+      "latency_ms_p95": 457.1,
+      "deterministic": 1,
+      "gate": "PASS",
+      "score": 0.9833
+    },
+    {
+      "candidate": "naive-baseline",
+      "fails": 0,
+      "error": "",
+      "node_f1": 1.0,
+      "edge_precision": 0.9444,
+      "edge_recall": 1.0,
+      "latency_ms_p50": 0.0,
+      "latency_ms_p95": 0.0,
+      "deterministic": 1,
+      "gate": "PASS",
+      "score": 0.9833
+    },
+    {
+      "candidate": "networkx-cooc",
+      "fails": 0,
+      "error": "",
+      "node_f1": 1.0,
+      "edge_precision": 0.9444,
+      "edge_recall": 1.0,
+      "latency_ms_p50": 480.5,
+      "latency_ms_p95": 1024.6,
+      "deterministic": 1,
+      "gate": "PASS",
+      "score": 0.9833
+    },
+    {
+      "candidate": "ip-incumbent",
+      "fails": 0,
+      "error": "",
+      "node_f1": 1.0,
+      "edge_precision": 0.9048,
+      "edge_recall": 1.0,
+      "latency_ms_p50": 81.5,
+      "latency_ms_p95": 143.8,
+      "deterministic": 1,
+      "gate": "PASS",
+      "score": 0.9714
+    },
+    {
+      "candidate": "jaccard-graph",
+      "fails": 0,
+      "error": "",
+      "node_f1": 1.0,
+      "edge_precision": 0.8519,
+      "edge_recall": 1.0,
+      "latency_ms_p50": 0.2,
+      "latency_ms_p95": 0.7,
+      "deterministic": 1,
+      "gate": "PASS",
+      "score": 0.9556
+    }
+  ]
+}

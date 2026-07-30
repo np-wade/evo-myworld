@@ -1,0 +1,1103 @@
+{
+  "pub": "astralcodexten",
+  "base_url": "https://www.astralcodexten.com",
+  "n_posts": 73,
+  "posts": [
+    {
+      "slug": "breakdown-in-pakistan",
+      "title": "Your Book Review: Breakdown In Pakistan",
+      "subtitle": "Finalist #3 in the Book Review Contest",
+      "post_date": "2026-07-24T15:04:42.360Z",
+      "date": "2026-07-24",
+      "audience": "everyone",
+      "authors": [
+        "Scott Alexander"
+      ],
+      "url": "https://www.astralcodexten.com/p/breakdown-in-pakistan",
+      "description": "Finalist #3 in the Book Review Contest",
+      "word_count": 7197,
+      "type": "newsletter"
+    },
+    {
+      "slug": "the-hugging-face-incident",
+      "title": "The Hugging Face Incident",
+      "subtitle": "...",
+      "post_date": "2026-07-24T05:43:14.185Z",
+      "date": "2026-07-24",
+      "audience": "everyone",
+      "authors": [
+        "Scott Alexander"
+      ],
+      "url": "https://www.astralcodexten.com/p/the-hugging-face-incident",
+      "description": "...",
+      "word_count": 1325,
+      "type": "newsletter"
+    },
+    {
+      "slug": "links-for-july-2026-part-1",
+      "title": "Links For July 2026 (Part 1)",
+      "subtitle": "...",
+      "post_date": "2026-07-22T14:57:36.073Z",
+      "date": "2026-07-22",
+      "audience": "everyone",
+      "authors": [
+        "Scott Alexander"
+      ],
+      "url": "https://www.astralcodexten.com/p/links-for-july-2026-part-1",
+      "description": "...",
+      "word_count": 2780,
+      "type": "newsletter"
+    },
+    {
+      "slug": "contra-pritchard-on-liberal-happiness",
+      "title": "Contra Pritchard On Liberal Happiness",
+      "subtitle": "...",
+      "post_date": "2026-07-21T12:30:55.717Z",
+      "date": "2026-07-21",
+      "audience": "everyone",
+      "authors": [
+        "Scott Alexander"
+      ],
+      "url": "https://www.astralcodexten.com/p/contra-pritchard-on-liberal-happiness",
+      "description": "...",
+      "word_count": 1166,
+      "type": "newsletter"
+    },
+    {
+      "slug": "open-thread-443",
+      "title": "Open Thread 443",
+      "subtitle": "...",
+      "post_date": "2026-07-20T11:27:22.183Z",
+      "date": "2026-07-20",
+      "audience": "everyone",
+      "authors": [
+        "Scott Alexander"
+      ],
+      "url": "https://www.astralcodexten.com/p/open-thread-443",
+      "description": "...",
+      "word_count": 615,
+      "type": "newsletter"
+    },
+    {
+      "slug": "your-book-review-great-and-desperate",
+      "title": "Your Book Review: Great And Desperate Cures",
+      "subtitle": "Finalist #2 in the Book Review Contest",
+      "post_date": "2026-07-17T15:22:53.320Z",
+      "date": "2026-07-17",
+      "audience": "everyone",
+      "authors": [
+        "Scott Alexander"
+      ],
+      "url": "https://www.astralcodexten.com/p/your-book-review-great-and-desperate",
+      "description": "Finalist #2 in the Book Review Contest",
+      "word_count": 19246,
+      "type": "newsletter"
+    },
+    {
+      "slug": "against-stochastic-terrorism",
+      "title": "Against \"Stochastic Terrorism\"",
+      "subtitle": "...",
+      "post_date": "2026-07-16T22:18:00.818Z",
+      "date": "2026-07-16",
+      "audience": "everyone",
+      "authors": [
+        "Scott Alexander"
+      ],
+      "url": "https://www.astralcodexten.com/p/against-stochastic-terrorism",
+      "description": "...",
+      "word_count": 1802,
+      "type": "newsletter"
+    },
+    {
+      "slug": "six-slightly-skew-boogeymen",
+      "title": "Six Slightly Skew Boogeymen",
+      "subtitle": "...",
+      "post_date": "2026-07-16T00:55:28.337Z",
+      "date": "2026-07-16",
+      "audience": "only_paid",
+      "authors": [
+        "Scott Alexander"
+      ],
+      "url": "https://www.astralcodexten.com/p/six-slightly-skew-boogeymen",
+      "description": "...",
+      "word_count": 1535,
+      "type": "newsletter"
+    },
+    {
+      "slug": "ai-chip-regulation-is-not-a-dystopian",
+      "title": "AI Chip Regulation Is Not A Dystopian Surveillance State",
+      "subtitle": "...",
+      "post_date": "2026-07-15T10:19:35.996Z",
+      "date": "2026-07-15",
+      "audience": "everyone",
+      "authors": [
+        "Scott Alexander"
+      ],
+      "url": "https://www.astralcodexten.com/p/ai-chip-regulation-is-not-a-dystopian",
+      "description": "...",
+      "word_count": 3549,
+      "type": "newsletter"
+    },
+    {
+      "slug": "open-thread-442",
+      "title": "Open Thread 442",
+      "subtitle": "...",
+      "post_date": "2026-07-13T08:25:48.430Z",
+      "date": "2026-07-13",
+      "audience": "everyone",
+      "authors": [
+        "Scott Alexander"
+      ],
+      "url": "https://www.astralcodexten.com/p/open-thread-442",
+      "description": "...",
+      "word_count": 43,
+      "type": "newsletter"
+    },
+    {
+      "slug": "introducing-plan-a",
+      "title": "Introducing Plan A",
+      "subtitle": "...",
+      "post_date": "2026-07-09T16:19:53.009Z",
+      "date": "2026-07-09",
+      "audience": "everyone",
+      "authors": [
+        "Scott Alexander"
+      ],
+      "url": "https://www.astralcodexten.com/p/introducing-plan-a",
+      "description": "...",
+      "word_count": 4289,
+      "type": "newsletter"
+    },
+    {
+      "slug": "your-book-review-the-book-of-abraham",
+      "title": "Your Book Review: The Book Of Abraham",
+      "subtitle": "Finalist #1 in the Book Review Contest",
+      "post_date": "2026-07-08T12:48:42.152Z",
+      "date": "2026-07-08",
+      "audience": "everyone",
+      "authors": [
+        "Scott Alexander"
+      ],
+      "url": "https://www.astralcodexten.com/p/your-book-review-the-book-of-abraham",
+      "description": "...",
+      "word_count": 14110,
+      "type": "newsletter"
+    },
+    {
+      "slug": "open-thread-441",
+      "title": "Open Thread 441",
+      "subtitle": "...",
+      "post_date": "2026-07-06T09:01:09.872Z",
+      "date": "2026-07-06",
+      "audience": "everyone",
+      "authors": [
+        "Scott Alexander"
+      ],
+      "url": "https://www.astralcodexten.com/p/open-thread-441",
+      "description": "...",
+      "word_count": 246,
+      "type": "newsletter"
+    },
+    {
+      "slug": "the-ai-superforecasters-are-here",
+      "title": "The AI Superforecasters Are Here",
+      "subtitle": "...",
+      "post_date": "2026-07-02T23:14:12.972Z",
+      "date": "2026-07-02",
+      "audience": "everyone",
+      "authors": [
+        "Scott Alexander"
+      ],
+      "url": "https://www.astralcodexten.com/p/the-ai-superforecasters-are-here",
+      "description": "...",
+      "word_count": 5065,
+      "type": "newsletter"
+    },
+    {
+      "slug": "hidden-open-thread-4405",
+      "title": "Hidden Open Thread 440.5",
+      "subtitle": "...",
+      "post_date": "2026-07-02T09:07:54.499Z",
+      "date": "2026-07-02",
+      "audience": "only_paid",
+      "authors": [
+        "Scott Alexander"
+      ],
+      "url": "https://www.astralcodexten.com/p/hidden-open-thread-4405",
+      "description": "...",
+      "word_count": 20,
+      "type": "newsletter"
+    },
+    {
+      "slug": "chip-off-the-old-block",
+      "title": "Chip Off The Old Block",
+      "subtitle": "...",
+      "post_date": "2026-07-01T03:11:23.243Z",
+      "date": "2026-07-01",
+      "audience": "everyone",
+      "authors": [
+        "Scott Alexander"
+      ],
+      "url": "https://www.astralcodexten.com/p/chip-off-the-old-block",
+      "description": "...",
+      "word_count": 3441,
+      "type": "newsletter"
+    },
+    {
+      "slug": "open-thread-440",
+      "title": "Open Thread 440",
+      "subtitle": "...",
+      "post_date": "2026-06-29T13:33:40.967Z",
+      "date": "2026-06-29",
+      "audience": "everyone",
+      "authors": [
+        "Scott Alexander"
+      ],
+      "url": "https://www.astralcodexten.com/p/open-thread-440",
+      "description": "...",
+      "word_count": 303,
+      "type": "newsletter"
+    },
+    {
+      "slug": "the-metaculus-threat-to-democracy",
+      "title": "The Metaculus Democracy Threat Index",
+      "subtitle": "...",
+      "post_date": "2026-06-25T23:59:00.926Z",
+      "date": "2026-06-25",
+      "audience": "everyone",
+      "authors": [
+        "Scott Alexander"
+      ],
+      "url": "https://www.astralcodexten.com/p/the-metaculus-threat-to-democracy",
+      "description": "...",
+      "word_count": 1426,
+      "type": "newsletter"
+    },
+    {
+      "slug": "hidden-open-thread-4395",
+      "title": "Hidden Open Thread 439.5",
+      "subtitle": "...",
+      "post_date": "2026-06-25T09:11:01.236Z",
+      "date": "2026-06-25",
+      "audience": "only_paid",
+      "authors": [
+        "Scott Alexander"
+      ],
+      "url": "https://www.astralcodexten.com/p/hidden-open-thread-4395",
+      "description": "...",
+      "word_count": 20,
+      "type": "newsletter"
+    },
+    {
+      "slug": "should-people-avoid-whole-body-screening",
+      "title": "Should People Avoid Whole-Body Screening Info?",
+      "subtitle": "...",
+      "post_date": "2026-06-23T00:41:37.405Z",
+      "date": "2026-06-23",
+      "audience": "everyone",
+      "authors": [
+        "Scott Alexander"
+      ],
+      "url": "https://www.astralcodexten.com/p/should-people-avoid-whole-body-screening",
+      "description": "...",
+      "word_count": 3847,
+      "type": "newsletter"
+    },
+    {
+      "slug": "open-thread-439",
+      "title": "Open Thread 439",
+      "subtitle": "...",
+      "post_date": "2026-06-22T15:01:34.466Z",
+      "date": "2026-06-22",
+      "audience": "everyone",
+      "authors": [
+        "Scott Alexander"
+      ],
+      "url": "https://www.astralcodexten.com/p/open-thread-439",
+      "description": "...",
+      "word_count": 206,
+      "type": "newsletter"
+    },
+    {
+      "slug": "preliminary-thoughts-on-the-midjourney",
+      "title": "Preliminary Thoughts On The Midjourney Scanner",
+      "subtitle": "...",
+      "post_date": "2026-06-19T05:32:51.405Z",
+      "date": "2026-06-19",
+      "audience": "everyone",
+      "authors": [
+        "Scott Alexander"
+      ],
+      "url": "https://www.astralcodexten.com/p/preliminary-thoughts-on-the-midjourney",
+      "description": "...",
+      "word_count": 3327,
+      "type": "newsletter"
+    },
+    {
+      "slug": "waiting-for-the-miracle",
+      "title": "Waiting For The Miracle",
+      "subtitle": "...",
+      "post_date": "2026-06-18T04:42:50.782Z",
+      "date": "2026-06-18",
+      "audience": "everyone",
+      "authors": [
+        "Scott Alexander"
+      ],
+      "url": "https://www.astralcodexten.com/p/waiting-for-the-miracle",
+      "description": "...",
+      "word_count": 10884,
+      "type": "newsletter"
+    },
+    {
+      "slug": "never-cross-a-river-four-feet-deep",
+      "title": "Never Cross a River Four Feet Deep on Average",
+      "subtitle": "Guest post by Alexander \"Sasha\" Putilin",
+      "post_date": "2026-06-16T20:07:52.069Z",
+      "date": "2026-06-16",
+      "audience": "everyone",
+      "authors": [
+        "Scott Alexander",
+        "Sasha Putilin"
+      ],
+      "url": "https://www.astralcodexten.com/p/never-cross-a-river-four-feet-deep",
+      "description": "Guest post by Alexander \"Sasha\" Putilin",
+      "word_count": 5672,
+      "type": "newsletter"
+    },
+    {
+      "slug": "open-thread-438",
+      "title": "Open Thread 438",
+      "subtitle": "...",
+      "post_date": "2026-06-16T04:22:53.430Z",
+      "date": "2026-06-16",
+      "audience": "everyone",
+      "authors": [
+        "Scott Alexander"
+      ],
+      "url": "https://www.astralcodexten.com/p/open-thread-438",
+      "description": "...",
+      "word_count": 242,
+      "type": "newsletter"
+    },
+    {
+      "slug": "my-ai-opinions",
+      "title": "My AI Opinions",
+      "subtitle": "...",
+      "post_date": "2026-06-11T20:50:39.591Z",
+      "date": "2026-06-11",
+      "audience": "everyone",
+      "authors": [
+        "Scott Alexander"
+      ],
+      "url": "https://www.astralcodexten.com/p/my-ai-opinions",
+      "description": "...",
+      "word_count": 6090,
+      "type": "newsletter"
+    },
+    {
+      "slug": "hidden-open-thread-4375",
+      "title": "Hidden Open Thread 437.5",
+      "subtitle": "...",
+      "post_date": "2026-06-11T14:51:14.136Z",
+      "date": "2026-06-11",
+      "audience": "only_paid",
+      "authors": [
+        "Scott Alexander"
+      ],
+      "url": "https://www.astralcodexten.com/p/hidden-open-thread-4375",
+      "description": "...",
+      "word_count": 20,
+      "type": "newsletter"
+    },
+    {
+      "slug": "berkeley-meetup-this-wednesday-77b",
+      "title": "Berkeley Meetup This Wednesday",
+      "subtitle": "...",
+      "post_date": "2026-06-08T23:12:38.496Z",
+      "date": "2026-06-08",
+      "audience": "everyone",
+      "authors": [
+        "Scott Alexander"
+      ],
+      "url": "https://www.astralcodexten.com/p/berkeley-meetup-this-wednesday-77b",
+      "description": "...",
+      "word_count": 150,
+      "type": "newsletter"
+    },
+    {
+      "slug": "open-thread-437",
+      "title": "Open Thread 437",
+      "subtitle": "...",
+      "post_date": "2026-06-08T14:18:09.187Z",
+      "date": "2026-06-08",
+      "audience": "everyone",
+      "authors": [
+        "Scott Alexander"
+      ],
+      "url": "https://www.astralcodexten.com/p/open-thread-437",
+      "description": "...",
+      "word_count": 177,
+      "type": "newsletter"
+    },
+    {
+      "slug": "choose-book-review-finalists-2026",
+      "title": "Choose Book Review Finalists 2026",
+      "subtitle": "...",
+      "post_date": "2026-06-03T19:57:08.318Z",
+      "date": "2026-06-03",
+      "audience": "everyone",
+      "authors": [
+        "Scott Alexander"
+      ],
+      "url": "https://www.astralcodexten.com/p/choose-book-review-finalists-2026",
+      "description": "...",
+      "word_count": 148,
+      "type": "newsletter"
+    },
+    {
+      "slug": "open-thread-436",
+      "title": "Open Thread 436",
+      "subtitle": "...",
+      "post_date": "2026-06-02T04:23:03.788Z",
+      "date": "2026-06-02",
+      "audience": "everyone",
+      "authors": [
+        "Scott Alexander"
+      ],
+      "url": "https://www.astralcodexten.com/p/open-thread-436",
+      "description": "...",
+      "word_count": 465,
+      "type": "newsletter"
+    },
+    {
+      "slug": "book-review-the-dialectical-imagination",
+      "title": "Book Review: The Dialectical Imagination",
+      "subtitle": "...",
+      "post_date": "2026-05-29T08:14:27.191Z",
+      "date": "2026-05-29",
+      "audience": "everyone",
+      "authors": [
+        "Scott Alexander"
+      ],
+      "url": "https://www.astralcodexten.com/p/book-review-the-dialectical-imagination",
+      "description": "...",
+      "word_count": 7667,
+      "type": "newsletter"
+    },
+    {
+      "slug": "hidden-open-thread-4355",
+      "title": "Hidden Open Thread 435.5",
+      "subtitle": "...",
+      "post_date": "2026-05-27T22:21:52.555Z",
+      "date": "2026-05-27",
+      "audience": "only_paid",
+      "authors": [
+        "Scott Alexander"
+      ],
+      "url": "https://www.astralcodexten.com/p/hidden-open-thread-4355",
+      "description": "...",
+      "word_count": 20,
+      "type": "newsletter"
+    },
+    {
+      "slug": "use-ai-this-election",
+      "title": "Use AI This Election",
+      "subtitle": "...",
+      "post_date": "2026-05-26T20:22:30.159Z",
+      "date": "2026-05-26",
+      "audience": "everyone",
+      "authors": [
+        "Scott Alexander"
+      ],
+      "url": "https://www.astralcodexten.com/p/use-ai-this-election",
+      "description": "...",
+      "word_count": 3288,
+      "type": "newsletter"
+    },
+    {
+      "slug": "open-thread-435",
+      "title": "Open Thread 435",
+      "subtitle": "...",
+      "post_date": "2026-05-25T16:11:06.262Z",
+      "date": "2026-05-25",
+      "audience": "everyone",
+      "authors": [
+        "Scott Alexander"
+      ],
+      "url": "https://www.astralcodexten.com/p/open-thread-435",
+      "description": "...",
+      "word_count": 165,
+      "type": "newsletter"
+    },
+    {
+      "slug": "new-paradigms-wont-save-you",
+      "title": "New Paradigms Won't Save You",
+      "subtitle": "...",
+      "post_date": "2026-05-22T08:49:25.555Z",
+      "date": "2026-05-22",
+      "audience": "everyone",
+      "authors": [
+        "Scott Alexander"
+      ],
+      "url": "https://www.astralcodexten.com/p/new-paradigms-wont-save-you",
+      "description": "...",
+      "word_count": 814,
+      "type": "newsletter"
+    },
+    {
+      "slug": "hidden-open-thread-4345",
+      "title": "Hidden Open Thread 434.5",
+      "subtitle": "...",
+      "post_date": "2026-05-21T00:10:27.196Z",
+      "date": "2026-05-21",
+      "audience": "only_paid",
+      "authors": [
+        "Scott Alexander"
+      ],
+      "url": "https://www.astralcodexten.com/p/hidden-open-thread-4345",
+      "description": "...",
+      "word_count": 20,
+      "type": "newsletter"
+    },
+    {
+      "slug": "the-types-of-candidate-you-find-in",
+      "title": "The Types Of Candidate You Find In The California Gubernatorial Race",
+      "subtitle": "...",
+      "post_date": "2026-05-19T10:19:35.129Z",
+      "date": "2026-05-19",
+      "audience": "everyone",
+      "authors": [
+        "Scott Alexander"
+      ],
+      "url": "https://www.astralcodexten.com/p/the-types-of-candidate-you-find-in",
+      "description": "...",
+      "word_count": 4778,
+      "type": "newsletter"
+    },
+    {
+      "slug": "open-thread-434",
+      "title": "Open Thread 434",
+      "subtitle": "...",
+      "post_date": "2026-05-18T15:03:49.030Z",
+      "date": "2026-05-18",
+      "audience": "everyone",
+      "authors": [
+        "Scott Alexander"
+      ],
+      "url": "https://www.astralcodexten.com/p/open-thread-434",
+      "description": "...",
+      "word_count": 313,
+      "type": "newsletter"
+    },
+    {
+      "slug": "the-sigmoids-wont-save-you",
+      "title": "The Sigmoids Won't Save You",
+      "subtitle": "...",
+      "post_date": "2026-05-15T08:55:10.585Z",
+      "date": "2026-05-15",
+      "audience": "everyone",
+      "authors": [
+        "Scott Alexander"
+      ],
+      "url": "https://www.astralcodexten.com/p/the-sigmoids-wont-save-you",
+      "description": "...",
+      "word_count": 1246,
+      "type": "newsletter"
+    },
+    {
+      "slug": "every-magazine-piece-on-the-sf-ai",
+      "title": "Every Magazine Piece On The SF AI Scene",
+      "subtitle": "...",
+      "post_date": "2026-05-14T05:40:29.756Z",
+      "date": "2026-05-14",
+      "audience": "only_paid",
+      "authors": [
+        "Scott Alexander"
+      ],
+      "url": "https://www.astralcodexten.com/p/every-magazine-piece-on-the-sf-ai",
+      "description": "...",
+      "word_count": 1198,
+      "type": "newsletter"
+    },
+    {
+      "slug": "nostalgebraists-hydrogen-jukeboxes",
+      "title": "Nostalgebraist's Hydrogen Jukeboxes",
+      "subtitle": "...",
+      "post_date": "2026-05-13T12:16:41.649Z",
+      "date": "2026-05-13",
+      "audience": "everyone",
+      "authors": [
+        "Scott Alexander"
+      ],
+      "url": "https://www.astralcodexten.com/p/nostalgebraists-hydrogen-jukeboxes",
+      "description": "...",
+      "word_count": 2278,
+      "type": "newsletter"
+    },
+    {
+      "slug": "open-thread-433",
+      "title": "Open Thread 433",
+      "subtitle": "...",
+      "post_date": "2026-05-11T08:43:51.779Z",
+      "date": "2026-05-11",
+      "audience": "everyone",
+      "authors": [
+        "Scott Alexander"
+      ],
+      "url": "https://www.astralcodexten.com/p/open-thread-433",
+      "description": "...",
+      "word_count": 274,
+      "type": "newsletter"
+    },
+    {
+      "slug": "three-model-organisms-for-taste",
+      "title": "Three Model Organisms For Taste",
+      "subtitle": "...",
+      "post_date": "2026-05-08T08:50:41.734Z",
+      "date": "2026-05-08",
+      "audience": "everyone",
+      "authors": [
+        "Scott Alexander"
+      ],
+      "url": "https://www.astralcodexten.com/p/three-model-organisms-for-taste",
+      "description": "...",
+      "word_count": 1786,
+      "type": "newsletter"
+    },
+    {
+      "slug": "contra-everyone-on-taste",
+      "title": "Contra Everyone On Taste",
+      "subtitle": "...",
+      "post_date": "2026-05-07T06:04:44.853Z",
+      "date": "2026-05-07",
+      "audience": "everyone",
+      "authors": [
+        "Scott Alexander"
+      ],
+      "url": "https://www.astralcodexten.com/p/contra-everyone-on-taste",
+      "description": "...",
+      "word_count": 5114,
+      "type": "newsletter"
+    },
+    {
+      "slug": "hidden-open-thread-4325",
+      "title": "Hidden Open Thread 432.5",
+      "subtitle": "...",
+      "post_date": "2026-05-07T05:42:26.050Z",
+      "date": "2026-05-07",
+      "audience": "only_paid",
+      "authors": [
+        "Scott Alexander"
+      ],
+      "url": "https://www.astralcodexten.com/p/hidden-open-thread-4325",
+      "description": "...",
+      "word_count": 20,
+      "type": "newsletter"
+    },
+    {
+      "slug": "open-thread-432",
+      "title": "Open Thread 432",
+      "subtitle": "...",
+      "post_date": "2026-05-04T12:54:07.654Z",
+      "date": "2026-05-04",
+      "audience": "everyone",
+      "authors": [
+        "Scott Alexander"
+      ],
+      "url": "https://www.astralcodexten.com/p/open-thread-432",
+      "description": "...",
+      "word_count": 156,
+      "type": "newsletter"
+    },
+    {
+      "slug": "what-deontological-bars",
+      "title": "What Deontological Bars?",
+      "subtitle": "...",
+      "post_date": "2026-04-30T23:11:09.241Z",
+      "date": "2026-04-30",
+      "audience": "everyone",
+      "authors": [
+        "Scott Alexander"
+      ],
+      "url": "https://www.astralcodexten.com/p/what-deontological-bars",
+      "description": "...",
+      "word_count": 1586,
+      "type": "newsletter"
+    },
+    {
+      "slug": "your-attempt-to-solve-debate-will",
+      "title": "Your Attempt To Solve Debate Will Not Work",
+      "subtitle": "...",
+      "post_date": "2026-04-28T19:55:10.509Z",
+      "date": "2026-04-28",
+      "audience": "everyone",
+      "authors": [
+        "Scott Alexander"
+      ],
+      "url": "https://www.astralcodexten.com/p/your-attempt-to-solve-debate-will",
+      "description": "...",
+      "word_count": 1243,
+      "type": "newsletter"
+    },
+    {
+      "slug": "open-thread-431",
+      "title": "Open Thread 431",
+      "subtitle": "...",
+      "post_date": "2026-04-27T12:50:10.341Z",
+      "date": "2026-04-27",
+      "audience": "everyone",
+      "authors": [
+        "Scott Alexander"
+      ],
+      "url": "https://www.astralcodexten.com/p/open-thread-431",
+      "description": "...",
+      "word_count": 261,
+      "type": "newsletter"
+    },
+    {
+      "slug": "links-for-april-2026",
+      "title": "Links For April 2026",
+      "subtitle": "...",
+      "post_date": "2026-04-23T17:33:29.849Z",
+      "date": "2026-04-23",
+      "audience": "everyone",
+      "authors": [
+        "Scott Alexander"
+      ],
+      "url": "https://www.astralcodexten.com/p/links-for-april-2026",
+      "description": "...",
+      "word_count": 6287,
+      "type": "newsletter"
+    },
+    {
+      "slug": "half-a-month-of-consolation-writing",
+      "title": "Half A Month Of Consolation Writing Advice",
+      "subtitle": "...",
+      "post_date": "2026-04-21T15:14:10.213Z",
+      "date": "2026-04-21",
+      "audience": "everyone",
+      "authors": [
+        "Scott Alexander"
+      ],
+      "url": "https://www.astralcodexten.com/p/half-a-month-of-consolation-writing",
+      "description": "...",
+      "word_count": 5903,
+      "type": "newsletter"
+    },
+    {
+      "slug": "open-thread-430",
+      "title": "Open Thread 430",
+      "subtitle": "...",
+      "post_date": "2026-04-20T05:10:07.715Z",
+      "date": "2026-04-20",
+      "audience": "everyone",
+      "authors": [
+        "Scott Alexander"
+      ],
+      "url": "https://www.astralcodexten.com/p/open-thread-430",
+      "description": "...",
+      "word_count": 521,
+      "type": "newsletter"
+    },
+    {
+      "slug": "orban-was-bad-even-though-we-dont",
+      "title": "Orban Was Bad, Even Though We Don't Have A Perfect Word For His Badness",
+      "subtitle": "...",
+      "post_date": "2026-04-16T01:51:55.751Z",
+      "date": "2026-04-16",
+      "audience": "everyone",
+      "authors": [
+        "Scott Alexander"
+      ],
+      "url": "https://www.astralcodexten.com/p/orban-was-bad-even-though-we-dont",
+      "description": "...",
+      "word_count": 2051,
+      "type": "newsletter"
+    },
+    {
+      "slug": "open-thread-429",
+      "title": "Open Thread 429",
+      "subtitle": "...",
+      "post_date": "2026-04-13T12:53:42.423Z",
+      "date": "2026-04-13",
+      "audience": "everyone",
+      "authors": [
+        "Scott Alexander"
+      ],
+      "url": "https://www.astralcodexten.com/p/open-thread-429",
+      "description": "...",
+      "word_count": 102,
+      "type": "newsletter"
+    },
+    {
+      "slug": "open-thread-4285-zagreb-update",
+      "title": "Open Thread 428.5 + Zagreb Update",
+      "subtitle": "...",
+      "post_date": "2026-04-08T18:45:24.675Z",
+      "date": "2026-04-08",
+      "audience": "everyone",
+      "authors": [
+        "Scott Alexander"
+      ],
+      "url": "https://www.astralcodexten.com/p/open-thread-4285-zagreb-update",
+      "description": "...",
+      "word_count": 38,
+      "type": "newsletter"
+    },
+    {
+      "slug": "zagreb-meetup-this-friday",
+      "title": "Zagreb Meetup This Friday",
+      "subtitle": "...",
+      "post_date": "2026-04-07T20:51:24.097Z",
+      "date": "2026-04-07",
+      "audience": "everyone",
+      "authors": [
+        "Scott Alexander"
+      ],
+      "url": "https://www.astralcodexten.com/p/zagreb-meetup-this-friday",
+      "description": "...",
+      "word_count": 206,
+      "type": "newsletter"
+    },
+    {
+      "slug": "open-thread-428",
+      "title": "Open Thread 428",
+      "subtitle": "...",
+      "post_date": "2026-04-06T09:01:19.263Z",
+      "date": "2026-04-06",
+      "audience": "everyone",
+      "authors": [
+        "Scott Alexander"
+      ],
+      "url": "https://www.astralcodexten.com/p/open-thread-428",
+      "description": "...",
+      "word_count": 666,
+      "type": "newsletter"
+    },
+    {
+      "slug": "the-pauseai-protest-a-photo-essay",
+      "title": "The PauseAI Protest: A Photo-Essay",
+      "subtitle": "...",
+      "post_date": "2026-04-03T05:23:46.469Z",
+      "date": "2026-04-03",
+      "audience": "only_paid",
+      "authors": [
+        "Scott Alexander"
+      ],
+      "url": "https://www.astralcodexten.com/p/the-pauseai-protest-a-photo-essay",
+      "description": "...",
+      "word_count": 1245,
+      "type": "newsletter"
+    },
+    {
+      "slug": "hidden-open-thread-4275",
+      "title": "Hidden Open Thread 427.5",
+      "subtitle": "...",
+      "post_date": "2026-04-03T05:21:46.344Z",
+      "date": "2026-04-03",
+      "audience": "only_paid",
+      "authors": [
+        "Scott Alexander"
+      ],
+      "url": "https://www.astralcodexten.com/p/hidden-open-thread-4275",
+      "description": "...",
+      "word_count": 20,
+      "type": "newsletter"
+    },
+    {
+      "slug": "meetups-everywhere-spring-2026-times",
+      "title": "Meetups Everywhere Spring 2026: Times & Places",
+      "subtitle": "...",
+      "post_date": "2026-04-01T03:24:46.393Z",
+      "date": "2026-04-01",
+      "audience": "everyone",
+      "authors": [
+        "Skyler"
+      ],
+      "url": "https://www.astralcodexten.com/p/meetups-everywhere-spring-2026-times",
+      "description": "...",
+      "word_count": 11382,
+      "type": "newsletter"
+    },
+    {
+      "slug": "against-the-concept-of-telescopic",
+      "title": "Against The Concept Of Telescopic Altruism",
+      "subtitle": "...",
+      "post_date": "2026-03-31T11:32:53.974Z",
+      "date": "2026-03-31",
+      "audience": "everyone",
+      "authors": [
+        "Scott Alexander"
+      ],
+      "url": "https://www.astralcodexten.com/p/against-the-concept-of-telescopic",
+      "description": "...",
+      "word_count": 1336,
+      "type": "newsletter"
+    },
+    {
+      "slug": "open-thread-427",
+      "title": "Open Thread 427",
+      "subtitle": "...",
+      "post_date": "2026-03-30T08:26:09.904Z",
+      "date": "2026-03-30",
+      "audience": "everyone",
+      "authors": [
+        "Scott Alexander"
+      ],
+      "url": "https://www.astralcodexten.com/p/open-thread-427",
+      "description": "...",
+      "word_count": 590,
+      "type": "newsletter"
+    },
+    {
+      "slug": "a-buddhist-sun-miracle",
+      "title": "A Buddhist Sun Miracle?",
+      "subtitle": "...",
+      "post_date": "2026-03-27T15:21:05.687Z",
+      "date": "2026-03-27",
+      "audience": "everyone",
+      "authors": [
+        "Scott Alexander"
+      ],
+      "url": "https://www.astralcodexten.com/p/a-buddhist-sun-miracle",
+      "description": "...",
+      "word_count": 1591,
+      "type": "newsletter"
+    },
+    {
+      "slug": "book-review-the-white-king-of-la",
+      "title": "Book Review: The White King Of La Gonave",
+      "subtitle": "...",
+      "post_date": "2026-03-27T00:26:19.673Z",
+      "date": "2026-03-27",
+      "audience": "only_paid",
+      "authors": [
+        "Scott Alexander"
+      ],
+      "url": "https://www.astralcodexten.com/p/book-review-the-white-king-of-la",
+      "description": "...",
+      "word_count": 3244,
+      "type": "newsletter"
+    },
+    {
+      "slug": "hidden-open-thread-4265",
+      "title": "Hidden Open Thread 426.5",
+      "subtitle": "...",
+      "post_date": "2026-03-26T23:06:51.259Z",
+      "date": "2026-03-26",
+      "audience": "only_paid",
+      "authors": [
+        "Scott Alexander"
+      ],
+      "url": "https://www.astralcodexten.com/p/hidden-open-thread-4265",
+      "description": "...",
+      "word_count": 20,
+      "type": "newsletter"
+    },
+    {
+      "slug": "how-natural-tradeoff-and-failure",
+      "title": "How Natural Tradeoff And Failure Components?",
+      "subtitle": "...",
+      "post_date": "2026-03-26T11:17:22.542Z",
+      "date": "2026-03-26",
+      "audience": "everyone",
+      "authors": [
+        "Scott Alexander"
+      ],
+      "url": "https://www.astralcodexten.com/p/how-natural-tradeoff-and-failure",
+      "description": "...",
+      "word_count": 783,
+      "type": "newsletter"
+    },
+    {
+      "slug": "every-debate-on-pausing-ai",
+      "title": "Every Debate On Pausing AI",
+      "subtitle": "...",
+      "post_date": "2026-03-25T15:26:07.841Z",
+      "date": "2026-03-25",
+      "audience": "everyone",
+      "authors": [
+        "Scott Alexander"
+      ],
+      "url": "https://www.astralcodexten.com/p/every-debate-on-pausing-ai",
+      "description": "...",
+      "word_count": 1155,
+      "type": "newsletter"
+    },
+    {
+      "slug": "open-thread-426",
+      "title": "Open Thread 426",
+      "subtitle": "...",
+      "post_date": "2026-03-23T13:34:59.798Z",
+      "date": "2026-03-23",
+      "audience": "everyone",
+      "authors": [
+        "Scott Alexander"
+      ],
+      "url": "https://www.astralcodexten.com/p/open-thread-426",
+      "description": "...",
+      "word_count": 180,
+      "type": "newsletter"
+    },
+    {
+      "slug": "being-john-rawls",
+      "title": "Being John Rawls",
+      "subtitle": "...",
+      "post_date": "2026-03-19T03:31:17.266Z",
+      "date": "2026-03-19",
+      "audience": "everyone",
+      "authors": [
+        "Scott Alexander"
+      ],
+      "url": "https://www.astralcodexten.com/p/being-john-rawls",
+      "description": "...",
+      "word_count": 5424,
+      "type": "newsletter"
+    },
+    {
+      "slug": "hidden-open-thread-4255",
+      "title": "Hidden Open Thread 425.5",
+      "subtitle": "...",
+      "post_date": "2026-03-18T22:41:42.688Z",
+      "date": "2026-03-18",
+      "audience": "only_paid",
+      "authors": [
+        "Scott Alexander"
+      ],
+      "url": "https://www.astralcodexten.com/p/hidden-open-thread-4255",
+      "description": "...",
+      "word_count": 20,
+      "type": "newsletter"
+    },
+    {
+      "slug": "support-your-local-collaborator",
+      "title": "Support Your Local Collaborator",
+      "subtitle": "...",
+      "post_date": "2026-03-18T02:47:37.829Z",
+      "date": "2026-03-18",
+      "audience": "everyone",
+      "authors": [
+        "Scott Alexander"
+      ],
+      "url": "https://www.astralcodexten.com/p/support-your-local-collaborator",
+      "description": "...",
+      "word_count": 1450,
+      "type": "newsletter"
+    },
+    {
+      "slug": "shameless-guesses-not-hallucinations",
+      "title": "Shameless Guesses, Not Hallucinations",
+      "subtitle": "...",
+      "post_date": "2026-03-16T20:25:24.712Z",
+      "date": "2026-03-16",
+      "audience": "everyone",
+      "authors": [
+        "Scott Alexander"
+      ],
+      "url": "https://www.astralcodexten.com/p/shameless-guesses-not-hallucinations",
+      "description": "...",
+      "word_count": 1015,
+      "type": "newsletter"
+    }
+  ]
+}

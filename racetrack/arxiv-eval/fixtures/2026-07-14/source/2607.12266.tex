@@ -1,0 +1,2682 @@
+\section{The assembled evidence for the coverage model}\label{app:evidence}
+
+Table~\ref{tab:evidence} collects the evidence for the coverage model in one place, with each claim's
+standing stated explicitly, since the support is deliberately heterogeneous: a representation
+theorem, certified measurements, a confirmed prediction, and a set of benchmark results. Detailed
+treatments are at the listed locations.
+
+\begin{table}[h]
+  \centering
+  \footnotesize
+  \begin{tabular}{@{}p{0.26\linewidth}p{0.30\linewidth}p{0.18\linewidth}p{0.17\linewidth}@{}}
+    \toprule
+    Claim & Evidence & Standing & Where \\
+    \midrule
+    The ceiling $c$ exists & bounded loss with decaying marginal damage on exact lattices & measured & Section~\ref{sec:coverage} \\
+    The class $g\bigl(\sum_i b_i\bigr)$ is canonical & Acz\'el--Ling representation & proven & App.~\ref{app:link} \\
+    $f$ is within ${\sim}2\%$ ordinal defect of the class & split-half certification against matched-noise nulls & measured, certified & Section~\ref{sec:ordinal}, App.~\ref{app:ordinal} \\
+    Alternating M\"obius spectrum, overshoot up to $32\times$ & \thmthree{} prediction confirmed on exact lattices & confirmed prediction & Section~\ref{sec:duality}, App.~\ref{app:proofs} \\
+    Certificate identity and its $O(L)$ product form & \thmone{}, \thmfour{}, \propfive{} & proven, numerically verified & Sections~\ref{sec:walsh}, \ref{sec:tau}, App.~\ref{app:proofs} \\
+    $\tau$ organizes the measured order-$\ge 2$ shares & 36 dense-model and 32 MoE-block cells; Spearman $0.958$ ($\tau$), Pearson $0.984$--$0.997$ (exact form) & measured & Section~\ref{sec:tauval} \\
+    The share is forecastable from sampled configurations & estimator comparison against held-out lattices (Table~\ref{tab:certest}) & measured & Section~\ref{sec:tauval} \\
+    The generator is probit-$\sqrt{\cdot}$, with exp its tractable approximation & slope calibration across six cells & measured & App.~\ref{app:knapsack} \\
+    Aumann--Shapley recovers the optimal coefficient at an effective density, and its layer ordering exactly & Prop.~B.1; real-model correlation $0.785$ & proven under coverage; empirical validation & App.~\ref{app:as} \\
+    The fit transports across deployment densities & degradation $1.3$--$2.0\times$ against the GP's $2.1$--$4.9\times$ at $N=L/2$ & measured & Section~\ref{sec:predictor} \\
+    \bottomrule
+  \end{tabular}
+  \caption{The evidence for the coverage model, with each claim's standing. Proven means a theorem
+  (numerically verified where marked),
+  measured means a lattice or benchmark result, and a confirmed prediction is a property of the data
+  that the fit did not use.}
+  \label{tab:evidence}
+\end{table}
+
+\section{The model class $g\bigl(\sum_i b_i\bigr)$: canonicity, and details for the ordinal
+analysis}\label{app:link}
+
+The Walsh--Hadamard expansion of $f$ is exactly the functional-ANOVA decomposition on the
+$p$-biased Boolean cube: order 0 is the mean, order 1 the per-layer main effects, order $k$ the $k$-way
+components. The tempting reading, that order-$\ge 2$ energy measures interaction among layers, does
+not follow, because ANOVA additivity is additivity in the loss values and the loss saturates, so a model
+that is additive in the loss must spend order-$\ge 2$ energy merely to represent the curvature of
+saturation, even with no coupling among layers. Order-$\ge 2$ energy therefore conflates real coupling
+with the shape of a scalar transformation. The class $L(S)=g\bigl(\sum_{i\in S} b_i\bigr)$, additive after
+a strictly increasing $g$, partially disentangles the two, since if a single such $g$ linearizes $f$ (that is,
+$g^{-1}\circ f$ is order-1), the order-$\ge 2$ energy was produced by $g$ rather than by interaction among
+layers.
+% Coverage is exactly such a model, additive in $b$ with a saturating generator, and \thmfour{}
+% together with the collapse of Section~\ref{sec:tauval} shows that the loss-space order-$\ge 2$ energy is
+% predicted by the generator. The same accounting explains the collapse below 4 bits described in
+% Section~\ref{sec:allocsub4}, where
+% the generator is near-vertical, so order-$\ge 2$ energy explodes (held-out additive $R^2=-0.92$) without
+% new structure among layers appearing. (The GPTQ ladder of Section~\ref{sec:allocsub4} behaves
+% differently: the coverage-form certificate forecasts at most 0.02 there, yet the additive prediction
+% underestimates the allocator's chosen configurations by 16--57\%.) 
+The residual test that survives this critique is the order-$\ge 2$
+energy after the best transformation, measured in Section~\ref{sec:ordinal}, with protocol details below.
+
+\paragraph{Why searching over transformations is canonical.} The class $g\bigl(\sum_i b_i\bigr)$ is not a
+parametric convenience. It is exactly the class of damage functions that accumulate one layer at a time by
+a fixed rule, $f(S\cup\{i\}) = f(S) \oplus d_i$, with a per-layer increment $d_i$ that does not depend on
+$S$ and an operation $\oplus$ that is associative, continuous, and strictly increasing with identity $0$.
+By the Acz\'el--Ling
+representation theorem, every such $\oplus$ is conjugate to ordinary addition: there is a strictly
+increasing generator $g$ with $x\oplus y = g\bigl(g^{-1}(x)+g^{-1}(y)\bigr)$, unique up to scale
+\citep{aczel1966fe,ling1965assoc}. Accumulating damage by any rule with these properties is therefore
+equivalent to $f$ being additive after some strictly increasing transformation, and the search of
+App.~\ref{app:knapsack} ranges over such
+rules. Coverage is the instance $x\oplus y = x+y-xy/c$, the probabilistic sum (noisy-OR)
+\citep{pearl1988probabilistic,klement2000tnorms}, whose generator is the log-headroom
+$g^{-1}(f) = -\log(1-f/c)$. 
+The essential interaction of Section~\ref{sec:ordinal} is then precisely what no rule with
+these properties can absorb,
+namely the ordinal defect.
+% The probit-$\sqrt{\cdot}$ rule of App.~\ref{app:knapsack} is
+% another instance. 
+
+\subsection{Details for Section~\ref{sec:walsh}: the ordinal certification and the noise-corrected
+energies}\label{app:ordinal}
+
+\begin{proof}[Proof of \thmtwo]
+($\Rightarrow$) A strictly increasing $g$ preserves and reflects strict order. ($\Leftarrow$) On the finite
+set $V=\{b\cdot x\}$ define $g_0(b\cdot x):=f(x)$. This is well-defined (if $b\cdot x=b\cdot y$, the order
+condition forces $f(x)=f(y)$) and strictly increasing (if $b\cdot x<b\cdot y$ then $f(x)<f(y)$), and it
+extends piecewise-linearly to a strictly increasing $g$ on $\mathbb{R}$.
+\end{proof}
+
+The claim is the finite binary case of additive conjoint measurement
+\citep{lucetukey1964conjoint,debreu1960topological,scott1964measurement}, and is stated for
+completeness.
+
+\paragraph{Certification protocol: the estimand and the noise floor.} This and the next three
+paragraphs detail
+how the ordinal defect of Section~\ref{sec:ordinal} is measured and certified. The estimand is the
+draw-expected damage $\tilde f$: where the measured $f(S)$ of Section~\ref{sec:walsh} averages 16
+stochastic-rounding draws, $\tilde f(S)$ is its expectation over draws, and all randomness below is over
+those draws. The ranking constraints
+of $\tilde f$ are the inequalities $b\cdot(x-y)>0$, one per ordered pair of configurations with
+$\tilde f(x)>\tilde f(y)$. By
+\thmtwo{}, an index satisfying every constraint exists exactly when $\tilde f$ is additive up to a strictly
+increasing transformation, and the ordinal defect is
+the smallest fraction of the constraints that any index must violate. The complication is that $\tilde f$
+is known only up to the draw noise. Both
+bounds below therefore share two devices. First, the draws are split into two halves, whose means
+$\bar f_A$ and $\bar f_B$ are independent estimates of $\tilde f$ at every configuration, the split-half device
+of reliability theory \citep{spearman1910correlation,brown1910some}. Second, a pair of
+configurations contributes a constraint on a given half (is \emph{eligible} there) only if its gap on
+that half exceeds twice its standard error. A half-mean at configuration $S$ has standard error
+$\hat\sigma(S)/\sqrt{8}$, with $\hat\sigma(S)$ the sample standard deviation of the draws, so the gap
+between configurations $x$ and $y$ has standard error
+$\sqrt{\hat\sigma(x)^2 + \hat\sigma(y)^2}/\sqrt{8}$.
+
+\paragraph{The upper bound: an exhibited index.} Because the defect is a minimum over indices, the
+fraction of constraints violated by any single index bounds it from above. The tightest such bound would
+come from the index minimizing the violated fraction, which is NP-hard to find \citep{amaldi1995maxfs},
+so we exhibit instead the solution $(b, \xi)$ of the hinge relaxation
+\[
+\min_{b,\,\xi} \ \sum_p \xi_p \qquad \text{subject to} \qquad
+b\cdot(x_p - y_p) \ \ge\ 1 - \xi_p, \quad \xi_p \ge 0 ,
+\]
+the pairwise-preference construction of ranking with slack variables \citep{joachims2002ranking}, here
+without the norm term, so the problem is a linear program, fit on the eligible constraints of half A. The
+fitted index's violated fraction is then evaluated twice: in-sample, on the half-A constraints it was fit
+on, and cross-half, on half B's own eligible constraints, which the fit never saw. The two evaluations
+play different roles. 
+% If $f$ were measured exactly, no split would be needed, since the in-sample
+% fraction of a fit on all constraints would be both a valid upper bound and the tightest one this index
+% family offers. 
+With noisy draws the reported number is instead an estimate of the index's violation rate
+on $\tilde f$'s constraints, and the in-sample rate is biased low for that quantity. The
+cross-half rate removes this adaptation, evaluating a fixed index on independently selected constraints.
+We report both and quote the larger. On most cells the two agree to within about a tenth of a percentage
+point.
+
+\paragraph{The lower bound: certified witnesses.} The witnesses are rank flips, two contexts that order
+the same two layers oppositely (the infeasibility witnesses of Section~\ref{sec:ordinal}). For a layer pair
+$(i,j)$ and a context $S$ containing neither, the constraint between $\tilde f(S\cup\{i\})$ and
+$\tilde f(S\cup\{j\})$
+involves $b$ only through the sign of $b_i - b_j$, which is the same for every context. If, among
+$\tilde f$'s constraints, $m$ contexts order $i$ above $j$ and $n$ order $j$ above $i$, then every additive index
+violates at least $\min(m,n)$ of them. Summing $\min(m,n)$ over layer pairs, whose constraint families are disjoint,
+counts constraints that every index must violate, so this count divided by the number of eligible
+constraints is a lower bound on the defect, and by \thmtwo{} a
+single opposed pair of contexts already refutes every increasing transformation. To certify a context
+against noise, it must be eligible on half A and recur with the same sign on half B. The witness
+count
+of Table~\ref{tab:ordinal} is the sum over layer pairs of the smaller number of certified contexts of
+each preference direction.
+
+\paragraph{The matched-noise null.} The noise floor and the eligible constraint check still pass a small number of
+false positives, so every statistic above, for both bounds, is read against a matched-noise null lattice
+pushed through the identical pipeline. The null is the coverage model fitted to the measured means, which
+is additive after an increasing transformation and so contains no true flips, with the 16 draws
+regenerated as independent Gaussian samples centered on the fit, scaled by each configuration's measured
+per-draw sample standard deviation $\hat\sigma(S)$. This is a parametric bootstrap under the hypothesis of no
+essential interaction \citep[Section~6.5]{efron1993bootstrap}. The Gaussian form is an assumption, and a mild
+one here, because every statistic consumes the draws only through the two half-means, each an average of
+8 draws that are themselves means of per-token losses.
+%  so the half-means are close to Gaussian whatever
+% the shape of a single draw. 
+The null measures the false-positive rate of the whole procedure, and a cell
+is certified only where the measured statistic exceeds its null.
+
+\begin{table}[t]
+    \centering
+    \small
+    \begin{tabular}{llccccccc}
+      \toprule
+      & & \multicolumn{2}{c}{Witnesses} & \multicolumn{2}{c}{Sign replication} & \multicolumn{2}{c}{LP upper bound (\%)} & $E^*$ (\%) \\
+      \cmidrule(lr){3-4}\cmidrule(lr){5-6}\cmidrule(lr){7-8}\cmidrule(lr){9-9}
+      Model & Activation scales & meas. & null & meas. & null & meas. & null & \\
+      \midrule
+      Qwen3-0.6B & per-block & 13 & 18 & 0.76 & 0.66 & 0.6 & 0.8--1.1 & 4.9 \\
+      Qwen3-8B (fp32) & per-block & 5 & 10 & 0.67 & 0.61 & 0.5--0.6 & 0.7--1.1 & 0.2 \\
+      Llama-3.2-3B & per-block & 56 & 6 & 0.80 & 0.69 & 1.2--1.4 & 0.3--0.4 & 1.7 \\
+      Qwen3-30B-A3B & per-block & 21 & 7 & 0.79 & 0.53 & 0.5--0.8 & 0.4--0.8 & $-0.4$ \\
+      \midrule
+      Qwen3-0.6B & per-tensor & 74 & 18 & 0.95 & 0.77 & 1.6 & 2.5--2.8 & 3.5 \\
+      \bottomrule
+    \end{tabular}
+    \caption{Certification of the ordinal defect on full $2^8$ lattices. 
+    Only comparisons whose loss gap exceeds twice its standard error enter any
+    count. Witnesses count is the sum over layer-pairs of the smaller number of contexts of each preference direction
+    that sign-replicate across the two halves of the draws. Sign replication is the replicated fraction of half-A comparisons.
+    LP upper bound is the fraction of eligible ranking constraints
+    violated by the additive index fit on half A, evaluated in-sample on half A and cross-half on half B.
+    The range spans the two evaluations, and the text quotes the larger. Every statistic is compared
+    with the identical statistic on the matched-noise null, which contains no true flips. $E^*$ is the
+    order-$\ge 2$ energy share remaining after the best strictly increasing transformation of the loss
+    (the free-monotone estimator of App.~\ref{app:ordinal}).}
+    \label{tab:ordinal}
+  \end{table}
+
+\paragraph{Per-model detail.} Table~\ref{tab:ordinal} reports every cell against its null. In the deployed
+per-block regime, Qwen3-0.6B and Qwen3-8B sit at or below their nulls and are
+statistically indistinguishable from zero, Qwen3-30B-A3B has a defect of at most $0.8\%$, at its null, and
+Llama-3.2-3B carries a small genuine residue (56 witnesses against a null of 6). In the per-tensor regime
+the witnesses exceed their null (74 against 18, at $0.95$ sign replication), which is the outlier
+coupling of Section~\ref{sec:scope} appearing as certified rank reversals. An additive index nevertheless still
+orders at least $98\%$ of the ranking constraints above the noise floor correctly. Nearly all of the apparent high-order energy in this
+worst cell is therefore curvature of the loss coordinates, as seen by $E^\star$.
+
+\paragraph{Removing the stochastic-rounding noise floor from measured order energies.} The split of the
+draws serves a second, separate role for the order energies of Section~\ref{sec:walsh}, where the halves are
+differenced rather than held out. Each measured
+$f(S)$ averages $K$ stochastic-rounding draws and so equals the draw-expected damage $\tilde f(S)$
+plus a mean-zero
+Monte-Carlo error with variance $\sigma^2(S)/K$, where $\sigma^2(S)$ is the per-draw variance at
+configuration $S$. The Walsh transform is linear, so the measured coefficients are likewise unbiased.
+Their squares are not, since
+$\E[(a+Z)^2] = a^2 + \Var(Z)$ for constant $a$ and mean-zero $Z$, so each measured order energy $W_k$
+exceeds the energy of the draw-expectation by the summed error variances of its order-$k$ coefficients,
+a floor
+$\nu_k > 0$. The per-coefficient error variance is nearly the same for every basis function
+(independent per-configuration noise is white in an orthonormal basis: exactly even at $p=\tfrac12$,
+within a small per-order factor at $p=0.6$), so $\nu_k$ is close to proportional to the number
+$\binom{L}{k}$ of order-$k$ basis functions. All but $L$ of the $2^L-1$ non-constant functions have
+order $\ge 2$, so the floor's mass lands almost entirely in the order-$\ge 2$ energies and deflates the
+measured order-1 share. To estimate it, we average two disjoint halves of the draws
+separately, $\bar f_A$ and $\bar f_B$, and form the difference table
+$d(S)=\tfrac12\bigl(\bar f_A(S)-\bar f_B(S)\bigr)$, in which the draw-expectation cancels exactly and a
+pure mean-zero error of the same variance $\sigma^2(S)/K$ remains, so the order energies of $d$ satisfy
+$\E[W^{(d)}_k]=\nu_k$. This requires only that the two halves are independent (fresh rounding draws per
+configuration and draw). The corrected
+energies reported in Sections~\ref{sec:walsh} and \ref{sec:tauval} are
+$\max(W_k - W^{(d)}_k,\,0)$. Subtracting replicate-estimated error variance from an observed second
+moment is the classical variance-components device of the analysis of variance
+\citep[Ch.~7]{scheffe1959anova}, applied here to split-half replicates
+\citep{spearman1910correlation,brown1910some}.
+
+\paragraph{Estimating the transformation-independent energy floor.} For strictly increasing $g$ let $E(g)$
+be the relative order-$\ge 2$ Walsh energy of the transformed damage $g^{-1}\circ \tilde f$. By \thmone{}
+applied
+to $g^{-1}\circ \tilde f$, $E(g)$ is the fraction of the transformed damage's variance that the best additive
+model leaves unexplained, and $E^* := \inf_g E(g)$ is the floor of that fraction over all strictly
+increasing transformations. A small $E^*$
+therefore certifies that $g^{-1}\circ \tilde f$ is nearly additive for some strictly increasing $g$, so the
+measured high-order energy is curvature of the loss coordinates rather than coupling among layers.
+Estimation must respect two hazards: Monte-Carlo noise spreads nearly evenly across the Walsh basis, as
+above (247 of 255 basis functions have order $\ge 2$, so raw noise masquerades as high-order structure),
+and $g^{-1}$ is nonlinear, amplifying noise where the inverse is steep. The protocol therefore
+splits the 16 rounding draws into three parts and fits every transform on part 1 only. The parametric
+families are fit by nonlinear least squares, and the free monotone transform by alternating a weighted
+degree-$\le 1$ fit with isotonic regression against the ordering of $f$'s values, which searches all
+increasing transformations at once and is the fit that estimates $E^*$: isotonic regression returns the
+least-squares best monotone nondecreasing fit to a scatter, computed exactly by the
+pool-adjacent-violators algorithm \citep{ayer1955pava,barlow1972isotonic}. Each squared Walsh coefficient of
+the transformed damage is then estimated by multiplying the coefficient computed from part 2 by the
+coefficient computed from part 3, an unbiased estimate of the squared coefficient because the two parts'
+noises are independent and mean zero. The product is unbiased but not constrained to be nonnegative,
+so a cell whose true share is near zero can estimate slightly negative, as the $-0.4\%$ entry of
+Table~\ref{tab:ordinal} does. The headline numbers appear in Section~\ref{sec:ordinal}, and the
+per-cell values in the last column of Table~\ref{tab:ordinal}. 
+
+% The estimate
+% under a fitted parametric family is fragile, because a misfitted ceiling makes the inverse near-vertical
+% at the top of the range and manufactures high-order energy ($4.9\%\to 28\%$ on the 0.6B cell under a
+% misfit exponential ceiling), so the quoted $E^*$ comes from the free-monotone transform.
+
+\paragraph{What depends on the measure.} Being exactly degree-$\le 1$, raw or after a transformation, is
+an algebraic property of $f$ (of its unique multilinear extension), independent of the product measure,
+since the span of the degree-$\le k$ $\mup$-Walsh functions is the same subspace for every $p$. What depends
+on $p$ is the accounting: the best degree-$\le 1$ projection, its coefficients $w_i(p)$, and the
+order-$\ge 2$ energy are all priced under the chosen measure. Two consequences follow. \thmone's
+certificate is stated, and must be read, at the deployment $\mup$. The wrong anchor of Section~\ref{sec:anchor} is
+ultimately a wrong measure, the isolated slope $s_i$ being the $p\to 0$ limit of the deployment-point slope
+$w_i(p)$. 
+% And the coverage fit transports across $p$ (Section~\ref{sec:predictor}, Fig.~\ref{fig:ood}) while
+% loss-scale additive coefficients must shift with the operating point.
+
+\section{Experimental setup}\label{app:setup}
+
+We collect the protocol shared across Sections~\ref{sec:walsh}--\ref{sec:scope} here. Section-specific
+deviations are noted in place.
+
+\paragraph{Models.} \emph{LLMs}: Qwen3-0.6B, Qwen2.5-3B, Qwen3-4B, Qwen3-8B, Llama-3.2-3B,
+ with the per-linear order-share cells of
+Section~\ref{sec:walsh} extending to Qwen3-14B, Qwen3-32B, Llama-3.3-70B, Qwen2.5-72B, and
+gpt-oss-120B; Qwen3-30B-A3B, Qwen3-235B-A22B, and GLM-4.6 (355B
+MoE) for allocation at scale; Qwen3.6-27B for the vendor-checkpoint serving comparison,
+with damage measured and ModelOpt calibrated on a chat-templated task corpus (96 MATH-train, 64
+gsm8k-train, 96 MMLU-Pro validation prompts); Qwen3-235B and GLM-5.2 (753B) for the
+scale-robustness checks.
+\emph{Diffusion}: Qwen-Image-2512 DiT ($L=60$ transformer blocks) for the diffusion
+prediction results. All weights are the public checkpoints.
+
+\paragraph{Quantization formats.} The measurement regime throughout is W4A4 with NVFP4 per-block
+scales. We also analyze W16A4 (activation-only, isolating the channel that carries the
+non-additivity) and per-tensor activation scaling (a coarse setting that induces interactions of every
+order among layers). The allocation alphabet is $\{16, 8, 4\}$ bits (bf16 / FP8 / NVFP4) for the
+servable studies and is extended to $\{16,8,4,2,1\}$ for the
+below-4-bit collapse study. Serving uses three pipelines. NVIDIA ModelOpt PTQ with TensorRT-LLM
+serves the $\ge 4$-bit MoE deployment recipes, and vLLM the vendor-checkpoint comparison of
+Section~\ref{sec:alloc27b}; these paths serve W4A4 ModelOpt exports with runtime activation
+quantization on the NVFP4 units (NVIDIA's published 27B checkpoint, which keeps its NVFP4 linears
+weight-only, is the exception), as does the SGLang-served GLM-5.2 comparison. 
+% The served-accuracy
+% grids (Tables~\ref{tab:ge4served30},
+% \ref{tab:ge4served235}, \ref{tab:sub4served30}, and \ref{tab:sub4code}) instead realize the weight
+% channel only: weights are cast to each configuration's assigned formats (round-to-nearest at
+% $\ge 4$ bits, GPTQ below four), exported as ordinary bf16 checkpoints, and served by SGLang with
+% activations left unquantized, so these tables test the allocation's weight placement rather than
+% the full W4A4 pipeline. A W4A4 replication of the 30B grid subset (Section~\ref{sec:allocmoe}:
+% additive, coverage, and ModelOpt at effective bits 4.5 and 5.0 as ModelOpt exports with runtime
+% activation quantization, TensorRT-LLM, AIME-2025 over 8 seeds) gives 71.7/69.6/70.8 at eff 4.5 and
+% 69.2/72.9/68.8 at 5.0, against the weight-only grid's 75.4/69.6/70.0 and 69.2/69.6/72.9.
+\paragraph{The damage set function and the lattice.} For a contiguous block of $L$ layers we form
+$f(S)=\lce(S\ \text{quantized}) - \lce(\text{bf16})$ by running the model with exactly the units in $S$
+quantized. Every exact lattice in the paper measures such a block centered at the network's mid-depth (block
+offset $\lfloor(L'-L)/2\rfloor$ in an $L'$-layer network, so the middle eight of Qwen3-0.6B's 28
+layers), except the Qwen3-30B-A3B extension of Fig.~\ref{fig:tau}, which repeats the measurement at
+eight block positions. Restricting to a small block is what makes the $2^L$ enumeration feasible, and
+the enumerated lattice is a reference against which sampled estimates, fitted models, and the
+noise corrections of App.~\ref{app:ordinal} are certified. The full-network cells
+(Section~\ref{sec:walsh}, the prediction benchmark, and the allocation studies) instead quantize units
+anywhere in the network, where enumeration is impossible, and sample configurations from the $p$-biased
+measure $\mup$. Each $f(S)$ is
+averaged over stochastic-rounding draws (3 seeds for the headline sampled cells, std $\le 0.03$; 8--16
+draws for the exact lattices of Section~\ref{sec:walsh}, whose noise treatment is in App.~\ref{app:ordinal}).
+The
+Walsh/M\"obius transforms are computed from measured $f(S)$. The order-$\ge 2$
+energy certificate is the measured $\sum_{k\ge 2}W_k/\Var(f)$ where a lattice is affordable and, at scale,
+the closed-form forecast from the fitted break-rates, namely the exact heterogeneous product form
+$1 - \sum\beta_i/[\prod(1+\beta_i)-1]$ of \propfive{} (Section~\ref{sec:tau}), whose symmetric summary is $\tau$
+(share $\approx\tfrac12\tau^2$). The ``$\tau$-forecast'' label refers to this pipeline. Where
+a measured share exists for comparison, the forecast understates it (Qwen3-30B: forecast
+$3{\times}10^{-4}$ against measured 0.013). Even at that ratio the 235B and GLM-4.6 forecasts
+(${\sim}10^{-4}$) stay below 0.01, so they certify additive dominance, not a precise share.
+
+\paragraph{Calibration and evaluation data.} Prediction and interaction-order studies use WikiText-2
+(``wiki'') and a Python code corpus, CodeSearchNet functions (``code''). 
+The MoE allocation studies use a task-aligned calibration set: BFCL-v3
+(live\_simple, live\_multiple, simple\_python, multiple) tool-use prompts plus RULER validation prompts,
+tokenized to 16 sequences of 2{,}048 tokens. The fake-quant metric is the KL divergence
+$\mathrm{KL}(\text{bf16} \,\|\, \text{quantized})$ of next-token distributions on the disjoint eval half
+of this set. Served downstream evaluation uses AIME-2025, GPQA
+diamond, MMLU-Pro, HumanEval, and gsm8k (Section~\ref{sec:allocation}).
+
+\begin{table}[t]
+  \centering
+  \small
+  \begin{tabular}{llcccccccc}
+    \toprule
+    & & \multicolumn{8}{c}{Context size $|S|$ (layers already quantized)} \\
+    \cmidrule(lr){3-10}
+    Model & Activation scales & 0 & 1 & 2 & 3 & 4 & 5 & 6 & 7 \\
+    \midrule
+    Qwen3-0.6B & per-block & .183 & .022 & .024 & .022 & .021 & .023 & .022 & .012 \\
+    Qwen3-8B (fp32) & per-block & .023 & .006 & .006 & .006 & .006 & .007 & .003 & .009 \\
+    Llama-3.2-3B & per-block & .016 & .013 & .010 & .009 & .009 & .007 & .009 & .003 \\
+    Qwen3-30B-A3B & per-block & .060 & .027 & .024 & .023 & .022 & .016 & .021 & .021 \\
+    Qwen3-0.6B & per-tensor & 10.6 & .997 & .381 & .173 & .111 & .078 & .048 & .011 \\
+    \bottomrule
+  \end{tabular}
+  \caption{Saturation measured directly: mean marginal damage by context size on the certification
+  cells of Section~\ref{sec:ordinal}. Each
+  entry averages $f(S\cup\{i\}) - f(S)$ over the layer-context pairs with $|S|$ layers already
+  quantized. In every cell the marginal damage is largest at $|S|=0$ and falls once other layers are
+  quantized concurrently.}
+  \label{tab:marginals}
+\end{table}
+
+\paragraph{Predictor fitting.} The coverage model $(c, \{a_i\})$ and the additive model are fit by joint
+least squares rather than per-coefficient sampling, for the variance and consistency reasons given in
+the next two paragraphs. Fits use $N$
+sampled configurations. Fits are initialized by linearizing through the generator
+(ordinary least squares on the log-headroom values at a provisional ceiling) and refined by bounded
+trust-region least squares in loss
+space. Fitting in loss space avoids the alternative of transforming the data and then regressing, which
+is biased because noise pushed through the nonlinear transform no longer averages to zero.
+The surrogate baselines (RF/MiCo, GP-RBF/AutoQRA, RBF kernel
+regression/AMQ, CoopQ pairwise) are fit on the same configurations, and GP/RF are
+additionally converted into allocators (knapsack over their predicted marginals) for the
+allocator-to-allocator comparison in Section~\ref{sec:allocation}. Aumann--Shapley scores are computed fit-free
+by the path-integral estimator: the loss gradient is integrated by a 4-node midpoint rule along the
+path that scales weights and unit-input activations linearly from full precision ($t=0$) to fully
+quantized ($t=1$), one integral per demotion level ($16\to 8$ and $16\to 4$), with MoE routing frozen
+along the path since the router's argmax is not differentiable. 
+% This parameter-space path is the
+% continuous relaxation of the multilinear-extension diagonal that Prop.~B.1 analyzes, where $t$ is
+% instead the probability that each unit is quantized. The two integrals agree when the loss responds
+% linearly to the per-unit perturbations and differ in general, and the correlation of 0.785 between the
+% path-integral and fitted in-context coefficients on real models (App.~\ref{app:as}) is the empirical
+% bridge between them.
+
+\paragraph{Why joint least squares rather than per-coefficient sampling.} The plug-in estimate of
+each Walsh coefficient from samples, $(1/N)\sum_n f(S_n)\chi_T(S_n)$ \citep{lmn1993}, is unbiased, but its
+variance
+carries the total second moment $\E_{\mup}[f^2]$, because every other coefficient's energy leaks in
+through the
+sampled, non-orthogonal design. Jointly regressing on all $L+1$ degree-$\le 1$ terms absorbs that
+leakage into the fitted terms. Ordinary least squares is the classical control-variate regression
+estimator, whose asymptotic variance is
+only the energy of $f$ orthogonal to the fitted span, that is, the order-$\ge 2$ energy plus noise, rather
+than $\Var(f)$ \citep{lavenberg1981cv,glynn2002cv,owen2013mcbook}. Random-design least squares is
+stable and near-optimal already at $N \propto L\log L$ samples \citep{cohen2017optimalwls}. With
+${\sim}90\%$ of the variance at order 1 (Section~\ref{sec:walsh}), regression gives roughly a $10\times$
+per-coefficient
+variance reduction at equal $N$, the reciprocal of the order-$\ge 2$ share, so the certificate also
+quantifies the gain from regression. The same
+regression-over-sampling argument recurs in Shapley estimation (KernelSHAP against permutation sampling,
+\citealp{covert2021kernelshap}).
+
+\paragraph{Statistical footing of the fits.} The coverage fit is ordinary nonlinear least squares:
+consistent for the best coverage-family approximation of $f$ even when the model is misspecified
+\citep{jennrich1969,white1981}, and the maximum-likelihood estimate under Gaussian noise when it is
+correct. Two caveats: the objective is non-convex, so we initialize by linearizing through the
+generator as described above, and on near-linear data the ceiling is weakly identified (only the
+products $c\,a_i$ are pinned down), which perturbs $(c,a_i)$ individually but not predictions.
+
+\paragraph{Measurement cost.} Cost is counted in measured configurations, since each is a forward pass
+over the calibration set. The headline budget is $N\approx L$ configurations, against roughly $100L$
+progressive-quantization evaluations for SPQE's permutation-sampled Shapley \citep{impq2025}.
+
+\paragraph{Prediction benchmark in full.} Table~\ref{tab:master} reports the per-cell results of the
+Section~\ref{sec:benchmark} benchmark at the small budget, and Fig.~\ref{fig:predn} the
+error-versus-$N$ sweep on the 3B-wiki cell. The certificate column is the held-out residual of an
+additive fit, the direct \thmone{} estimate: 300 configurations are sampled per cell from $\mu_{0.6}$,
+an additive model is fit on the first 150, and the column reports the mean squared residual on the
+remaining 150 divided by the damage variance. 
+
+\begin{table}[t]
+\centering\small
+\caption{Prediction benchmark at the small-$N$ budget ($N=L/2$): Median held-out
+relative error at half the $L$ single-layer measurements that isolate-and-sum requires. Entries are single-seed measurements over 120 held-out configurations.
+Table~\ref{tab:seeds} reports 3-seed spreads on two W4A4 cells. Isolate-and-sum reaches 0.38--0.63 on the FP4-damaged models (0.6B, 4B, 30B),
+against 0.08--0.19 for the better of coverage and additive on 0.6B and 4B. Two cells require comment.
+On 8B the damage of the fully quantized model is small ($f(\text{all}) \approx 0.46$), all methods are
+approximately tied, and isolate-and-sum looks adequate because there is
+little to mis-price. The 30B MoE row is hard for every method (best 0.252). The last column is the
+cell's order-$\ge 2$ share under $\mu_{0.6}$. It is
+largest on the rows where every method's error is worst (4B-wiki at 0.21 and 30B at 0.30).}
+\label{tab:master}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{llcccccccc}
+\toprule
+model & data & isolate-sum & additive & coverage & CoopQ & RF & GP & RBF & order-$\ge 2$ share \\
+\midrule
+Qwen3-0.6B      & wiki & 0.390 & \textbf{0.080} & 0.110 & 0.105 & 0.111 & 0.143 & 0.175 & .035 \\
+Qwen3-0.6B      & code & 0.416 & 0.110 & 0.129 & \textbf{0.094} & 0.150 & 0.166 & 0.162 & .038 \\
+Qwen2.5-3B      & wiki & 0.107 & 0.313 & \textbf{0.092} & 0.356 & 0.093 & 0.212 & 0.377 & .016 \\
+Qwen2.5-3B      & code & 0.130 & 0.333 & 0.145 & 0.364 & \textbf{0.119} & 0.251 & 0.394 & .024 \\
+Qwen3-4B        & wiki & 0.377 & 0.288 & \textbf{0.184} & 0.245 & 0.228 & 0.341 & 0.338 & .210 \\
+Qwen3-4B        & code & 0.535 & 0.200 & 0.191 & \textbf{0.180} & 0.185 & 0.207 & 0.252 & .090 \\
+Qwen3-8B        & wiki & \textbf{0.076} & 0.161 & 0.131 & 0.193 & 0.117 & 0.224 & 0.262 & .053 \\
+Qwen3-8B        & code & 0.100 & 0.207 & 0.153 & 0.241 & \textbf{0.093} & 0.277 & 0.297 & .051 \\
+Llama-3.2-3B    & wiki & 0.197 & 0.133 & \textbf{0.128} & 0.224 & 0.156 & 0.245 & 0.285 & .023 \\
+Llama-3.2-3B    & code & 0.146 & 0.165 & \textbf{0.126} & 0.224 & 0.157 & 0.282 & 0.316 & .028 \\
+Qwen3-30B (MoE) & wiki & 0.629 & 0.368 & 0.433 & 0.344 & 0.424 & 0.386 & \textbf{0.252} & .302 \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.72\linewidth]{fig3_predict_vs_N.png}
+  \caption{Median held-out relative error vs.\ number of measured configurations on the 3B-wiki cell of
+  Table~\ref{tab:master}. Coverage ($L+1$ parameters) sits at its error
+  floor from $N=L/2$ (0.093, tied with the random forest at 0.094), the additive fit sits at 0.29--0.32
+  for $N \le L$ and ties with coverage from $N \approx 4L$, and the Gaussian
+  process needs roughly $4L$ configurations to match. From $N \approx L$ the random forest attains the
+  lowest error on this cell, reaching 0.03 at $N \approx 8L$ against coverage's plateau at 0.08. The
+  large-$N$ winner varies by cell (on 0.6B-wiki the Gaussian process leads and the forest trails every
+  other method). Isolate-and-sum is constant at 0.11, since it has no fitted
+  parameters, and its failures occur on the damaged cells of Table~\ref{tab:master}. CoopQ overfits at
+  large $N$.}
+  \label{fig:predn}
+\end{figure}
+
+\begin{table}[t]
+\centering\small
+\caption{Qwen-Image DiT (Section~\ref{sec:dit}): median held-out relative
+error vs.\ $N$, $L=60$ blocks at per-block NVFP4. The final
+column is the measured order-$\ge 2$
+share.}
+\label{tab:dit}
+\begin{tabular}{cccccccc}
+\toprule
+$N$ & additive & coverage & pairwise & RBF-KR & RF & GP & order-$\ge 2$ share (cert.) \\
+\midrule
+30  & 0.356 & 0.151 & 0.425 & 0.378 & \textbf{0.142} & 0.368 & 0.36 \\
+60  & 0.411 & 0.129 & 0.276 & 0.358 & \textbf{0.111} & 0.241 & \\
+120 & 0.146 & \textbf{0.113} & 0.199 & 0.302 & 0.116 & 0.150 & \\
+240 & 0.114 & 0.124 & 0.162 & 0.245 & \textbf{0.109} & 0.120 & \\
+360 & \textbf{0.099} & 0.111 & 0.119 & 0.204 & 0.111 & 0.106 & \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Certificate estimators.} Table~\ref{tab:certest} reports the per-cell detail behind the
+estimator comparison of Section~\ref{sec:tauval}: the root-mean-squared error, over 8 sampling seeds,
+of estimating a lattice's true order-$\ge 2$ share from $N$ configurations sampled at $p=0.6$, for the
+\propfive(i) forecast from the coverage fit and the held-out residual of an additive fit. The residual
+estimator's agreement with the forecast, available at no extra measurement cost, is a per-instance
+check of the coverage assumption itself.
+
+\begin{table}[t]
+  \centering
+  \footnotesize
+  \begin{tabular}{lccccccc}
+    \toprule
+    & & \multicolumn{2}{c}{$N=28$} & \multicolumn{2}{c}{$N=56$} & \multicolumn{2}{c}{$N=112$} \\
+    \cmidrule(lr){3-4}\cmidrule(lr){5-6}\cmidrule(lr){7-8}
+    cell & true share & fcst & resid & fcst & resid & fcst & resid \\
+    \midrule
+    Qwen3-0.6B FP4 per-block  & .008 & \textbf{.060} & .139 & \textbf{.067} & .078 & .073 & \textbf{.068} \\
+    Qwen3-8B FP4 per-block    & .019 & \textbf{.010} & .366 & \textbf{.009} & .204 & \textbf{.006} & .168 \\
+    Qwen3-0.6B INT8 per-tensor & .325 & \textbf{.083} & .362 & \textbf{.105} & .216 & \textbf{.110} & .240 \\
+    Qwen3-0.6B FP4 per-tensor & .812 & \textbf{.195} & 1.23 & \textbf{.119} & .319 & \textbf{.067} & .538 \\
+    Qwen3-8B FP4 per-tensor   & .922 & \textbf{.235} & 1.01 & \textbf{.164} & .492 & \textbf{.079} & .614 \\
+    \bottomrule
+  \end{tabular}
+  \caption{Estimating a cell's order-$\ge 2$ share from $N$ sampled configurations. Each estimator receives only
+  $N$ configurations drawn from $\mup$ at $p=0.6$, and the draw is repeated with 8 independent seeds.
+  An entry is the root-mean-squared error of the 8 resulting estimates against the true share. The two
+  estimators are the \propfive(i) forecast computed from a coverage fit (fcst) and the held-out residual
+  of an additive fit (resid), both defined in Section~\ref{sec:tauval}.
+  The forecast is best at 14 of 15 cell-budget pairs. 
+  % The three per-tensor rows are lattices measured
+  % for this comparison (10 rounding draws, 128-token calibration sequences). They are distinct from the
+  % per-tensor certification cell of Table~\ref{tab:ordinal} (16 draws, 32-token calibration), whose
+  % noise-corrected share is 0.67, so the share of a cell is quoted only with its own lattice.
+  }
+  \label{tab:certest}
+\end{table}
+
+\paragraph{Allocation.} Given a memory budget
+$\mathrm{eff} = \sum \mathrm{numel}\cdot\mathrm{bits} / \sum \mathrm{numel}$ (kernel-independent, with
+numel a tensor's element count), a
+3-level $\{16,8,4\}$ knapsack minimizes predicted $\Delta\lce$ per effective bit. A unit is a weight tensor
+or a fused group that must share one format, such as the q/k/v projections or one MoE layer's experts.
+The served recipes
+additionally tie fusion groups (q/k/v into one \code{qkv\_proj}, one expert format per MoE layer block) so
+the per-layer-mixed checkpoint loads in TensorRT-LLM. Baselines are matched to the same $\mathrm{eff}$.
+The two fit-free variants price demotions differently: AS-add uses the path-integral coefficients
+directly, so predicted damage adds across units, while AS-cov converts the same coefficients to
+break-rates, with the ceiling calibrated from one measured corner (the all-4-bit configuration), so
+damage composes through the coverage form. The two structural rules use no damage measurements.
+Naive-uniform lowers every unit together through the $\{16,8,4\}$ ladder and, if the resulting uniform
+level falls below the target effective bits, restores the smallest tensors to 16 bits until the next
+restoration would exceed the budget. Naive-routed places routed experts at the lowest level and protects
+attention.
+
+\input{generated/tab_ge4served30}
+\input{generated/tab_ge4served235}
+
+\paragraph{GPTQ ladder details (Section~\ref{sec:allocsub4}).} Grids are symmetric with one scale per
+128 input columns, and each linear layer's Hessian is accumulated from the scoring half of the task
+calibration set. The all-units GPTQ-4 calibration KL of 0.054 is comparable to NVFP4 RTN at 0.047, and
+at 2 bits RTN gives 7.0 against GPTQ's 13.6, so 2 bits is unusable as a uniform level under either
+quantizer. For the fused expert blocks, all experts
+in a layer share the Hessian of the block's full token stream: the first projection's Hessian is
+accumulated from the block input, and the second projection's from intermediate activations recomputed
+on that input, a standard simplification that ignores the router's token-to-expert assignment. At the
+235B scale the all-units GPTQ-3 calibration KL is 0.115.
+
+\paragraph{Sub-4 served detail (Section~\ref{sec:allocsub4}).} Table~\ref{tab:sub4served30} gives the
+full served grid on the reasoning benchmarks for every method and budget. The reasoning benchmarks
+are AIME-2025 (30 problems), GPQA diamond (198 questions), and MMLU-Pro (a fixed
+1{,}000-question subset), decoded at temperature 0.6, top-$p$ 0.95, top-$k$ 20, with a 32{,}768-token
+budget on AIME-2025 and 16{,}384 elsewhere. The ModelOpt configuration scores at the chance level of
+each multiple-choice format (23.2 on four-option GPQA, 9.0 on ten-option MMLU-Pro).
+
+\input{generated/tab_sub4served30}
+
+
+
+\paragraph{Joint measurement of the allocation tables.} 
+% All cells of a given allocation table are
+% produced by one pipeline on the same 16 evaluation sequences, so between-method comparisons are paired.
+% The fake-quant evaluation is deterministic once the software environment is fixed (library versions are
+% recorded alongside the result files), so every cell is exactly reproducible. All scoring signals use the
+% scoring half of the calibration set, including the int8-outlier severity and the 300 fit configurations
+% of \code{gp-alloc}, \code{rf-alloc}, and the fitted variants. 
+CoopQ's quadratic program is solved by
+greedy plus local search (SCIP unavailable). Its published ${\sim}100L$ budget (${\sim}24$k evaluations)
+was not run (Section~\ref{sec:allocmoe} reports the 1{,}205- and 942-evaluation tiers). An ablation
+isolates the cause of its deficit: the additive and coverage models fit on the
+942 configurations CoopQ's permutation walks visited, allocating on its alphabet, land at
+CoopQ's
+level ($+.004$--$.008$, paired-significant), because configurations visited along a permutation walk are
+efficient
+for averaging marginal contributions but nearly collinear as regression data, while the same regression
+on 300 independently sampled configurations lands within $.002$ of AS at every contended budget (within
+$.001$ at eff $\ge 4.5$).
+
+\paragraph{Hardware and software.} Scoring and fake-quant run on a single B200 (device-map
+pipeline-parallel across $8\times$B200 for the 235B/355B/753B models), and serving runs on $1\times$B200
+(30B, TP=1) up to $8\times$B200 (GLM, TP=8). PyTorch and Hugging Face Transformers handle fake-quant,
+NVIDIA ModelOpt and TensorRT-LLM handle the $\ge 4$-bit
+deployment recipes.
+SGLang serves the sub-4 benchmarks from bf16-exported checkpoints and the GLM 5.2 benchmarks
+(Section~\ref{sec:allocsub4}),
+vLLM serves the Qwen3.6-27B comparison (Section~\ref{sec:alloc27b}), and
+scikit-learn
+provides the surrogate baselines.
+
+\section{Interpretability of the fitted parameters}\label{sec:interp}
+
+\paragraph{Budget pricing.} Fitting coverage on ${\sim}200$ configurations of Qwen3-0.6B (all 28
+layers, activations quantized at FP4 per-block-32, configurations drawn at $p=0.6$), we price
+unseen configurations of the form ``protect the $m$ most fragile layers and quantize the rest'',
+comparing the predicted $\Delta L$, which costs no forward passes once the model is fit, against the
+measured value (Table~\ref{tab:budget}). Across the deployment range, protecting a few to about half
+the layers, coverage prices the configuration to within 4\%, whereas isolate-and-sum's prediction is
+$2$--$3\times$ the truth. The lone breakdown is quantizing a single layer, where the model, fit on
+configurations drawn at $p=0.6$, extrapolates far outside its fit distribution and misses by
+${\sim}95\%$.
+
+\begin{table}[t]
+\centering\small
+\caption{Budget pricing on unseen protect-$m$ configurations (Qwen3-0.6B).}
+\label{tab:budget}
+\begin{tabular}{cccc}
+\toprule
+protected $m$ & predicted $\Delta L$ & measured $\Delta L$ & rel.\ err. \\
+\midrule
+0 (all quantized) & 6.26 & 6.50 & 3.7\% \\
+2  & 6.20 & 6.21 & 0.2\% \\
+4  & 6.11 & 6.05 & 0.9\% \\
+8  & 5.81 & 5.75 & 1.0\% \\
+12 & 5.31 & 5.52 & 3.9\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{The fragility scores are corpus-portable.} Fitting the break-rates $a_i$ independently on
+wiki and on code yields strongly agreeing vectors (Spearman $\rho = 0.74$, Pearson $r = 0.86$ on
+Qwen3-0.6B; $\rho = 0.78$, $r = 0.93$ on Qwen2.5-3B), with the same deep layers fragile in both
+corpora. 
+%The break-rates are therefore a property of the model rather than of the calibration text:
+We propose to fit $a_i$ once on a source corpus, and to deploy on a new corpus refit only the single scalar ceiling
+$c$. At small budgets this one-parameter transfer attains lower error than the $(L{+}1)$-parameter
+in-domain fit, 0.058 against 0.098 at 9 configurations for code-to-wiki on both 0.6B and 3B, and 0.076
+against 0.110 at 36 configurations for wiki-to-code on 3B.
+
+\paragraph{Multi-seed robustness.} Table~\ref{tab:seeds} reports median held-out relative error over 3
+seeds at the $N\approx L$ budget. Coverage attains the lowest error on 0.6B and ties the
+Gaussian process on 3B, isolate-and-sum fails uniformly across seeds, and 3B's higher order-$\ge 2$
+share (0.26 against 0.6B's 0.05) is exactly where coverage's margin over the additive fit is largest,
+so the certificate forecasts where the saturation structure pays off before any predictor is fit.
+
+\begin{table}[t]
+\centering\small
+\caption{Multi-seed robustness at the $N\approx L$ budget, with the certificate per row.}
+\label{tab:seeds}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lcccccccc}
+\toprule
+ & isolate-sum & additive & coverage & CoopQ & RF & GP & RBF & order-$\ge 2$ share (cert.) \\
+\midrule
+Qwen3-0.6B, $N{=}L{=}28$ & $0.474\pm0.010$ & $0.144\pm0.008$ & $\mathbf{0.085\pm0.013}$ & $0.113\pm0.002$ & $0.133\pm0.003$ & $0.099\pm0.002$ & $0.134\pm0.018$ & 0.05 \\
+Qwen2.5-3B, $N{=}L{=}36$ & $2.798\pm0.030$ & $0.221\pm0.036$ & $\mathbf{0.098\pm0.009}$ & $0.143\pm0.019$ & $0.109\pm0.005$ & $0.095\pm0.008$ & $0.142\pm0.012$ & 0.26 \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\section{Aumann--Shapley recovers the in-context coefficient at an effective density (proof under
+coverage)}\label{app:as}
+
+There are three per-layer slopes, all gradients of the saturating loss at different anchors: the
+empty-anchor slope \citep[HAWQ, isolated;][]{hawq2019,dong2020hawqv2}, $s_i = f(\{i\}) = c\,a_i$, inflated
+by the factor of Section~\ref{sec:anchor}; the deployment-point slope, which is the optimal additive coefficient,
+$w_i = c\,a_i\prod_{j\ne i}(1 - p\,a_j)$, optimal but requiring a fit at the $p$-biased operating point;
+and the path-average slope \citep[Aumann--Shapley;][]{aumann1974values,sundararajan2017ig}, which is
+fit-free,
+\[
+  AS_i = c\,a_i\int_0^1 \prod_{j\ne i}(1 - t\,a_j)\,dt .
+\]
+Completeness, the property that the coefficients sum exactly to the total damage, is the classical
+efficiency property of the Aumann--Shapley value and does not require the coverage form.
+Under coverage it is immediate, since
+$\frac{d}{dt}\bigl[c - c\prod_j(1 - t\,a_j)\bigr] = \sum_i c\,a_i\prod_{j\ne i}(1 - t\,a_j)$, and
+integrating over $t \in [0,1]$ gives $\sum_i AS_i = f(\text{all})$ with no remainder (measured residual
+on real models 0.06\%). To state what the path integral recovers, write
+$w_i(q) = c\,a_i\prod_{j\ne i}(1 - q\,a_j)$ for the optimal additive coefficient when the deployment
+density is $q$.
+%  the corollary of \thmone{} and \thmfour{} in App.~\ref{app:proofs} applied with $q$ in
+% place of $p$, so that the fitted coefficient above is $w_i = w_i(p)$.
+
+\begin{customprop}{B.1}\label{prop:asrec}
+Let $f$ be the coverage model with break-rates $a_1, \ldots, a_L \in [0,1)$ and let $p \in (0,1)$.
+(i) For every layer $i$ there is an effective density $t_i^{*} \in (0, \tfrac12]$ such that
+$AS_i = w_i(t_i^{*})$, so the fit-free path integral equals the optimal additive coefficient evaluated
+at $t_i^{*}$ in place of $p$. (ii) For all layers $i$ and $k$, $AS_i > AS_k$ if and only if
+$w_i > w_k$, if and only if $a_i > a_k$, so the path-average and deployment-point coefficients order
+the layers identically at every deployment density.
+\end{customprop}
+
+\begin{proof}
+(i) Write $g_i(t) = \prod_{j\ne i}(1 - t\,a_j)$, so that $AS_i = c\,a_i\int_0^1 g_i$ and
+$w_i(q) = c\,a_i\,g_i(q)$. If $a_j = 0$ for every $j \ne i$ then $g_i \equiv 1$ and any $t_i^{*}$
+serves. Otherwise $g_i$ is positive, continuous, strictly decreasing, and convex on $[0,1]$: with
+$h_j(t) = -a_j/(1 - t\,a_j)$, differentiating the product gives $g_i' = g_i\sum_{j} h_j$ and
+$g_i'' = g_i\sum_{j \ne l} h_j h_l \ge 0$, where the sums run over indices other than $i$ and the
+$h_j$ agree in sign. Jensen's inequality for the uniform measure on $[0,1]$ gives
+$\int_0^1 g_i \ge g_i(\tfrac12)$, strict monotonicity gives $\int_0^1 g_i < g_i(0)$, and the
+intermediate value theorem then yields a unique $t_i^{*} \in (0, \tfrac12]$ with
+$g_i(t_i^{*}) = \int_0^1 g_i$. Multiplying by $c\,a_i$ gives $AS_i = w_i(t_i^{*})$.
+(ii) Factor out the full survival product $G(t) = \prod_{j}(1 - t\,a_j)$, positive on $[0,1]$ because
+every $a_j < 1$. Then
+\[
+  w_i = c\,G(p)\,\frac{a_i}{1 - p\,a_i},
+  \qquad
+  AS_i = c\int_0^1 G(t)\,\frac{a_i}{1 - t\,a_i}\,dt ,
+\]
+and for each fixed $t \in [0,1]$ the map $x \mapsto x/(1 - t\,x)$ is strictly increasing on $[0,1)$.
+Hence $a_i > a_k$ implies $w_i > w_k$ and $AS_i > AS_k$, while $a_i = a_k$ forces equality in both, and
+the two orderings coincide with the ordering by break-rate.
+\end{proof}
+
+Part (i) places the fit-free
+coefficient in the same family as the fitted one, evaluated at the effective density $t_i^{*}$ rather
+than at the deployment density $p$ (since $t_i^{*} \le \tfrac12 < p$ at our $p=0.6$, the path-average
+coefficient sits above the deployment-point one whenever other layers have nonzero break-rates). Part
+(ii) shows that this difference in evaluation point never reorders layers. What remains numerical is
+the magnitude agreement between $AS_i$ and
+$w_i(p)$: the correlation is 0.9997 on coverage-generated data and 0.785 on real models, while the
+empty-anchor $s_i$ is inflated by the factor ${\approx}\,e^{p\sum_j a_j}$. Since $s_i = c\,a_i$
+is itself increasing in the break-rate, part (ii) extends to the empty anchor under the coverage model,
+so the failure of isolated sensitivity documented in Section~\ref{sec:anchor} is a failure of magnitude rather
+than of order. 
+
+\section{Proofs (Theorems 3 and 4, Proposition 5, the two anchors, kernel eigenvalues)}\label{app:proofs}
+
+
+\paragraph{Notation.} Under the product measure $\mup$ (each $x_i \sim \mathrm{Bernoulli}(p)$,
+independent), the space of functions on $\{0,1\}^L$ carries the inner product
+$\langle g,h\rangle = \E_{\mup}[gh]$. With the standardized coordinates
+$\phi_i(x) := (x_i-p)/\sqrt{p(1-p)}$ ($\E[\phi_i]=0$, $\E[\phi_i^2]=1$), the Walsh functions
+$\chi_T := \prod_{i\in T}\phi_i$ ($\chi_\emptyset := 1$) form an orthonormal basis: for $T\ne T'$,
+independence factorizes $\E[\chi_T\chi_{T'}]$ per coordinate, and each coordinate in $T\triangle T'$
+contributes $\E[\phi_i]=0$. Hence $f = \sum_T \fhat(T)\chi_T$ with $\fhat(T)=\langle f,\chi_T\rangle$,
+$\E[f]=\fhat(\emptyset)$, and (Parseval) $\Var_p(f) = \sum_{T\ne\emptyset} \fhat(T)^2$
+\citep{odonnell2014boolean}.
+
+\paragraph{Proof of Theorem 3 (M\"obius spectrum).} For $T\ne\emptyset$,
+$\varphi(T) = \sum_{R\subseteq T}(-1)^{|T|-|R|} f(R)$ with $f(R) = c - c\prod_{i\in R}(1-a_i)$. The
+constant $c$ alternates to zero over the subsets of a nonempty $T$. For the product part, the alternating
+subset-sum of a product factorizes coordinatewise,
+\[
+\sum_{R\subseteq T}(-1)^{|T|-|R|}\prod_{i\in R}g_i = \prod_{i\in T}(g_i-1).
+\]
+With $g_i = 1-a_i$ this gives
+$-c\prod_{i\in T}(-a_i) = c\,(-1)^{|T|+1}\prod_{i\in T}a_i$. \qed
+
+\paragraph{Proof of Theorem 4 (Walsh spectrum).} Write $f = c - H$ with the headroom
+$H(x) = c\prod_i g_i(x_i)$, $g_i(x_i) = 1 - a_i x_i$. Constants are orthogonal to every $\chi_T$ with
+$T\ne\emptyset$, so $\fhat(T) = -\hat H(T)$ for $T\ne\emptyset$, while
+$\fhat(\emptyset) = \E[f] = c - \hat H(\emptyset) = c\bigl(1-\prod_i(1-a_ip)\bigr)$. Because $H$ and $\chi_T$ are both products over
+\emph{independent} coordinates, the expectation factorizes:
+$\hat H(T) = c\prod_{i\in T}\E[g_i\phi_i]\cdot\prod_{i\notin T}\E[g_i]$. The one-coordinate integrals
+(using $x_i^2=x_i$): $\E[g_i] = 1-a_ip$ and
+$\E[g_i\phi_i] = -a_i\,\E[x_i(x_i-p)]/\sqrt{p(1-p)} = -a_i\sqrt{p(1-p)}$. Substituting and negating gives
+$\fhat(T) = c\,(-1)^{|T|+1}(p(1-p))^{|T|/2}\prod_{i\in T}a_i\cdot\prod_{i\notin T}(1-a_ip)$. \qed
+
+
+
+\begin{proof}[Proof of \propfive(ii) and (iii)]
+Notation as in Section~\ref{sec:tau}, with $B := \tau^2 = \sum_i\beta_i$. By \propfive(i),
+$\sharegeq = S_2/S_1$ with $S_1 := \sum_{k\ge 1}\es{k} = \prod_i(1+\beta_i)-1$ and
+$S_2 := \sum_{k\ge 2}\es{k}$.
+
+\emph{(ii)} The leading term is exact algebra: $(\sum\beta_i)^2 = \sum\beta_i^2 + 2\es{2}$, so
+$\es{2} = \tfrac12(B^2 - \sum\beta_i^2) = \tfrac12 B^2(1 - 1/\Leff)$, hence
+$\es{2}/\es{1} = \tfrac12 B(1 - 1/\Leff)$. For the error we use $k!\,\es{k} \le B^k$ (expand
+$B^k = (\sum\beta)^k$: the $k!\,\es{k}$ injective monomials are a subset of its nonnegative terms), whence
+$S_2 - \es{2} = \sum_{k\ge 3}\es{k} \le \sum_{k\ge 3}B^k/k! \le (B^3/6)e^B$ (termwise,
+$3!(k-3)! \le k!$) and $S_1 \le e^B - 1$. \emph{Upper:}
+$\sharegeq \le S_2/\es{1} \le \es{2}/B + (B^2/6)e^B$. \emph{Lower:}
+$\sharegeq \ge \es{2}/S_1 \ge \es{2}/(e^B-1) = (\es{2}/B)\cdot B/(e^B-1) \ge (\es{2}/B)(1 - B/2)
+\ge \es{2}/B - B^2/4$, using the elementary inequality $x/(e^x-1) \ge 1 - x/2$ for $x \ge 0$ (the power
+series of $x - (e^x-1)(1-x/2)$ is $\sum_{k\ge 3}\frac{k-2}{2\,k!}x^k$, with nonnegative coefficients) and
+$\es{2}/B \le B/2$. Both one-sided deviations are $\le (B^2/4)e^B$, which is the stated remainder bound.
+The profile's third moment (via $\es{3}$) first appears at $O(\tau^4)$.
+
+\emph{(iii)} At fixed $B$, $\sharegeq = 1 - B/(P-1)$ is strictly increasing in
+$P := \prod_i(1+\beta_i)$, and $\log P = \sum_i \log(1+\beta_i)$ is a symmetric sum of one concave scalar
+function over the coordinates, the canonical Schur-concave form \citep{marshall2011majorization}, so
+$\sharegeq$ is Schur-concave at fixed $B$. The uniform profile $\beta_i \equiv B/L$ is majorized by
+every profile of total $B$, hence is the maximizer (equivalently, Jensen on the strictly concave
+$\log(1+\cdot)$ gives $\log P \le L\log(1+B/L)$, with equality iff all $\beta_i$ are equal). The outer
+bound follows since $L \mapsto (1+B/L)^L$ increases to $e^B$ (AM--GM on $L$ copies of $1+B/L$ and one
+copy of $1$). As $\Leff \to 1$ the share vanishes, since a one-fragile-layer $f \approx c\,a_i\,x_i$
+is a one-coordinate, hence exactly degree-1, function.
+\end{proof}
+
+\paragraph{Corollary (the two anchors of Section~\ref{sec:anchor}).} By Theorem 1 the optimal degree-$\le 1$
+predictor is the projection $\fhat(\emptyset) + \sum_i \fhat(\{i\})\chi_{\{i\}}$. Converting
+$\chi_{\{i\}}$ back to the $\{0,1\}$ coordinate gives the optimal additive coefficient
+$w_i = \fhat(\{i\})/\sqrt{p(1-p)} = \E_p[f\mid x_i=1] - \E_p[f\mid x_i=0]$, the in-context marginal, which
+under coverage (Theorem~4 with $T=\{i\}$) is $w_i = c\,a_i\prod_{j\ne i}(1-a_jp)$. The empty-anchor
+slope is $s_i = f(\{i\}) = c\,a_i$ directly from the coverage model. Hence the inflation factor
+$s_i/w_i = 1/\prod_{j\ne i}(1-a_jp) \approx e^{p\sum_j a_j}$ quoted in Section~\ref{sec:anchor}. \qed
+
+% The statements are numerically verified. The product form matches brute-force Theorem-4 enumeration to
+% ${\sim}10^{-16}$ over random $(L, a, c, p)$, the $(\tau^4/4)e^{\tau^2}$ bound and the symmetric upper
+% bound of \propfive(iii) hold on
+% 5{,}000 random heterogeneous profiles ($L=2\ldots 40$, zero violations, worst $|R|$/bound $= 0.31$), and
+% $|R|/\tau^4$ is stable as a fixed profile is scaled down, confirming the error order.
+
+\paragraph{The symmetric case.} For completeness, the equality case of \propfive(iii) with its order
+spectrum.
+
+\begin{corollary*}[symmetric saturation law]
+If $a_i \equiv a$, then $\beta_i \equiv \beta = p(1-p)\,a^2/(1-ap)^2$ and $\tau^2 = L\beta$, the order
+spectrum is binomial,
+\[
+  W_k = c^2\binom{L}{k}\,(p(1-p))^k a^{2k}(1-ap)^{2(L-k)},
+\]
+and the certificate collapses to the one-parameter law
+\[
+  \sharegeq = 1 - \frac{\tau^2}{(1+\tau^2/L)^L - 1}
+  \;\xrightarrow{\;\tau\to 0\;}\; \frac{L-1}{2L}\,\tau^2 \;\approx\; \tfrac{1}{2}\tau^2 .
+\]
+\end{corollary*}
+
+\begin{proof}
+With equal break-rates every size-$k$ subset contributes the same product, so
+$\es{k} = \binom{L}{k}\beta^k$ and $\prod_i(1+\beta_i) = (1+\beta)^L$, and \propfive(i) reduces to the
+stated law, which is also the equality case of \propfive(iii). The $W_k$ formula is \thmfour{} with
+equal $a_i$ times the $\binom{L}{k}$ count of size-$k$ sets, and the small-$\tau$ limit is
+\propfive(ii) with $\Leff = L$.
+\end{proof}
+
+\paragraph{Walsh eigenvalues of the RBF kernel (Section~\ref{sec:ood}).} On binary vectors the squared
+Euclidean distance collapses to the size of the symmetric difference, $\lVert x - x'\rVert^2 =
+\sum_i (x_i - x_i')^2 = |x \oplus x'|$, so the RBF kernel is a function of the XOR alone,
+$K(x,x') = \kappa(x \oplus x')$ with $\kappa(u) = e^{-\gamma \sum_i u_i}$. For any such kernel, the
+operator $(T_K f)(x) = \E_{x'}[K(x,x')f(x')]$ under the uniform measure ($p=\tfrac12$) is diagonal in
+the Walsh basis. Fix $x$ and reparametrize the average over $x'$ by $u := x \oplus x'$. Hence
+\[
+  (T_K\chi_T)(x) = \E_{x'}\bigl[\kappa(x \oplus x')\,\chi_T(x')\bigr]
+  = \E_u\bigl[\kappa(u)\,\chi_T(x \oplus u)\bigr].
+\]
+The character identity
+$\chi_T(x \oplus u) = \chi_T(x)\,(-1)^{\sum_{i\in T} u_i}$ then gives
+$T_K\chi_T = \lambda_T\,\chi_T$ with $\lambda_T = \E_u\bigl[\kappa(u)\,(-1)^{\sum_{i\in T} u_i}\bigr]$.
+This expectation factorizes over the independent uniform bits,
+\[
+  \lambda_T \;=\; \prod_{i\in T}\E\bigl[e^{-\gamma u_i}(-1)^{u_i}\bigr]
+  \prod_{i\notin T}\E\bigl[e^{-\gamma u_i}\bigr]
+  \;=\; \Bigl(\tfrac{1-e^{-\gamma}}{2}\Bigr)^{|T|}\Bigl(\tfrac{1+e^{-\gamma}}{2}\Bigr)^{L-|T|}
+  \;=\; \Bigl(\tfrac{1+e^{-\gamma}}{2}\Bigr)^{L}\,\tanh(\gamma/2)^{|T|}.
+\]
+The eigenvalues are positive, depend on $T$ only through $|T|$, and decay geometrically in $|T|$ with
+ratio $\tanh(\gamma/2) < 1$, which is the high-order shrinkage quoted in Section~\ref{sec:ood}. At
+$p \ne \tfrac12$ the kernel is still a function of $x \oplus x'$, but the $\mup$-Walsh basis is no
+longer exactly its eigenbasis, which is why Section~\ref{sec:ood} states the diagonalization as
+approximate at $p = 0.6$.
+
+\section{The log-headroom knapsack, and the generator the data selects}\label{app:knapsack}
+
+\paragraph{Knapsack certificate.} Because coverage is linear in $b$, a service-level constraint of the
+form
+$\Delta\lce \le \varepsilon$ maps to a scalar budget $\sum_{i\in S} b_i \le B$ with
+$B = -\log(1 - \varepsilon/c)$. The cheapest configuration meeting the constraint protects the set $P$
+minimizing protection
+cost subject to $\sum_{i\notin P} b_i \le B$ is a 0/1 knapsack, solvable exactly by
+dynamic programming. The deliverable is a predicted $\Delta\lce$ for the chosen configuration,
+quotable before committing ($\le 4\%$ error, App.~\ref{sec:interp}), which a ranking structurally cannot
+produce and which a Gaussian process prices with $1.6$--$2.9\times$ coverage's error near the heavily
+quantized corner where optimal configurations live (Section~\ref{sec:ood}).
+
+\paragraph{Which generator the data selects.} The ceiling $c$ and membership in the class
+$g\bigl(\sum_i b_i\bigr)$ are established empirically, by the marginal-damage measurements of
+Section~\ref{sec:coverage} and the ordinal certification of Section~\ref{sec:ordinal}, while the
+exponential generator (coverage/noisy-OR), which is what makes the headroom consumption multiplicative, is
+justified only by
+fit quality. Refitting the lattices with candidate strictly increasing generators (all with $L+1$
+parameters, $p=0.6$) shows that prediction is insensitive to the choice (held-out relative error
+${\approx}\,0.064$--$0.071$ for all), but the slope calibration, the ratio
+$w_{\text{model}}/w_{\text{data}}$ of model-implied to measured in-context slopes, selects one: across
+the five non-degenerate of six (model, corpus) cells, the probit-$\sqrt{\cdot}$ ratio is 0.93--1.03,
+while the exponential ratio spans 0.86 down to ${\approx}0$ (exp, probit, tanh, and rational sit at
+0.58--0.67 on Qwen3-0.6B). The saturation rule
+best supported by the data is therefore the probit-$\sqrt{\cdot}$ generator
+$g(u) = c\,\operatorname{erfc}\bigl(1/\sqrt{2u}\bigr)$, the probability that zero-mean Gaussian
+corruption of variance $u$ exceeds a fixed threshold, scaled by the ceiling; the exponential coverage
+model is its tractable approximation. 
+
+% Two further measurements agree. The coverage-form
+% Aumann--Shapley coefficients land at about half the fitted in-context coefficients under the
+% exponential generator, with the ratio restored under probit-$\sqrt{\cdot}$. And the coverage-predicted
+% anchor-inflation ratios of Section~\ref{sec:anchor} sit uniformly below the measured ones while
+% correlating with them per layer within each cell (Pearson $0.40$--$0.92$ across the four per-block
+% certification cells), the direction expected if the exponential generator compresses the slopes that
+% the probit-$\sqrt{\cdot}$ generator matches.
+
+\section{Extended related work}\label{app:related}
+
+\paragraph{MoE-specific mixed precision.} For mixture-of-experts models, MC-MoE
+\citep{mcmoe2025} solves a linear program over expert routing and frequency importance. It allocates by
+an additive importance score and does not analyze the order of the damage or report a validity
+certificate. The head-to-head comparisons against CoopQ and MC-MoE appear in
+Section~\ref{sec:allocation}.
+
+\paragraph{Path-integral sensitivity.} Integrated Gradients \citep{sundararajan2017ig} and the
+Aumann--Shapley value \citep{aumann1974values} are the classical methods. PQI/ReQuant \citep{hu2025pqi}
+applies the path integral to weight-level sensitivity but assumes per-weight effects sum, and QIG
+\citep{qig2026} is
+token-level for vision-language models. We apply the path integral to the layer-selection set function
+(App.~\ref{app:as}).
+
+\paragraph{Rotation methods.} QuaRot, SpinQuant, and QuIP\#
+\citep{ashkboos2024quarot,liu2024spinquant,tseng2024quipsharp} flatten the representation before
+quantizing rather than allocating precision. They alter the base quantizer on which any allocator
+operates, so they compose with allocation (Section~\ref{sec:future}). A rotation that flattens per-layer
+heterogeneity also removes the per-layer differences that allocation exploits.
+
+\paragraph{Low-order surrogates of subset functions outside quantization.} The analytical approach has
+precedents in several adjacent literatures: functional ANOVA over configuration spaces
+\citep{hutter2014fanova}; Datamodels \citep{ilyas2022datamodels}, whose finding that linear surrogates of
+training-data-subset effects work well is the data-subset analog of our first-order finding; SPEX
+\citep{spex2025}, sparse Boolean-Fourier surrogates of LLM outputs over input-masking subsets; the
+Harsanyi-interaction line \citep{ren2023harsanyi}, which applies M\"obius machinery to input coalitions;
+and Walsh surrogates for pseudo-Boolean black-box optimization \citep{lepretre2019walsh,bocs2018}. 
+
+\paragraph{In-context and isolated measurements.} That an effect measured in isolation differs from the effect in context
+is known qualitatively from coalition-value pruning \citep{ancona2020shapley}, the joint-versus-sum
+analysis of Combinatorial Brain Surgeon for weight pruning \citep{cbs2022}, the Hydra-effect self-repair
+mechanism \citep{mcgrath2023hydra}, the permutation-sampled marginals of CoopQ's SPQE estimator
+\citep{impq2025}, and the
+layer-subset surrogates now used for LLM pruning \citep{pruninggame2026}, all of which work around the
+same anchor problem. What we contribute is the application to mixed-precision quantization,
+specifically, the closed-form inflation factor under saturation, its measured
+magnitude on modern LLMs, and a fit-free estimator of the correct coefficient (Section~\ref{sec:predictor}), one
+Aumann--Shapley path integral in place of the SPQE estimator's ${\sim}100L$ quantized evaluations.
+\begin{table}[t]
+\centering\footnotesize
+\caption{Sub-4 allocation on the GPTQ ladder (Qwen3-30B), calibration KL on the evaluation-task
+corpus (96 MBPP, 64 gsm8k-train, 64 MATH, 64 MMLU-Pro validation prompts; evaluation half, 16
+shared sequences). Every method is derived and measured on this corpus. $*$ marks methods
+significantly different from the additive allocator under a paired $t$-test over the 16 shared
+sequences, Holm-corrected within each budget row at the 5\% level. Parentheticals give each
+method's measurement cost: \emph{meas.}\ counts isolated per-unit damage measurements on the
+ladder (additive prices each unit's $4\to3$ and $3\to2$ steps; isolated-rank ranks by the same
+damages), \emph{cfg.}\ counts sampled mixed configurations the fitted, GP, and RF predictors are
+fit on, and CoopQ's count is its permutation-walk evaluations.}
+\label{tab:sub4kl}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{ccccccccccc}
+\toprule
+eff & additive & CoopQ & fitted & gp & rf & isolated-rank & uniform & ModelOpt & MC-MoE & int8-outlier \\
+ & (96 meas.) & (376 meas.) & (40 cfg.) & (40 cfg.) & (40 cfg.) & (192 meas.) & & & & \\
+\midrule
+3.5 & 0.086 & 0.092 & 0.161$^*$ & 0.178$^*$ & 0.176$^*$ & \textbf{0.082}$^*$ & 0.099$^*$ & 0.300$^*$ & 0.271$^*$ & 0.386$^*$ \\
+3.25 & \textbf{0.107} & 0.110 & 0.214$^*$ & 0.223$^*$ & 0.287$^*$ & 0.107 & 0.124$^*$ & 0.620$^*$ & 0.528$^*$ & 0.703$^*$ \\
+3.0 & \textbf{0.145} & \textbf{0.145} & 0.293$^*$ & 0.337$^*$ & 0.449$^*$ & \textbf{0.145} & \textbf{0.145} & 0.952$^*$ & 1.098$^*$ & 1.110$^*$ \\
+2.9 & 0.215 & 0.228$^*$ & 0.322$^*$ & 0.350$^*$ & 0.548$^*$ & \textbf{0.191}$^*$ & 0.236$^*$ & 1.042$^*$ & 1.222$^*$ & 1.229$^*$ \\
+2.75 & 0.415 & 0.354$^*$ & 0.422 & 0.412 & 0.849$^*$ & 0.389 & \textbf{0.319}$^*$ & 1.255$^*$ & 1.366$^*$ & 1.370$^*$ \\
+2.5 & 0.854 & \textbf{0.631}$^*$ & 0.715$^*$ & 0.710$^*$ & 1.445$^*$ & 1.026$^*$ & 0.798$^*$ & 1.605$^*$ & 1.695$^*$ & 1.736$^*$ \\
+2.3 & 1.563 & \textbf{1.122}$^*$ & 1.298$^*$ & 1.349$^*$ & 2.121$^*$ & 1.627$^*$ & 1.649$^*$ & 2.079$^*$ & 2.215$^*$ & 2.215$^*$ \\
+2.1 & 2.482 & \textbf{2.285}$^*$ & 2.472 & 2.472 & 2.984$^*$ & 2.482 & 2.617$^*$ & 2.967$^*$ & 3.057$^*$ & 2.967$^*$ \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\begin{table}[t]
+\centering\footnotesize
+\caption{Qwen3-235B below four bits on the evaluation-task corpus. Top: calibration KL of the
+three directly constructed allocations (same ladder and corpus protocol as
+Table~\ref{tab:sub4kl}). Bottom: served accuracy, AIME-2025 (8 seeds) / GPQA diamond /
+MMLU-Pro, for the five listed configurations (GPTQ weight-only checkpoints); bf16 anchors 80.0/71.7/82.9.
+The additive allocation preserves reasoning at 3.5 effective bits and degrades through 3.0;
+every earlier-derived method collapses by 2.9. The rows marked eval.-task deriv.\ are
+allocations derived on the evaluation-task corpus itself. 
+Both remain functional at 2.9 (42.9 and 41.2 AIME with no
+generation reaching the token cap) The surviving configurations are those whose calibration KL (0.44) sits below the
+termination threshold of Section~\ref{sec:allocsub4}.}
+\label{tab:sub4b235}
+\begin{tabular}{lcccc}
+\toprule
+calibration KL & eff 3.5 & eff 3.0 & eff 2.9 & eff 2.75 \\
+\midrule
+additive & 0.167 & 0.292 & 0.435 & 1.162 \\
+uniform & 0.217 & 0.297 & 2.006 & 4.674 \\
+ModelOpt & 1.477 & 5.642 & 6.274 & 7.462 \\
+\midrule
+served & & & & \\
+additive & 73.3/68.7/81.8 & 39.6/52.0/69.6 & 2.1/31.8/41.0 & 0.0/22.2/10.0 \\
+additive (eval.-task deriv.) & 70.4/66.7/81.4 & 58.3/60.1/77.1 & 42.9/48.0/66.8 & 0.0/18.7/11.6 \\
+coverage (eval.-task deriv.) & 71.7/66.7/80.9 & 59.6/62.6/76.3 & 41.2/44.4/66.7 & 0.0/25.3/10.9 \\
+uniform & 66.2/65.7/80.6 & 60.4/61.1/77.2 & 5.0/16.7/21.3 & 0.0/0.0/0.2 \\
+ModelOpt & 0.0/18.2/8.7 & 0.0/2.0/1.0 & 0.0/1.0/0.3 & 0.0/0.0/0.2 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\centering\footnotesize
+\caption{Served accuracy of the Qwen3-235B allocations at effective bits 4.2--8.0 over the
+$\{16,8,4\}$ levels (allocations derived on the evaluation-task corpus of
+Table~\ref{tab:sub4kl}).
+Each cell gives AIME-2025 (average of 8 sampled seeds) / GPQA diamond / MMLU-Pro; bf16 baselines
+80.0/71.7/82.9. Every measured cell is within seed noise of the anchor on all three benchmarks.}
+\label{tab:ge4served235}
+\begin{tabular}{lccc}
+\toprule
+ & eff 4.2 & eff 5.0 & eff 8.0 \\
+\midrule
+uniform & 79.6/70.2/82.6 & 78.3/69.2/82.3 & 81.2/70.7/82.7 \\
+AS-additive & 77.1/70.7/83.4 & 80.4/69.2/83.0 & 82.1/68.2/83.2 \\
+ModelOpt & 78.3/69.2/82.5 & 80.4/73.2/81.8 & 79.6/67.2/83.7 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\centering\footnotesize
+\caption{Served accuracy of every sub-4 Qwen3-30B configuration on the reasoning benchmarks.
+Each cell gives AIME-2025 (average of 8 sampled seeds) / GPQA diamond / MMLU-Pro pass rates for
+the method's configuration at that effective-bit budget All allocations are derived from damages measured on the
+evaluation-task calibration corpus of Table~\ref{tab:sub4kl}. bf16 baselines: 73.3/61.6/76.2.}
+\label{tab:sub4served30}
+\begin{tabular}{lcccc}
+\toprule
+ & eff 3.5 & eff 3.0 & eff 2.9 & eff 2.75 \\
+\midrule
+additive & 68.8/62.1/73.7 & 59.6/51.0/73.4 & 49.6/44.4/67.1 & 23.3/31.3/54.3 \\
+coverage & 65.4/56.1/74.6 & 61.7/53.0/74.0 & 55.0/47.0/68.1 & 25.4/34.3/55.4 \\
+CoopQ & 66.2/55.6/74.1 & 59.2/53.5/72.1 & 46.2/47.5/67.3 & 14.2/27.3/55.2 \\
+isolated-rank & 63.3/55.6/74.7 & 57.1/50.5/73.1 & 56.2/52.0/67.0 & 26.2/30.8/54.4 \\
+uniform & 65.8/57.1/74.5 & 59.2/54.0/73.5 & 41.2/47.5/65.2 & 30.0/42.9/58.6 \\
+fitted & 56.7/54.0/71.4 & 34.2/38.9/60.5 & 33.3/36.4/57.5 & 15.4/25.8/48.3 \\
+gp & 53.3/49.5/69.3 & 31.2/32.8/58.1 & 30.0/37.9/55.1 & 3.3/25.8/45.4 \\
+rf & 57.1/50.5/70.6 & 3.3/20.7/45.0 & 0.0/9.6/20.9 & 0.0/7.6/4.3 \\
+ModelOpt & 40.0/31.3/60.4 & 0.0/18.7/8.7 & 0.0/22.7/9.1 & 0.0/18.2/6.3 \\
+MC-MoE & 38.8/45.5/66.1 & 0.0/18.7/9.0 & 0.0/16.7/8.0 & 0.0/16.7/4.7 \\
+int8-outlier & 35.8/31.8/53.8 & 0.0/18.7/7.0 & 0.0/13.1/--- & 0.0/12.1/4.0 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\centering\small
+\caption{Served AIME-2025 accuracy (average of 8 sampled seeds) of every Qwen3-30B allocation at
+effective bits 4.2--8.0 over the $\{16,8,4\}$ levels,
+served by SGLang; bf16 anchor 73.3. GPQA diamond spans 59.1--63.1 and MMLU-Pro 76.2--78.3 across the same
+grid, no method ordering is significant at any budget (a
+16-seed replication of the AS-additive--uniform gap at eff 4.5 gives 73.3
+against 69.8, about 1.4 standard errors).}
+\label{tab:ge4served30}
+\begin{tabular}{lccccc}
+\toprule
+ & eff 4.2 & eff 4.5 & eff 5.0 & eff 6.0 & eff 8.0 \\
+\midrule
+AS-additive & 68.8 & 75.4 & 69.2 & 71.7 & 70.4 \\
+AS-coverage & 69.2 & 69.6 & 69.6 & 71.2 & 70.4 \\
+uniform & 68.8 & 69.6 & 69.2 & 69.6 & 72.1 \\
+routed & 71.2 & 70.8 & 69.6 & 71.7 & 70.8 \\
+ModelOpt & 70.0 & 70.0 & 72.9 & 70.8 & 68.8 \\
+fitted & 70.8 & 71.7 & 71.2 & 73.8 & 69.6 \\
+gp & 70.8 & 69.6 & 73.8 & 69.6 & 72.1 \\
+rf & 72.5 & 73.3 & 70.8 & 69.2 & 72.5 \\
+CoopQ & 67.5 & 75.8 & 69.6 & 68.8 & 74.2 \\
+MC-MoE & 67.1 & 67.5 & 70.4 & 68.8 & 71.7 \\
+int8-outlier & 71.7 & 67.1 & 72.5 & 73.3 & 75.0 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% ---------------------------------------------------------------------------
+% Theorem machinery. The numbering follows order of appearance (Thm 1, Thm 2 =
+% the ordinal theorem, Thm 3 = Mobius spectrum, Thm 4 = Walsh spectrum,
+% Prop 5 = heterogeneous certificate) and is load-bearing in cross-references,
+% so theorem numbers are set manually via the custom* environments below.
+% ---------------------------------------------------------------------------
+\theoremstyle{plain}
+\newtheorem{innercustomthm}{Theorem}
+\newenvironment{customthm}[1]
+  {\renewcommand\theinnercustomthm{#1}\innercustomthm}
+  {\endinnercustomthm}
+\newtheorem{innercustomprop}{Proposition}
+\newenvironment{customprop}[1]
+  {\renewcommand\theinnercustomprop{#1}\innercustomprop}
+  {\endinnercustomprop}
+\newtheorem{innercustomcor}{Corollary}
+\newenvironment{customcor}[1]
+  {\renewcommand\theinnercustomcor{#1}\innercustomcor}
+  {\endinnercustomcor}
+\newtheorem*{corollary*}{Corollary}
+\newtheorem*{proposition*}{Proposition}
+
+% Manual theorem-number shorthands used in prose.
+\newcommand{\thmone}{Theorem~1}
+\newcommand{\thmtwo}{Theorem~2}    % the ordinal theorem
+\newcommand{\thmthree}{Theorem~3}  % Mobius spectrum
+\newcommand{\thmfour}{Theorem~4}   % Walsh spectrum
+\newcommand{\propfive}{Proposition~5}  % heterogeneous certificate
+% Legacy aliases (kept so stray references still compile; prefer the new names).
+\newcommand{\thmthreep}{\thmfour}
+\newcommand{\propthreepp}{\propfive}
+
+% ---------------------------------------------------------------------------
+% Math shorthands.
+% ---------------------------------------------------------------------------
+\newcommand{\E}{\mathbb{E}}
+\DeclareMathOperator{\Var}{Var}
+\newcommand{\lce}{L_{\mathrm{CE}}}
+\newcommand{\fhat}{\hat f}
+\newcommand{\mup}{\mu_p}
+\newcommand{\sharegeq}{\mathrm{share}_{\ge 2}}
+\newcommand{\Leff}{L_{\mathrm{eff}}}
+\newcommand{\es}[1]{e_{#1}}            % elementary symmetric polynomial
+
+% Inline code / file names.
+\newcommand{\code}[1]{\texttt{#1}}
+
+\documentclass[11pt]{article}
+
+% ---------------------------------------------------------------------------
+% Preprint layout (arXiv-style, no conference class). Swap the class + drop
+% geometry to move to a venue template later; the body lives in sections/.
+% ---------------------------------------------------------------------------
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{microtype}
+\usepackage{natbib}            % authoryear; \citep / \citet
+\usepackage{enumitem}
+\setlist{topsep=2pt,itemsep=2pt,leftmargin=1.4em}
+\usepackage{xcolor}
+\usepackage{authblk}           % author/affiliation blocks with superscript labels
+\usepackage[colorlinks=true,linkcolor=blue!55!black,citecolor=blue!55!black,urlcolor=blue!55!black]{hyperref}
+
+\graphicspath{{figures/}{generated/}}
+
+\input{macros}
+
+\title{Saturation Makes Quantization Error Additive: A Coverage Model with a Certificate}
+
+\author{Joshua Hill\thanks{Work done during an internship at Baseten Labs, Inc.}\\
+Baseten Labs, Inc.\\  
+David R.\ Cheriton School of Computer Science, University of Waterloo\\
+}
+\date{}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Mixed-precision quantization must decide which parts of a model to keep at higher precision. A common
+premise, shared by sensitivity-based methods such as HAWQ and CoopQ, is that the loss from quantizing a set
+of layers can be reconstructed from per-layer or pairwise sensitivities measured in isolation. We test this
+premise at the 4-bit weight-and-activation precisions now being deployed, treating the change in loss
+$f(S)$ from quantizing a layer set $S$ as a set function on the Boolean cube and
+analyzing it through two classical changes of basis. This analysis yields two findings. First, across
+configurations drawn from the deployment distribution, 85--93\% of the variance of $f$ is explained by
+per-layer effects alone. Second, a monotone transform of a sum of per-layer terms reproduces $f$'s ranking of
+configurations, misordering at most 2\% of pairs.
+
+Both findings are consequences of the \emph{saturation} of the loss. Because the loss is bounded, each quantized
+layer consumes a fraction $a_i$ (its break-rate) of the remaining headroom toward a ceiling $c$; the
+resulting coverage model $f(S)=c\bigl(1-\prod_{i\in S}(1-a_i)\bigr)$ reproduces the measured variance
+profile of $f$ to within a few percent from its $L$ fitted break-rates. This structure supports two
+predictors of a configuration's loss, each with $L+1$ parameters. The additive model is the optimal
+first-order predictor. By Parseval's identity its mean-squared error
+equals the variance of $f$ left unexplained by per-layer effects, which we measure on full lattices,
+estimate out of sample at full-network scale, and report with every result as
+a certificate
+of how well any additive model can do. The coverage model itself is the second predictor, and the two
+predict comparably.
+
+Saturation makes a layer's marginal damage depend on how many other layers are quantized, so sensitivities
+measured in isolation, including a Hessian-trace HAWQ-v2, mis-price a configuration's loss by
+71--376\%. An Aumann--Shapley path integral recovers the optimal additive coefficient up to a
+layer-specific effective deployment density, preserving its ranking of layers exactly, a recovery we
+prove under the coverage model. Both predictors price a configuration before deployment, match black-box
+surrogates at small measurement budgets, degrade at most $2\times$ beyond the
+configurations fit on, where the surrogates degrade $2$--$5\times$. As allocators at matched memory, they
+attain the lowest KL divergence among the compared allocators at the contended budgets of
+mixture-of-experts models from 30B to 355B parameters (17--21\% lower KL
+divergence than the production ModelOpt baseline on Qwen3-30B).
+Below four bits, the resulting allocations continue to solve code and reasoning tasks
+at budgets where allocations from gradient sensitivities no longer produce terminating generations.
+\end{abstract}
+
+\input{sections/01_intro}
+\input{sections/02_related}
+\input{sections/04_walsh}
+\input{sections/05_theory}
+\input{sections/06_anchor}
+\input{sections/07_predictor}
+\input{sections/08_allocation}
+\input{sections/09_scope}
+\input{sections/11_future}
+\input{sections/12_conclusion}
+
+\bibliographystyle{plainnat}
+\bibliography{references}
+
+\clearpage
+\appendix
+\input{appendix/a_link}
+\input{appendix/b_as}
+\input{appendix/c_knapsack}
+\input{appendix/d_setup}
+\input{appendix/g_interp}
+\input{appendix/e_proofs}
+\input{appendix/f_evidence}
+\input{appendix/f_related}
+
+\end{document}
+
+\section{Conclusion}\label{sec:conclusion}
+
+Viewed through its signed M\"obius expansion, low-bit quantization damage appears to carry irreducible
+structure at every order, yet in the Walsh basis roughly 90\% of its variance is order-1, and a
+saturating coverage model with one parameter per layer generates both behaviors exactly, the divergent
+series and the concentrated spectrum alike. Because the order-$\ge 2$ share equals the best additive
+predictor's mean-squared error as a fraction of the variance (\thmone), every result is paired with a
+certificate of when additive machinery suffices for prediction, measured on exact lattices or forecast in closed form
+from fitted break-rates, and the ordinal defect places the damage within a few percent of a monotone
+function of a per-layer sum, so the residual interaction is largely the curvature of the loss scale
+rather than structure among layers.
+
+The practical consequences follow. Sensitivities measured in isolation overstate configuration losses
+by 71--376\%, by a closed-form inflation factor. The fitted coverage and additive models price a
+configuration's loss before deployment, are best or tied against black-box surrogates at small
+measurement budgets, and degrade at most $2\times$ under extrapolation to differently quantized
+configurations where Gaussian-process surrogates degrade $2$--$5\times$. One Aumann--Shapley path
+integral recovers the optimal additive coefficient at a layer-specific effective density, and the
+ordering of layers exactly, with no sampled configurations. Used as allocators
+at matched memory, the same models
+attain the lowest KL among the compared allocators, $17$--$21\%$ below the production ModelOpt baseline
+on Qwen3-30B, with consistent margins at 235B and 355B. The
+margins
+appear where per-unit sensitivities are heterogeneous and budgets are contended, and they vanish in the
+served $\ge 4$-bit regime, which is near-lossless by construction. Below four bits, where an RTN
+base collapses every allocator, an error-compensating base restores the choice, and allocation decides
+whether the served model produces terminating generations at all. 
+% The certificate certifies
+% prediction, not serving: by \thmone{} it is the exact mean-squared error of the best additive fit
+% under the deployment distribution, and the serving limits above are established by the measurements
+% themselves.
+
+\section{An interpretable predictor, in and out of distribution}\label{sec:predictor}
+
+Two predictors are fit throughout: the coverage model, and the additive model. Each has $L+1$ parameters, 
+fit by least squares in
+loss space on $N \approx L$ measured configurations.
+The choice of estimator (joint regression rather than per-coefficient sampling), its consistency under
+misspecification, and the cost comparison with the ${\sim}100L$ progressive-quantization
+evaluations of CoopQ's SPQE estimator and with the fit-free Aumann--Shapley variant are discussed in
+App.~\ref{app:setup}.
+
+\subsection{Benchmark}\label{sec:benchmark}
+
+The benchmark task is to predict $f(S)$ for held-out configurations from $N$ measured ones. Per
+(model, corpus) cell, every method is fit on $N$ configurations sampled from $\mup$ at $p=0.6$ and
+scored by median relative error on 120 held-out configurations, against the surrogate predictors of
+Section~\ref{sec:related} (random forest, Gaussian process, RBF kernel model, and CoopQ's
+linear-plus-pairwise model), at W4A4 on the six models and two corpora of Table~\ref{tab:master}
+(App.~\ref{app:setup}, with the error-versus-$N$ sweep in Fig.~\ref{fig:predn}). At the $N=L/2$ budget,
+coverage
+or additive is best in 5 of 11 cells and within 0.03 of best in 8, with small margins separating the
+leading methods, while isolate-and-sum, at the same measurement cost, fails at 0.38--0.63 error on the
+FP4-damaged models. 
+% Each cell also reports its certificate, the order-$\ge 2$ share measured as the
+% held-out residual of an additive fit (App.~\ref{app:setup}). 
+
+% The three largest shares
+% (0.09--0.30) mark the three rows with the worst best-attainable error, and the largest, at the
+% crossover value of Section~\ref{sec:dit}, is the one row a black-box surrogate takes by a wide margin.
+
+% With enough in-distribution data the surrogates interpolate best (on 3B-wiki the forest reaches 0.03 at
+% $N \approx 8L$ against coverage's 0.08 plateau, while on 0.6B-wiki the Gaussian process leads instead),
+% so large-$N$ interpolation selects no single predictor. 
+The deciding comparisons are extrapolation to differently quantized configurations,
+where coverage degrades at most $2\times$ against the Gaussian process's $2$--$5\times$
+(Section~\ref{sec:ood}), allocation, where the surrogates fail outright (Section~\ref{sec:allocmoe}),
+and pricing, which only the parametric models provide (App.~\ref{sec:interp}).
+
+% \paragraph{Interpretability enables action.} Unlike the nonparametric surrogates, coverage returns $L$
+% per-layer fragility scores $a_i$ and a ceiling $c$. This enables (i) budget pricing: predicting any
+% configuration's
+% loss before committing, and solving for the cheapest configuration with $\Delta\lce\le\varepsilon$, which
+% rankings
+% cannot; (ii) targeted precision, applying expensive fixes such as rotation or an extra bit only to
+% high-$a_i$ layers; and (iii) mechanistic validation, relating $a_i$ to layer depth, type, and outlier
+% kurtosis (Section~\ref{sec:interp}).
+
+\subsection{Out of distribution: stationary kernels do not encode saturation}\label{sec:ood}
+
+On binary configuration vectors the RBF kernel \citep{williams2006gpml} reduces to
+$K(S,S') = \exp(-\gamma\,|S\triangle S'|)$, a stationary kernel in the Hamming metric. Under the
+uniform measure, kernels of this
+form are diagonal in the Walsh basis with eigenvalues that depend only on the order $|T|$ and decay as
+$|T|$ grows (\citealp{odonnell2014boolean}; derivation in App.~\ref{app:proofs}), and approximately so
+at $p=0.6$, so Gaussian-process regression with this kernel is
+shrinkage of high-order Walsh coefficients \citep[Section~2.6]{williams2006gpml}, the same low-order
+preference our measurements justify.
+This is why the Gaussian process matches our predictors at large $N$ in distribution, where order-1
+terms carry most of the damage variance (Section~\ref{sec:walsh}).
+The difference emerges out of distribution. 
+Stationarity applies the same similarity rule everywhere on
+the cube, while saturation does not: under coverage the marginal effect
+$f(S\cup\{i\})-f(S)=c\,a_i\prod_{j\in S}(1-a_j)$ shrinks as the context $S$ grows. The stationary prior
+does not encode this structure.
+% , and its posterior attenuates toward the prior mean exponentially in the
+% Hamming distance from the training set.
+We test this on the two cells of Table~\ref{tab:seeds} (Qwen3-0.6B and
+Qwen2.5-3B, wiki), fitting every method on configurations drawn at $p=0.6$ as before and scoring each
+on 120 test configurations drawn at $p=0.85$ 
+or at $p=0.35$. At the $N=L/2$ budget, coverage's error grows by
+$1.3$--$2.0\times$ and the additive model's by $1.1$--$1.9\times$ relative to their in-distribution
+errors across the four (cell, shift) pairs, while the
+Gaussian process's grows by $2.1$--$4.9\times$ and the random forest's by $2.0$--$3.9\times$
+(Fig.~\ref{fig:ood}). 
+
+% The same protocol at W4A4 was also measured and does not separate the methods,
+% since those cells are nearly saturated: the $p=0.85$ shift is easy for every method, and at $p=0.35$
+% on the 3B cell every method's absolute error becomes large (coverage smallest at 0.71, the Gaussian
+% process at 19.4). A shift test separates methods only between those two poles, where the shifted losses change enough
+% to be nontrivial but not so much that every method fails. The W16A4 cells sit in that regime, and the
+% extrapolation claims of this section are therefore scoped to them.
+% Coverage's worst error under either shift (0.22) is below the Gaussian process's
+% best (0.26). 
+The heavily quantized direction is the one allocation exercises, hence an explanation for its
+performance in allocation.
+% The greedy of
+% Section~\ref{sec:allocation} prices configurations more heavily quantized than any it was fit on, so a
+% predictor's error under that shift sets allocation quality, and
+% Section~\ref{sec:allocmoe} measures the failure directly.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{fig4_ood.png}
+  \caption{Fit at $p=0.6$, tested at $p=0.85$ and $p=0.35$. Coverage degrades $1.3$--$2.0\times$ and the additive fit $1.1$--$1.9\times$ relative to
+  their in-distribution errors, while the
+  Gaussian process degrades $2.1$--$4.9\times$ and the random forest $2.0$--$3.9\times$; the
+  stationary priors of the surrogates do not encode saturation.}
+  \label{fig:ood}
+\end{figure}
+
+\subsection{A diffusion transformer}\label{sec:dit}
+
+The benchmark repeats on the Qwen-Image-2512 diffusion transformer ($L=60$ blocks, per-block NVFP4),
+with $f(S)$ the mean squared error between the quantized and full-precision model outputs at the first
+denoising step (per-budget results in App.~\ref{app:setup}, Table~\ref{tab:dit}). The measured
+order-$\ge 2$ share is 0.36, above every LLM cell (0.016--0.30, Tables~\ref{tab:master}
+and~\ref{tab:seeds}). At small budgets, coverage and random forest edge the other methods,
+with performance converging across methods as budget size increases.
+
+% At small budgets coverage attains the lowest error of every method except the
+% random forest: 0.15 at $N=L/2$ against the Gaussian process's 0.37, with additive at $3.2\times$
+% coverage's error at $N=L$, and both matching coverage only from $N \approx 4L$. The forest, in
+% contrast, matches coverage immediately (0.142 against 0.151 at $N=L/2$), and at $N \ge 4L$ additive,
+% coverage, the forest, and the Gaussian process converge within ${\approx}0.02$ of each other.
+
+% \paragraph{The crossover is monotone in the certificate (Fig.~\ref{fig:crossover}).} Across cells, the
+% (RF $-$ coverage) error gap falls as the share rises: $+0.048$ at share 0.05 and $+0.011$ at 0.26 (the
+% W16A4 cells of Table~\ref{tab:seeds}, $N=L$), $-0.009$ at 0.30 (the 30B cell of
+% Table~\ref{tab:master}, $N=L/2$), and $-0.009$ at 0.36 (the DiT, $N=L/2$), crossing zero at a share of
+% roughly 0.3. The forest can fit the higher orders but pays for them in data, while coverage's $L{+}1$
+% parameters are the matched model when per-layer terms dominate. By \thmone{}, no predictor can improve
+% on the best additive one by more than the order-$\ge 2$ energy, so a small share leaves the forest
+% nothing to gain and a large share permits the gain it realizes. The certificate is computable from the
+% same measured configurations, so the choice of model class can be made before committing to one.
+%
+% \begin{figure}[t]
+%   \centering
+%   \includegraphics[width=0.7\linewidth]{fig10_cov_rf_crossover.png}
+%   \caption{The certificate predicts the parametric-to-nonparametric crossover: the (RF $-$ coverage)
+%   small-budget relative-error gap against each cell's order-$\ge 2$ share, for the four cells and
+%   budgets listed in the text. The gap falls monotonically and crosses zero at a share of
+%   $\approx 0.3$. By \thmone{}, improvement over the best additive predictor is capped by the share.}
+%   \label{fig:crossover}
+% \end{figure}
+
+\section{Future work}\label{sec:future}
+
+\paragraph{Data randomness in the theory.} We treat $f(S)=\Delta L$ as deterministic, but it is an
+expectation over the calibration distribution, with data-dependent break-rates. A two-source variance
+decomposition, layer-selection variance (the $p$-biased Walsh account) plus data-sampling variance, would
+give a principled law connecting calibration size to prediction variance and a data-aware certificate.
+
+\paragraph{Hardware- and framework-aware allocation.} Effective
+bits equal memory is the wrong cost for realized speedup, which is a property of the serving stack: fusion
+granularity sets the alphabet (one format per fused qkv or expert block), 
+kernel availability determines if certain bit-widths (e.g. sub-4) are servable.
+Co-designing the cost function of the allocator with the serving stack would lead to better realized speed gains.
+
+% , and the batch and parallelism regime
+% can flip the sign of the speedup (communication-bound decode buys nothing, GEMM-bound prefill helps).
+% Replacing effective bits with a measured per-(family, format, fusion-group, batch, parallelism)
+% latency-delta cost table, with fusion and kernels as hard constraints, would co-design the allocator with
+% the serving stack and bridge predicted quality to realized speedup; under such constraints the clean
+% per-bit knapsack of App.~\ref{app:knapsack} becomes a constrained program, and global methods (ILP,
+% relaxation-plus-rounding) replace the greedy.
+
+% \paragraph{Extreme quantization.} 
+% % The GPTQ ladder delivers a served sub-4 result on one model and one
+% % task (Section~\ref{sec:allocsub4}). The open items are replication of the non-termination onset and of
+% % the allocator ordering on further models and tasks, a base quantizer that survives
+% % 2 bits
+% % (QuIP\#-class incoherence processing, since at 2 bits scale granularity dominated error compensation in
+% % our comparison), and finer grids between 2 and 3 bits where the rationing question is sharpest.
+% Composing our allocation algorithm with base quantizers which mitigate extreme quantization (e.g. GPTQ, QuIP\#) is an 
+% open application.
+
+\paragraph{Composing allocation with outlier and rotation methods.} Allocation
+chooses how many bits each unit gets, while rotations (QuaRot, SpinQuant, QuIP\#), SmoothQuant, and
+llm.int8() change how much a unit is damaged at a given bit-width, 
+% lowering the per-unit break-rate and,
+% under a shared scale, the cross-layer coupling itself (SmoothQuant moves the order-$\ge 2$ share from
+% 0.67 to 0.46, and outlier clipping from 0.67 to 0.16, Section~\ref{sec:scope}). 
+Our framework operates on
+whatever base quantizer produces $f(S)$, so the two compose: allocate over a rotated or outlier-handled
+base. 
+% The open question is the sign of the combination, which the theory makes precise. Outlier handling
+% that flattens heterogeneity, as a good rotation is designed to, would shrink the headroom allocation
+% exploits, whereas outlier handling that lowers a uniform floor
+% leaves the relative heterogeneity intact. The certificate and the spread of the
+% break-rates quantify this directly: measuring them before and after the orthogonal method predicts whether
+% composition compounds the gains or cannibalizes them, and targets the expensive fix at high-$a_i$ units
+% (Section~\ref{sec:scope}). This converts allocation versus outlier methods into allocation over outlier
+% methods, with a predictive rule for when it pays.
+
+\section{The measured structure of quantization damage}\label{sec:walsh}
+
+This section reports the two measurements on which the rest of the paper builds: the decomposition of the
+damage variance by order, and the ordinal defect, which measures how much of that structure survives every
+increasing transformation of the loss.
+
+\paragraph{Set-up.} For a contiguous block of $L$ layers (finer units are quantized in
+Section~\ref{sec:allocation}), centered at the network's mid-depth
+(App.~\ref{app:setup}), we measure $f(S)=\Delta\lce$ for the full subset lattice of $2^L$ subsets
+$S$, running the model with exactly the layers in $S$ quantized. The quantizer rounds stochastically, so
+each $f(S)$ is the average of several independent rounding draws (16 for the lattices in this section;
+App.~\ref{app:setup}). A measure over configurations must be fixed before variances or prediction
+errors can be defined, and it should weigh the configurations that matter in practice, which are mostly
+quantized. We therefore analyze $f$ under the \emph{deployment distribution} $\mup$, the product measure
+in which each layer is quantized independently with probability $p$, and take $p=0.6$ throughout unless
+stated otherwise. We expand the measured $f$ in the
+\emph{Walsh basis} $\{\chi_T\}$, with coefficients $\hat f(T)$ \citep{odonnell2014boolean}. We denote the
+\emph{order-$k$ energy} $W_k = \sum_{|T|=k} \fhat(T)^2$, and by Parseval's identity, $\Var(f)=\sum_{k\ge 1}W_k$, so the ratio $W_k/\Var(f)$ is the
+fraction of the loss variance attributable to order-$k$ structure. The following identity gives these energies their
+operational meaning.
+
+\begin{customthm}{1}[additive error equals order-$\ge 2$ energy]\label{thm:one}
+For any $f$ on $\{0,1\}^L$ and any $p\in(0,1)$, the best degree-$\le 1$ 
+predictor $f_1$ under $\mup$ has squared error exactly equal to the high-order Walsh energy:
+$\E_{\mup}\bigl[(f-f_1)^2\bigr] = \sum_{k\ge 2} W_k$.
+\end{customthm}
+
+\begin{proof}
+The degree-$\le 1$ functions are exactly $\mathrm{span}\{\chi_\emptyset, \chi_{\{1\}}, \ldots,
+\chi_{\{L\}}\}$, least squares in $L^2(\mup)$ is the orthogonal projection onto that span, and by
+Parseval the squared residual is $\sum_{|T|\ge 2}\fhat(T)^2$.
+\end{proof}
+
+This is the $d=1$ case of low-degree learning \citep{odonnell2014boolean,lmn1993,sobol2001}.
+
+\paragraph{Result (Fig.~\ref{fig:walsh-energy}).} Roughly 90\% of the variance is order-1, with
+order-$\ge 2$ contributing 7--15\% across models and datasets. On a 10-layer Qwen3-8B block,
+order-1 accounts for $87.3\%$ of the variance as measured and $98.1\%$ once the noise floor
+contributed by the stochastic-rounding draws is subtracted (the split-half estimate of
+App.~\ref{app:ordinal}), and on an 8-layer Qwen3-0.6B block for
+$93.8\%$ and $99.2\%$. Across $\{$Qwen3-0.6B, Qwen2.5-3B, Qwen3-4B, Qwen3-8B, Llama-3.2-3B,
+Qwen3-30B-A3B$\}\times\{$wiki, code$\}$ (WikiText-2 and a code corpus, App.~\ref{app:setup}) the
+sampled order-1 share is 85--93\% when whole layers are quantized at FP4. The concentration is not an
+artifact of whole-layer units or of small scale (Fig.~\ref{fig:walsh-energy}): on exact $2^8$ lattices
+over eight consecutive linear units at W4A4, the order-1 share is 97--99\% on models from 0.6B to
+Qwen2.5-72B, and 90.7\% on gpt-oss-120B.
+
+\paragraph{The intercept diagnostic (Fig.~\ref{fig:walsh-intercept}).} An additive model with no
+intercept, which is the constraint that aggregating isolated sensitivities imposes ($f(\emptyset)=0$),
+reaches $R^2=0.13$ on the 0.6B block, where FP4 damage is large, against $0.78$ on the 8B block, where it
+is small. Relaxing this constraint raises both to $0.94$ and $0.87$. Both fits are least squares under
+$\mup$ on the full lattice.
+
+The remaining questions are why the small order-$\ge 2$ content is structured the way it is and what
+generates it. The answer we propose is saturation (Section~\ref{sec:theory}). Before turning to it, we ask how much of the
+order-$\ge 2$ energy reflects structure among layers at all.
+
+\subsection{The ordinal defect: additivity up to an increasing transformation}\label{sec:ordinal}
+
+The order-$\ge 2$ energy has two caveats as an indicator of structure among layers. First, it is
+measure-relative. 
+Second, and more fundamentally, it is not
+invariant under a change of coordinates on the loss values, since replacing $f$ by $\psi \circ f$ for a
+strictly increasing $\psi:\mathbb{R}\to\mathbb{R}$ can change the energy if $\psi$ is curved, 
+so an exactly additive $f$ could acquire nonzero higher-order energy. A principled
+notion of irreducible structure should therefore quantify over all strictly increasing $\psi$. For
+binary factors this is possible, because additivity up to an increasing transformation is a purely ordinal
+property.
+
+\begin{customthm}{2}[additivity up to an increasing transformation is ordinal]\label{thm:ordinal}
+$f(x) = g(b\cdot x)$ for some $b\in\mathbb{R}^L$ and strictly increasing $g$ if and only if some additive
+index reproduces $f$'s ranking of subsets, that is, $f(x) < f(y) \iff b\cdot x < b\cdot y$ for all
+$x,y \in \{0,1\}^L$.
+\end{customthm}
+
+The theorem is the finite binary case of additive conjoint measurement
+\citep{lucetukey1964conjoint,debreu1960topological}. App.~\ref{app:link} gives the
+short proof. Throughout, an \emph{additive index} is a linear score $x \mapsto b\cdot x$ used only
+through the ordering it induces on configurations. Whether such an index exists is a linear program, with one inequality
+$b\cdot(x-y)>0$ per
+ordered pair \citep{scott1964measurement}. The smallest witnesses of infeasibility are \emph{rank flips},
+pairs of comparisons that order the same two layers oppositely in two contexts:
+$f(S\cup i) > f(S\cup j)$ but $f(T\cup i) < f(T\cup j)$ forces both $b_i>b_j$ and $b_i<b_j$, so a single
+true flip refutes every strictly increasing $\psi$. We call the minimal fraction of ranking
+constraints that any additive index must violate the \emph{ordinal defect} of $f$.
+
+\paragraph{Measurement.} On full $2^8$ configuration lattices, measured with 16 stochastic-rounding
+draws per configuration (App.~\ref{app:setup}), we bound the defect from both sides, certifying each
+statistic against measurement noise. For the lower bound we count rank flips. Splitting the 16 draws
+into two halves gives two independent estimates of every configuration's loss, and a flip is counted
+only if it is detected above the noise floor on the first half and recurs with the same sign on the second. The surviving
+count is then read against the count that the identical pipeline produces on a matched-noise null, a
+synthetic lattice constructed to contain no true flips (the coverage model of Section~\ref{sec:theory} fitted
+to the measured losses, plus noise at each configuration's measured level). For the upper bound we
+exhibit an index, since the fraction of ranking
+constraints violated by any single index bounds the defect from above. The exhibited index minimizes the total
+slack of the constraints of one half of the draws, again a linear program, and its violated fraction is
+evaluated both on that half and on the held-out half's constraints, with the larger of the two quoted
+(App.~\ref{app:ordinal}, per-model results in
+Table~\ref{tab:ordinal}).
+In the deployed per-block regime the certified ordinal defect is
+at most $1.4\%$ (the largest cell, Llama-3.2-3B). The energy counterpart agrees: minimizing the order-$\ge 2$
+share over all strictly increasing transformations of the loss (the estimator $E^*$ of
+App.~\ref{app:ordinal}) yields an upper bound of $0$--$5\%$
+across the deployed cells (last column of Table~\ref{tab:ordinal}). The zeros are not blindness of the procedure. Applied to the non-deployed
+per-tensor regime of Section~\ref{sec:scope}, the same procedure finds flips well in excess of its
+matched-noise null (74 against 18, Table~\ref{tab:ordinal}), so genuine reversals are detected where a
+known mechanism produces them, and even there an additive
+index orders at least $98\%$ of the comparisons above the noise floor correctly. 
+The measured
+$f$ is therefore, to that accuracy, of the form $g\bigl(\sum_{i\in S} b_i\bigr)$ for a strictly increasing $g$, and
+the apparent high-order energy reflects the curvature of $g$ rather than structure among layers.
+
+
+
+\begin{figure}[t]
+  \centering
+  \begin{subfigure}[t]{0.615\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{fig1a_order1_share.png}
+    \caption{Order-1 share, every exact lattice.}
+    \label{fig:walsh-energy}
+  \end{subfigure}\hfill
+  \begin{subfigure}[t]{0.365\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{fig1b_intercept.png}
+    \caption{The intercept diagnostic (in sample).}
+    \label{fig:walsh-intercept}
+  \end{subfigure}
+  \caption{(\subref{fig:walsh-energy}) Order-1 share of the damage variance on every exact lattice
+  measured, under the deployment measure $\mup$, $p=0.6$. Red: the two whole-layer FP4 lattices of this
+  section (Qwen3-0.6B, 8 layers, $2^8$ configurations; Qwen3-8B, 10 layers, $2^{10}$), noise-corrected
+  as in App.~\ref{app:ordinal}. Teal: exact $2^8$ lattices at per-linear W4A4 granularity (NVFP4,
+  block 16), each over eight consecutive mid-depth linear units, with damage measured as the KL
+  divergence to the full-precision model on a WikiText-2 calibration set (light bars: code corpus).
+  The share is 96.9--99.7\% on dense models from 0.6B to 72B and 90.7\% on the sparse-MoE
+  gpt-oss-120B, where fused expert blocks add coupling.
+  (\subref{fig:walsh-intercept}) The additive fit without an intercept, the constraint that
+  isolated-sensitivity aggregation imposes ($f(\emptyset)=0$), against the same model class with
+  a free intercept, which by \thmone{} is the degree-$\le 1$ projection; least squares under $\mup$ on
+  the two whole-layer lattices.}
+  \label{fig:walsh}
+\end{figure}
+
+\section{Why isolated sensitivity mis-prices a configuration: the wrong anchor}\label{sec:anchor}
+
+Throughout, a predictor's \emph{anchor} is the
+configuration, or distribution over configurations, at which its coefficients are measured: isolated sensitivities
+are anchored at the unquantized network,
+while the coefficients of a fitted additive model are anchored at the deployment distribution.
+
+\paragraph{The measurement.} An estimate of a configuration's loss built from per-layer sensitivities
+alone is the sum $\sum_{i\in S} f(\{i\})$, which we call \emph{isolate-and-sum} throughout. 
+ On the fully quantized configuration of the
+exact whole-layer FP4 lattices (the two lattices of Section~\ref{sec:walsh} and the four
+certification cells of Table~\ref{tab:ordinal}) this aggregation overstates the measured loss by
+71--346\%. The mis-pricing persists on full networks. Predicting $f$ on
+configurations that protect a sampled subset of layers and quantize the rest (all 36 Qwen3-8B and 48
+Qwen3-30B-A3B layers, protection sizes 1 to
+$L/2$), isolate-and-sum's median relative error is
+51\% on Qwen3-8B and 203\% on Qwen3-30B-A3B, while additive and coverage models fitted on 80
+sampled configurations attain 2--3\% on the same held-out protection sets. HAWQ-v2, scoring each layer by its Hessian trace (Hutchinson estimator) times its mean squared
+quantization perturbation \citep{dong2020hawqv2}, inherits the same anchor: summed over each of the
+two Section~\ref{sec:walsh} lattices it overstates the fully quantized corner by 89\% (Qwen3-8B) and
+376\% (Qwen3-0.6B), against isolate-and-sum's 155\% and 250\% on the same corners.
+
+\paragraph{Marginal scale.} The failure is caused by two distinct order-1 coefficients.
+The \emph{in-context} slope, the coefficient of the optimal additive fit, is
+$w_i = \E_p[f\mid x_i=1] - \E_p[f\mid x_i=0]$, the marginal effect of layer $i$ averaged over deployment
+configurations. The \emph{isolated} slope, the quantity that HAWQ-style scores approximate,
+is $s_i = f(\{i\})$, the marginal at the
+unquantized network. Under coverage, $s_i = c\,a_i$ while $w_i = c\,a_i\prod_{j\ne i}(1-p a_j)$, so
+\[
+  \frac{s_i}{w_i} = \frac{1}{\prod_{j\ne i}(1-p a_j)} \approx e^{\,p\sum_j a_j},
+\]
+a ratio that grows exponentially with $p\sum_j a_j$. We validate the formula directly on the
+full $2^8$ lattices, comparing the measured ratio $s_i/w_i$ 
+against the value the fitted coverage model predicts. The measured medians are 1.9 / 3.0 / 3.9 / 9.2
+(Llama-3.2-3B / Qwen3-30B-A3B / Qwen3-8B / Qwen3-0.6B) against predicted
+1.8 / 2.3 / 2.5 / 7.7, with more detail in
+App.~\ref{app:knapsack}. 
+The two-slope identity is a one-line corollary of Theorems~1 and~4 (App.~\ref{app:proofs}).
+% A small order-$\ge 2$ share bounds the mean-squared error of the fitted additive model (\thmone{}), but
+% it says nothing about the isolated-anchor sum, whose coefficients are inflated by the factor above
+% regardless.
+
+% Section~\ref{sec:allocation} uses this mis-pricing directly: allocators scored with the in-context
+% coefficient outperform allocators scored at the unquantized-network anchor, at matched memory. 
+
+\section{Allocation at matched memory}\label{sec:allocation}
+
+\subsection{Setup}\label{sec:allocsetup}
+
+Given a memory budget in effective bits,
+$\mathrm{eff} = \sum \mathrm{numel}\cdot\mathrm{bits} / \sum \mathrm{numel}$, the allocator assigns each
+unit (a weight tensor, or a fused group that must share one serving format, App.~\ref{app:setup}) a
+bit-width in $\{16,8,4\}$ to minimize predicted $\Delta\lce$ (Section~\ref{sec:allocsub4} extends the
+alphabet below four bits). Under the coverage model, predicted damage increases
+in the summed log-headroom costs $b_i$ of the demotions taken, so minimizing it under a bit budget is a
+knapsack over those per-demotion costs (App.~\ref{app:knapsack}). 
+
+% Demotion prices are estimated in deployment context, from a
+% coverage or additive fit on sampled configurations or fit-free from one
+% Aumann--Shapley path integral per demotion level, written AS-cov and AS-add (App.~\ref{app:as}).
+
+\paragraph{Converting the baselines into allocators.} The
+Section~\ref{sec:predictor} baselines are predictors, so each is fit on the same $N=300$
+sampled configurations and run through the same knapsack over its predicted marginals (\code{fit-add} for
+the fitted additive model, \code{gp-alloc} and \code{rf-alloc} for the surrogates). 
+% Two incumbents complete the set: CoopQ/SPQE
+% \citep{impq2025}, and MC-MoE
+% \citep{mcmoe2025}, which ranks experts by a routing-frequency-times-mass prior and uses no damage
+% measurements. 
+We fit the coverage and additive scores either with least squares or an Aumann-Shapley path integral.
+The Aumann--Shapley score is the loss gradient averaged over increasingly quantized contexts, and under the
+coverage model it equals the optimal in-context coefficient evaluated at an effective deployment
+density (App.~\ref{app:as}). 
+% The metric is the KL
+% divergence from the bf16 model's next-token distribution to the quantized model.
+
+
+\subsection{Serving against vendor NVFP4 checkpoints}\label{sec:alloc27b}
+
+On the dense Qwen3.6-27B we compare the additive allocation at 5.41 effective bits, derived from
+measured per-unit step damages on a task-aligned calibration set (App.~\ref{app:setup}), against the
+two public NVFP4 checkpoints, NVIDIA's at 6.31 effective bits and Unsloth's at 6.73, all served by
+vLLM on one B200 at concurrency 128. Ours and Unsloth's checkpoints serve W4A4 NVFP4, quantizing
+activations at runtime against per-block scales; NVIDIA's published checkpoint keeps its NVFP4
+linears weight-only (W4A16). The additive configuration matches the vendor checkpoints
+downstream (Table~\ref{tab:race27b}), and the smaller footprint is
+realized as speed: it is the fastest system at every prompt/generation shape, $1.5$--$2.0\times$ the
+bf16 throughput and 8--24\% above the Unsloth checkpoint (Fig.~\ref{fig:race27b}).
+
+\begin{table}[t]
+\centering\small
+\caption{Qwen3.6-27B served accuracy (pass@1; AIME25 averaged over 8 seeds; thinking sampling).}
+\label{tab:race27b}
+\begin{tabular}{lcccc}
+\toprule
+ & eff.\ bits & AIME25 & GPQA & MMLU-Pro \\
+\midrule
+bf16 & 16 & 90.0 & 83.8 & 86.3 \\
+NVIDIA NVFP4 & 6.31 & 90.8 & 67.2 & 85.8 \\
+Unsloth NVFP4 & 6.73 & 90.4 & 82.3 & 86.7 \\
+additive & 5.41 & 90.0 & 79.8 & 86.5 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{fig_race27b.png}
+  \caption{Qwen3.6-27B output throughput at four prompt/generation shapes,
+   with the speedup over bf16 marked on the additive bars. The additive
+  configuration is fastest at every shape at the lowest effective bits.}
+  \label{fig:race27b}
+\end{figure}
+
+The comparison repeats at 753B. On GLM-5.2 we compare the additive allocation (4.84 stored weight
+bits per parameter, 474~GB) against NVIDIA's published NVFP4 checkpoint (4.76 bits, 465~GB) and the
+FP8 base model, served by SGLang on $4\times$B200 at concurrency 8. Both NVFP4 configurations are W4A4.
+ Accuracy matches at matched
+stored size (Fig.~\ref{fig:glm52}), and the additive configuration reads 28.3~GB of weights per
+decoded token against the checkpoint's 45.9, so it decodes $1.19\times$ faster: the allocation
+places its low-precision bits on the units decode reads most often.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.5\linewidth]{fig_glm52.png}
+  \caption{GLM-5.2 (753B) decode throughput, SGLang on $4\times$B200 at concurrency 8, with total
+  stored weight and weight bytes read per decoded token (batch size 1) below each bar. Accuracy is
+  matched: MMLU 0.842 (additive) against 0.838 (NVIDIA NVFP4) and 0.864 (the FP8 base), GPQA diamond
+  0.470 against 0.455 and 0.465 (zero-shot letter-logit scoring; 228-question stratified MMLU subset,
+  198 GPQA questions).}
+  \label{fig:glm52}
+\end{figure}
+\subsection{MoE language models}\label{sec:allocmoe}
+
+We benchmark our methods against the incumbent methods. The certificate accompanying these results
+depends on the units it is measured over. On the eight whole-layer FP4 block lattices of Qwen3-30B
+(Section~\ref{sec:tauval}) the measured order-$\ge 2$ share has median 0.013. At the allocation
+granularity itself (per-linear units over the $\{16,8,4\}$ alphabet) no lattice is enumerable, and
+the split-half cross-estimate (coefficient products of two disjoint halves, as in
+App.~\ref{app:ordinal}) from the 300 sampled configurations of the fitted baselines, unbiased
+but not constrained to be nonnegative, gives $-0.09 \pm 0.10$ on the 30B pool and $0.24 \pm 0.14$ on
+the 235B pool. At $N=300$ the sampling error is of the order of the share itself, so the
+allocation-granularity certificate is an order-of-magnitude statement, not a precise value. 
+% The
+% $\tau$-forecasts from fitted break-rates are
+% ${\sim}10^{-4}$ at 235B and GLM-4.6, and where a lattice exists to check this pipeline it understates
+% the measured share (App.~\ref{app:setup}). 
+Per-method values are in
+Tables~\ref{tab:30bb} and~\ref{tab:235c}, each with a paired test over the 16 shared evaluation
+sequences, Holm-corrected within each budget row at the 5\% level.
+%  the
+% budget-by-budget curves in Fig.~\ref{fig:pareto}. 
+On Qwen3-30B the additive- and coverage-scored allocators lead at every measured budget.
+
+% Only the 235B eff-8 corner, near-lossless with nothing to allocate, goes to all-FP8, while the more
+% damage-sensitive 30B differentiates even there (Section~\ref{sec:allocwhere}: the contended range is
+% set by the damage level, not by effective bits alone).
+
+% \paragraph{Reading the KL margins.} The servable $\ge 4$-bit regime is near-lossless downstream
+% (Section~\ref{sec:scope}), so these matched-memory KL margins are a leading indicator rather than a
+% realized accuracy gap: a distributional safety margin for settings that are not near-lossless (harder
+% tasks, tighter formats, longer horizons). The margins are consistent across three MoE scales (Qwen3-30B
+% and 235B, GLM-4.6 at 355B) and every contended budget. Below four bits the margin is realized, deciding whether
+% the served model functions at all (Section~\ref{sec:allocsub4}).
+
+
+
+\begin{table}[t]
+\centering
+\caption{Qwen3-30B allocation comparison at matched effective bits, calibration KL on the task-aligned
+corpus of App.~\ref{app:setup} (BFCL and RULER prompts).
+$*$ marks methods
+significantly different from AS-additive under a paired $t$-test over the 16 shared sequences,
+Holm-corrected within each budget row at the 5\% level. $^\dagger$ marks MC-MoE's per-expert form, which assigns each
+expert its own format and cannot be loaded by the fused serving kernels, so the fusion column is its
+servable form. int8-outlier ranks units by an llm.int8-style activation-outlier severity score.
+Marginal 95\% intervals on the entries span
+$\pm.001$--$.007$.}
+\label{tab:30bb}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{ccccccccccccc}
+\toprule
+eff & naive-unif & naive-routed & ModelOpt & int8-outlier & CoopQ (1{,}205 ev) & MC-MoE per-exp$^\dagger$ & MC-MoE fusion &
+fit-add (300 ev) & gp-alloc (300 ev) & rf-alloc (300 ev) & AS-cov & AS-add \\
+\midrule
+4.2 & .0480$^*$ & .0367 & .0429$^*$ & .0428$^*$ & .0419$^*$ & .0359 & .0359 & .0372 & .0382$^*$ & .0538$^*$ & .0365 & \textbf{.0353} \\
+4.5 & .0344 & .0344 & .0383$^*$ & .0327 & .0393$^*$ & .0318 & .0337 & \textbf{.0310} & .0319 & .0486$^*$ & .0317 & .0321 \\
+5.0 & .0335$^*$ & .0344$^*$ & .0331$^*$ & .0310$^*$ & .0347$^*$ & .0275 & .0311 & .0284$^*$ & .0295$^*$ & .0443$^*$ & .0266 & \textbf{.0264} \\
+6.0 & .0318$^*$ & .0344$^*$ & .0253$^*$ & .0253$^*$ & .0308$^*$ & .0232 & .0255 & .0229$^*$ & .0235$^*$ & .0421$^*$ & .0202 & \textbf{.0200} \\
+8.0 & .0137$^*$ & .0344$^*$ & .0215$^*$ & .0177$^*$ & .0137$^*$ & .0192 & .0119 & .0185$^*$ & .0201$^*$ & .0371$^*$ & \textbf{.0106} & .0109 \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+The predictor skill of a black-box surrogate does not transfer: \code{gp-alloc} trails the AS and
+fitted allocators by 3--18\% at the contended budgets (the extrapolation failure of
+Section~\ref{sec:ood} in allocation form), and \code{rf-alloc} falls below naive-uniform.
+CoopQ trails AS by $+19$ to $+54\%$
+despite 1{,}205 sampled KL evaluations against AS's zero, and it scores whole layers rather than the
+240 per-linear units of the other methods, the only granularity its measurement design affords, since
+its permutation-walk cost scales with the unit count.
+% , since
+% walk cost and its pairwise surrogate scale with the unit count (${\approx}24{,}000$ evaluations at its
+% published budget, App.~\ref{app:setup}).
+% Its
+% pairwise term $K$ contributes nothing: allocating from its linear term alone changes the KL by at most
+% .0003 at any contended budget, which the certificate (order-$\ge 2$ share .013) indicated in advance.
+
+% Serving the same eleven methods' configurations across these budgets (allocations derived on the
+% evaluation-task corpus of Table~\ref{tab:sub4kl}, weight-only RTN checkpoints, five benchmarks)
+% realizes none of these margins: 
+% Serving the same methods' configurations at these budgets realizes none of these KL margins:
+Table~\ref{tab:ge4served30} shows AIME-2025 scores for the evaluated methods on Qwen3-30B,
+with every method between 66 and 76 against the bf16 anchor 73.3 and no significant ordering at any
+budget. This finding survives both W4A4 and W4A16 quantization regimes.
+% The finding survives the serving channel: re-serving the additive, coverage, and ModelOpt
+% configurations at effective bits 4.5 and 5.0 as full W4A4 ModelOpt exports (activations quantized at
+% runtime, served by TensorRT-LLM; q/k/v tied to the group maximum for fused serving, shifting the AS
+% budgets by at most $+0.09$ effective bits) gives 68.8--72.9 across the six cells, again with no
+% significant method ordering at either budget.
+
+
+% (d) MC-MoE's routing-frequency-times-mass prior involves no damage measurement. It nearly matches AS at
+% eff $\le 4.5$ ($+0.3$ to $+1.7\%$, in its unservable per-expert form) but trails by $+4\%$ at eff 5.0
+% and $+16\%$ at eff 6.0.
+% (e) Per-expert MC-MoE's KL is $0/5.6/11.6/9.0\%$ lower than its fusion-constrained form's across the
+% contended budgets, the measured price of fused serving. Per-expert kernels would recover roughly 10\%
+% and still trail AS at eff $\ge 5$.
+% (f) int8-outlier is significantly worse than AS-additive at four of the five budgets ($+17$ to
+% $+62\%$, paired test), indistinguishable only at eff 4.5: an activation-outlier score is an isolated
+% magnitude proxy, the Section~\ref{sec:anchor} mis-pricing in allocation form.
+% (g) At the loose eff-8 corner, the binary $\{8,4\}$ alphabets degenerate to all-FP8 (.0137), ModelOpt
+% spends the same memory for .0215, and the three-level allocators promote a few sensitive units to 16
+% bits and improve on the degenerate point (AS-cov .0106, MC-MoE fusion .0119), while naive-routed, whose
+% rule fixes routed experts at the lowest level, stays flat at .0344 regardless of budget.
+
+\paragraph{Scale replication (Qwen3-235B, Table~\ref{tab:235c}).} The comparison was re-run at
+$8\times$ scale on Qwen3-235B. The in-context family again carries the contended budgets: AS-additive
+is best at eff 4.2, the fitted additive and coverage variants at 4.5--6.0, and every method outside
+the family is significantly worse at eff 4.2, 4.5, and 6.0 (at 5.0, naive-uniform, ModelOpt, and
+\code{gp-alloc} are not separated after the Holm correction). 
+% The loose eff-8 corner goes to
+% naive-uniform, where near-lossless budgets leave little to allocate. 
+The comparison extends once more
+to
+GLM-4.6 (355B): a three-level $\{16,8,4\}$ allocation over its 43{,}364 units gives AS-coverage
+calibration KLs of 0.059, 0.045, and 0.036 at effective bits 5, 6, and 7, against ModelOpt's 0.088,
+0.071, and 0.045, margins of 34, 37, and 20\%, with AS-additive within 0.006 of AS-coverage at
+every budget. 
+
+\begin{table}[t]
+\centering
+\caption{Qwen3-235B, all methods measured jointly on the task-aligned corpus of
+App.~\ref{app:setup}, with paired significance vs.\ AS-additive over the 16 shared sequences
+($*$ = significant after Holm correction within each budget row at the 5\% level).}
+\label{tab:235c}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{ccccccccccc}
+\toprule
+eff & naive-unif & naive-routed & ModelOpt & CoopQ (942 ev) & fit-add & fit-cov & gp-alloc & rf-alloc &
+AS-cov & AS-add \\
+\midrule
+4.2 & 0.0196$^*$ & 0.0171$^*$ & 0.0222$^*$ & 0.0205$^*$ & 0.0186$^*$ & 0.0183$^*$ & 0.0185$^*$ & 0.0232$^*$ & 0.0172$^*$ & \textbf{0.0163} \\
+4.5 & 0.0161$^*$ & 0.0163$^*$ & 0.0180$^*$ & 0.0190$^*$ & \textbf{0.0149} & 0.0158 & 0.0163$^*$ & 0.0211$^*$ & 0.0161$^*$ & 0.0151 \\
+5.0 & 0.0144 & 0.0163$^*$ & 0.0151 & 0.0185$^*$ & \textbf{0.0129} & 0.0133 & 0.0141 & 0.0198$^*$ & 0.0132 & 0.0139 \\
+6.0 & 0.0141$^*$ & 0.0163$^*$ & 0.0128$^*$ & 0.0157$^*$ & 0.0102 & \textbf{0.0094}$^*$ & 0.0116$^*$ & 0.0188$^*$ & 0.0112$^*$ & 0.0101 \\
+8.0 & \textbf{0.0068}$^*$ & 0.0163$^*$ & 0.0096 & 0.0068$^*$ & 0.0083$^*$ & 0.0083 & 0.0099 & 0.0154$^*$ & 0.0090 & 0.0091 \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+
+
+% Every structural finding replicates. The in-context family leads every contended budget with members
+% within $\pm.001$--$.003$ of each other, AS-additive is uniquely best at the tightest budget, 
+% and every baseline outside the family is significantly worse at eff 4.2, 4.5,
+% and 6.0 (at 5.0, naive-uniform and \code{gp-alloc} fall within noise). 
+% CoopQ's deficit grows with
+% scale, from $+19$ to $+54\%$ at 30B to $+26$ to $+55\%$ here, at 942 evaluations against zero.
+% The deficit follows from its measurement design rather than its surrogate class: our models fit on the
+% 942 configurations its permutation walks visited reproduce it, while the same models fit on 300
+% independently sampled configurations land within $.002$ of AS (not shown).
+
+% The eff-8 budget again belongs to
+% near-uniform configurations, as scoped in Section~\ref{sec:scope}. Within the family, significance
+% resolves the near-ties: at 30B eff 5.0/6.0 the fit-free AS is significantly better than its
+% 300-evaluation fitted siblings, while at 235B eff 5.0/6.0 fitted-coverage leads by a starred
+% $.0006$--$.0007$. The spread within the family is at noise scale, and the gap between the family and
+% the rest is not.
+
+
+
+\subsection{Allocation below four bits}\label{sec:allocsub4}
+
+% Below four bits allocation stops being a proxy-metric comparison and starts deciding whether the served
+% model functions at all. The regime is productive: the allocated configurations serve at bf16-level
+% gsm8k accuracy at effective bits 3.5 and continue solving the task down to 2.75, where the
+% gradient-scored configuration at the same memory no longer produces terminating generations
+% (Table~\ref{tab:sub4served}). 
+Below four bits the base quantizer decides whether allocation has anything to work with: under
+round-to-nearest quantization, every allocator we measured collapses at every sub-4 budget regardless of model
+scale, so we use an error-compensating base. We construct a
+per-unit GPTQ \citep{frantar2022gptq} ladder on Qwen3-30B, quantizing every unit at 4, 3, and 2 bits
+(weight-only; details in App.~\ref{app:setup}). 
+
+% Error compensation opens the 3-bit rung: with all units at
+% one level, the calibration KL is 0.054 at GPTQ-4, 0.202 at GPTQ-3, and 13.6 at GPTQ-2, so the usable
+% ladder is $\{4,3,2\}$ with 2 bits as a level to be rationed. The 13.6 is carried by the attention
+% projections, which hold only 0.8\% of the quantized weight: with those kept at 4 bits, all-2 over the
+% expert blocks reaches KL 1.29, the floor of Table~\ref{tab:sub4kl}.
+
+% The allocation study covers the 48 fused expert blocks, which hold 99.2\% of the quantized weight,
+% with attention fixed at 4 bits and effective bits computed over the expert weight. The additive
+% allocator prices each unit's 4-to-3 and 3-to-2 steps with 96 isolated damage measurements (each unit
+% at 3 and at 2 bits, all others at 4) and greedily takes the step of minimum damage per bit saved;
+% ModelOpt ranks units by squared-gradient sensitivity under the same greedy; the uniform mix demotes
+% units in random order. The comparison is deliberately not measurement-matched: additive consumes the
+% 96 measurements, ModelOpt only gradients, the uniform mix nothing. 
+
+% The additive model ranks but does
+% not price here: it predicts the KL of 40 random mixed configurations with $R^2 = 0.991$ (median
+% relative error 7.8\%) yet underestimates the allocator's own chosen configurations by 16--57\%, an
+% interaction the certificate forecast (at most 0.02 on these budgets) does not flag, so a quotable
+% damage estimate at sub-4 budgets requires measuring the chosen configuration. 
+
+In Table~\ref{tab:sub4kl}, the additive allocator's KL sits $3.0$--$6.6\times$ below ModelOpt's at
+the servable budgets ($\ge 2.75$, established by the serving results below). CoopQ and the isolated
+ranking, which reorders the additive allocator's own per-unit damages, occupy the same tier, while
+MC-MoE and int8-outlier sit above ModelOpt. 
+% The random uniform mix is not separated from the measured tier by KL alone, since it
+% coincides with the all-3 configuration at eff 3.0 and has the lowest KL at 2.75, so the KL
+% separation is from the gradient and prior scores, not from the random mix. 
+% Below the servable range
+% CoopQ leads, improving on the additive allocation by 8--28\%.
+
+% A HAWQ-style ranking of the units by the same 96 isolated damages, without the per-bit pricing,
+% produces allocations nearly identical to the additive allocator's (not shown), since the expert blocks
+% have equal parameter counts, so damage ordering and damage-per-bit pricing
+% nearly coincide. 
+
+% Interaction-aware measurement pays only in the deep band: at effective bits 2.5 and
+% 2.3, CoopQ and the allocators fitted on the 40 mixed configurations improve on the best 96-measurement
+% allocation by 8--16\%, while at the servable budgets a 96-measurement allocation is best overall or
+% within 1.3\% of best, at a fifth of CoopQ's measurement cost.
+The construction replicates at scale on Qwen3-235B-A22B (Table~\ref{tab:sub4b235}): of the three
+constructed allocations the additive one holds the lowest calibration KL at every sub-4 budget,
+preserves reasoning when served at
+effective bits 3.5, and degrades through 3.0.
+ At effective
+bits 2.9 the additive scoring rule appears on both sides of the survival boundary: derived on the
+evaluation-task corpus itself, the additive and coverage allocations remain functional (42.9 and
+41.2 AIME-2025), while the additive allocation of identical memory derived on a separately measured
+corpus collapses (2.1, as does the random mix at 5.0). The gap opens before the boundary (58.3
+against 39.6 at effective bits 3.0), so at this scale the derivation corpus, not the scoring rule,
+sets the usable budget; every arm collapses at 2.75.
+
+\input{generated/tab_sub4_235b}
+% , with the additive
+% configuration at effective bits 2.75 reaching calibration KL 0.310 against 1.008 for the uniform mix
+% and 3.18 for ModelOpt.
+
+\input{generated/tab_sub4kl}
+
+% Serving these configurations tests whether the calibration-KL margins are realized as accuracy
+% differences. We first me gsm8k (greedy decoding, 8{,}192-token generation cap, symbolic answer matching, 150
+% problems per configuration, 300-problem bf16 anchor 96.7; the full KL-and-accuracy grid is
+% Table~\ref{tab:sub4served}) they are, in three ways. At effective bits 3.5
+% the additive configuration beats the ModelOpt configuration at identical memory, 97.3 against 91.3
+% (all nine discordant problems favor it, McNemar $p = 0.0039$), the first budget in our study at which
+% a matched-memory KL margin is realized as a served accuracy difference. At 2.9 and 2.75 the ModelOpt
+% configurations stop terminating (the model stops emitting its end-of-sequence token, so every attempt
+% runs to the token cap and yields no answer), while the additive configurations of the same memory
+% solve the task (94.7 and 86.7), moving the smallest usable budget from about 3.0 effective bits under
+% the gradient ranking to 2.75 under measured step damages. And the failure has a common boundary, a
+% \emph{termination threshold}:  every configuration whose calibration KL exceeds roughly 0.45 nats stops
+% terminating, however that KL was reached (the additive configuration at KL 0.448 also fails to
+% terminate, while at 0.232 it solves the task), and degradation across this gsm8k grid is graded:
+% generations terminate and solve the task below roughly 0.25 nats, produce coherent reasoning that
+% fails to conclude within the cap near 0.45, and decay into repeated fragments beyond 0.6. Three
+% configurations chosen
+% before serving as an out-of-sample test of the threshold (the uniform mixes at effective bits 2.9 and
+% 2.75, KL 0.18 and 0.25, and the all-3 configuration, 0.12) all terminate, at gsm8k 92.0, 88.7, and
+% 95.3, so survival separates the measured-step allocation from the gradient ranking, not from the
+% random mix.
+
+% Table~\ref{tab:sub4served30} reports the full served grid. The methods that
+% measure the ladder (additive, coverage with the measured ceiling, CoopQ, isolated-rank) occupy the top
+% tier at every budget together with the uniform mix; the fitted surrogates lose 20--30 points at
+% effective bits 3.0; and ModelOpt, MC-MoE, and int8-outlier collapse at 3.0 and below. Within the top
+% tier the ordering moves with budget (additive leads at 3.5, coverage at 3.0, isolated-rank at 2.9, and
+% the uniform mix at 2.75), so below four bits the decisive separation is tier membership, which tracks
+% whether the method measured the ladder, rather than a single winner. 
+
+Serving these configurations tests whether the calibration-KL margins are realized as served
+accuracy. Table~\ref{tab:sub4code} reports HumanEval at both scales, and the full reasoning grid is
+Table~\ref{tab:sub4served30} (App.~\ref{app:setup}). The failure mode has a common boundary, a
+\emph{termination threshold}: above a model-specific calibration KL a configuration stops emitting
+its end-of-sequence token, every generation runs to the token cap, and no answer is produced. On the
+30B grid the boundary sits near 0.45 nats (\code{rf-alloc} at KL 0.449 collapses on AIME-2025 while
+the additive configuration at 0.415 continues to score, Table~\ref{tab:sub4served30}), and the
+threshold governs termination rather than accuracy. At effective bits 2.9 the four HumanEval methods
+order exactly as their calibration KLs (0.215, 0.228, 0.236, and 1.042 giving 73.2, 44.5, 38.4, and
+0.0). The accuracy gaps do not scale with the KL gaps:
+CoopQ sits within 0.013 nats of the additive configuration yet 29 points below it, so which units
+receive the 2-bit assignments
+changes served accuracy at fixed memory and near-fixed KL. At 2.75 the ordering itself breaks: the
+uniform mix has the lowest KL (0.319 against additive's 0.415) yet scores 19.5 against 54.9.
+
+
+% gsm8k registers only the threshold (additive against uniform is $+5/-1$ discordants, not significant),
+% so the accuracy contrast at matched survival needs a task with headroom below the threshold, and code
+% provides it. On HumanEval (execution-graded, 164 problems, bf16 anchor 82.3) accuracy falls
+% continuously along the additive configurations (68.9 at effective bits 2.9, 53.0 at 2.75), and at 2.9
+% the allocators order exactly as their calibration KLs (additive 0.150, uniform 0.176, ModelOpt 0.445
+% giving 68.9, 37.8, 0.0): the additive configuration is 31 points above the uniform mix at identical
+% memory (56 of 61 discordant problems, McNemar $p < 10^{-10}$). Weight-only fake quantization assigns each unit a fixed
+% tensor, so every configuration also exports as an ordinary bf16 checkpoint and serves natively; SGLang
+% serving agrees with the Hugging Face harness on all nine configurations measured on both (identical
+% orderings, accuracies within 4.3 points), 
+
+% so Table~\ref{tab:sub4code} reports the full comparison on
+% the production stack, with the Qwen3-235B replication. Two facts extend it. First, CoopQ separates
+% calibration KL from served behavior: at effective bits 2.9 its configuration matches the additive one
+% in KL (0.153 against 0.150) and in the multiset of levels (43 blocks at 3 bits, 5 at 2), yet scores
+% 44.5 against 73.2, and at 2.75 it collapses to 6.1, below the uniform mix. Which units receive the
+% 2-bit assignments therefore changes served accuracy at fixed memory and fixed calibration KL, and the
+% threshold direction only survives one way: exceeding it collapsed every configuration measured, but
+% CoopQ collapses at KL 0.226, well below the 0.45-nat boundary that held on the gsm8k grid, so a
+% below-threshold KL does not guarantee termination across allocators. Second, the 235B serving was preregistered. The
+% recorded predictions (the additive configuration at KL 0.310 terminates; the uniform mix at 1.008 and
+% ModelOpt at 3.184 collapse; the three order as their KLs) held except termination: the additive
+% configuration produces coherent code but runs past the cap on 101 of 164 problems, so the 0.45-nat
+% threshold is not a constant across models. A second preregistration, recorded after this failure and
+% before any further serving, placed the 235B onset in $(0.15, 0.31]$ and predicted the effective-bits
+% 2.9 outcomes: the additive configuration (KL 0.150) terminates, the uniform mix (0.309) and ModelOpt
+% (2.004) collapse. All three held (Table~\ref{tab:sub4code}), so the threshold transfers as an ordering
+% with a model-specific value.
+
+\begin{table}[t]
+\centering\small
+\caption{Served HumanEval accuracy (pass rate on base tests, all 164 problems, greedy decoding).
+Cells at 0.0 are collapsed
+configurations, with all or nearly all generations reaching the 8{,}192-token cap without terminating.
+The two columns per model share one anchor measurement. The 235B CoopQ configurations
+were not constructed due to measurement cost.}
+\label{tab:sub4code}
+\begin{tabular}{lcccc}
+\toprule
+ & 30B, eff 2.9 & 30B, eff 2.75 & 235B, eff 2.9 & 235B, eff 2.75 \\
+\midrule
+bf16 anchor & 83.5 & 83.5 & 88.4 & 88.4 \\
+additive & \textbf{73.2} & \textbf{54.9} & \textbf{53.0} & \textbf{7.9} \\
+CoopQ & 44.5 & 6.1 & --- & --- \\
+uniform mix & 38.4 & 19.5 & 0.0 & 0.0 \\
+ModelOpt & 0.0 & 0.0 & 0.0 & 0.0 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% On the reasoning benchmarks under the model's recommended sampled decoding (AIME-2025, GPQA diamond,
+% MMLU-Pro; Table~\ref{tab:sub4served30}), the same ordering reproduces at effective bits 2.9, and the
+% additive and uniform configurations tie at 2.75.
+
+% \subsection{Certificates, and where the margins appear}\label{sec:allocwhere}
+
+% \paragraph{A certificate, not just a ranking.} A service-level constraint
+% $\Delta\lce \le \varepsilon$ maps to a scalar budget on the summed log-headroom costs
+% (App.~\ref{app:knapsack}), so the allocator returns a configuration together with a predicted
+% $\Delta\lce$, quotable before committing ($\le 4\%$ error, Section~\ref{sec:interp}), which a ranking
+% cannot produce. The ordinal certification of Section~\ref{sec:ordinal} supplies the matching upper
+% bound: every allocator above scores configurations with some additive index, and the certified ordinal
+% defect (the smallest fraction of pairwise ranking constraints any additive index must violate) is
+% ${\sim}1$--$2\%$ in this regime, capping what any interaction-aware allocator can gain over additive
+% scoring.
+
+% \paragraph{Where the margins appear.} The matched-memory margin requires three conditions. The units
+% must differ in sensitivity at the allocation granularity: the coefficient of variation of the
+% in-context AS scores is $\approx 1$--$1.8$ on the MoE expert-layer inventories, with a
+% few units carrying most of the sensitivity. The budget must be contended, low enough that some units
+% must sit below their near-lossless precision. And the per-unit differences must survive the base
+% quantizer, since a rotation that flattens them removes what allocation exploits
+% (Section~\ref{sec:future}). The certificate plays a different role: by \thmone{}, it equals the best
+% additive predictor's mean-squared error as a fraction of the damage variance, and it is not monotone in
+% the margin (Qwen3-30B's $-17$ to $-21\%$ margin arises at a measured share of 0.013).
+
+% \paragraph{A preregistered prospective test.} Before running any allocation on a fourth MoE
+% (Qwen3.5-35B-A3B), we timestamped two predictions: that AS would attain lower KL than ModelOpt at every
+% contended budget, and that the margin would fall in the $[-10,-40]\%$ band spanned by the three prior
+% MoEs. The first was confirmed (Table~\ref{tab:35b}: AS best at every contended budget, with AS-additive
+% and AS-coverage agreeing), and the band was rejected ($-5\%$ median), which identifies the covariate
+% the band transfer was missing. This checkpoint is over an order of magnitude more KL-sensitive at
+% matched eff (0.435 against Qwen3-30B's 0.032 at eff 4.5), and across the contended cells of the MoEs
+% above, the AS-versus-ModelOpt margin shrinks as the shared damage floor grows: $-20/{-21}\%$ at eff
+% 5.0/6.0 on Qwen3-30B ($\mathrm{KL}_{\mathrm{AS}} \approx 0.02$--$0.03$) against $-8.3/{-7.6}\%$ on the
+% 35B ($\mathrm{KL}_{\mathrm{AS}} \approx 0.38$--$0.40$). A large shared damage floor, where every unit
+% already hurts at its best available level, compresses what allocation can differentiate, so the margin
+% band transfers only conditional on the damage level. The budget axis shows the same compression: at eff
+% $\le 4.2$ every method makes the same few protection choices, freedom returns at 4.5--6.0 on this
+% model, and the contended range itself moves with the damage floor.
+
+% \begin{table}[t]
+% \centering\small
+% \caption{Qwen3.5-35B-A3B prospective test (KL, with the parenthetical giving the difference from
+% AS-additive and $*$ marking paired significance over 16 shared sequences). Bold marks the lowest KL in
+% the row. At eff 4.0 every greedy method degenerates to the identical all-4
+% allocation, KL 0.631, and eff 4.2 sits close enough to that floor that no method separates.}
+% \label{tab:35b}
+% \begin{tabular}{ccccc}
+% \toprule
+% eff & naive-uniform & naive-routed & AS-add $=$ AS-cov & ModelOpt \\
+% \midrule
+% 4.2 & \textbf{0.458} ($-.005$) & 0.458 (off-budget: rule min eff $\approx 4.36$) & 0.462 & 0.465 ($+.003$) \\
+% 4.5 & 0.457 ($+.022^*$) & 0.458 ($+.023$) & \textbf{0.435} & 0.449 ($+.014$) \\
+% 5.0 & 0.430 ($+.030^*$) & 0.458 ($+.058^*$) & \textbf{0.400} & 0.436 ($+.037^*$) \\
+% 6.0 & 0.378 ($+.002$) & 0.458 ($+.082^*$) & \textbf{0.375} & 0.406 ($+.030^*$) \\
+% \bottomrule
+% \end{tabular}
+% \end{table}
+
+% \begin{figure}[t]
+%   \centering
+%   \includegraphics[width=\linewidth]{fig7_alloc_pareto.png}
+%   \caption{Allocation Pareto (fake-quant KL $\downarrow$ vs.\ effective bits) for Qwen3-30B (left) and
+%   235B (right). AS-coverage and AS-additive attain the lowest KL of the compared methods at every 235B
+%   budget and at the contended 30B budgets, and naive-uniform takes only the loose
+%   235B eff-8 corner (near-lossless, nothing to allocate). Of the surrogates run as allocators,
+%   \code{gp-alloc} trails AS by 3--18\% at the contended budgets, while \code{rf-alloc} is worse than
+%   naive-uniform
+%   (piecewise-constant marginals starve the greedy). ModelOpt falls below naive-uniform at eff 4.2/4.5 on
+%   235B and at eff 8.0 on 30B.}
+%   \label{fig:pareto}
+% \end{figure}
+
+
+\section{The reconciling theory: saturation generates both views}\label{sec:theory}
+
+\subsection{The coverage model}\label{sec:coverage}
+
+Section~\ref{sec:walsh} left two measurements in need of a common explanation: per-layer effects carry
+most of the variance of the measured damage $f$, and some additive index reproduces at least $98\%$ of
+its pairwise ranking of configurations. This section proposes saturation as the origin of both. We describe the damage with a saturating \emph{coverage model},
+\begin{equation}
+  f(S) = c\Bigl(1 - \prod_{i\in S}(1 - a_i)\Bigr),
+  \label{eq:coverage}
+\end{equation}
+with a per-layer \emph{break-rate} $a_i\in[0,1]$ and a \emph{ceiling} $c>0$. Define the \emph{headroom}
+$h(S) := c - f(S)$, the remaining distance to the ceiling. Imposing the coverage model is exactly the
+statement that each quantized layer consumes a fixed fraction $a_i$ of whatever headroom remains,
+$h(S\cup\{i\}) = (1-a_i)\,h(S)$ regardless of which layers came before.
+
+This model is grounded in a measured property of the damage. Saturation, as we use the term, is the
+conjunction of two facts visible on the configuration lattices of Section~\ref{sec:ordinal}: the loss
+of a heavily quantized configuration is finite, and the marginal damage of one more quantized
+layer shrinks as more layers are already quantized. Table~\ref{tab:marginals} reports the measurement
+for each of the five certification cells, where a \emph{cell} is one model and quantizer setting
+measured as a full $2^8$ lattice. Averaging $f(S\cup\{i\}) - f(S)$ over layers $i$
+and contexts $S \not\ni i$ of a fixed size, we see that every cell's average marginal quantization
+damage is largest when no other layer is quantized and falls once other layers are quantized
+concurrently. The
+evidence for coverage is assembled with each claim's standing in App.~\ref{app:evidence}.
+
+
+
+Equivalently, the coverage model is the statement that $f$ is additive in log-headroom,
+$-\log(1-f(S)/c) = \sum_{i\in S} b_i$ with $b_i:=-\log(1-a_i)$, hence coverage lies in the class
+$g\bigl(\sum_{i\in S} b_i\bigr)$ of Section~\ref{sec:ordinal} with generator $g(u)=c(1-e^{-u})$. 
+The measurements of Section~\ref{sec:ordinal} place $f$ within a ${\sim}2\%$
+ordinal defect of this class across measured models. 
+% What remains empirical about coverage is therefore only
+% \emph{which} generator $g$ the data selects, not whether a $g\bigl(\sum b_i\bigr)$ form is legitimate.
+
+% The names \emph{break-rate}, \emph{survival}, and \emph{noisy-OR} \citep{pearl1988probabilistic} come
+% from the equivalent series-reliability reading of Eq.~\eqref{eq:coverage}, in which quantizing layer
+% $i$ independently corrupts the prediction with probability $a_i$, a corrupted prediction incurs excess
+% loss $c$, and $\prod_{i\in S}(1-a_i)$ is the probability the prediction survives. We use this reading
+% for vocabulary and intuition, for instance the reciprocal-survival inflation factor of
+% Section~\ref{sec:anchor}, while the claim the data validates is the headroom-composition rule above,
+% not a per-token mixture. The evidence for coverage, spanning the mechanism above, the canonicity of the
+% model class, the independent signed-expansion test, and the identification of the generator, is
+% assembled with each claim's standing in App.~\ref{app:evidence}.
+
+\subsection{The M\"obius and Walsh-Hadamard expansions}\label{sec:duality}
+
+The coverage model was introduced to account for the variance and ranking measurements of
+Section~\ref{sec:walsh}, and it is fitted to measured loss values (Section~\ref{sec:tauval}). It makes
+a second prediction about a quantity that plays no role in that fit. The \emph{M\"obius/Harsanyi
+transform} gives signed coordinates $\varphi(T)=\sum_{R\subseteq T}(-1)^{|T|-|R|}f(R)$ that
+reconstruct the damage as $f(T) = \sum_{R \subseteq T} \varphi(R)$. 
+Restricting the reconstruction sums to subsets of size $\le 1$
+is precisely the isolate-and-sum aggregation of Section~\ref{sec:anchor}, since
+$\varphi(\emptyset) = f(\emptyset) = 0$ and $\varphi(\{i\}) = f(\{i\})$. Restricting them to size
+$\le 2$ adds exactly the pairwise finite differences
+$\varphi(\{i,j\}) = f(\{i,j\}) - f(\{i\}) - f(\{j\})$ that CLADO \citep{clado2023} measures as its
+cross-layer sensitivities.
+
+\begin{customthm}{3}[M\"obius spectrum of coverage]\label{thm:mobius}
+The M\"obius transform of the coverage model is, exactly,
+$\varphi(T) = c\,(-1)^{|T|+1}\prod_{i\in T} a_i$ for $|T|\ge 1$ and $\varphi(\emptyset)=0$.
+\end{customthm}
+
+Coverage predicts a distinct form for this expansion. Its coefficients are nonzero at
+every order and alternate in sign, so low-order truncations should overshoot and oscillate. 
+The measured lattices show exactly this behavior
+(Fig.~\ref{fig:mobius}). On Qwen3-0.6B at FP4 (8-layer exact lattice) the partial sums alternate, 
+converging only at
+$k=L$. On a 10-layer Qwen3-8B block with the full $2^{10}$-configuration lattice the same
+divergence-then-cancellation appears at larger amplitude, swinging to $\pm 4.8$ against a true loss of
+$0.148$, an overshoot of up to $32\times$. Because an order-$k$ M\"obius coefficient is an
+alternating sum of up to $2^k$ measured values, the partial sums amplify measurement noise, so we
+certify the swing by the split-half device of App.~\ref{app:ordinal}: partial sums computed from two
+disjoint halves of the rounding draws independently reproduce the alternating overshoot (both swing
+beyond $\pm 4$), while the same sums computed from the half-difference table, which contains noise
+only, stay within $\pm 1.2$.
+% This further shows that it is not sufficient to consider
+% higher-order interaction terms in a predictor for the quantization damage.
+% Taken alone, this behavior could be read as irreducibly
+% high-order structure. Under coverage it is the expected consequence of saturation, produced by $L$
+% per-layer parameters.
+
+\begin{customthm}{4}[Walsh spectrum of coverage]\label{thm:walshspec}
+Under the $p$-biased measure $\mup$, the Walsh coefficients are, exactly,
+\[
+  \fhat(T) = c\,(-1)^{|T|+1}\,(p(1-p))^{|T|/2}\Bigl(\prod_{i\in T} a_i\Bigr)\prod_{i\notin T}(1 - a_i p)
+  \quad\text{for } T \ne \emptyset,
+\]
+and $\fhat(\emptyset) = \E_{\mup}[f] = c\bigl(1 - \prod_{i}(1 - a_i p)\bigr)$.
+\end{customthm}
+
+% The Walsh coefficient is the same $(-1)^{|T|+1}\prod a_i$ object as the M\"obius coefficient, multiplied
+% by a
+% geometric envelope and then squared in the energy $W_k$. That squaring is why the content that makes the
+% signed series diverge appears in Section~\ref{sec:walsh} only as a small, cancellation-free $W_k$. The signed
+% divergence and the variance concentration are one $L$-parameter model viewed signed versus squared. 
+Proofs of both transforms are in App.~\ref{app:proofs}. 
+% Each is a few lines, since the alternating subset-sum and
+% the $\mup$-expectation of a product both factorize over coordinates, and both are verified to machine
+% precision against brute-force enumeration.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.9\linewidth]{fig1_mobius_divergence.png}
+  \caption{The signed M\"obius expansion behaves as coverage predicts: order-$k$ truncations alternate and
+  overshoot before full-order cancellation. Qwen3-8B 10-layer exact
+  1024-configuration lattice, swings to $\pm 4.8$ (up to $32\times$ the true $0.148$), converging only at
+  $k=10$ (right). The oscillation is certified against measurement noise: noise-only partial sums from the
+  split-half difference table stay within $\pm 1.2$ (Section~\ref{sec:duality}).}
+  \label{fig:mobius}
+\end{figure}
+
+\subsection{The saturation-depth law}\label{sec:tau}
+By \thmone{}, the mean-squared error of the best additive predictor equals the order-$\ge 2$ energy
+$\sum_{k\ge 2} W_k$. Dividing by the variance turns it into the order-$\ge 2$ share
+\[
+  \sharegeq := \frac{\sum_{k\ge 2} W_k}{\Var(f)},
+\]
+the fraction of the damage variance that per-layer effects leave unexplained, which is the normalized
+form in which we report the certificate. 
+The certificate
+columns of the benchmark and allocation tables quote the share,
+which is comparable across cells (Sections~\ref{sec:predictor} and \ref{sec:allocation}), while
+statements in loss units use the absolute energies, namely the additive error floor of \thmone{} and
+the sampling variance of the additive-coefficient estimator, which is the order-$\ge 2$ energy plus
+noise (App.~\ref{app:setup}). 
+On a
+measured lattice the share is computed exactly, but at full-network scale, where no $2^L$ lattice can
+be measured, it must be forecast from the $L+1$ fitted parameters of the coverage model. This
+subsection derives that forecast, and that of the higher-order Walsh energies, from \propfive{} in
+closed form. For a break-rate
+profile $(a_1,\ldots,a_L)$ define the per-layer energy ratios and their aggregates
+\[
+  \beta_i := \frac{p(1-p)\,a_i^2}{(1-a_ip)^2},
+  \qquad
+  \tau^2 := \sum_i \beta_i,
+  \qquad
+  \Leff := \frac{\bigl(\sum_i\beta_i\bigr)^2}{\sum_i\beta_i^2} \in [1, L],
+\]
+with $\tau$ the \emph{saturation depth} and $\Leff$ the participation ratio of the profile, which
+equals $L$ exactly when all $\beta_i$ are equal and approaches $1$ as one layer dominates. Let
+$\es{k} := \sum_{|T|=k}\prod_{i\in T}\beta_i$ be the elementary symmetric polynomials in the
+$\beta_i$.
+
+\begin{customprop}{5}[heterogeneous certificate]\label{prop:hetcert}
+Assume not all $a_i$ are zero. Under the coverage model,
+\begin{enumerate}
+\item[(i)] (product form) $W_k = c^2\bigl[\prod_i(1-a_ip)^2\bigr]\,\es{k}$, hence
+  computable in closed form from the $L+1$ fitted parameters, which are themselves fit from
+  $\mathcal{O}(L)$ measured configurations, and,
+  \begin{equation}
+    \sharegeq = 1 - \frac{\tau^2}{\prod_i(1+\beta_i) - 1};
+    \label{eq:hetshare}
+  \end{equation}
+\item[(ii)] (leading order) $\sharegeq = \frac{\Leff-1}{2\Leff}\,\tau^2 + R$ with
+  $|R| \le \tfrac14\tau^4 e^{\tau^2}$, so to second order in the per-layer amplitudes heterogeneity
+  enters the certificate only through the effective depth $\Leff$;
+\item[(iii)] at fixed $\tau^2$, $\sharegeq$ is Schur-concave in
+  $(\beta_1,\ldots,\beta_L)$, hence
+  \[
+    \sharegeq \;\le\; 1 - \frac{\tau^2}{(1+\tau^2/L)^L - 1} \;\le\; 1 - \frac{\tau^2}{e^{\tau^2}-1},
+  \]
+  with equality on the left exactly when all $\beta_i$ are equal.
+\end{enumerate}
+\end{customprop}
+
+\begin{proof}
+%   \paragraph{Reading $\tau$.} Each Walsh coefficient is $|\fhat(T)| = c(1-ap)^L \beta^{|T|/2}$, so
+% $\beta^{1/2} = \sqrt{p(1-p)}\,a/(1-ap)$ is the per-layer amplitude ratio: each additional participating
+% layer scales the amplitude by $\beta^{1/2}$ and the energy by $\beta$. Normalizing the order-energies
+% $\{W_k\}$ by $\Var(f)$ turns them into a probability distribution over the order $k$, describing where
+% the variance lives. For the symmetric coverage model that distribution is exactly
+% $\mathrm{Binomial}(L, q)$ with $q = \beta/(1+\beta)$, whose mean and variance
+% both reduce to $L\beta$ for small $\beta$. Thus $\tau^2 = L\beta$ is, to leading order, the mean order of
+% the spectrum and $\tau$ its standard deviation, linear in $a$ and growing as $L^{1/2}$ with depth, and the
+% certificate is the tail statement $\sharegeq = P(K\ge 2 \mid K\ge 1)$ for $K$ so distributed, exact at
+% finite $L$. The exact
+% $\sharegeq(\tau)$ is the parameter-free curve of Fig.~\ref{fig:tau}, a sigmoid in $\tau$ with its
+% transition at $\tau\approx 1$. The $\tfrac12\tau^2$ tail is its small-damage regime, and by \thmone{} it
+% is also the best additive predictor's error floor. One consequence is worth stating here. For
+% $\tau \lesssim 1$ the generator $g$ is traversed only over a nearly linear region, so the coverage and
+% additive predictors nearly coincide, and the empirical near-tie between them is examined in
+% Section~\ref{sec:predictor}.
+For (i), \thmfour{} gives
+$\fhat(T)^2 = c^2 (p(1-p))^{|T|} \prod_{i\in T} a_i^2 \prod_{i\notin T}(1-a_ip)^2$. Multiplying and
+dividing by $\prod_{i\in T}(1-a_ip)^2$ factors every squared coefficient into the $T$-independent
+constant $c^2\prod_{i=1}^{L}(1-a_ip)^2$ times $\prod_{i\in T}\beta_i$, so $W_k$ is that constant times
+$\es{k}$, the variance $\sum_{k\ge 1} W_k$ is the constant times $\prod_i(1+\beta_i) - 1$ by the
+generating identity $\prod_i(1+\beta_i) = \sum_{k\ge 0}\es{k}$. The claim follows.
+Parts (ii) and (iii) are proven in App.~\ref{app:proofs}.
+\end{proof}
+
+%Part (i) is the form every certificate in this paper is evaluated from. 
+
+% On blocks it is
+% computed by exhaustive enumeration of \thmfour{} from the fitted $(c, a_i)$, and at full-network
+% scale, where enumeration is impossible, the product form is what makes the certificate computable
+% from fitted break-rates at all. 
+% Part (iii) makes the symmetric case an exact
+% worst case: a coverage-generated measurement can only sit on or below the envelope at matched
+% $\tau$, so plotting measured shares against it (Fig.~\ref{fig:tau}) compares them with the exact upper
+% bound. 
+% At the equality case of part (iii), all break-rates equal, the certificate collapses to the
+% one-parameter law $\sharegeq(\tau) = 1 - \tau^2/[(1+\tau^2/L)^L - 1]$, with small-$\tau$ limit
+% $\frac{L-1}{2L}\,\tau^2 \approx \tfrac12\tau^2$ by part (ii) with $\Leff = L$. 
+% This
+% \emph{saturation-depth law} is the parameter-free curve of Fig.~\ref{fig:tau}.
+% For a symmetric profile it is, by \thmone{}, the best additive
+% predictor's error floor as a fraction of the damage variance, and for every other profile it bounds
+% that fraction from above, by part (iii). 
+Combining \thmone{} with part (ii), for small $\tau$ the
+best additive predictor's mean-squared error is at most ${\approx}\tfrac12\tau^2\,\Var(f)$, so even
+an exact coverage fit, whose error under the model is zero, can improve on additive prediction by no
+more than that. 
+% The benchmark and allocation results of Sections~\ref{sec:predictor}
+% and~\ref{sec:allocation} exhibit the resulting near-tie once $N$ reaches a few multiples of $L$ (the
+% two fits tie from $N \approx 4L$ in Fig.~\ref{fig:predn}), while at $N = L/2$ the additive fit's
+% held-out error is roughly three times coverage's (0.315 against 0.093 on the 3B-wiki cell).
+The symmetric case is stated as a corollary, with its binomial order
+spectrum, in App.~\ref{app:proofs}.
+
+% \paragraph{Reading $\tau$.} Each Walsh coefficient is $|\fhat(T)| = c(1-ap)^L \beta^{|T|/2}$, so
+% $\beta^{1/2} = \sqrt{p(1-p)}\,a/(1-ap)$ is the per-layer amplitude ratio: each additional participating
+% layer scales the amplitude by $\beta^{1/2}$ and the energy by $\beta$. Normalizing the order-energies
+% $\{W_k\}$ by $\Var(f)$ turns them into a probability distribution over the order $k$, describing where
+% the variance lives. For the symmetric coverage model that distribution is exactly
+% $\mathrm{Binomial}(L, q)$ with $q = \beta/(1+\beta)$, whose mean and variance
+% both reduce to $L\beta$ for small $\beta$. Thus $\tau^2 = L\beta$ is, to leading order, the mean order of
+% the spectrum and $\tau$ its standard deviation, linear in $a$ and growing as $L^{1/2}$ with depth, and the
+% certificate is the tail statement $\sharegeq = P(K\ge 2 \mid K\ge 1)$ for $K$ so distributed, exact at
+% finite $L$.
+
+% The bound runs in one direction only. A small $\tau$ caps the additive error for every break-rate
+% profile, since parts (ii) and (iii) give $\sharegeq \lesssim \tfrac12\tau^2$ regardless of
+% heterogeneity, but a large $\tau$ caps nothing, since by part (i) a profile concentrated on one
+% layer has $\sharegeq = 0$ at any $\tau$. Certification therefore evaluates the product form of part
+% (i) and uses $\tau$ only to certify smallness. 
+% The same formulas locate the two regimes where the
+% additive machinery fails. For a balanced profile ($\Leff \approx L$) at $\tau \gtrsim 1$, the
+% one-parameter law puts the additive error above a third of the damage variance already at $\tau = 1$.
+% For a concentrated profile ($\Leff \to 1$) the additive error is small, but all except one of the
+% $L+1$ fitted coefficients then carry almost no variance, so at a fixed measurement budget their
+% estimates are noise-dominated and per-layer prediction degrades (the 4B-wiki instance, participation
+% ratio $\approx 1.2$ of 36 layers, Section~\ref{sec:scope}).
+
+\subsection{Validation of the certificate}\label{sec:tauval}
+
+\paragraph{The $\tau$-collapse (Fig.~\ref{fig:tau}).} We empirically test the saturation-depth law.
+Each cell contributes one point, its measured order-$\ge 2$ share
+against its fitted $\tau$, and \propfive(iii) requires any coverage-generated profile to fall on or
+below the parameter-free
+curve, with balanced break-rate profiles on it.
+%  so that the single fitted scalar locates every cell
+% between additive and many-body damage. 
+We measured 36 full $2^8$ lattices, three models
+(Qwen3-0.6B, Qwen2.5-3B, Llama-3.2-3B) crossed with twelve quantizer settings, integer
+round-to-nearest at 8/6/5/4/3 bits with per-channel or per-tensor scales and 4-bit floating point
+(FP4) with per-block or per-tensor scales (App.~\ref{app:setup}). For each cell we noise-correct the
+order energies (App.~\ref{app:ordinal}), fit the coverage model to the same lattice by nonlinear
+least squares (App.~\ref{app:setup}), and compare the measured order-$\ge 2$ share with the fit. The
+measured share tracks the fitted $\tau = (\sum_i\beta_i)^{1/2}$ at
+Spearman $\rho = 0.958$, and the exact share of \propfive(i), computed from the fitted $(c,a_i)$,
+predicts the measured share at Pearson $\rho = 0.984$. Ten of the 36 cells exceed the curve, by at
+most 8 percentage points. The largest exceedances are 8-bit cells whose absolute damage sits at the
+measurement noise floor, where the noise-corrected share is unstable, and Llama-3.2-3B cells, the one
+model with certified rank reversals (Table~\ref{tab:ordinal}), so the exceedances are consistent with
+share noise plus the residual structure that coverage does not capture.
+Repeating the comparison on Qwen3-30B-A3B
+blocks (32 further cells, 8 block positions by 4 quantizer formats) gives Pearson $r = 0.997$.
+% The large deviations in
+% the figure run downward, the one direction \propfive(iii) permits. 
+% The per-tensor cells fall
+% 10--20\,pp below the prediction, consistent with true break-rate profiles more concentrated than the
+% fit resolves (on the Qwen3-0.6B FP4 cell, order-1 terms carry 96.9\% of the measured variance but
+% only 93.2\% of the fitted model's variance), and the few 4--8\,pp exceedances lie within the fit's
+% 3.7\,pp median gap, in cells at the measurement noise floor or in 3-bit MoE cells below the
+% fit-quality threshold. At small $\tau$ the lattice never approaches the ceiling, so only the
+% products $c\,a_i$ are identifiable and the fitted $\tau$ there is noise-limited. One caveat applies.
+% The grid uses a single calibration corpus, and the robustness of the fitted break-rates across
+% corpora is established separately (Spearman $\rho = 0.74$--$0.78$ between break-rates fitted on wiki
+% and on code, Section~\ref{sec:interp}).
+
+\paragraph{Out-of-sample validation.} A certificate measured on a full lattice uses only \thmone{}.
+When enumeration is intractable, we instead assume the coverage model and forecast the certificate
+from break-rates fitted on sampled configurations. We
+test the forecasting pipeline directly against held-out lattices, with per-cell results in
+Table~\ref{tab:certest} of App.~\ref{app:setup}. The forecast classifies the near-additive and
+heavily coupled regimes correctly (App.~\ref{app:setup}).
+
+% We fit the break-rates on
+% $N \approx L$ sampled configurations, the predictor's own budget, forecast the order-$\ge 2$ share
+% with \propfive(i), and compare it with the share measured on the held-out full lattice. Near-additive
+% cells forecast 2.6--6.4\% against measured 2.8--3.1\%, and many-body cells (interactions of every
+% order among layers) forecast 59--63\% against 71--81\% (at most 4\,pp standard deviation over
+% sampling seeds), so the forecast errs only by understating the share in the regime it already flags
+% as beyond additive methods. On five exact lattices spanning true shares of 0.8\% to 92\%
+% (Qwen3-0.6B and Qwen3-8B), the forecast also attains lower error at 14 of 15 cell-budget pairs than
+% the
+% two model-free estimators computable from the same configurations, the held-out residual of an
+% additive fit and a split-half spectral estimate (Walsh coefficients from two disjoint halves of the
+% configurations, multiplied so that independent noise cancels in expectation), with the per-cell
+% detail in Table~\ref{tab:certest} of App.~\ref{app:setup}. 
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{fig_tau_collapse.png}
+  \caption{One parameter organizes the order-$\ge 2$ share. Left: measured (noise-corrected)
+  order-$\ge 2$ energy share vs.\ fitted saturation depth $\tau = (\sum\beta_i)^{1/2}$ for 36 cells, 
+  against the parameter-free symmetric law
+  $\sharegeq(\tau)=1-\tau^2/[(1+\tau^2/L)^L-1]$. The curve is parameter-free: by
+  \propfive(iii) it is the exact worst case at matched $\tau$ for a coverage-generated profile. Most
+  per-channel and
+  per-block cells sit on or below it (ten cells exceed it by at most 8 percentage points, noise-floor
+  and Llama-3.2-3B cells, Section~\ref{sec:tauval}), while per-tensor 
+  cells deviate below it, in the regime the theory flags as beyond coverage. Right: measured share vs.\ the exact
+  heterogeneous \propfive{} prediction from the fitted $(c,a_i)$ (Pearson $r=0.984$; 30B-block extension
+  $r=0.997$).}
+  \label{fig:tau}
+\end{figure}
+
+\section{Scope}\label{sec:scope}
+
+\paragraph{The activation channel carries the structure.} Measuring the damage set function on the
+same layers with weights only (W4A16), activations only (W16A4), and both (W4A4) quantized, the weight
+channel is non-saturating (isolate-and-sum error $\approx 0.10$, $\sum_i f(\{i\})/f(\text{all}) \approx 1.0$)
+while the activation channel saturates strongly (isolate-and-sum 2.80 against coverage's 0.098 on the
+3B W16A4 cell, Table~\ref{tab:seeds}). The saturation therefore lives in the activation channel,
+which is why the method targets activation and W4A4 quantization.
+
+\paragraph{Outlier-borne coupling under coarse activation scaling.} At the deployed NVFP4 per-block
+format the order-$\ge 2$ share is 0.07 and the additive and coverage models attain the lowest errors,
+while under per-tensor activation scales (a coarse setting that is not deployed) the share reaches
+0.67 on the 0.6B certification lattice of Section~\ref{sec:ordinal} (the per-tensor cell of
+Table~\ref{tab:ordinal}; the separately measured per-tensor lattice of Table~\ref{tab:certest}
+puts its own share at 0.81), and the
+nonparametric surrogates attain lower error, a breakdown the certificate forecasts. The coupling is
+outlier-borne: localizing the scale (per-block-256)
+drops the share to 0.01, clipping the top 0.1\% of activations drops it to 0.16, and SmoothQuant-style
+scaling before quantizing drops it to 0.46. The fitted break-rates themselves are depth-structured
+rather than outlier-driven (on Qwen3-0.6B they correlate with depth at Spearman $\rho = +0.68$ and
+with output RMS at $\rho = +0.50$, but not with activation kurtosis). 
+
+\paragraph{Measurement protocol.} Headline cells use 3 seeds (std $\le 0.03$), and the per-tensor
+W4A4 isolate-and-sum failure is also 3-seed stable (0.6B $20.6\pm 0.3$, 3B $14.1\pm 0.3$), so the
+rankings are robust.
+
+% \paragraph{Cost is reported as memory.} Moving the always-active layers of the 30B MoE to FP8 changes
+% decode latency by only $-2$ to $-5\%$ at concurrency 8--128, since MoE decode time is dominated by
+% overhead and communication rather than by the GEMMs that quantization accelerates. We therefore report
+% cost as effective bits, that is, as memory; realized speedup is a property of the serving stack.
+
+\section{Related work}\label{sec:related}
+
+\paragraph{Mixed-precision allocation via per-layer sensitivity.} AWQ \citep{lin2024awq} uses
+activation-aware scaling, HAWQ and HAWQ-v2 \citep{hawq2019,dong2020hawqv2} a Hessian eigenvalue or trace,
+BRECQ \citep{li2021brecq} and GPTQ \citep{frantar2022gptq} second-order weight reconstruction, and NVIDIA
+ModelOpt's \code{auto\_quantize} \citep{modelopt}, the production method we benchmark, a Taylor/Fisher
+score combined with a linear program over a sum of isolated per-layer scores. All of these aggregate
+first- or second-order single-layer signals. In our deployment regime the closest neighbor is FGMP
+\citep{fgmp2025}, which selects FP8-versus-NVFP4 blocks for weights and activations by a Fisher-weighted
+perturbation score. Its score belongs to the same Taylor/Fisher family whose production embodiment,
+ModelOpt, we benchmark throughout, while its intra-tensor block granularity requires co-designed kernels
+that no serving stack we target provides, so it composes with layer-level allocation rather than
+competing with it. ScaleBITS
+\citep{scalebits2026} performs hardware-aligned bitwidth allocation for weights only.
+
+\paragraph{Interaction-aware allocation.} CoopQ \citep{impq2025}, first circulated under the name IMPQ,
+is the closest neighbor among interaction-aware methods. Its SPQE estimator samples layer permutations and progressively
+quantizes along each, thereby measuring marginal contributions in context (permutation-sampled Shapley, at
+a cost of roughly $100L$ quantized evaluations), then fits a linear-plus-pairwise surrogate
+($a^\top q + q^\top K q$) and allocates by solving a binary quadratic program via MILP linearization.
+CLADO \citep{clado2023} measures pairwise cross-layer effects by joint-quantization finite differences on
+CNNs and ViTs and rejects the independence assumption.
+Both fix the expansion order at two and do not test whether that order suffices. GuidedQuant
+\citep{kim2025guidedquant} keeps within-output-channel dependencies but ignores cross-layer terms, and QEP
+\citep{qep2025} models cross-layer accumulation as a compensation term. Sections
+\ref{sec:walsh}--\ref{sec:theory} supply what none of these test, namely the order of the expansion, and
+Section~\ref{sec:anchor} gives the closed-form account of the isolated-anchor bias they implicitly work around.
+
+\paragraph{Configuration-quality surrogates.} For the prediction task itself, MiCo \citep{mico2025} fits
+a random-forest accuracy predictor for edge-scale networks, AMQ \citep{amq2025} an RBF kernel model for
+LLM weight-only quantization, and AutoQRA \citep{autoqra2026} a Gaussian-process surrogate inside a joint
+search over bit-widths and adapter ranks. These predictor classes are accurate in-distribution but opaque,
+and we show they degrade $2$--$5\times$ when extrapolating to more heavily quantized configurations
+(Section~\ref{sec:predictor}).
+
+
+% What
+% that literature does not provide, and what quantization damage requires, is a saturating mechanistic
+% generator together with the closed-form validity certificate it yields. Applied to quantization
+% configurations the instrument is new in this domain, not in general.
+
+\paragraph{}Additional related works are surveyed in App.~\ref{app:related}.
+
+% Two adjacent strands are surveyed in App.~\ref{app:related}: MoE- and diffusion-specific mixed-precision
+% allocators, against which the head-to-head comparisons appear in Section~\ref{sec:allocation}, and
+% path-integral sensitivity methods, which we adapt to the layer-selection set function
+% (Section~\ref{sec:allocation}, App.~\ref{app:as}). The literature on isolated-versus-in-context effects is
+% discussed where it is used (Section~\ref{sec:anchor}).
+
+% \paragraph{Position.} The surrogate task is crowded and the low-order-surrogate approach is established
+% in adjacent domains. To our knowledge, the order-by-order measurement of quantization damage, the closed
+% form connecting the divergent M\"obius series and the concentrated Walsh spectrum through one
+% $L$-parameter model, and the self-certifying error theory are new, and the certificate is the piece none of
+% the incumbent allocators or surrogates provides.
+
+\section{Introduction}\label{sec:intro}
+
+Quantizing a transformer to low bit-widths is the dominant route to cheap inference, and the formats now
+being deployed quantize both weights and activations to 4 bits. What remains a design choice is
+\textit{mixed precision}: which layers (or tensors) to keep at higher precision under a memory budget. The
+choice is consequential, since allocations at the same memory budget can differ in output fidelity by tens
+of percent (Section~\ref{sec:allocation}), and it is currently made by per-layer sensitivity heuristics.
+
+These heuristics share a structural premise. Each scores a layer by a sensitivity measured largely in
+isolation (i.e. with other layers unquantized), such as a Hessian eigenvalue or trace \citep[HAWQ;][]{hawq2019,dong2020hawqv2}, a
+squared-gradient Fisher score \citep[ModelOpt;][]{modelopt}, or at most a pairwise interaction term
+\citep{clado2023}, and then aggregates these scores to rank layers or to estimate the loss of a joint
+configuration. To our knowledge, to what extent the loss of quantizing a \emph{set} of layers is in fact
+recoverable from such low-order measurements has never been tested directly. Throughout, the \emph{order}
+of a term is the number of layers it involves jointly, so per-layer terms are first-order and pairwise
+terms second-order. The loss from quantization is a \emph{set function} defined on all $2^L$ subsets of $L$
+layers (equivalently, the boolean cube $\{0,1\}^L$), which cannot be enumerated for models of any realistic depth.
+
+To measure the order of this function directly, we write
+$f(S) = \lce(S\ \text{quantized}) - \lce(\text{full precision})$ for the damage of quantizing the layer set
+$S$, obtained by evaluating the partially quantized model, and analyze the measured $f$ through two
+classical changes of basis. The Walsh transform (the functional-ANOVA decomposition) splits the variance
+of $f$ by order under the \emph{deployment distribution}, the distribution in which each layer is
+quantized independently with probability $p$. The M\"obius expansion reconstructs $f$ from signed terms of
+increasing order. This analysis yields two findings.
+
+The first finding is that the variance of the damage is almost entirely first-order. Across configurations
+drawn from the deployment distribution, 85--93\% of the variance of $f$ is explained by per-layer effects,
+rising to 98--99\% on exact lattices (blocks of $L$ layers for which every one of the $2^L$ configurations
+is measured) once measurement noise is corrected for (Fig.~\ref{fig:walsh}, Section~\ref{sec:walsh}). 
+The unexplained remainder therefore serves as a \emph{certificate}: a single number, measured on full
+lattices (an identity, by \thmone{}) or forecast in closed form from fitted break-rates at
+full-network scale
+(Section~\ref{sec:tau}), that states in advance
+how well any additive model can do, and which we report alongside
+every result. The additive model attaining this error floor also has a closed form
+(Section~\ref{sec:anchor}).
+% A simple
+% diagnostic then locates what fails in the incumbent heuristics. Aggregating isolated sensitivities is
+% equivalent to fitting an additive model constrained to predict zero damage at the unquantized network. On
+% the exact lattice where FP4 damage is large, that constrained fit reaches $R^2 = 0.13$, and freeing the
+% single intercept parameter raises it to $0.94$ (Section~\ref{sec:walsh}). The additive model class therefore
+% contains accurate predictors, and the failure lies in the zero-damage constraint that isolated scores
+% impose.
+
+The second finding is that the variance of $f$ explained by higher-order terms does not reflect a failure of per-layer structure. The
+order-$\ge 2$ share, the fraction of the variance that per-layer effects leave unexplained, equals by
+\thmone{} the mean-squared error of the best additive fit divided by the variance
+(Section~\ref{sec:walsh}). This share can be nonzero
+even when the damage is perfectly described by per-layer terms. If $f$ is additive after a strictly increasing
+transformation, that is, it has the form $g\bigl(\sum_{i\in S} b_i\bigr)$ for per-layer contributions
+$b_i$ and a strictly increasing $g$, then composing with $g^{-1}$ yields a function whose
+order-$\ge 2$ energy is exactly zero. Whether $f$ belongs to this class is testable on rankings alone
+(\thmtwo), and we measure the smallest fraction of pairwise configuration comparisons that any additive
+index must order incorrectly, certified against measurement noise (Section~\ref{sec:ordinal}). This
+fraction is at most 2\%, on some models indistinguishable from zero, and a direct search over
+transformations agrees. The
+measured damage is therefore of the form $f(S) \approx g\bigl(\sum_{i\in S} b_i\bigr)$.
+This model class recurs throughout the paper. It justifies the form fitted in Section~\ref{sec:theory}, and it
+caps how much any interaction-aware allocator can improve on additive configuration scoring
+(Section~\ref{sec:allocation}).
+
+We show that a single property, \emph{saturation}, explains both findings exactly. Because the loss is
+bounded, one can define the \emph{headroom} $h(S) = c - f(S)$, the damage still available below a ceiling
+$c$. The measurements are well described by a model in which each quantized layer consumes a fixed fraction
+$a_i$ of the remaining headroom, $h(S\cup\{i\}) = (1-a_i)\,h(S)$, independently of which layers preceded
+it. Equivalently, $f(S)=c\bigl(1-\prod_{i\in S}(1-a_i)\bigr)$, which we call the \emph{coverage model}.
+The model is fitted to the measured losses of sampled
+configurations by least squares. 
+
+% Expanding the fitted model in the M\"obius basis then predicts a property
+% of coefficients that played no role in the fit: they should be nonzero at every order and alternate in
+% sign, so low-order truncations of the measured expansion should overshoot and oscillate.
+% The exact lattices confirm this behavior, with partial sums overshooting the true loss by up to
+% $32\times$ before cancelling at full order (Fig.~\ref{fig:mobius}, Section~\ref{sec:duality}). 
+% Taken alone, such
+% divergence would suggest that no truncation of the expansion at any low order can describe $f$. Under
+% coverage it is the expected consequence of saturation, produced by $L$ per-layer parameters. 
+% Nor is 
+The model class of the second finding is not arbitrary. By a representation theorem of Acz\'el and Ling
+\citep{aczel1966fe,ling1965assoc}, any rule that accumulates damage one layer at a time through a fixed
+operation that is associative, continuous, and strictly increasing can be rewritten in the form
+$g\bigl(\sum_i b_i\bigr)$ (App.~\ref{app:link}). 
+% Assuming such a model therefore assumes only that damage accumulates by a
+% fixed rule of this kind, and coverage is the member of this class that the measured headroom
+% consumption selects (App.~\ref{app:link}).
+
+% This structure supports two predictors of a configuration's loss, each with $L+1$ parameters, and an
+% accuracy statement for them that is exact rather than an upper bound. 
+% The \textbf{additive} model is the
+% optimal first-order predictor, and by Parseval's identity
+% its mean-squared error equals the order-$\ge 2$ Walsh energy of $f$, the portion of the variance carried by
+% terms above first order (\thmone). That
+% quantity therefore serves as a \textbf{certificate}: a single number, measured on full lattices or computed
+% in closed form from fitted break-rates at full-network scale (Section~\ref{sec:tau}), that states in advance
+% exactly how well any additive model can do, and which we report alongside every result. 
+
+% Both predictors, the fitted coverage model and the additive model, predict a held-out
+% configuration's loss to within roughly 6--13\% from about $L$ measurements, and the two predict comparably,
+% which the theory explains: no predictor can improve on the best additive one by more than the
+% order-$\ge 2$ energy, and at deployed damage levels that energy is a few percent of the variance
+% (Section~\ref{sec:tau}). The certificate also identifies when
+% neither suffices, as an order-$\ge 2$ share near $0.3$ marks the point at which nonparametric surrogates
+% become preferable (Section~\ref{sec:predictor}).
+
+Aggregating isolated sensitivities is equivalent to fitting an additive model constrained to predict
+zero damage at the unquantized network, and this constraint is what fails in the incumbent
+heuristics: freeing the single intercept parameter raises $R^2$ from $0.13$ to $0.94$ on the exact
+lattice where FP4 damage is large (Section~\ref{sec:walsh}). Because saturation shrinks a layer's
+marginal damage as more layers are quantized, a sensitivity measured with every other layer at full
+precision is inflated by a closed-form factor, the quantitative form of a context dependence known
+qualitatively
+\citep{ancona2020shapley,mcgrath2023hydra,impq2025}, and summing $L$ inflated coefficients compounds
+the error to 71--376\%, which we measure for isolate-and-sum (i.e. the quantization loss is the sum of the damages from quantizing each layer separately)
+ and for a Hessian-trace HAWQ-v2
+(Section~\ref{sec:anchor}). A single
+\emph{Aumann--Shapley path integral} recovers the additive model's optimal coefficient evaluated at a
+layer-specific effective deployment density, and with it the exact ranking of layers, with no sampled
+configurations, a recovery we prove under the coverage model (Section~\ref{sec:predictor},
+App.~\ref{app:as}).
+
+Because both models predict rather than rank, they can \emph{price} a configuration, that is, quote its
+loss before committing to it, which a ranking cannot do. On unseen configurations that protect the most
+fragile layers and quantize the rest, the quoted loss is
+accurate to within 4\% (App.~\ref{sec:interp}). Against the black-box surrogates used for the same task,
+random forests \citep{mico2025}, Gaussian processes \citep{autoqra2026}, and RBF kernels \citep{amq2025},
+the $(L{+}1)$-parameter models are best or tied at small measurement budgets, the regime that matters when
+every measurement is a forward pass. The strongest of these, the Gaussian process, succeeds for a reason
+our analysis identifies and fails where the theory predicts, degrading $2$--$5\times$ under
+extrapolation to differently quantized configurations than those it was fit on, where the additive and coverage
+models stay within $2\times$. That direction of failure matters because
+an allocator must price configurations quantized at various levels
+(Section~\ref{sec:allocation}).
+
+Used as allocators at matched memory, the same fitted models attain the lowest KL divergence among the
+compared allocators (sensitivity scores, structural rules, and the black-box surrogates converted into
+allocators) on mixture-of-experts language models across models from 0.6B to 355B parameters
+(Section~\ref{sec:allocation}). Below four bits configurations allocated from the fitted models
+continue to solve code and reasoning tasks at effective bit-widths where configurations
+from other methods of the same memory budget no longer produce terminating generations, at both 30B and 235B
+(Section~\ref{sec:allocsub4}).
+
+\paragraph{Contributions.}
+\begin{enumerate}
+% \item An exact \textbf{Walsh (functional-ANOVA) variance decomposition} of low-bit quantization damage
+%   on full $2^L$ lattices: 85--93\% of the variance is first-order, and the coordinate-free ordinal defect
+%   is at most 2\% (Section~\ref{sec:walsh}, Fig.~\ref{fig:walsh}).
+\item A \textit{closed-form theory}: the coverage model's exact M\"obius and Walsh spectra
+  (Theorems~3 and~4), corroborated by the confirmed divergence of the signed expansion
+  (Fig.~\ref{fig:mobius}); the certificate identity (\thmone) with an exact $O(L)$ heterogeneous form
+  (\propfive); and the ordinal characterization of additivity up to an increasing transformation
+  (\thmtwo)
+  (Sections~\ref{sec:walsh}--\ref{sec:theory}, App.~\ref{app:proofs}).
+\item A \textit{negative result with a closed-form account}: sensitivities measured in isolation,
+  including HAWQ-v2, mis-price a configuration's loss by 71--376\%, and the inflation factor
+  responsible is derived in closed form (Section~\ref{sec:anchor}).
+\item A \textit{fit-free estimator}: one Aumann--Shapley path integral recovers the additive model's
+  optimal coefficient at a layer-specific effective density, and its layer ranking exactly, proven
+  under the coverage model (Section~\ref{sec:predictor}, App.~\ref{app:as}).
+\item An \textit{interpretable predictor} that is best or tied against RF/GP/RBF/pairwise baselines at
+  small budgets, degrades at most $2\times$ under configuration extrapolation where the GP
+  degrades
+  $2$--$5\times$, and is validated on LLMs 0.6B--355B and a diffusion DiT
+  (Section~\ref{sec:predictor}, Fig.~\ref{fig:ood}).
+\item An \textit{allocator at matched memory} that attains the lowest KL among sensitivity-, rule-,
+  and surrogate-based allocators (17--21\% below the production ModelOpt baseline on Qwen3-30B,
+  13--27\% on Qwen3-235B, 20--37\% on GLM-4.6) and decides served task survival below four bits.
+\end{enumerate}
+
+% \paragraph{Scope.} The order-energy measurements and the predictor concern activation quantization at
+% FP4 / W4A4, the deployed regime. Weight-only quantization is near-additive, and KV-cache quantization more
+% so, so neither carries the structure studied here. The prediction results span LLMs from 0.6B to 355B
+% parameters and two diffusion DiTs, while the allocation results hold at matched memory in the
+% contended-budget regime, with their limits mapped in Section~\ref{sec:scope}.

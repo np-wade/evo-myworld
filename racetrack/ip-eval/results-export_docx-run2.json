@@ -1,0 +1,59 @@
+{
+  "mode": "S8 DOCX package validity vs OOXML required parts (gate: valid zip+parts)",
+  "n_entries": 4,
+  "candidates_unavailable": [],
+  "leaderboard": [
+    {
+      "candidate": "docxtpl-minimal",
+      "fails": 0,
+      "error": "",
+      "docx_valid": 1,
+      "has_footnotes": 0,
+      "has_styles": 1,
+      "latency_ms_p50": 264.3,
+      "latency_ms_p95": 368.5,
+      "deterministic": -1,
+      "gate": "PASS",
+      "score": 1.0
+    },
+    {
+      "candidate": "ip-incumbent",
+      "fails": 0,
+      "error": "",
+      "docx_valid": 1,
+      "has_footnotes": 1,
+      "has_styles": 1,
+      "latency_ms_p50": 50.3,
+      "latency_ms_p95": 52.8,
+      "deterministic": -1,
+      "gate": "PASS",
+      "score": 1.0
+    },
+    {
+      "candidate": "pandoc-docx",
+      "fails": 0,
+      "error": "",
+      "docx_valid": 1,
+      "has_footnotes": 1,
+      "has_styles": 1,
+      "latency_ms_p50": 231.9,
+      "latency_ms_p95": 232.8,
+      "deterministic": -1,
+      "gate": "PASS",
+      "score": 1.0
+    },
+    {
+      "candidate": "python-docx",
+      "fails": 0,
+      "error": "",
+      "docx_valid": 1,
+      "has_footnotes": 0,
+      "has_styles": 1,
+      "latency_ms_p50": 130.9,
+      "latency_ms_p95": 140.7,
+      "deterministic": -1,
+      "gate": "PASS",
+      "score": 1.0
+    }
+  ]
+}

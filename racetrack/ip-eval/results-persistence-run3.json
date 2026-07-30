@@ -1,0 +1,68 @@
+{
+  "mode": "P10: torn-read atomicity (gate), lost updates, corrupt-file recovery, write p50",
+  "n_entries": 4,
+  "candidates_unavailable": [],
+  "leaderboard": [
+    {
+      "candidate": "ip-incumbent",
+      "fails": 0,
+      "error": "",
+      "p50_write_ms": 1.17,
+      "torn_reads": 0,
+      "lost_updates": 0,
+      "concurrent_errors": 0,
+      "corrupt_behavior": "threw:SyntaxError",
+      "corrupt_score": 0.5,
+      "atomic_ok": 1,
+      "no_lost": 1,
+      "latency_ms_p50": 112.3,
+      "latency_ms_p95": 129.1,
+      "deterministic": 1,
+      "gate": "PASS",
+      "score": 0.85
+    },
+    {
+      "candidate": "sqlite-store",
+      "fails": 0,
+      "error": "",
+      "p50_write_ms": 0.074,
+      "torn_reads": 0,
+      "lost_updates": 0,
+      "concurrent_errors": 0,
+      "corrupt_behavior": "threw:DatabaseError",
+      "corrupt_score": 0.5,
+      "atomic_ok": 1,
+      "no_lost": 1,
+      "latency_ms_p50": 6.2,
+      "latency_ms_p95": 6.9,
+      "deterministic": 1,
+      "gate": "PASS",
+      "score": 0.85
+    },
+    {
+      "candidate": "naive-baseline",
+      "fails": 0,
+      "error": "",
+      "p50_write_ms": 0.022,
+      "torn_reads": 182,
+      "lost_updates": 19,
+      "concurrent_errors": 0,
+      "corrupt_behavior": "threw:JSONDecodeError",
+      "corrupt_score": 0.5,
+      "atomic_ok": 0,
+      "no_lost": 0,
+      "latency_ms_p50": 1.8,
+      "latency_ms_p95": 2.2,
+      "deterministic": 0,
+      "gate": "FAIL",
+      "score": 0.0
+    },
+    {
+      "candidate": "pouchdb-store",
+      "fails": 1,
+      "error": "RuntimeError: store probe failed: {'write_read': {'ok': False, 'error': 'pouch probe: oad (node:internal/modules/cjs/loader:255:19)\\n    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)\\n    at node:internal/main/run_main_module:33:47\\n\\nNode.js v24.18.0\\n'}, 'conc",
+      "gate": "FAIL",
+      "score": 0.0
+    }
+  ]
+}

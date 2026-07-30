@@ -1,0 +1,570 @@
+[
+  {
+    "race": "cross_app_contract",
+    "candidate": "versioned-jsonl",
+    "source": "projects/evo-myworld/plugins/evo/src/evo/runner_bridge.py",
+    "kind": "reference",
+    "score": 1.0,
+    "gate": true,
+    "metrics": {
+      "cases": 12,
+      "correct": 12,
+      "median_ms": 0.00459,
+      "roundtrip": true,
+      "foreign_metadata": true
+    },
+    "status": "scored",
+    "reason": ""
+  },
+  {
+    "race": "cross_app_contract",
+    "candidate": "claw-cip-profile",
+    "source": "filing-cabinet/library-base/repos/zeroclaw-labs_claw-standards/spec/cip-1.0-draft.md",
+    "kind": "technique-port",
+    "score": 1.0,
+    "gate": true,
+    "metrics": {
+      "cases": 12,
+      "correct": 12,
+      "median_ms": 0.004965,
+      "roundtrip": true,
+      "foreign_metadata": true
+    },
+    "status": "scored",
+    "reason": ""
+  },
+  {
+    "race": "cross_app_contract",
+    "candidate": "witt-brain-jsonrpc-service",
+    "source": "projects/witt-brain/src/interface/server.rs",
+    "kind": "pending",
+    "score": null,
+    "gate": null,
+    "metrics": {},
+    "status": "pending",
+    "reason": "Long-running service adapter through Witt Link; no CLI dependency"
+  },
+  {
+    "race": "cross_app_contract",
+    "candidate": "baml",
+    "source": "filing-cabinet/library-base/repos/BoundaryML_baml/code",
+    "kind": "pending",
+    "score": null,
+    "gate": null,
+    "metrics": {},
+    "status": "pending",
+    "reason": "Native BAML validator/generator adapter"
+  },
+  {
+    "race": "cross_app_contract",
+    "candidate": "apache-thrift",
+    "source": "filing-cabinet/library-base/repos/apache_thrift/code",
+    "kind": "pending",
+    "score": null,
+    "gate": null,
+    "metrics": {},
+    "status": "pending",
+    "reason": "IDL compiler and cross-language generated clients"
+  },
+  {
+    "race": "cross_app_contract",
+    "candidate": "apache-fory",
+    "source": "filing-cabinet/library-base/repos/apache_fory/code",
+    "kind": "pending",
+    "score": null,
+    "gate": null,
+    "metrics": {},
+    "status": "pending",
+    "reason": "Native codec adapters for the selected app languages"
+  },
+  {
+    "race": "agent_lifecycle",
+    "candidate": "evo-mission-dag",
+    "source": "projects/evo-myworld/plugins/evo/src/evo/missions.py",
+    "kind": "technique-port",
+    "score": 0.7142857142857143,
+    "gate": true,
+    "metrics": {
+      "passed": 5,
+      "total": 7,
+      "median_ms": 0.01221,
+      "idempotent_claim": true,
+      "exclusive_claim": true,
+      "dependency_unlock": true,
+      "restart_recovery": true,
+      "cancel_cascade": true,
+      "failure_propagation": false,
+      "pause_resume": false
+    },
+    "status": "scored",
+    "reason": ""
+  },
+  {
+    "race": "agent_lifecycle",
+    "candidate": "witt-spine-lanes",
+    "source": "projects/witt-spine/crates/spine-engine/src/lib.rs",
+    "kind": "technique-port",
+    "score": 0.7142857142857143,
+    "gate": true,
+    "metrics": {
+      "passed": 5,
+      "total": 7,
+      "median_ms": 0.013388,
+      "idempotent_claim": true,
+      "exclusive_claim": true,
+      "dependency_unlock": true,
+      "restart_recovery": true,
+      "cancel_cascade": false,
+      "failure_propagation": true,
+      "pause_resume": false
+    },
+    "status": "scored",
+    "reason": ""
+  },
+  {
+    "race": "agent_lifecycle",
+    "candidate": "pueue-queue",
+    "source": "filing-cabinet/library-base/repos/Nukesor_pueue/code",
+    "kind": "technique-port",
+    "score": 0.7142857142857143,
+    "gate": true,
+    "metrics": {
+      "passed": 5,
+      "total": 7,
+      "median_ms": 0.011639,
+      "idempotent_claim": true,
+      "exclusive_claim": true,
+      "dependency_unlock": true,
+      "restart_recovery": true,
+      "cancel_cascade": false,
+      "failure_propagation": false,
+      "pause_resume": true
+    },
+    "status": "scored",
+    "reason": ""
+  },
+  {
+    "race": "agent_lifecycle",
+    "candidate": "cowork-os",
+    "source": "filing-cabinet/library-base/repos/CoWork-OS_CoWork-OS/code",
+    "kind": "pending",
+    "score": null,
+    "gate": null,
+    "metrics": {},
+    "status": "pending",
+    "reason": "Task/session API adapter"
+  },
+  {
+    "race": "agent_lifecycle",
+    "candidate": "agent-control",
+    "source": "filing-cabinet/library-base/repos/agentcontrol_agent-control/code",
+    "kind": "pending",
+    "score": null,
+    "gate": null,
+    "metrics": {},
+    "status": "pending",
+    "reason": "Engine control-plane adapter"
+  },
+  {
+    "race": "agent_lifecycle",
+    "candidate": "crabfleet",
+    "source": "filing-cabinet/library-base/repos/zeroclaw-labs_crabfleet/code",
+    "kind": "pending",
+    "score": null,
+    "gate": null,
+    "metrics": {},
+    "status": "pending",
+    "reason": "Fleet session adapter"
+  },
+  {
+    "race": "identity_trace",
+    "candidate": "normalized-name-trace-id",
+    "source": "projects/assembly-office/server.js",
+    "kind": "reference",
+    "score": 1.0,
+    "gate": true,
+    "metrics": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "trace_join_rate": 1.0,
+      "median_ms": 0.029802
+    },
+    "status": "scored",
+    "reason": ""
+  },
+  {
+    "race": "identity_trace",
+    "candidate": "agent-trace-envelope",
+    "source": "filing-cabinet/library-base/repos/cursor_agent-trace/code/schemas.ts",
+    "kind": "technique-port",
+    "score": 1.0,
+    "gate": true,
+    "metrics": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "trace_join_rate": 1.0,
+      "median_ms": 0.030042
+    },
+    "status": "scored",
+    "reason": ""
+  },
+  {
+    "race": "identity_trace",
+    "candidate": "cosine-resolution",
+    "source": "projects/witt-spine/crates/spine-trunk/src/dedup.rs",
+    "kind": "technique-port",
+    "score": 1.0,
+    "gate": true,
+    "metrics": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "trace_join_rate": 1.0,
+      "median_ms": 0.058366
+    },
+    "status": "scored",
+    "reason": ""
+  },
+  {
+    "race": "identity_trace",
+    "candidate": "ontocast-aligner",
+    "source": "filing-cabinet/library-base/repos/growgraph_ontocast/code/ontocast/tool/agg/entity_aligner.py",
+    "kind": "pending",
+    "score": null,
+    "gate": null,
+    "metrics": {},
+    "status": "pending",
+    "reason": "Embedding model adapter"
+  },
+  {
+    "race": "identity_trace",
+    "candidate": "flyline",
+    "source": "filing-cabinet/library-base/repos/HalFrgrd_flyline/code",
+    "kind": "pending",
+    "score": null,
+    "gate": null,
+    "metrics": {},
+    "status": "pending",
+    "reason": "Trace-normalization adapter"
+  },
+  {
+    "race": "gateway_routing",
+    "candidate": "hardcoded-ports",
+    "source": "projects/witt-link-server/config.toml",
+    "kind": "reference",
+    "score": 0.42857142857142855,
+    "gate": false,
+    "metrics": {
+      "routes": 7,
+      "correct": 3,
+      "failover": "evo-dashboard",
+      "median_ms": 0.000102
+    },
+    "status": "scored",
+    "reason": ""
+  },
+  {
+    "race": "gateway_routing",
+    "candidate": "prefix-front-door",
+    "source": "filing-cabinet/library-base/repos/nginx_nginx/code",
+    "kind": "technique-port",
+    "score": 1.0,
+    "gate": false,
+    "metrics": {
+      "routes": 7,
+      "correct": 7,
+      "failover": "localai",
+      "median_ms": 0.00017
+    },
+    "status": "scored",
+    "reason": ""
+  },
+  {
+    "race": "gateway_routing",
+    "candidate": "health-registry-router",
+    "source": "projects/witt-link-server/src",
+    "kind": "technique-port",
+    "score": 1.0,
+    "gate": true,
+    "metrics": {
+      "routes": 7,
+      "correct": 7,
+      "failover": "witt-link",
+      "median_ms": 0.00019
+    },
+    "status": "scored",
+    "reason": ""
+  },
+  {
+    "race": "gateway_routing",
+    "candidate": "mitmproxy",
+    "source": "filing-cabinet/library-base/repos/mitmproxy_mitmproxy/code",
+    "kind": "pending",
+    "score": null,
+    "gate": null,
+    "metrics": {},
+    "status": "pending",
+    "reason": "Live programmable proxy adapter"
+  },
+  {
+    "race": "gateway_routing",
+    "candidate": "pingora",
+    "source": "filing-cabinet/library-base/repos/cloudflare_pingora/code",
+    "kind": "pending",
+    "score": null,
+    "gate": null,
+    "metrics": {},
+    "status": "pending",
+    "reason": "Compiled Rust proxy adapter"
+  },
+  {
+    "race": "hybrid_recall",
+    "candidate": "fts-only",
+    "source": "projects/evo-myworld/world/backend/evo_graph.py",
+    "kind": "reference",
+    "score": 0.6,
+    "gate": false,
+    "metrics": {
+      "recall_at_3": 0.6,
+      "keyword_gate": true,
+      "semantic_gate": true,
+      "median_ms_per_query": 0.042588
+    },
+    "status": "scored",
+    "reason": ""
+  },
+  {
+    "race": "hybrid_recall",
+    "candidate": "vector-only",
+    "source": "filing-cabinet/library-base/repos/facebookresearch_faiss/code",
+    "kind": "reference",
+    "score": 0.8,
+    "gate": false,
+    "metrics": {
+      "recall_at_3": 0.8,
+      "keyword_gate": false,
+      "semantic_gate": true,
+      "median_ms_per_query": 0.030762
+    },
+    "status": "scored",
+    "reason": ""
+  },
+  {
+    "race": "hybrid_recall",
+    "candidate": "rrf-hybrid",
+    "source": "projects/witt-spine/crates/spine-trunk/src/recall.rs",
+    "kind": "technique-port",
+    "score": 1.0,
+    "gate": true,
+    "metrics": {
+      "recall_at_3": 1.0,
+      "keyword_gate": true,
+      "semantic_gate": true,
+      "median_ms_per_query": 0.033341
+    },
+    "status": "scored",
+    "reason": ""
+  },
+  {
+    "race": "hybrid_recall",
+    "candidate": "qdrant-native",
+    "source": "filing-cabinet/library-base/repos/qdrant_qdrant/code",
+    "kind": "pending",
+    "score": null,
+    "gate": null,
+    "metrics": {},
+    "status": "pending",
+    "reason": "Qdrant daemon/client adapter"
+  },
+  {
+    "race": "hybrid_recall",
+    "candidate": "turso-native",
+    "source": "filing-cabinet/library-base/repos/tursodatabase_turso/code",
+    "kind": "pending",
+    "score": null,
+    "gate": null,
+    "metrics": {},
+    "status": "pending",
+    "reason": "Turso vector/FTS build and client adapter"
+  },
+  {
+    "race": "hybrid_recall",
+    "candidate": "tantivy",
+    "source": "filing-cabinet/library-base/repos/quickwit-oss_tantivy/code",
+    "kind": "pending",
+    "score": null,
+    "gate": null,
+    "metrics": {},
+    "status": "pending",
+    "reason": "Compiled keyword-arm adapter"
+  },
+  {
+    "race": "hybrid_recall",
+    "candidate": "meilisearch",
+    "source": "filing-cabinet/library-base/repos/meilisearch_meilisearch/code",
+    "kind": "pending",
+    "score": null,
+    "gate": null,
+    "metrics": {},
+    "status": "pending",
+    "reason": "Daemon image and client adapter"
+  },
+  {
+    "race": "graph_lineage",
+    "candidate": "memory-adjacency",
+    "source": "projects/graphify-app/src/search/db-graph.js",
+    "kind": "reference",
+    "score": 1.0,
+    "gate": true,
+    "metrics": {
+      "probes": 40,
+      "p50_batch_ms": 0.182724,
+      "exact": true
+    },
+    "status": "scored",
+    "reason": ""
+  },
+  {
+    "race": "graph_lineage",
+    "candidate": "sqlite-edges",
+    "source": "projects/graphify-app/src/search/db.js",
+    "kind": "reference",
+    "score": 1.0,
+    "gate": true,
+    "metrics": {
+      "probes": 40,
+      "p50_batch_ms": 3.60002,
+      "exact": true,
+      "integrity": true
+    },
+    "status": "scored",
+    "reason": ""
+  },
+  {
+    "race": "graph_lineage",
+    "candidate": "falkordb",
+    "source": "projects/graphify-app/data/falkor/dump.rdb",
+    "kind": "pending",
+    "score": null,
+    "gate": null,
+    "metrics": {},
+    "status": "pending",
+    "reason": "Isolated FalkorDB fixture loader and client adapter"
+  },
+  {
+    "race": "graph_lineage",
+    "candidate": "supermemory-graph",
+    "source": "filing-cabinet/library-base/repos/supermemoryai_supermemory/code/packages/memory-graph",
+    "kind": "pending",
+    "score": null,
+    "gate": null,
+    "metrics": {},
+    "status": "pending",
+    "reason": "Memory-graph query adapter"
+  },
+  {
+    "race": "graph_lineage",
+    "candidate": "hypermem",
+    "source": "filing-cabinet/library-base/repos/EverMind-AI_HyperMem/code/hypermem",
+    "kind": "pending",
+    "score": null,
+    "gate": null,
+    "metrics": {},
+    "status": "pending",
+    "reason": "Hypergraph ingestion/query adapter"
+  },
+  {
+    "race": "self_improvement",
+    "candidate": "argmax",
+    "source": "projects/evo-myworld/plugins/evo/src/evo/frontier_strategies.py",
+    "kind": "reference",
+    "score": 0.58,
+    "gate": false,
+    "metrics": {
+      "mean_best_heldout": 0.58,
+      "mean_arms_explored": 1,
+      "unsafe_promotions_blocked": 12,
+      "median_ms": 1.277135,
+      "weight_updates": false
+    },
+    "status": "scored",
+    "reason": ""
+  },
+  {
+    "race": "self_improvement",
+    "candidate": "evo-pareto",
+    "source": "projects/evo-myworld/plugins/evo/src/evo/frontier_strategies.py",
+    "kind": "technique-port",
+    "score": 0.72,
+    "gate": true,
+    "metrics": {
+      "mean_best_heldout": 0.72,
+      "mean_arms_explored": 3,
+      "unsafe_promotions_blocked": 21,
+      "median_ms": 1.55911,
+      "weight_updates": false
+    },
+    "status": "scored",
+    "reason": ""
+  },
+  {
+    "race": "self_improvement",
+    "candidate": "flywheel-ucb",
+    "source": "filing-cabinet/library-base/repos/Wassimyounes01_flywheel/code/docs/architecture.md",
+    "kind": "technique-port",
+    "score": 0.72,
+    "gate": true,
+    "metrics": {
+      "mean_best_heldout": 0.72,
+      "mean_arms_explored": 4,
+      "unsafe_promotions_blocked": 24,
+      "median_ms": 1.273463,
+      "weight_updates": false
+    },
+    "status": "scored",
+    "reason": ""
+  },
+  {
+    "race": "self_improvement",
+    "candidate": "evoagentbench",
+    "source": "filing-cabinet/library-base/repos/EverMind-AI_EvoAgentBench/code",
+    "kind": "pending",
+    "score": null,
+    "gate": null,
+    "metrics": {},
+    "status": "pending",
+    "reason": "Dataset/evaluator adapter and local task subset"
+  },
+  {
+    "race": "self_improvement",
+    "candidate": "rd-agent",
+    "source": "filing-cabinet/library-base/repos/microsoft_RD-Agent/code",
+    "kind": "pending",
+    "score": null,
+    "gate": null,
+    "metrics": {},
+    "status": "pending",
+    "reason": "Experiment-generation adapter"
+  },
+  {
+    "race": "self_improvement",
+    "candidate": "opik-optimizer",
+    "source": "filing-cabinet/library-base/repos/comet-ml_opik/code",
+    "kind": "pending",
+    "score": null,
+    "gate": null,
+    "metrics": {},
+    "status": "pending",
+    "reason": "Judge/optimizer adapter"
+  },
+  {
+    "race": "self_improvement",
+    "candidate": "prompt-engineer",
+    "source": "filing-cabinet/library-base/repos/Wassimyounes01_prompt-engineer/code",
+    "kind": "pending",
+    "score": null,
+    "gate": null,
+    "metrics": {},
+    "status": "pending",
+    "reason": "Prompt mutation adapter"
+  }
+]

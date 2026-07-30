@@ -49,6 +49,11 @@ all = [
 mcp = [
     "mcp>=1.0.0",
 ]
+# `evo tune` uses Optuna's TPE sampler when present; without it, tuning falls
+# back to a built-in random search, so this stays optional.
+tune = [
+    "optuna>=3.6.0",
+]
 
 [project.urls]
 Homepage = "https://github.com/evo-hq/evo"
@@ -59,6 +64,7 @@ Issues = "https://github.com/evo-hq/evo/issues"
 evo = "evo.cli:main"
 evo-dashboard = "evo.dashboard:main"
 evo-drain = "evo.inject.drain:main"
+evo-artifact = "evo.artifacts:main"
 
 [project.entry-points."hermes_agent.plugins"]
 evo = "evo.hermes_plugin"

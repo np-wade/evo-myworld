@@ -1,0 +1,68 @@
+{
+  "mode": "S2 section splitting vs gold headings (gate: mean_f1>=0.3)",
+  "n_entries": 4,
+  "candidates_unavailable": [
+    {
+      "candidate": "ontocast-chunker",
+      "reason": "ontocast chunker not importable standalone: module load drags hdbscan/umap-learn/scikit-learn/langchain_core + rdflib, and its semantic mode needs sentence-transformers model weights (no model downloads allowed); naive path not reachable standalone"
+    },
+    {
+      "candidate": "opennlp-split",
+      "reason": "opennlp is a Java/Maven project; no java on this box"
+    },
+    {
+      "candidate": "undoc-headings",
+      "reason": "undoc shim binary not built (/home/npwad/coding/docker-envs/projects/evo-myworld/racetrack/ip-eval/.venv-candidates/undoc/bin/undoc-extract); pack rule is reuse-only (no rebuild), and split() receives text, not a docx file the binary could parse"
+    }
+  ],
+  "leaderboard": [
+    {
+      "candidate": "ip-incumbent",
+      "fails": 0,
+      "error": "",
+      "mean_f1": 0.7778,
+      "gamma_f1": 0.3333,
+      "latency_ms_p50": 88.7,
+      "latency_ms_p95": 279.5,
+      "deterministic": 1,
+      "gate": "PASS",
+      "score": 0.7778
+    },
+    {
+      "candidate": "naive-baseline",
+      "fails": 0,
+      "error": "",
+      "mean_f1": 0.6275,
+      "gamma_f1": 0.0,
+      "latency_ms_p50": 0.0,
+      "latency_ms_p95": 0.4,
+      "deterministic": 1,
+      "gate": "PASS",
+      "score": 0.6275
+    },
+    {
+      "candidate": "haystack-splitter",
+      "fails": 0,
+      "error": "",
+      "mean_f1": 0.0,
+      "gamma_f1": 0.0,
+      "latency_ms_p50": 1023.2,
+      "latency_ms_p95": 3371.7,
+      "deterministic": 1,
+      "gate": "FAIL",
+      "score": 0.0
+    },
+    {
+      "candidate": "paperspine-split",
+      "fails": 0,
+      "error": "",
+      "mean_f1": 0.0,
+      "gamma_f1": 0.0,
+      "latency_ms_p50": 0.4,
+      "latency_ms_p95": 1.3,
+      "deterministic": 1,
+      "gate": "FAIL",
+      "score": 0.0
+    }
+  ]
+}

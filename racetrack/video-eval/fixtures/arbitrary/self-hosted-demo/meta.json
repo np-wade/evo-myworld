@@ -1,0 +1,9 @@
+{
+  "source": "arbitrary",
+  "vid": "self-hosted-demo",
+  "url": "file:///home/npwad/coding/docker-envs/projects/evo-myworld/racetrack/video-eval/fixtures/arbitrary/self-hosted-demo/page.html",
+  "has_gold": true,
+  "audio_file": "audio.wav",
+  "duration_s": 120.0,
+  "note": "self-authored page; media+transcript from youtube/UF8uR6Z6KLc"
+}

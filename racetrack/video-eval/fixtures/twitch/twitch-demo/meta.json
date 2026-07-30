@@ -1,0 +1,9 @@
+{
+  "source": "twitch",
+  "vid": "twitch-demo",
+  "url": "https://www.twitch.tv/videos/2829622205",
+  "has_gold": false,
+  "audio_file": "audio.wav",
+  "duration_s": 120.0,
+  "note": "no-gold ASR-only fixture; audio borrowed from youtube/UF8uR6Z6KLc to exercise consistency scoring OFFLINE. Live Twitch VOD not frozen."
+}
